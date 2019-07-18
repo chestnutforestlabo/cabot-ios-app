@@ -1,0 +1,11 @@
+xcuserdata
+Pods/
+.DS_Store
+build
+NavCog3.xcworkspace
+Podfile.lock
+/.project
+/.settings/
+Carthage/
+lastcommit.txt
+project.xcworkspace/

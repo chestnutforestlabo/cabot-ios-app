@@ -1,0 +1,804 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2EA29375279802F2C659809A /* libPods-CaBot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 56BE4BD043FAE871B580CD67 /* libPods-CaBot.a */; };
+		7E29F00D228B548100CA7DD6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00C228B548100CA7DD6 /* AppDelegate.swift */; };
+		7E29F00F228B548100CA7DD6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00E228B548100CA7DD6 /* ViewController.swift */; };
+		7E29F012228B548100CA7DD6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F010228B548100CA7DD6 /* Main.storyboard */; };
+		7E29F014228B548200CA7DD6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F013228B548200CA7DD6 /* Assets.xcassets */; };
+		7E29F017228B548200CA7DD6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F015228B548200CA7DD6 /* LaunchScreen.storyboard */; };
+		7E29F022228B548200CA7DD6 /* CaBotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F021228B548200CA7DD6 /* CaBotTests.swift */; };
+		7E29F02D228B548200CA7DD6 /* CaBotUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F02C228B548200CA7DD6 /* CaBotUITests.swift */; };
+		7E29F063228B55C000CA7DD6 /* HLPSetting.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F04E228B55C000CA7DD6 /* HLPSetting.m */; };
+		7E29F064228B55C000CA7DD6 /* HLPSettingView.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F04F228B55C000CA7DD6 /* HLPSettingView.strings */; };
+		7E29F065228B55C000CA7DD6 /* HLPSettingViewSwitchCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F052228B55C000CA7DD6 /* HLPSettingViewSwitchCell.xib */; };
+		7E29F066228B55C000CA7DD6 /* HLPSettingViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F055228B55C000CA7DD6 /* HLPSettingViewCell.m */; };
+		7E29F067228B55C000CA7DD6 /* HLPSettingHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F057228B55C000CA7DD6 /* HLPSettingHelper.m */; };
+		7E29F068228B55C000CA7DD6 /* HLPSettingViewTextCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F059228B55C000CA7DD6 /* HLPSettingViewTextCell.xib */; };
+		7E29F069228B55C000CA7DD6 /* HLPSettingViewPickerCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F05B228B55C000CA7DD6 /* HLPSettingViewPickerCell.xib */; };
+		7E29F06A228B55C000CA7DD6 /* HLPSettingViewSliderCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F05D228B55C000CA7DD6 /* HLPSettingViewSliderCell.xib */; };
+		7E29F06B228B55C000CA7DD6 /* HLPSettingTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F05E228B55C000CA7DD6 /* HLPSettingTableView.m */; };
+		7E29F06C228B55C000CA7DD6 /* HLPSettingViewSubtitleCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F05F228B55C000CA7DD6 /* HLPSettingViewSubtitleCell.xib */; };
+		7E29F06D228B55C000CA7DD6 /* NavDeviceTTS.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F062228B55C000CA7DD6 /* NavDeviceTTS.m */; };
+		7E29F071228B55FC00CA7DD6 /* destinations.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F06E228B55FC00CA7DD6 /* destinations.yaml */; };
+		7E29F072228B55FC00CA7DD6 /* CaBotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F070228B55FC00CA7DD6 /* CaBotService.swift */; };
+		7E29F075228B5B5B00CA7DD6 /* Yams.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E29F074228B5B5B00CA7DD6 /* Yams.framework */; };
+		7E29F078228CB2EA00CA7DD6 /* HLPLocationManager.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E29F077228CB2EA00CA7DD6 /* HLPLocationManager.framework */; };
+		7EF5F1EA228DB07100788987 /* NavUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EF5F1E8228DB07100788987 /* NavUtil.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		7E29F01E228B548200CA7DD6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7E29F001228B548100CA7DD6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7E29F008228B548100CA7DD6;
+			remoteInfo = CaBot;
+		};
+		7E29F029228B548200CA7DD6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7E29F001228B548100CA7DD6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7E29F008228B548100CA7DD6;
+			remoteInfo = CaBot;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		35ECB82D33B1989C1B8B8CC7 /* Pods-CaBot.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CaBot.release.xcconfig"; path = "Pods/Target Support Files/Pods-CaBot/Pods-CaBot.release.xcconfig"; sourceTree = "<group>"; };
+		56BE4BD043FAE871B580CD67 /* libPods-CaBot.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CaBot.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7E29F009228B548100CA7DD6 /* CaBot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CaBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7E29F00C228B548100CA7DD6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		7E29F00E228B548100CA7DD6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		7E29F011228B548100CA7DD6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		7E29F013228B548200CA7DD6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		7E29F016228B548200CA7DD6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		7E29F018228B548200CA7DD6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7E29F01D228B548200CA7DD6 /* CaBotTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CaBotTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7E29F021228B548200CA7DD6 /* CaBotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaBotTests.swift; sourceTree = "<group>"; };
+		7E29F023228B548200CA7DD6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7E29F028228B548200CA7DD6 /* CaBotUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CaBotUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7E29F02C228B548200CA7DD6 /* CaBotUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaBotUITests.swift; sourceTree = "<group>"; };
+		7E29F02E228B548200CA7DD6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7E29F04C228B55C000CA7DD6 /* NavDeviceTTS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NavDeviceTTS.h; sourceTree = "<group>"; };
+		7E29F04E228B55C000CA7DD6 /* HLPSetting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HLPSetting.m; sourceTree = "<group>"; };
+		7E29F050228B55C000CA7DD6 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/HLPSettingView.strings"; sourceTree = "<group>"; };
+		7E29F051228B55C000CA7DD6 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/HLPSettingView.strings; sourceTree = "<group>"; };
+		7E29F052228B55C000CA7DD6 /* HLPSettingViewSwitchCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HLPSettingViewSwitchCell.xib; sourceTree = "<group>"; };
+		7E29F053228B55C000CA7DD6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/HLPSettingView.strings; sourceTree = "<group>"; };
+		7E29F054228B55C000CA7DD6 /* HLPSettingTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HLPSettingTableView.h; sourceTree = "<group>"; };
+		7E29F055228B55C000CA7DD6 /* HLPSettingViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HLPSettingViewCell.m; sourceTree = "<group>"; };
+		7E29F056228B55C000CA7DD6 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/HLPSettingView.strings; sourceTree = "<group>"; };
+		7E29F057228B55C000CA7DD6 /* HLPSettingHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HLPSettingHelper.m; sourceTree = "<group>"; };
+		7E29F058228B55C000CA7DD6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/HLPSettingView.strings; sourceTree = "<group>"; };
+		7E29F059228B55C000CA7DD6 /* HLPSettingViewTextCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HLPSettingViewTextCell.xib; sourceTree = "<group>"; };
+		7E29F05A228B55C000CA7DD6 /* HLPSetting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HLPSetting.h; sourceTree = "<group>"; };
+		7E29F05B228B55C000CA7DD6 /* HLPSettingViewPickerCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HLPSettingViewPickerCell.xib; sourceTree = "<group>"; };
+		7E29F05C228B55C000CA7DD6 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/HLPSettingView.strings"; sourceTree = "<group>"; };
+		7E29F05D228B55C000CA7DD6 /* HLPSettingViewSliderCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HLPSettingViewSliderCell.xib; sourceTree = "<group>"; };
+		7E29F05E228B55C000CA7DD6 /* HLPSettingTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HLPSettingTableView.m; sourceTree = "<group>"; };
+		7E29F05F228B55C000CA7DD6 /* HLPSettingViewSubtitleCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HLPSettingViewSubtitleCell.xib; sourceTree = "<group>"; };
+		7E29F060228B55C000CA7DD6 /* HLPSettingHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HLPSettingHelper.h; sourceTree = "<group>"; };
+		7E29F061228B55C000CA7DD6 /* HLPSettingViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HLPSettingViewCell.h; sourceTree = "<group>"; };
+		7E29F062228B55C000CA7DD6 /* NavDeviceTTS.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NavDeviceTTS.m; sourceTree = "<group>"; };
+		7E29F06E228B55FC00CA7DD6 /* destinations.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = destinations.yaml; sourceTree = "<group>"; };
+		7E29F06F228B55FC00CA7DD6 /* bridging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bridging.h; sourceTree = "<group>"; };
+		7E29F070228B55FC00CA7DD6 /* CaBotService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaBotService.swift; sourceTree = "<group>"; };
+		7E29F074228B5B5B00CA7DD6 /* Yams.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Yams.framework; path = Carthage/Build/iOS/Yams.framework; sourceTree = "<group>"; };
+		7E29F077228CB2EA00CA7DD6 /* HLPLocationManager.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HLPLocationManager.framework; path = Carthage/Build/iOS/HLPLocationManager.framework; sourceTree = "<group>"; };
+		7EF5F1E8228DB07100788987 /* NavUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NavUtil.m; sourceTree = "<group>"; };
+		7EF5F1E9228DB07100788987 /* NavUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NavUtil.h; sourceTree = "<group>"; };
+		B903843AD4ECBA9B22E1A569 /* Pods-CaBot.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CaBot.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CaBot/Pods-CaBot.debug.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7E29F006228B548100CA7DD6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7E29F078228CB2EA00CA7DD6 /* HLPLocationManager.framework in Frameworks */,
+				7E29F075228B5B5B00CA7DD6 /* Yams.framework in Frameworks */,
+				2EA29375279802F2C659809A /* libPods-CaBot.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7E29F01A228B548200CA7DD6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7E29F025228B548200CA7DD6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		34934AE706D8EADF308BC169 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				B903843AD4ECBA9B22E1A569 /* Pods-CaBot.debug.xcconfig */,
+				35ECB82D33B1989C1B8B8CC7 /* Pods-CaBot.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		7E29F000228B548100CA7DD6 = {
+			isa = PBXGroup;
+			children = (
+				7E29F04B228B55C000CA7DD6 /* FromNavCog */,
+				7E29F00B228B548100CA7DD6 /* CaBot */,
+				7E29F020228B548200CA7DD6 /* CaBotTests */,
+				7E29F02B228B548200CA7DD6 /* CaBotUITests */,
+				7E29F00A228B548100CA7DD6 /* Products */,
+				7E29F073228B5B5A00CA7DD6 /* Frameworks */,
+				34934AE706D8EADF308BC169 /* Pods */,
+			);
+			sourceTree = "<group>";
+		};
+		7E29F00A228B548100CA7DD6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7E29F009228B548100CA7DD6 /* CaBot.app */,
+				7E29F01D228B548200CA7DD6 /* CaBotTests.xctest */,
+				7E29F028228B548200CA7DD6 /* CaBotUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7E29F00B228B548100CA7DD6 /* CaBot */ = {
+			isa = PBXGroup;
+			children = (
+				7E29F00C228B548100CA7DD6 /* AppDelegate.swift */,
+				7E29F00E228B548100CA7DD6 /* ViewController.swift */,
+				7E29F070228B55FC00CA7DD6 /* CaBotService.swift */,
+				7E29F06F228B55FC00CA7DD6 /* bridging.h */,
+				7E29F06E228B55FC00CA7DD6 /* destinations.yaml */,
+				7E29F010228B548100CA7DD6 /* Main.storyboard */,
+				7E29F013228B548200CA7DD6 /* Assets.xcassets */,
+				7E29F015228B548200CA7DD6 /* LaunchScreen.storyboard */,
+				7E29F018228B548200CA7DD6 /* Info.plist */,
+			);
+			path = CaBot;
+			sourceTree = "<group>";
+		};
+		7E29F020228B548200CA7DD6 /* CaBotTests */ = {
+			isa = PBXGroup;
+			children = (
+				7E29F021228B548200CA7DD6 /* CaBotTests.swift */,
+				7E29F023228B548200CA7DD6 /* Info.plist */,
+			);
+			path = CaBotTests;
+			sourceTree = "<group>";
+		};
+		7E29F02B228B548200CA7DD6 /* CaBotUITests */ = {
+			isa = PBXGroup;
+			children = (
+				7E29F02C228B548200CA7DD6 /* CaBotUITests.swift */,
+				7E29F02E228B548200CA7DD6 /* Info.plist */,
+			);
+			path = CaBotUITests;
+			sourceTree = "<group>";
+		};
+		7E29F04B228B55C000CA7DD6 /* FromNavCog */ = {
+			isa = PBXGroup;
+			children = (
+				7E29F04D228B55C000CA7DD6 /* SettingUtil */,
+				7E29F04C228B55C000CA7DD6 /* NavDeviceTTS.h */,
+				7E29F062228B55C000CA7DD6 /* NavDeviceTTS.m */,
+				7EF5F1E9228DB07100788987 /* NavUtil.h */,
+				7EF5F1E8228DB07100788987 /* NavUtil.m */,
+			);
+			path = FromNavCog;
+			sourceTree = "<group>";
+		};
+		7E29F04D228B55C000CA7DD6 /* SettingUtil */ = {
+			isa = PBXGroup;
+			children = (
+				7E29F04E228B55C000CA7DD6 /* HLPSetting.m */,
+				7E29F04F228B55C000CA7DD6 /* HLPSettingView.strings */,
+				7E29F052228B55C000CA7DD6 /* HLPSettingViewSwitchCell.xib */,
+				7E29F054228B55C000CA7DD6 /* HLPSettingTableView.h */,
+				7E29F055228B55C000CA7DD6 /* HLPSettingViewCell.m */,
+				7E29F057228B55C000CA7DD6 /* HLPSettingHelper.m */,
+				7E29F059228B55C000CA7DD6 /* HLPSettingViewTextCell.xib */,
+				7E29F05A228B55C000CA7DD6 /* HLPSetting.h */,
+				7E29F05B228B55C000CA7DD6 /* HLPSettingViewPickerCell.xib */,
+				7E29F05D228B55C000CA7DD6 /* HLPSettingViewSliderCell.xib */,
+				7E29F05E228B55C000CA7DD6 /* HLPSettingTableView.m */,
+				7E29F05F228B55C000CA7DD6 /* HLPSettingViewSubtitleCell.xib */,
+				7E29F060228B55C000CA7DD6 /* HLPSettingHelper.h */,
+				7E29F061228B55C000CA7DD6 /* HLPSettingViewCell.h */,
+			);
+			path = SettingUtil;
+			sourceTree = "<group>";
+		};
+		7E29F073228B5B5A00CA7DD6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7E29F077228CB2EA00CA7DD6 /* HLPLocationManager.framework */,
+				7E29F074228B5B5B00CA7DD6 /* Yams.framework */,
+				56BE4BD043FAE871B580CD67 /* libPods-CaBot.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		7E29F008228B548100CA7DD6 /* CaBot */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7E29F031228B548200CA7DD6 /* Build configuration list for PBXNativeTarget "CaBot" */;
+			buildPhases = (
+				344AFD22189AB0DD2AE2C797 /* [CP] Check Pods Manifest.lock */,
+				7E29F005228B548100CA7DD6 /* Sources */,
+				7E29F006228B548100CA7DD6 /* Frameworks */,
+				7E29F007228B548100CA7DD6 /* Resources */,
+				7E29F076228B5B8900CA7DD6 /* ShellScript */,
+				50E93E96BF6CB2BF6BCE6CFC /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CaBot;
+			productName = CaBot;
+			productReference = 7E29F009228B548100CA7DD6 /* CaBot.app */;
+			productType = "com.apple.product-type.application";
+		};
+		7E29F01C228B548200CA7DD6 /* CaBotTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7E29F034228B548200CA7DD6 /* Build configuration list for PBXNativeTarget "CaBotTests" */;
+			buildPhases = (
+				7E29F019228B548200CA7DD6 /* Sources */,
+				7E29F01A228B548200CA7DD6 /* Frameworks */,
+				7E29F01B228B548200CA7DD6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7E29F01F228B548200CA7DD6 /* PBXTargetDependency */,
+			);
+			name = CaBotTests;
+			productName = CaBotTests;
+			productReference = 7E29F01D228B548200CA7DD6 /* CaBotTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		7E29F027228B548200CA7DD6 /* CaBotUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7E29F037228B548200CA7DD6 /* Build configuration list for PBXNativeTarget "CaBotUITests" */;
+			buildPhases = (
+				7E29F024228B548200CA7DD6 /* Sources */,
+				7E29F025228B548200CA7DD6 /* Frameworks */,
+				7E29F026228B548200CA7DD6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7E29F02A228B548200CA7DD6 /* PBXTargetDependency */,
+			);
+			name = CaBotUITests;
+			productName = CaBotUITests;
+			productReference = 7E29F028228B548200CA7DD6 /* CaBotUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7E29F001228B548100CA7DD6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1020;
+				LastUpgradeCheck = 1020;
+				ORGANIZATIONNAME = CMU;
+				TargetAttributes = {
+					7E29F008228B548100CA7DD6 = {
+						CreatedOnToolsVersion = 10.2.1;
+					};
+					7E29F01C228B548200CA7DD6 = {
+						CreatedOnToolsVersion = 10.2.1;
+						TestTargetID = 7E29F008228B548100CA7DD6;
+					};
+					7E29F027228B548200CA7DD6 = {
+						CreatedOnToolsVersion = 10.2.1;
+						TestTargetID = 7E29F008228B548100CA7DD6;
+					};
+				};
+			};
+			buildConfigurationList = 7E29F004228B548100CA7DD6 /* Build configuration list for PBXProject "CaBot" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				"zh-Hans",
+				ja,
+				ko,
+				"en-US",
+			);
+			mainGroup = 7E29F000228B548100CA7DD6;
+			productRefGroup = 7E29F00A228B548100CA7DD6 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				7E29F008228B548100CA7DD6 /* CaBot */,
+				7E29F01C228B548200CA7DD6 /* CaBotTests */,
+				7E29F027228B548200CA7DD6 /* CaBotUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		7E29F007228B548100CA7DD6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7E29F06C228B55C000CA7DD6 /* HLPSettingViewSubtitleCell.xib in Resources */,
+				7E29F017228B548200CA7DD6 /* LaunchScreen.storyboard in Resources */,
+				7E29F014228B548200CA7DD6 /* Assets.xcassets in Resources */,
+				7E29F012228B548100CA7DD6 /* Main.storyboard in Resources */,
+				7E29F065228B55C000CA7DD6 /* HLPSettingViewSwitchCell.xib in Resources */,
+				7E29F071228B55FC00CA7DD6 /* destinations.yaml in Resources */,
+				7E29F069228B55C000CA7DD6 /* HLPSettingViewPickerCell.xib in Resources */,
+				7E29F06A228B55C000CA7DD6 /* HLPSettingViewSliderCell.xib in Resources */,
+				7E29F064228B55C000CA7DD6 /* HLPSettingView.strings in Resources */,
+				7E29F068228B55C000CA7DD6 /* HLPSettingViewTextCell.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7E29F01B228B548200CA7DD6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7E29F026228B548200CA7DD6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		344AFD22189AB0DD2AE2C797 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CaBot-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		50E93E96BF6CB2BF6BCE6CFC /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-CaBot/Pods-CaBot-frameworks.sh",
+				"${PODS_ROOT}/OpenCV-Dynamic/opencv2.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/opencv2.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CaBot/Pods-CaBot-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		7E29F076228B5B8900CA7DD6 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/iOS/Yams.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/HLPLocationManager.framework",
+			);
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/Yams.framework",
+				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/HLPLocationManager.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/usr/local/bin/carthage copy-frameworks\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		7E29F005228B548100CA7DD6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7E29F066228B55C000CA7DD6 /* HLPSettingViewCell.m in Sources */,
+				7E29F067228B55C000CA7DD6 /* HLPSettingHelper.m in Sources */,
+				7E29F06D228B55C000CA7DD6 /* NavDeviceTTS.m in Sources */,
+				7E29F00F228B548100CA7DD6 /* ViewController.swift in Sources */,
+				7E29F00D228B548100CA7DD6 /* AppDelegate.swift in Sources */,
+				7EF5F1EA228DB07100788987 /* NavUtil.m in Sources */,
+				7E29F063228B55C000CA7DD6 /* HLPSetting.m in Sources */,
+				7E29F06B228B55C000CA7DD6 /* HLPSettingTableView.m in Sources */,
+				7E29F072228B55FC00CA7DD6 /* CaBotService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7E29F019228B548200CA7DD6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7E29F022228B548200CA7DD6 /* CaBotTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7E29F024228B548200CA7DD6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7E29F02D228B548200CA7DD6 /* CaBotUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		7E29F01F228B548200CA7DD6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7E29F008228B548100CA7DD6 /* CaBot */;
+			targetProxy = 7E29F01E228B548200CA7DD6 /* PBXContainerItemProxy */;
+		};
+		7E29F02A228B548200CA7DD6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7E29F008228B548100CA7DD6 /* CaBot */;
+			targetProxy = 7E29F029228B548200CA7DD6 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		7E29F010228B548100CA7DD6 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7E29F011228B548100CA7DD6 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		7E29F015228B548200CA7DD6 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7E29F016228B548200CA7DD6 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		7E29F04F228B55C000CA7DD6 /* HLPSettingView.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7E29F050228B55C000CA7DD6 /* zh-Hans */,
+				7E29F051228B55C000CA7DD6 /* ja */,
+				7E29F053228B55C000CA7DD6 /* en */,
+				7E29F056228B55C000CA7DD6 /* ko */,
+				7E29F058228B55C000CA7DD6 /* Base */,
+				7E29F05C228B55C000CA7DD6 /* en-US */,
+			);
+			name = HLPSettingView.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		7E29F02F228B548200CA7DD6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		7E29F030228B548200CA7DD6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		7E29F032228B548200CA7DD6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = B903843AD4ECBA9B22E1A569 /* Pods-CaBot.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = B98QB5W4Z4;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
+				INFOPLIST_FILE = CaBot/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = CMU.CaBotRemote.CaBot;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = CaBot/bridging.h;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		7E29F033228B548200CA7DD6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 35ECB82D33B1989C1B8B8CC7 /* Pods-CaBot.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = B98QB5W4Z4;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
+				INFOPLIST_FILE = CaBot/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = CMU.CaBotRemote.CaBot;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = CaBot/bridging.h;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		7E29F035228B548200CA7DD6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = B98QB5W4Z4;
+				INFOPLIST_FILE = CaBotTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = CMU.CaBotRemote.CaBotTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CaBot.app/CaBot";
+			};
+			name = Debug;
+		};
+		7E29F036228B548200CA7DD6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = B98QB5W4Z4;
+				INFOPLIST_FILE = CaBotTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = CMU.CaBotRemote.CaBotTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CaBot.app/CaBot";
+			};
+			name = Release;
+		};
+		7E29F038228B548200CA7DD6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = B98QB5W4Z4;
+				INFOPLIST_FILE = CaBotUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = CMU.CaBotRemote.CaBotUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = CaBot;
+			};
+			name = Debug;
+		};
+		7E29F039228B548200CA7DD6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = B98QB5W4Z4;
+				INFOPLIST_FILE = CaBotUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = CMU.CaBotRemote.CaBotUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = CaBot;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		7E29F004228B548100CA7DD6 /* Build configuration list for PBXProject "CaBot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7E29F02F228B548200CA7DD6 /* Debug */,
+				7E29F030228B548200CA7DD6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7E29F031228B548200CA7DD6 /* Build configuration list for PBXNativeTarget "CaBot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7E29F032228B548200CA7DD6 /* Debug */,
+				7E29F033228B548200CA7DD6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7E29F034228B548200CA7DD6 /* Build configuration list for PBXNativeTarget "CaBotTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7E29F035228B548200CA7DD6 /* Debug */,
+				7E29F036228B548200CA7DD6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7E29F037228B548200CA7DD6 /* Build configuration list for PBXNativeTarget "CaBotUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7E29F038228B548200CA7DD6 /* Debug */,
+				7E29F039228B548200CA7DD6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 7E29F001228B548100CA7DD6 /* Project object */;
+}
