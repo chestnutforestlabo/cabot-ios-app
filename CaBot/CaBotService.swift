@@ -56,7 +56,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     internal func startHeartBeat() {
         Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { (timer) in
             DispatchQueue.main.async {
-                //print("heartbeat")
+                print("heartbeat")
                 if (!self.hearbeatChar.notify(value: "1")) {
                     self.delegate?.caBot(service: self, centralConnected: false)
                 } else {
@@ -67,6 +67,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     }
     
     public func send(destination: String) -> Bool {
+        print("destination \(destination)")
         return (self.destinationChar.notify(value: destination))
     }
     

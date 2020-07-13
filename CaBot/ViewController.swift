@@ -62,40 +62,27 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
         if setting.name.hasPrefix("EDITOR_") {
             if let destination = setting.name {
                 
-                NavUtil.showModalWaiting(withMessage: "waiting")
-                DispatchQueue.main.asyncAfter(deadline: .now()+1) {
-                    guard let tts = NavDeviceTTS.shared() else {
-                        return
-                    }
-                    
-                    tts.speak("Start navigation to \(setting.label!)", withOptions: ["force":true]){
-                        DispatchQueue.main.asyncAfter(deadline: .now()+1.5) {
+                DispatchQueue.main.async {
+                    NavUtil.showModalWaiting(withMessage: "waiting")
+                    if ViewController.service.send(destination: destination) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                            self.navigationController?.popViewController(animated: true)
                             NavUtil.hideModalWaiting()
-                            if ViewController.service.send(destination: destination) {
-                                self.navigationController?.popViewController(animated: true)
-                            } else {
-                                let alertController = UIAlertController(title: "Error", message: "CaBot may not be connected", preferredStyle: .alert)
-                                let ok = UIAlertAction(title: "Okay", style: .default) { (action:UIAlertAction) in
-                                    alertController.dismiss(animated: true, completion: {
-                                    })
-                                }
-                                alertController.addAction(ok)
-                                self.present(alertController, animated: true, completion: nil)
-                            }
                         }
+                    } else {
+                        let alertController = UIAlertController(title: "Error", message: "CaBot may not be connected", preferredStyle: .alert)
+                        let ok = UIAlertAction(title: "Okay", style: .default) { (action:UIAlertAction) in
+                            alertController.dismiss(animated: true, completion: {
+                            })
+                        }
+                        alertController.addAction(ok)
+                        self.present(alertController, animated: true, completion: nil)
                     }
                 }
             }
         } else if setting.name == "cancel_navigation" {
             NavUtil.showModalWaiting(withMessage: "waiting")
             DispatchQueue.main.async {
-                guard let tts = NavDeviceTTS.shared() else {
-                    return
-                }
-                
-                tts.speak("Cancel navigation", withOptions: ["force":true]){
-                }
-                
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                     NavUtil.hideModalWaiting()
                 }
