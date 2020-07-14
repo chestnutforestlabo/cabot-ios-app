@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2EA29375279802F2C659809A /* libPods-CaBot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 56BE4BD043FAE871B580CD67 /* libPods-CaBot.a */; };
 		7E29F00D228B548100CA7DD6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00C228B548100CA7DD6 /* AppDelegate.swift */; };
 		7E29F00F228B548100CA7DD6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00E228B548100CA7DD6 /* ViewController.swift */; };
 		7E29F012228B548100CA7DD6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F010228B548100CA7DD6 /* Main.storyboard */; };
@@ -29,7 +28,6 @@
 		7E29F071228B55FC00CA7DD6 /* destinations.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F06E228B55FC00CA7DD6 /* destinations.yaml */; };
 		7E29F072228B55FC00CA7DD6 /* CaBotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F070228B55FC00CA7DD6 /* CaBotService.swift */; };
 		7E29F075228B5B5B00CA7DD6 /* Yams.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E29F074228B5B5B00CA7DD6 /* Yams.framework */; };
-		7E29F078228CB2EA00CA7DD6 /* HLPLocationManager.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E29F077228CB2EA00CA7DD6 /* HLPLocationManager.framework */; };
 		7EF5F1EA228DB07100788987 /* NavUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EF5F1E8228DB07100788987 /* NavUtil.m */; };
 /* End PBXBuildFile section */
 
@@ -51,8 +49,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		35ECB82D33B1989C1B8B8CC7 /* Pods-CaBot.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CaBot.release.xcconfig"; path = "Pods/Target Support Files/Pods-CaBot/Pods-CaBot.release.xcconfig"; sourceTree = "<group>"; };
-		56BE4BD043FAE871B580CD67 /* libPods-CaBot.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CaBot.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E29F009228B548100CA7DD6 /* CaBot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CaBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E29F00C228B548100CA7DD6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7E29F00E228B548100CA7DD6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -91,10 +87,8 @@
 		7E29F06F228B55FC00CA7DD6 /* bridging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bridging.h; sourceTree = "<group>"; };
 		7E29F070228B55FC00CA7DD6 /* CaBotService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaBotService.swift; sourceTree = "<group>"; };
 		7E29F074228B5B5B00CA7DD6 /* Yams.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Yams.framework; path = Carthage/Build/iOS/Yams.framework; sourceTree = "<group>"; };
-		7E29F077228CB2EA00CA7DD6 /* HLPLocationManager.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HLPLocationManager.framework; path = Carthage/Build/iOS/HLPLocationManager.framework; sourceTree = "<group>"; };
 		7EF5F1E8228DB07100788987 /* NavUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NavUtil.m; sourceTree = "<group>"; };
 		7EF5F1E9228DB07100788987 /* NavUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NavUtil.h; sourceTree = "<group>"; };
-		B903843AD4ECBA9B22E1A569 /* Pods-CaBot.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CaBot.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CaBot/Pods-CaBot.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,9 +96,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7E29F078228CB2EA00CA7DD6 /* HLPLocationManager.framework in Frameworks */,
 				7E29F075228B5B5B00CA7DD6 /* Yams.framework in Frameworks */,
-				2EA29375279802F2C659809A /* libPods-CaBot.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,15 +117,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		34934AE706D8EADF308BC169 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				B903843AD4ECBA9B22E1A569 /* Pods-CaBot.debug.xcconfig */,
-				35ECB82D33B1989C1B8B8CC7 /* Pods-CaBot.release.xcconfig */,
-			);
-			name = Pods;
-			sourceTree = "<group>";
-		};
 		7E29F000228B548100CA7DD6 = {
 			isa = PBXGroup;
 			children = (
@@ -143,7 +126,6 @@
 				7E29F02B228B548200CA7DD6 /* CaBotUITests */,
 				7E29F00A228B548100CA7DD6 /* Products */,
 				7E29F073228B5B5A00CA7DD6 /* Frameworks */,
-				34934AE706D8EADF308BC169 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -227,9 +209,7 @@
 		7E29F073228B5B5A00CA7DD6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				7E29F077228CB2EA00CA7DD6 /* HLPLocationManager.framework */,
 				7E29F074228B5B5B00CA7DD6 /* Yams.framework */,
-				56BE4BD043FAE871B580CD67 /* libPods-CaBot.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -241,12 +221,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7E29F031228B548200CA7DD6 /* Build configuration list for PBXNativeTarget "CaBot" */;
 			buildPhases = (
-				344AFD22189AB0DD2AE2C797 /* [CP] Check Pods Manifest.lock */,
 				7E29F005228B548100CA7DD6 /* Sources */,
 				7E29F006228B548100CA7DD6 /* Frameworks */,
 				7E29F007228B548100CA7DD6 /* Resources */,
 				7E29F076228B5B8900CA7DD6 /* ShellScript */,
-				50E93E96BF6CB2BF6BCE6CFC /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -375,41 +353,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		344AFD22189AB0DD2AE2C797 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-CaBot-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		50E93E96BF6CB2BF6BCE6CFC /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-CaBot/Pods-CaBot-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-CaBot/Pods-CaBot-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CaBot/Pods-CaBot-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		7E29F076228B5B8900CA7DD6 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -417,11 +360,9 @@
 			);
 			inputPaths = (
 				"$(SRCROOT)/Carthage/Build/iOS/Yams.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/HLPLocationManager.framework",
 			);
 			outputPaths = (
 				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/Yams.framework",
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/HLPLocationManager.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -628,7 +569,6 @@
 		};
 		7E29F032228B548200CA7DD6 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B903843AD4ECBA9B22E1A569 /* Pods-CaBot.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -653,7 +593,6 @@
 		};
 		7E29F033228B548200CA7DD6 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 35ECB82D33B1989C1B8B8CC7 /* Pods-CaBot.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;

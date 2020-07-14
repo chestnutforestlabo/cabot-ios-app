@@ -30,7 +30,6 @@
 
 import UIKit
 import Yams
-import HLPLocationManager
 import CoreBluetooth
 
 class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServiceDelegate  {
@@ -43,8 +42,6 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
     var centralConnected:Bool = false
     
     static func initHelper(){
-        HLPLocationManager.shared()?.start()
-        HLPLocationManager.shared()?.isBackground = true
         
         service = CaBotService()
         
