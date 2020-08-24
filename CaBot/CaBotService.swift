@@ -34,6 +34,17 @@ import CoreBluetooth
 protocol CaBotServiceDelegate {
     func caBot(service:CaBotService, centralConnected:Bool)
 }
+class settings{
+    
+    public static func _get_default_string(_ forKey:String, defval:String? = nil) -> String?{
+        if let ret = UserDefaults.standard.string(forKey: forKey), !ret.isEmpty{
+            return ret
+        }else{
+            return defval
+        }
+    }
+}
+
 
 class CaBotService: NSObject, CBPeripheralManagerDelegate {
     static let UUID_FORMAT = "35CE%04X-5E89-4C0D-A3F6-8A6A507C1BF1"
@@ -124,7 +135,8 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
         }
         
         print("service added: \(service)")
-        let advertisementData = [CBAdvertisementDataLocalNameKey: "CaBot"]
+        let teamid:String? = settings._get_default_string("team_id")
+        let advertisementData = [CBAdvertisementDataLocalNameKey: "CaBot" + (teamid != nil ? "-" + teamid! : "")]
         peripheralManager.startAdvertising(advertisementData)
         
     }

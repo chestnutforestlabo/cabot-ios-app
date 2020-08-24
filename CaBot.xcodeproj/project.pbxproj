@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		09725A8824EEA62E00012D42 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 09725A8724EEA62E00012D42 /* Settings.bundle */; };
 		7E29F00D228B548100CA7DD6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00C228B548100CA7DD6 /* AppDelegate.swift */; };
 		7E29F00F228B548100CA7DD6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00E228B548100CA7DD6 /* ViewController.swift */; };
 		7E29F012228B548100CA7DD6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F010228B548100CA7DD6 /* Main.storyboard */; };
@@ -49,6 +50,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		09725A8724EEA62E00012D42 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		7E29F009228B548100CA7DD6 /* CaBot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CaBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E29F00C228B548100CA7DD6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7E29F00E228B548100CA7DD6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -151,6 +153,7 @@
 				7E29F013228B548200CA7DD6 /* Assets.xcassets */,
 				7E29F015228B548200CA7DD6 /* LaunchScreen.storyboard */,
 				7E29F018228B548200CA7DD6 /* Info.plist */,
+				09725A8724EEA62E00012D42 /* Settings.bundle */,
 			);
 			path = CaBot;
 			sourceTree = "<group>";
@@ -332,6 +335,7 @@
 				7E29F069228B55C000CA7DD6 /* HLPSettingViewPickerCell.xib in Resources */,
 				7E29F06A228B55C000CA7DD6 /* HLPSettingViewSliderCell.xib in Resources */,
 				7E29F064228B55C000CA7DD6 /* HLPSettingView.strings in Resources */,
+				09725A8824EEA62E00012D42 /* Settings.bundle in Resources */,
 				7E29F068228B55C000CA7DD6 /* HLPSettingViewTextCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -572,7 +576,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = B98QB5W4Z4;
+				DEVELOPMENT_TEAM = 76CMF53Q35;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -596,7 +600,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = B98QB5W4Z4;
+				DEVELOPMENT_TEAM = 76CMF53Q35;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
