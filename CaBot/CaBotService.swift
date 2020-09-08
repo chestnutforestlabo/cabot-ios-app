@@ -418,7 +418,6 @@ class CaBotSpeechChar: CaBotChar {
             guard let tts = NavDeviceTTS.shared() else {
                 return
             }
-                
             for line in text.split(separator: "\n") {
                 if line == "__force_stop__" {
                     tts.speak("", withOptions: ["force": true], completionHandler: nil)

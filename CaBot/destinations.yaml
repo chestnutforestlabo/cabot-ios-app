@@ -1,30 +1,18 @@
--
-  title: Kitchen @ NSH 4th floor
-  value: EDITOR_node_1496171294096
--
-  title: Cobot Picture
-  value: EDITOR_node_1554925018637
--
-  title: Conference Room
-  value: EDITOR_node_1495222818017
--
-  title: Chieko's room
-  value: EDITOR_node_1490194296144
--
-  title: Gates elevator
-  value: EDITOR_node_1544143956425
--
-  title: NSH 4th Floor Restroom
-  value: EDITOR_node_1495221274864
--
-  title: Wean Library
-  value: EDITOR_node_1498748753059
--
-  title: Wean Start
-  value: EDITOR_node_1498750937477
--
-  title: Wean End
-  value: EDITOR_node_1555117754251
--
-  title: Wean Straight End
-  value: EDITOR_node_1498751106102
+- # EDITOR_node_1474876276625_TITLE
+  title: COREDO Muromachi 3 subway side entrance
+  value: EDITOR_node_1474876276625
+- # EDITOR_node_1475055758330_TITLE
+  title: Daily Yamazaki entrance 1
+  value: EDITOR_node_1475055758330
+- # EDITOR_node_1475144465320_TITLE
+  title: DO TABELKA (cafe)
+  value: EDITOR_node_1475144465320
+- # EDITOR_node_1482995134771_TITLE
+  title: Muji (cashier)
+  value: EDITOR_node_1482995134771
+- # EDITOR_node_1595235404111_TITLE
+  title: Mitsukoshi-mae station of Ginza Line
+  value: EDITOR_node_1595235404111
+- # EDITOR_node_1476189246820_TITLE
+  title: CHIBAGIN HIMAWARI GALLERY
+  value: EDITOR_node_1476189246820

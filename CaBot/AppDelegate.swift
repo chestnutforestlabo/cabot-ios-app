@@ -40,8 +40,38 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         ViewController.initHelper()
         // Override point for customization after application launch.
+        NotificationCenter.default.addObserver(self, selector: #selector(request_navigation(notification:)), name: Notification.Name(rawValue:"request_start_navigation"), object:nil)
 
         return true
+    }
+    func cancel_navigation(){
+        NavUtil.showModalWaiting(withMessage: "waiting")
+        DispatchQueue.main.async {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                NavUtil.hideModalWaiting()
+            }
+
+            ViewController.service.send(destination: "__cancel__")
+        }
+    }
+    @objc func request_navigation(notification:NSNotification?){
+        if let info = notification?.userInfo, let destination:String = info["toID"] as? String{
+            DispatchQueue.main.async {
+                NavUtil.showModalWaiting(withMessage: "waiting")
+                if ViewController.service.send(destination: destination) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        NavUtil.hideModalWaiting()
+                    }
+                } else {
+                    let alertController = UIAlertController(title: "Error", message: "CaBot may not be connected", preferredStyle: .alert)
+                    let ok = UIAlertAction(title: "Okay", style: .default) { (action:UIAlertAction) in
+                        alertController.dismiss(animated: true, completion: {
+                        })
+                    }
+                    alertController.addAction(ok)
+                }
+            }
+        }
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

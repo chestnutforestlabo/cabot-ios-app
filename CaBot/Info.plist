@@ -28,6 +28,10 @@
 	<string>This app uses your location always</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app uses your location always</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app uses your microphone</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>This app uses speech recognition</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
