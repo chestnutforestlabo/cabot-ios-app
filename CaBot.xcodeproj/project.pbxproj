@@ -52,6 +52,7 @@
 		09725B0C24FE573A00012D42 /* SliverDefaultTTS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0B24FE573A00012D42 /* SliverDefaultTTS.swift */; };
 		09725B102506313000012D42 /* en.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 09725B0E2506312F00012D42 /* en.yaml */; };
 		09725B112506313000012D42 /* ja.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 09725B0F2506312F00012D42 /* ja.yaml */; };
+		09725B19250CB50200012D42 /* conv_cabot_en.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B18250CB50200012D42 /* conv_cabot_en.swift */; };
 		7E29F00D228B548100CA7DD6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00C228B548100CA7DD6 /* AppDelegate.swift */; };
 		7E29F00F228B548100CA7DD6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00E228B548100CA7DD6 /* ViewController.swift */; };
 		7E29F012228B548100CA7DD6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F010228B548100CA7DD6 /* Main.storyboard */; };
@@ -113,6 +114,7 @@
 		09725B0B24FE573A00012D42 /* SliverDefaultTTS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliverDefaultTTS.swift; sourceTree = "<group>"; };
 		09725B0E2506312F00012D42 /* en.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = en.yaml; sourceTree = "<group>"; };
 		09725B0F2506312F00012D42 /* ja.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = ja.yaml; sourceTree = "<group>"; };
+		09725B18250CB50200012D42 /* conv_cabot_en.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = conv_cabot_en.swift; sourceTree = "<group>"; };
 		7E29F009228B548100CA7DD6 /* CaBot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CaBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E29F00C228B548100CA7DD6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7E29F00E228B548100CA7DD6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -191,6 +193,7 @@
 				09725A8C24F8D97100012D42 /* DialogViewController.swift */,
 				09725A8A24F8D97100012D42 /* LocalContext.swift */,
 				09725B0724FD5DF800012D42 /* conv_cabot.swift */,
+				09725B18250CB50200012D42 /* conv_cabot_en.swift */,
 			);
 			path = HLPDialog;
 			sourceTree = "<group>";
@@ -501,6 +504,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				09725B19250CB50200012D42 /* conv_cabot_en.swift in Sources */,
 				09725B0A24FE4AC300012D42 /* dlgviewcontroller_cabot.swift in Sources */,
 				7E29F066228B55C000CA7DD6 /* HLPSettingViewCell.m in Sources */,
 				09725AAF24F8D97200012D42 /* ConversationEx.swift in Sources */,

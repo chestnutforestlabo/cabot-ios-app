@@ -747,7 +747,9 @@ public class DialogViewController: UIViewController, UITableViewDelegate, UITabl
             //NavSound.sharedInstance().playVoiceRecoEnd()
         }
 
-        let conversation = conv_cabot()//ConversationEx()
+        let pre = Locale(identifier: Locale.preferredLanguages[0])
+        
+        let conversation = "en" == pre.languageCode ? conv_cabot_en() : conv_cabot()//ConversationEx()
         if var context = self.conv_context {
             self.conv_context_local.getContext().forEach({ (arg) in
                 let (key, value) = arg

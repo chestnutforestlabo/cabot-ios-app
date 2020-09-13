@@ -53,16 +53,17 @@ open class conv_cabot {
             return RestError.http(statusCode: statusCode, message: nil, metadata: nil)
         }
     }
-
+    
     private static let do_tabelka = try! NSRegularExpression(pattern: "どう食べるか|待ち合わせ|まちあわせ")
     private static let kutsushita = try! NSRegularExpression(pattern: "靴下")
     private static let taoru = try! NSRegularExpression(pattern: "タオル")
     private static let go_mujirushi = try! NSRegularExpression(pattern: "無印良品|無印|無地")
     private static let reji = try! NSRegularExpression(pattern: "レジ|精算")
-    private func _matches(_ text:String, regex: NSRegularExpression) -> Bool{
+    internal func _matches(_ text:String, regex: NSRegularExpression) -> Bool{
         return 0 < regex.matches(in: text, range:NSMakeRange(0, text.count)).count
     }
-    private func _get_response(_ orgtext:String?) -> [String:Any]{
+    
+    internal func _get_response(_ orgtext:String?) -> [String:Any]{
         var speak:String = "わかりません。もう一度お願いします。"
         var dest_info:[String:String]? = nil
         if let text = orgtext, !text.isEmpty{
