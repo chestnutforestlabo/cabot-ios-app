@@ -1,9 +1,24 @@
-- # EDITOR_node_1474876276625_TITLE
+- #
   title: Elevator (B1F)
   value: EDITOR_node_1474876589541
-- # EDITOR_node_1474876276625_TITLE
+- #
   title: Subway station
   value: EDITOR_node_1599633337007
+- # IBM Research - Tokyo
+  title: IBM Research - Tokyo
+  value: EDITOR_node_1589780736215
+- # 10F vending machine
+  title: 10F vending machine
+  value: EDITOR_node_1589781790959
+- # 11F vending machine
+  title: 11F vending machine
+  value: EDITOR_node_1589781245452
+- # IBM Japan entrance (1F)
+  title: IBM Japan entrance (1F)
+  value: EDITOR_node_1599730474821
+- # Office entrance (1F)
+  title: EDITOR_node_1599729758194_TITLE
+  value: EDITOR_node_1599729758194
 - # EDITOR_node_1474876276625_TITLE
   title: COREDO Muromachi 3 subway side entrance
   value: EDITOR_node_1474876276625
