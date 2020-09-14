@@ -120,10 +120,28 @@ open class STTHelper: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate, SF
         return NSError(domain:domain, code: code, userInfo:userInfo)
     }
     
+    fileprivate func findbtmicrophone(){
+        if let availableInputs = AVAudioSession.sharedInstance().availableInputs {
+            print("Found \(availableInputs.count) inputs")
+            for input in availableInputs {
+                print("Input: \(input)")
+                if input.portType == AVAudioSession.Port.bluetoothHFP {
+                    print("Setting preferred input")
+                    do {
+                        try AVAudioSession.sharedInstance().setPreferredInput(input)
+                    } catch {
+                        print("Error setting preferred input: \(error)")
+                    }
+                }
+            }
+        }
+    }
     fileprivate func startPWCaptureSession(){//alternative
         if nil == self.pwCaptureSession{
+            //self.findbtmicrophone()
             self.pwCaptureSession = AVCaptureSession()
             if let captureSession = self.pwCaptureSession{
+                captureSession.automaticallyConfiguresApplicationAudioSession = false
                 if let microphoneDevice = AVCaptureDevice.default(for: .audio) {
                     let microphoneInput = try? AVCaptureDeviceInput(device: microphoneDevice)
                     if(captureSession.canAddInput(microphoneInput!)){
@@ -195,7 +213,8 @@ open class STTHelper: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate, SF
         
         let audioSession:AVAudioSession = AVAudioSession.sharedInstance()
         do {
-            try audioSession.setCategory(AVAudioSession.Category.record)
+            //try audioSession.setCategory(AVAudioSession.Category.record)
+            try audioSession.setCategory(AVAudioSession.Category.playAndRecord, options: [.mixWithOthers, .allowBluetooth, .defaultToSpeaker])
             try audioSession.setActive(true)
         } catch {
         }

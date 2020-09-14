@@ -42,6 +42,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         NotificationCenter.default.addObserver(self, selector: #selector(request_navigation(notification:)), name: Notification.Name(rawValue:"request_start_navigation"), object:nil)
 
+        DispatchQueue.main.async {
+            UIApplication.shared.isIdleTimerDisabled = true//reset sleep timer
+        }
         return true
     }
     func cancel_navigation(){
