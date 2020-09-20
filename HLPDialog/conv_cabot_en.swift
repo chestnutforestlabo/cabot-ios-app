@@ -10,9 +10,10 @@ import Foundation
 
 class conv_cabot_en : conv_cabot{
     
-    private static let elevator = try! NSRegularExpression(pattern:"elevator")
-    private static let subway = try! NSRegularExpression(pattern:"subway|station")
-    
+    private static let elevator = try! NSRegularExpression(pattern:"elevator|Elevator")
+    private static let subway = try! NSRegularExpression(pattern:"subway|station|Subway|Station")
+    private static let dotavelka = try! NSRegularExpression(pattern:"cafe|eat|Cafe|Eat|Café|café")
+
     /*
      - # IBM Research - Tokyo
        title: IBM Research - Tokyo
@@ -27,10 +28,10 @@ class conv_cabot_en : conv_cabot{
        title: IBM Japan entrance (1F)
        value: EDITOR_node_1599730474821
      */
-    private static let trl = try! NSRegularExpression(pattern:"research|Tokyo")
+    private static let trl = try! NSRegularExpression(pattern:"research|Tokyo|Research")
     private static let vm10 = try! NSRegularExpression(pattern:"10")
     private static let vm11 = try! NSRegularExpression(pattern:"11")
-    private static let entrance = try! NSRegularExpression(pattern:"entrance")
+    private static let entrance = try! NSRegularExpression(pattern:"entrance|Entrance")
     
     internal override func _get_response(_ orgtext:String?) -> [String:Any]{
         var speak:String = "Sorry, I couldn't catch you."
@@ -45,6 +46,11 @@ class conv_cabot_en : conv_cabot{
                 speak = "OK, going to the subway station."
                 dest_info = [
                     "nodes": "EDITOR_node_1599633337007"
+                ]
+            }else if self._matches(text, regex: conv_cabot_en.dotavelka){
+                speak = "OK, going to Do Tabelka."
+                dest_info = [
+                    "nodes": "EDITOR_node_1475144465320",
                 ]
             }else if self._matches(text, regex: conv_cabot_en.trl){
                 speak = "OK, going to TRL."

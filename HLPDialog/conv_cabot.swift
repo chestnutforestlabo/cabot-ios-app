@@ -152,7 +152,10 @@ open class conv_cabot {
         let resmsg:MessageResponse = try! JSONDecoder().decode(MessageResponse.self, from:json)
         var res:RestResponse<MessageResponse> = RestResponse<MessageResponse>(statusCode: 200)
         res.result = resmsg
-        DispatchQueue.global().asyncAfter(deadline: .now() + 1.0){
+        /*DispatchQueue.global().asyncAfter(deadline: .now() + 1.0){
+            completionHandler(res, nil)
+        }*/
+        DispatchQueue.global().async{
             completionHandler(res, nil)
         }
     }
