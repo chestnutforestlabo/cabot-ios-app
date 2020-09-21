@@ -59,13 +59,21 @@ open class conv_cabot {
     private static let taoru = try! NSRegularExpression(pattern: "タオル")
     private static let go_mujirushi = try! NSRegularExpression(pattern: "無印良品|無印|無地")
     private static let reji = try! NSRegularExpression(pattern: "レジ|精算")
+    private static let find_person = try! NSRegularExpression(pattern: "(.*?)(さん|君|くん|ちゃん)?(を)?(探す|探して)")
     internal func _matches(_ text:String, regex: NSRegularExpression) -> Bool{
         return 0 < regex.matches(in: text, range:NSMakeRange(0, text.count)).count
+    }
+    internal func _at1(_ text:String, regex: NSRegularExpression) -> String?{
+        if let match = regex.firstMatch(in: text, range:NSMakeRange(0, text.count)) {
+            return String(text[Range(match.range(at: 1), in:text)!])
+        }
+        return nil
     }
     
     internal func _get_response(_ orgtext:String?) -> [String:Any]{
         var speak:String = "わかりません。もう一度お願いします。"
         var dest_info:[String:String]? = nil
+        var find_info:[String:String]? = nil
         if let text = orgtext, !text.isEmpty{
             if self._matches(text, regex: conv_cabot.do_tabelka){
                 speak = "わかりました。Do Tabelkaに向かいます"
@@ -86,9 +94,16 @@ open class conv_cabot {
                 dest_info = [
                     "nodes": "EDITOR_node_1495222818017"
                 ]
+            }else if self._matches(text, regex: conv_cabot.find_person){
+                if let target = self._at1(text, regex: conv_cabot.find_person) {
+                    speak = "わかりました。\(target)さんを探します"
+                    find_info = [
+                        "name": "yamamoto" // ToDo: name mapping or send raw text
+                    ]
+                }
             }
         }else{
-            speak = "どこに行きますか？"
+            speak = "ご用件は何でしょう？"
         }
         
         return [
@@ -99,8 +114,9 @@ open class conv_cabot {
             "intents":[],
             "entities":[],
             "context":[
-                "navi": dest_info == nil ? false : true,
+                "navi": (dest_info == nil && find_info == nil) ? false : true,
                 "dest_info": dest_info,
+                "find_info": find_info,
                 "system":[
                     "dialog_request_counter":0
                 ]

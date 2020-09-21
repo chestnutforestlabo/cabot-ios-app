@@ -33,6 +33,7 @@ import CoreBluetooth
 
 protocol CaBotServiceDelegate {
     func caBot(service:CaBotService, centralConnected:Bool)
+    func caBot(service:CaBotService, faceappConnected:Bool)
 }
 class settings{
     
@@ -57,11 +58,13 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     
     let uuid = CBUUID(string: String(format:UUID_FORMAT, 0x0000))
     var destinationChar:CaBotNotifyChar!
+    var findPersonChar:CaBotNotifyChar!
     var hearbeatChar:CaBotNotifyChar!
     var peripheralManager:CBPeripheralManager!
     var characteristics:[CBCharacteristic] = []
     var chars:[CaBotChar] = []
     var delegate:CaBotServiceDelegate?
+    var faceappReady:Bool = false
 
     
     override init(){
@@ -71,10 +74,15 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
         
         self.chars.append(CaBotStoreChar(service: self, handles:[0x0001, 0x0002], configKey:CaBotService.CABOT_SPEED_CONFIG))
         self.chars.append(CaBotStoreChar(service: self, handles:[0x0003, 0x0004], configKey:CaBotService.SPEECH_SPEED_CONFIG))
-        
+
         self.destinationChar = CaBotNotifyChar(service: self, handle:0x0010)
         self.chars.append(self.destinationChar)
-        
+
+        self.chars.append(CaBotFindPersonReadyChar(service: self, handle:0x0011))
+
+        self.findPersonChar = CaBotNotifyChar(service: self, handle:0x0012)
+        self.chars.append(self.findPersonChar)
+
         self.chars.append(CaBotQueryChar(service: self, handles:[0x0100, 0x0101]) { query in
             return ""
         })
@@ -92,6 +100,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
                 print("heartbeat")
                 if (!self.hearbeatChar.notify(value: "1")) {
                     self.delegate?.caBot(service: self, centralConnected: false)
+                    self.delegate?.caBot(service: self, faceappConnected: false)
                 } else {
                     self.delegate?.caBot(service: self, centralConnected: true)
                 }
@@ -102,6 +111,11 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     public func send(destination: String) -> Bool {
         print("destination \(destination)")
         return (self.destinationChar.notify(value: destination))
+    }
+    
+    public func find(person: String) -> Bool {
+        print("person \(person)")
+        return (self.findPersonChar.notify(value: "\(person);100000"))
     }
     
     internal func add(characteristic:CBCharacteristic) {
@@ -387,6 +401,54 @@ class CaBotQueryChar: CaBotChar {
     }
 }
 
+class CaBotFindPersonReadyChar: CaBotChar {
+    let uuid:CBUUID
+    let characteristic: CBMutableCharacteristic
+    
+    init(service: CaBotService,
+         handle:Int) {
+        self.uuid = service.generateUUID(handle: handle)
+        
+        self.characteristic = CBMutableCharacteristic(
+            type: self.uuid,
+            properties: [.write],
+            value: nil,
+            permissions: [.writeable])
+        
+        service.add(characteristic: self.characteristic)
+        
+        super.init(service: service)
+    }
+    
+    private func request(_ request:CBATTRequest) {
+        DispatchQueue.main.async {
+            guard let data = request.value else {
+                return
+            }
+            guard let text = String(data: data, encoding: .utf8) else {
+                return
+            }
+            // Backpack is ready
+            let ready:Bool = (text == "True") ? true : false
+            
+            self.service.faceappReady = ready
+            self.service.delegate?.caBot(service: self.service, faceappConnected: ready)
+            
+            print("Back pack ready:", text, ready)
+        }
+    }
+    
+    override func canHandle(writeRequest: CBATTRequest) -> Bool {
+        if writeRequest.characteristic.uuid.isEqual(self.characteristic.uuid) {
+            self.request(writeRequest)
+            self.service.peripheralManager.respond(
+                to: writeRequest,
+                withResult: .success)
+            return true
+        }
+        return false
+    }
+}
 
 class CaBotSpeechChar: CaBotChar {
     let uuid:CBUUID

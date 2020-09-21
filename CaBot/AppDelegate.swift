@@ -41,6 +41,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         ViewController.initHelper()
         // Override point for customization after application launch.
         NotificationCenter.default.addObserver(self, selector: #selector(request_navigation(notification:)), name: Notification.Name(rawValue:"request_start_navigation"), object:nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(request_find_person(notification:)), name: Notification.Name(rawValue:"request_find_person"), object:nil)
 
         DispatchQueue.main.async {
             UIApplication.shared.isIdleTimerDisabled = true//reset sleep timer
@@ -69,9 +70,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     let alertController = UIAlertController(title: "Error", message: "CaBot may not be connected", preferredStyle: .alert)
                     let ok = UIAlertAction(title: "Okay", style: .default) { (action:UIAlertAction) in
                         alertController.dismiss(animated: true, completion: {
+                            NavUtil.hideModalWaiting()
                         })
                     }
                     alertController.addAction(ok)
+                    self.window?.rootViewController?.present(alertController, animated: true, completion: nil)
+                }
+            }
+        }
+    }
+    @objc func request_find_person(notification:NSNotification?){
+        if let info = notification?.userInfo, let name:String = info["name"] as? String{
+            DispatchQueue.main.async {
+                NavUtil.showModalWaiting(withMessage: "waiting")
+                if ViewController.service.find(person: name) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        NavUtil.hideModalWaiting()
+                    }
+                } else {
+                    let alertController = UIAlertController(title: "Error", message: "CaBot may not be connected", preferredStyle: .alert)
+                    let ok = UIAlertAction(title: "Okay", style: .default) { (action:UIAlertAction) in
+                        alertController.dismiss(animated: true, completion: {
+                            NavUtil.hideModalWaiting()
+                        })
+                    }
+                    alertController.addAction(ok)
+                    self.window?.rootViewController?.present(alertController, animated: true, completion: nil)
                 }
             }
         }

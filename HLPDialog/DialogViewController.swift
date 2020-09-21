@@ -677,6 +677,27 @@ public class DialogViewController: UIViewController, UITableViewDelegate, UITabl
                         }
                     }
                 }
+                if case let JSON.object(find_info)? = cc.additionalProperties["find_info"] {
+                    var info:[String : Any] = [:]
+                    if case let JSON.string(name)? = find_info["name"] {
+                        info["name"] = name
+                    }
+                    postEndDialog = { [weak self] in
+                        if let weakself = self {
+                            weakself.cancellable = true
+                            weakself.updateView()
+                            
+                            if weakself.root != nil {
+                                _ = weakself.navigationController?.popToViewController(weakself.root!, animated: true)
+                            } else {
+                                _ = weakself.navigationController?.popToRootViewController(animated: true)
+                            }
+                            
+                            NotificationCenter.default.post(name: Notification.Name(rawValue:"request_find_person"),
+                                                            object: weakself, userInfo: info)
+                        }
+                    }
+                }
             }
         }
         var speech = restxt

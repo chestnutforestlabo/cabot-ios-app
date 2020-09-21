@@ -40,6 +40,7 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
     static var service:CaBotService!
     
     var centralConnected:Bool = false
+    var faceappConnected:Bool = false
     
     static func initHelper(){
         
@@ -120,6 +121,14 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
             self.updateView()
         }
     }
+    
+    func caBot(service: CaBotService, faceappConnected: Bool) {
+        self.faceappConnected = faceappConnected
+        //print(self.centralConnected)
+        DispatchQueue.main.async {
+            self.updateView()
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -159,10 +168,17 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
                 if self.centralConnected {
                     title = title + "📱"
                     accessibilityLabel = accessibilityLabel + " connected"
+
+                    if self.faceappConnected {
+                        title = title + "🎒"
+                        accessibilityLabel = accessibilityLabel + ", backpack ready"
+                    }
                 } else {
                     title = title + "📵"
                     accessibilityLabel = accessibilityLabel + " not connected"
                 }
+                
+                
                 //print(title)
                 if let settings = ViewController.defaultHelper.settings as! [HLPSetting]? {
                     for setting in settings {
