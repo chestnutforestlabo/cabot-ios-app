@@ -484,12 +484,13 @@ public class DialogViewHelper: NSObject {
         p = p / (MaxDB-threthold)
         p = max(p, 0)
         
-        
+        if (false) {
         peakTimer -= Frequency
         
         if (peakTimer < 0) { // reduce max power gradually
             power -= MaxDB*Frequency/speed
             power = max(power, 0)
+        }
         }
         
         indicatorCenter.size = min(CGFloat(p * (maxScaleOfVolumeIndicator - 1.0) + 1.0) * IconSize, IconCircleSize)
