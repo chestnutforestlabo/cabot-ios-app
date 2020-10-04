@@ -37,7 +37,9 @@
         UINib *nib = [UINib nibWithNibName:nibName bundle:[NSBundle mainBundle]];
         [self registerNib:nib forCellReuseIdentifier:cells[nibName]];
     }
-    
+    if (@available(iOS 13.0, *)) {
+        self.backgroundColor = [UIColor systemBackgroundColor];
+    }
     return self;
 }
 

@@ -620,11 +620,14 @@ public class DialogViewHelper: NSObject {
     var textTimer:Timer?
     var textPos:Int = 0
     var text:String?
-    public func showText(_ text:String) {
+    public func showText(_ text:String, color:UIColor? = nil) {
         
         let len = text.count
         
         DispatchQueue.main.async {
+            if let clr = color{
+                self.label.textColor = clr
+            }
             if let currentText = self.label.text {
                 if currentText.count < len ||
                     self.label.text?.prefix(len-1).description != text {

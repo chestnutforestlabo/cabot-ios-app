@@ -380,7 +380,7 @@ open class STTHelper: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate, SF
                 self.startPWCaptureSession()//alternative
                 self.startRecognize(actions, failure: failure, timeout: timeout)
                 
-                self.delegate?.showText(NSLocalizedString("SPEAK_NOW", tableName: nil, bundle: Bundle(for: type(of: self)), value: "", comment:"Speak Now!"))
+                self.delegate?.showText(NSLocalizedString("SPEAK_NOW", tableName: nil, bundle: Bundle(for: type(of: self)), value: "", comment:"Speak Now!"),color: UIColor.black)
                 self.delegate?.listen()
             })
             

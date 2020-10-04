@@ -69,7 +69,11 @@
     self.title.text = self.setting.label;
     self.title.adjustsFontSizeToFitWidth = YES;
     self.title.isAccessibilityElement = NO;
-    self.title.textColor = self.setting.disabled ? [UIColor grayColor] : [UIColor blackColor];
+    if (@available(iOS 13.0, *)) {
+        self.title.textColor = self.setting.disabled ? [UIColor grayColor] : [UIColor labelColor];
+    } else {
+        self.title.textColor = self.setting.disabled ? [UIColor grayColor] : [UIColor blackColor];
+    }
     
     if (self.setting.titleFont != nil) {
         self.title.font = self.setting.titleFont;
