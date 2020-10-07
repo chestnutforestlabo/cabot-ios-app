@@ -43,7 +43,7 @@ class conv_cabot_mj : conv_cabot{
             }else if self._matches(text, regex: conv_cabot_mj.reji){
                 speak = "わかりました。レジに向かいます。"
                 dest_info = [
-                    "nodes": "EDITOR_node_1495222818017"
+                    "nodes": "EDITOR_node_1482995134771"
                 ]
             }
         }else{
