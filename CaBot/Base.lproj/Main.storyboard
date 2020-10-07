@@ -56,6 +56,16 @@
                                     <segue destination="49U-6x-7J5" kind="show" id="cf8-Y8-zrY"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AKk-bB-83n">
+                                <rect key="frame" x="174" y="224" width="73" height="60"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <accessibility key="accessibilityConfiguration" label="Dialog"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="40"/>
+                                <state key="normal" title="Muji"/>
+                                <connections>
+                                    <segue destination="R3m-ca-rbt" kind="show" id="sjY-Jp-n8G"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="y0x-Rb-2nK"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -80,7 +90,23 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="05I-NP-juz" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2806" y="855"/>
+            <point key="canvasLocation" x="2728" y="248"/>
+        </scene>
+        <!--Dlgviewcontroller muji-->
+        <scene sceneID="uLc-dK-5JD">
+            <objects>
+                <viewController id="R3m-ca-rbt" customClass="dlgviewcontroller_muji" customModule="CaBot" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="JEX-1B-Rot">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="bQ3-8n-w8A"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="rd5-bB-oat"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="XrY-km-Jsd" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2728" y="930"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="ENn-5A-feV">
@@ -131,7 +157,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rB5-FK-cC4" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2806" y="131"/>
+            <point key="canvasLocation" x="2728" y="-455"/>
         </scene>
     </scenes>
     <resources>

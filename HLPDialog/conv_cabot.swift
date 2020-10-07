@@ -56,10 +56,8 @@ open class conv_cabot {
     
     private static let do_tabelka = try! NSRegularExpression(pattern: "どう食べるか|待ち合わせ|まちあわせ")
     private static let kutsushita = try! NSRegularExpression(pattern: "靴下")
-    private static let tana = try! NSRegularExpression(pattern:"棚|連れて行って")
     private static let taoru = try! NSRegularExpression(pattern: "タオル")
     private static let go_mujirushi = try! NSRegularExpression(pattern: "無印良品|無印|無地")
-    private static let reji = try! NSRegularExpression(pattern: "レジ|精算")
     private static let find_person = try! NSRegularExpression(pattern: "(.*?)(さん|君|くん|ちゃん)?(を)?(探す|探して)")
     internal func _matches(_ text:String, regex: NSRegularExpression) -> Bool{
         return 0 < regex.matches(in: text, range:NSMakeRange(0, text.count)).count
@@ -82,25 +80,13 @@ open class conv_cabot {
                     "nodes": "EDITOR_node_1475144465320",
                 ]
             }else if self._matches(text, regex: conv_cabot.kutsushita){
-                if self._matches(text, regex: conv_cabot.tana){
-                    speak = "わかりました。"
-                    dest_info = [
-                        "nodes": "EDITOR_node_1475151657340"
-                    ]
-                }else{
-                    speak = "コレドには無印良品とタビオがあります。"
-                }
+                speak = "コレドには無印良品とタビオがあります。"
             }else if self._matches(text, regex: conv_cabot.taoru){
                 speak = "コレドには今治タオルと無印良品があります。"
             }else if self._matches(text, regex: conv_cabot.go_mujirushi){
                 speak = "わかりました。無印良品に向かいます。"
                 dest_info = [
                     "nodes": "EDITOR_node_1482995134771"
-                ]
-            }else if self._matches(text, regex: conv_cabot.reji){
-                speak = "わかりました。レジに向かいます。"
-                dest_info = [
-                    "nodes": "EDITOR_node_1495222818017"
                 ]
             }else if self._matches(text, regex: conv_cabot.find_person){
                 if let target = self._at1(text, regex: conv_cabot.find_person) {

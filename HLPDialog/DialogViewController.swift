@@ -754,6 +754,10 @@ public class DialogViewController: UIViewController, UITableViewDelegate, UITabl
         })
     }
     
+    internal func getconversation(pre: Locale) -> conv_cabot{
+        return "en" == pre.languageCode ? conv_cabot_en() : conv_cabot()//ConversationEx()
+    }
+    
     var sendTimeout:Timer? = nil
     var sendTimeoutCount = 0
     
@@ -770,7 +774,7 @@ public class DialogViewController: UIViewController, UITableViewDelegate, UITabl
 
         let pre = Locale(identifier: Locale.preferredLanguages[0])
         
-        let conversation = "en" == pre.languageCode ? conv_cabot_en() : conv_cabot()//ConversationEx()
+        let conversation = self.getconversation(pre:pre)//ConversationEx()
         if var context = self.conv_context {
             self.conv_context_local.getContext().forEach({ (arg) in
                 let (key, value) = arg
