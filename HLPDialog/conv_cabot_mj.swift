@@ -25,8 +25,6 @@ import Foundation
 class conv_cabot_mj : conv_cabot{
     
     private static let tana = try! NSRegularExpression(pattern:"靴下|棚")
-    private static let taoru = try! NSRegularExpression(pattern: "タオル")
-    private static let go_mujirushi = try! NSRegularExpression(pattern: "無印良品|無印|無地")
     private static let reji = try! NSRegularExpression(pattern: "レジ|精算")
     private static let find_person = try! NSRegularExpression(pattern: "(.*?)(さん|君|くん|ちゃん)?(を)?(探す|探して)")
 
@@ -38,7 +36,7 @@ class conv_cabot_mj : conv_cabot{
             if self._matches(text, regex: conv_cabot_mj.tana){
                 speak = "わかりました。"
                 dest_info = [
-                    "nodes": "EDITOR_node_1475151657340"
+                    "nodes": "EDITOR_node_1601605415482"
                 ]
             }else if self._matches(text, regex: conv_cabot_mj.reji){
                 speak = "わかりました。レジに向かいます。"

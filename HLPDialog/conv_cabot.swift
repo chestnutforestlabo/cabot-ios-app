@@ -59,6 +59,7 @@ open class conv_cabot {
     private static let taoru = try! NSRegularExpression(pattern: "タオル")
     private static let go_mujirushi = try! NSRegularExpression(pattern: "無印良品|無印|無地")
     private static let find_person = try! NSRegularExpression(pattern: "(.*?)(さん|君|くん|ちゃん)?(を)?(探す|探して)")
+    private static let go_station = try! NSRegularExpression(pattern:"駅|帰")
     internal func _matches(_ text:String, regex: NSRegularExpression) -> Bool{
         return 0 < regex.matches(in: text, range:NSMakeRange(0, text.count)).count
     }
@@ -95,6 +96,11 @@ open class conv_cabot {
                         "name": "yamamoto" // ToDo: name mapping or send raw text
                     ]
                 }
+            }else if self._matches(text, regex: conv_cabot.go_station){
+                speak = "わかりました。駅に向かいます。"
+                dest_info = [
+                    "nodes": "EDITOR_node_1599633337007"
+                ]
             }
         }else{
             speak = "ご用件はなんでしょう？"
