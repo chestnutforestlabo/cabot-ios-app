@@ -71,7 +71,7 @@ open class conv_cabot {
     }
     
     internal func _get_response(_ orgtext:String?) -> [String:Any]{
-        var speak:String = "わかりません。もう一度お願いします。"
+        var speak:String = "すみません。もう一度お願いします。"
         var dest_info:[String:String]? = nil
         var find_info:[String:String]? = nil
         if let text = orgtext, !text.isEmpty{

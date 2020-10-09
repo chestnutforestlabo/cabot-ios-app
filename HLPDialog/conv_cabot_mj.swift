@@ -29,7 +29,7 @@ class conv_cabot_mj : conv_cabot{
     private static let find_person = try! NSRegularExpression(pattern: "(.*?)(さん|君|くん|ちゃん)?(を)?(探す|探して)")
 
     internal override func _get_response(_ orgtext:String?) -> [String:Any]{
-        var speak:String = "わかりません。もう一度お願いします。"
+        var speak:String = "すみません。もう一度お願いします。"
         var dest_info:[String:String]? = nil
         var find_info:[String:String]? = nil
         if let text = orgtext, !text.isEmpty{

@@ -57,11 +57,11 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AKk-bB-83n">
-                                <rect key="frame" x="174" y="224" width="73" height="60"/>
+                                <rect key="frame" x="128" y="224" width="165" height="60"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <accessibility key="accessibilityConfiguration" label="Dialog"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="40"/>
-                                <state key="normal" title="Muji"/>
+                                <state key="normal" title="Shopping"/>
                                 <connections>
                                     <segue destination="R3m-ca-rbt" kind="show" id="sjY-Jp-n8G"/>
                                 </connections>
