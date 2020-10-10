@@ -55,6 +55,7 @@
 		09725B102506313000012D42 /* en.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 09725B0E2506312F00012D42 /* en.yaml */; };
 		09725B112506313000012D42 /* ja.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 09725B0F2506312F00012D42 /* ja.yaml */; };
 		09725B19250CB50200012D42 /* conv_cabot_en.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B18250CB50200012D42 /* conv_cabot_en.swift */; };
+		097845C02531E65B004DE1F6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 097845C22531E65B004DE1F6 /* InfoPlist.strings */; };
 		7E29F00D228B548100CA7DD6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00C228B548100CA7DD6 /* AppDelegate.swift */; };
 		7E29F00F228B548100CA7DD6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00E228B548100CA7DD6 /* ViewController.swift */; };
 		7E29F012228B548100CA7DD6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F010228B548100CA7DD6 /* Main.storyboard */; };
@@ -119,6 +120,8 @@
 		09725B0E2506312F00012D42 /* en.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = en.yaml; sourceTree = "<group>"; };
 		09725B0F2506312F00012D42 /* ja.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = ja.yaml; sourceTree = "<group>"; };
 		09725B18250CB50200012D42 /* conv_cabot_en.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = conv_cabot_en.swift; sourceTree = "<group>"; };
+		097845C12531E65B004DE1F6 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		097845C32531E685004DE1F6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		7E29F009228B548100CA7DD6 /* CaBot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CaBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E29F00C228B548100CA7DD6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7E29F00E228B548100CA7DD6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -273,6 +276,7 @@
 				09725B0924FE4AC300012D42 /* dlgviewcontroller_cabot.swift */,
 				09725B0B24FE573A00012D42 /* SliverDefaultTTS.swift */,
 				0952AA32252D574D00A4458B /* dlgviewcontroller_muji.swift */,
+				097845C22531E65B004DE1F6 /* InfoPlist.strings */,
 			);
 			path = CaBot;
 			sourceTree = "<group>";
@@ -449,6 +453,7 @@
 				7E29F014228B548200CA7DD6 /* Assets.xcassets in Resources */,
 				09725B112506313000012D42 /* ja.yaml in Resources */,
 				09725B102506313000012D42 /* en.yaml in Resources */,
+				097845C02531E65B004DE1F6 /* InfoPlist.strings in Resources */,
 				7E29F012228B548100CA7DD6 /* Main.storyboard in Resources */,
 				7E29F065228B55C000CA7DD6 /* HLPSettingViewSwitchCell.xib in Resources */,
 				7E29F071228B55FC00CA7DD6 /* destinations.yaml in Resources */,
@@ -597,6 +602,15 @@
 				09725AD224F8DCFB00012D42 /* en */,
 			);
 			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		097845C22531E65B004DE1F6 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				097845C12531E65B004DE1F6 /* ja */,
+				097845C32531E685004DE1F6 /* en */,
+			);
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 		7E29F010228B548100CA7DD6 /* Main.storyboard */ = {
