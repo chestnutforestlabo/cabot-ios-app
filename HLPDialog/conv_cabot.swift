@@ -87,7 +87,8 @@ open class conv_cabot {
             }else if self._matches(text, regex: conv_cabot.go_mujirushi){
                 speak = "わかりました。無印良品に向かいます。"
                 dest_info = [
-                    "nodes": "EDITOR_node_1482995134771"
+                    // "nodes": "EDITOR_node_1482995134771" // 無印良品レジ
+                    "nodes": "EDITOR_node_1601661539802" // 無印良品(ギャラリー側出入口)
                 ]
             }else if self._matches(text, regex: conv_cabot.find_person){
                 if let target = self._at1(text, regex: conv_cabot.find_person) {
