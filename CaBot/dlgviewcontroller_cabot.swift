@@ -65,10 +65,6 @@ class dlgviewcontroller_cabot : DialogViewController{
             self._tts = value
         }
     }
-
-    internal override func getconversation(pre: Locale) -> conv_cabot{
-        return conv_cabot_hnd()//haneda
-    }
     
     override public func viewDidLoad() {
         self.baseHelper = DialogViewHelper()
