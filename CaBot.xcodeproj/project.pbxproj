@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		090EC9D32542ACA000A2D53E /* conv_cabot_hnd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090EC9D22542ACA000A2D53E /* conv_cabot_hnd.swift */; };
 		0929E0FE2527672A00D0C473 /* conv_cabot_mj.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0929E0FD2527672A00D0C473 /* conv_cabot_mj.swift */; };
 		0952AA33252D574D00A4458B /* dlgviewcontroller_muji.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0952AA32252D574D00A4458B /* dlgviewcontroller_muji.swift */; };
 		09725A8824EEA62E00012D42 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 09725A8724EEA62E00012D42 /* Settings.bundle */; };
@@ -97,6 +98,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		090EC9D22542ACA000A2D53E /* conv_cabot_hnd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = conv_cabot_hnd.swift; sourceTree = "<group>"; };
 		0929E0FD2527672A00D0C473 /* conv_cabot_mj.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = conv_cabot_mj.swift; sourceTree = "<group>"; };
 		0952AA32252D574D00A4458B /* dlgviewcontroller_muji.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dlgviewcontroller_muji.swift; sourceTree = "<group>"; };
 		09725A8724EEA62E00012D42 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
@@ -202,6 +204,7 @@
 				09725B0724FD5DF800012D42 /* conv_cabot.swift */,
 				0929E0FD2527672A00D0C473 /* conv_cabot_mj.swift */,
 				09725B18250CB50200012D42 /* conv_cabot_en.swift */,
+				090EC9D22542ACA000A2D53E /* conv_cabot_hnd.swift */,
 			);
 			path = HLPDialog;
 			sourceTree = "<group>";
@@ -525,6 +528,7 @@
 				7E29F06D228B55C000CA7DD6 /* NavDeviceTTS.m in Sources */,
 				09725ABC24F8DB1D00012D42 /* STTHelper.swift in Sources */,
 				09725A9424F8D97200012D42 /* LocalContext.swift in Sources */,
+				090EC9D32542ACA000A2D53E /* conv_cabot_hnd.swift in Sources */,
 				7E29F00F228B548100CA7DD6 /* ViewController.swift in Sources */,
 				0929E0FE2527672A00D0C473 /* conv_cabot_mj.swift in Sources */,
 				7E29F00D228B548100CA7DD6 /* AppDelegate.swift in Sources */,
