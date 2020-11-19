@@ -22,6 +22,12 @@
 
 import Foundation
 
+public protocol TTSUIProtocol{
+    func speak()
+    func showText(_ text:String)
+    func showText(_ text:String, color:UIColor?)
+}
+
 @objc
 public protocol TTSProtocol {
     func speak(_ text:String?, callback: @escaping ()->Void)

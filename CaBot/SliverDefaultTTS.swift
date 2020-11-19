@@ -142,7 +142,27 @@ class Synthesizer {
     }
 }
 
+
 class SilverDefaultTTS: TTSProtocol {
+    private static let preflangid:[String:String] = [
+        "ja": "ja-JP",
+        "en": "en-US"
+    ]
+    private static let prefvoice:[String:[NSRegularExpression]] = [
+        "ja-JP": [
+            try! NSRegularExpression(pattern:"O-ren（拡張）"),
+            try! NSRegularExpression(pattern:"O-ren")
+        ]
+    ]
+    
+    private static func getpfeflangid() -> String{
+        let pre = Locale(identifier: Locale.preferredLanguages[0])
+        return SilverDefaultTTS.preflangid[pre.languageCode ?? "ja"] ?? "ja-JP"
+    }
+    private static func getprefVoiceCriteria(langid:String) -> [NSRegularExpression]?{
+        return SilverDefaultTTS.prefvoice[langid]
+    }
+    
     func stop(_ immediate: Bool) {
         Synthesizer.stopSpeakingUtterance()
     }
@@ -155,12 +175,14 @@ class SilverDefaultTTS: TTSProtocol {
         //nop
     }
     
-    let delegate:DialogViewHelper
+    let delegate:TTSUIProtocol?
 
-    init(delegate:DialogViewHelper, _langid:String, _criteria:[NSRegularExpression]? = nil){
+    init(delegate:TTSUIProtocol? = nil, _langid:String? = nil, _criteria:[NSRegularExpression]? = nil){
         self.delegate = delegate
-        self.setlang(_langid)
-        if let criteria = _criteria{
+        let preflangid = _langid ?? SilverDefaultTTS.getpfeflangid()
+        self.setlang(preflangid)
+
+        if let criteria = _criteria ?? SilverDefaultTTS.getprefVoiceCriteria(langid: preflangid){
             self.setByName(criteria)
         }
     }
@@ -174,8 +196,8 @@ class SilverDefaultTTS: TTSProtocol {
         Synthesizer.searchPreferredVoice(criteria)
     }
     func speak(_ text: String?, callback: @escaping () -> Void) {
-        self.delegate.speak()
-        self.delegate.showText(" ")
+        self.delegate?.speak()
+        self.delegate?.showText(" ")
         Synthesizer.speak(text, callback: callback)
     }
     func stop() {

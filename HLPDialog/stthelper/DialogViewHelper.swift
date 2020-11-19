@@ -112,7 +112,8 @@ public class HelperView: UIView {
 }
 
 @objcMembers
-public class DialogViewHelper: NSObject {
+public class DialogViewHelper: NSObject, TTSUIProtocol {
+    
     fileprivate var initialized: Bool = false
     
     fileprivate var background: AnimLayer!          // first circle
@@ -617,10 +618,13 @@ public class DialogViewHelper: NSObject {
     
     // MARK: - Showing Text
     
+    public func showText(_ text: String) {
+        self.showText(text, color:nil)
+    }
     var textTimer:Timer?
     var textPos:Int = 0
     var text:String?
-    public func showText(_ text:String, color:UIColor? = nil) {
+    public func showText(_ text:String, color:UIColor?) {
         
         let len = text.count
         

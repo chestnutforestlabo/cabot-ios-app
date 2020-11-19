@@ -454,6 +454,17 @@ class CaBotSpeechChar: CaBotChar {
     let uuid:CBUUID
     let characteristic: CBMutableCharacteristic
     
+    var _tts:TTSProtocol? = nil
+    private let _tts_lock:NSLock = NSLock()
+    public var tts:TTSProtocol? {
+        get{
+            self._tts_lock.lock()
+            defer{self._tts_lock.unlock()}
+            self._tts = SilverDefaultTTS()
+            return self._tts
+        }
+    }
+
     init(service: CaBotService,
          handle:Int) {
         self.uuid = service.generateUUID(handle: handle)
@@ -477,14 +488,16 @@ class CaBotSpeechChar: CaBotChar {
             guard let text = String(data: data, encoding: .utf8) else {
                 return
             }
-            guard let tts = NavDeviceTTS.shared() else {
+            guard let tts = self.tts else{//NavDeviceTTS.shared() else {
                 return
             }
             for line in text.split(separator: "\n") {
                 if line == "__force_stop__" {
-                    tts.speak("", withOptions: ["force": true], completionHandler: nil)
+                    tts.speak(""){
+                        
+                    }//, withOptions: ["force": true], completionHandler: nil)
                 } else {
-                    tts.speak(String(line), withOptions: nil){
+                    tts.speak(String(line)){//, withOptions: nil){
                         
                     }
                 }
