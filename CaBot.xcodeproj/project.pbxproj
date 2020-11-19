@@ -104,7 +104,7 @@
 		090EC9D62546BE5800A2D53E /* dlgviewcontroller_hnd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dlgviewcontroller_hnd.swift; sourceTree = "<group>"; };
 		0929E0FD2527672A00D0C473 /* conv_cabot_mj.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = conv_cabot_mj.swift; sourceTree = "<group>"; };
 		0952AA32252D574D00A4458B /* dlgviewcontroller_muji.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dlgviewcontroller_muji.swift; sourceTree = "<group>"; };
-		095C322A25650FC20062F258 /* destinations_coredo_all.yaml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = destinations_coredo_all.yaml; sourceTree = "<group>"; };
+		095C322A25650FC20062F258 /* destinations_coredo_all.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = destinations_coredo_all.yaml; sourceTree = "<group>"; };
 		09725A8724EEA62E00012D42 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		09725A8A24F8D97100012D42 /* LocalContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalContext.swift; sourceTree = "<group>"; };
 		09725A8C24F8D97100012D42 /* DialogViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DialogViewController.swift; sourceTree = "<group>"; };

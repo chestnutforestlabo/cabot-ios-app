@@ -60,7 +60,7 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
         ViewController.defaultHelper.addSectionTitle("version: \(versionNo!) (\(buildNo!))")
 
         // load destination yaml and make destination list
-        if let yamlfile = Bundle.main.path(forResource: "destinations", ofType: "yaml") {
+        if let yamlfile = Bundle.main.path(forResource: "destinations_coredo_all"/*"destinations"*/, ofType: "yaml") {
             if let yaml = try? String(contentsOfFile: yamlfile) {
                 if let destinations = try? Yams.load(yaml: yaml) as? [[String:String]] {
                     for destination in destinations {
