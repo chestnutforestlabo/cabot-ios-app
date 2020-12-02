@@ -1,33 +1,40 @@
-- # 3F あーばんりさーちどあーず
+- # 3F
+  pron : あーばんりさーちどあーず
   title : アーバンリサーチドアーズ
   value : EDITOR_node_1475150717480
-- # いおり
+-
+  pron : いおり
   title : 伊織(今治タオル)
   value : EDITOR_node_1475150619848
-- # いでーしょっぷ
+-
+  pron : いでーしょっぷ
   title : IDEE SHOP
   value : EDITOR_node_1475231724951
-- # えふぃー
+-
+  pron : えふぃー
   title : efffy
   value : EDITOR_node_1475150752016
-- # きょうらくてい／めぐりあん
+-
+  pron : きょうらくてい／めぐりあん
   title : 橋楽亭／囲庵
   value : EDITOR_node_1479086140039
-- # これどむろまちぷらす
+-
+  pron : これどむろまちぷらす
   title : COREDO室町＋
   value : EDITOR_node_1475150316800
-- # しんぷりー
+-
+  pron : しんぷりー
   title : Simply
   value : EDITOR_node_1475150640609
-- # たびお
-  title : タビオ(靴下)
-  value : EDITOR_node_1475150803005
-- # ぽーかーふぇいす とーきょー とらでぃしょん
+-
+  pron : ぽーかーふぇいす とーきょー とらでぃしょん
   title : ポーカーフェイス トーキョー トラディション
   value : EDITOR_node_1475150304738|EDITOR_node_1475150800810
-- # まかないこすめ
+-
+  pron : まかないこすめ
   title : まかないこすめ
   value : EDITOR_node_1475150342219
-- # 喫煙所
+-
+  pron : 喫煙所
   title : 喫煙所
   value : EDITOR_node_1475150398607

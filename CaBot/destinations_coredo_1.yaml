@@ -1,30 +1,40 @@
-- # 1F いる ばーかろ あるま
+- # 1F
+  pron : いる ばーかろ あるま
   title : IL BACARO ALMA
   value : EDITOR_node_1480252627023
-- # かやのや
+-
+  pron : かやのや
   title : 茅乃舎
   value : EDITOR_node_1475120200562
-- # くらふとびあまーけっと
+-
+  pron : くらふとびあまーけっと
   title : クラフトビアマーケット
   value : EDITOR_node_1480252629079
-- # コレド室町３ 中央通り側出入口
+-
+  pron : コレド室町３ 中央通り側出入口
   title : コレド室町３ 中央通り側出入口
   value : EDITOR_node_1474885690356
-- # コレド室町３ 仲通り側出入口
+-
+  pron : コレド室町３ 仲通り側出入口
   title : コレド室町３ 仲通り側出入口
   value : EDITOR_node_1474885746617
-- # コレド室町３ 江戸桜通り側出入口
+-
+  pron : コレド室町３ 江戸桜通り側出入口
   title : コレド室町３ 江戸桜通り側出入口
   value : EDITOR_node_1474885710158
-- # ちばぎんこう とうきょうえいぎょうぶ
+-
+  pron : ちばぎんこう とうきょうえいぎょうぶ
   title : 千葉銀行 東京営業部
   value : EDITOR_node_1475120109135
-- # つるやよしのぶ
+-
+  pron : つるやよしのぶ
   title : 鶴屋吉信
   value : EDITOR_node_1475125375012
-- # りそな銀行ATM
+-
+  pron : りそな銀行ATM
   title : りそな銀行ATM
   value : EDITOR_node_1475143244229
-- # 多機能トイレ
+-
+  pron : 多機能トイレ
   title : 多機能トイレ
   value : EDITOR_node_1475120146496

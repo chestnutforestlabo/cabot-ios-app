@@ -1,24 +1,32 @@
-- # B1F コレド室町３ 地下広場側出入口
+- # B1F
+  pron : コレド室町３ 地下広場側出入口
   title : コレド室町３ 地下広場側出入口
   value : EDITOR_node_1474876207156
-- # コレド室町３ 地下鉄側出入口
+-
+  pron : コレド室町３ 地下鉄側出入口
   title : コレド室町３ 地下鉄側出入口
   value : EDITOR_node_1474876276625
-- # でいりーやまざき
+-
+  pron : でいりーやまざき
   title : デイリーヤマザキ
   value : EDITOR_node_1475225953274|EDITOR_node_1475055758330
-- # とみーず
+-
+  pron : とみーず
   title : TOMIZ
   value : EDITOR_node_1475055582635
-- # ぶーるあんじゅ
+-
+  pron : ぶーるあんじゅ
   title : BOULANGE
   value : EDITOR_node_1475056016924
-- # まざーはうす
+-
+  pron : まざーはうす
   title : マザーハウス
   value : EDITOR_node_1475064070965
-- # りそな銀行ATM
+-
+  pron : りそな銀行ATM
   title : りそな銀行ATM
   value : EDITOR_node_1474960831291
-- # 多機能トイレ
+-
+  pron : 多機能トイレ
   title : 多機能トイレ
   value : EDITOR_node_1474957224740
