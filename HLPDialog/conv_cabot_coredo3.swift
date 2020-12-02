@@ -26,6 +26,8 @@ import Yams
 class conv_cabot_coredo3 : conv_cabot{
     
     private static let _dest_title_ext:[String:String] = [
+        "COREDO室町＋": "コレド室町プラス",
+        "collex": "小レックス|これっくす|コレックス",
         "無印良品":"無印",
         "ちばぎんひまわりギャラリー":"ちばぎんひまわりギャラリー|ひまわり",
         "まかないこすめ": "まかないこすめ|まかないコスメ",
@@ -37,7 +39,7 @@ class conv_cabot_coredo3 : conv_cabot{
         "IDEE SHOP": "出井ショップ|イデーショップ",
         "伊織(今治タオル)":"伊織|タオル|今治",
         "LIVETART": "リベッターと|裏βと",
-        "日本橋 箸長": "端長|端鳥",
+        "DO TABELKA": "どう食べるか|ドゥータベルカ|どー食べるか|どーたべるか",
         "中川政七商店": "中川政七",
         "漆器 山田平安堂": "漆器|山田平安堂",
         "SUSgallery": "さすがギャラリー",
@@ -45,6 +47,7 @@ class conv_cabot_coredo3 : conv_cabot{
         "石見銀山　群言堂":"石見銀山|群言動|群言堂",
         "鶴屋吉信": "鶴屋",
         "茅乃舎": "茅乃舎|茅の家",
+        "TOMIZ": "トミーズ|とみーず",
         "BOULANGE": "ブール杏樹|ブーランジェ|ブーランジュ",
         "IL BACARO ALMA": "いるばーか|6歩間|６歩間|入る婆角歩間"
     ]
@@ -58,7 +61,11 @@ class conv_cabot_coredo3 : conv_cabot{
                     for destination in destinations {
                         let patternstr:String = conv_cabot_coredo3._dest_title_ext[destination["title"]!] ?? destination["title"]!
                         if let regex = try? NSRegularExpression(pattern: patternstr){
-                            self._destinations[destination["value"]!] = ["title":destination["title"]!, "regex": regex, "value": destination["value"]!]
+                            self._destinations[destination["value"]!] = [
+                                "title":destination["title"]!,
+                                "regex": regex, "value": destination["value"]!,
+                                "pron": destination["pron"]!
+                            ]
                         }
                     }
                 }
@@ -69,8 +76,8 @@ class conv_cabot_coredo3 : conv_cabot{
     internal override func _get_response(_ orgtext:String?) -> [String:Any]{
         var speak:String = "すみません。もう一度お願いします。"
         var dest_info:[String:String]? = nil
+        var output_pron:String? = nil
         if let text = orgtext, !text.isEmpty{
-            
             for (key, value) in self._destinations{
                 if let val = value as? [String:Any] {
                     if self._matches(text, regex:val["regex"] as! NSRegularExpression){
@@ -79,6 +86,9 @@ class conv_cabot_coredo3 : conv_cabot{
                         dest_info = [
                             "nodes": val["value"] as! String
                         ]
+                        if let pron = val["pron"] as? String{
+                            output_pron = "わかりました。 " + pron + " に向かいます。"
+                        }
                     }
                 }
             }
@@ -93,6 +103,7 @@ class conv_cabot_coredo3 : conv_cabot{
             "intents":[],
             "entities":[],
             "context":[
+                "output_pron": output_pron,
                 "navi": dest_info == nil ? false : true,
                 "dest_info": dest_info,
                 "system":[
