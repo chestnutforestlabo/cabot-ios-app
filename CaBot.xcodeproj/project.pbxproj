@@ -66,6 +66,7 @@
 		09725B112506313000012D42 /* ja.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 09725B0F2506312F00012D42 /* ja.yaml */; };
 		09725B19250CB50200012D42 /* conv_cabot_en.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B18250CB50200012D42 /* conv_cabot_en.swift */; };
 		097845C02531E65B004DE1F6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 097845C22531E65B004DE1F6 /* InfoPlist.strings */; };
+		097CD7C82578B0210017B824 /* destinations_root.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 097CD7C72578B0210017B824 /* destinations_root.yaml */; };
 		7E29F00D228B548100CA7DD6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00C228B548100CA7DD6 /* AppDelegate.swift */; };
 		7E29F00F228B548100CA7DD6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00E228B548100CA7DD6 /* ViewController.swift */; };
 		7E29F012228B548100CA7DD6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F010228B548100CA7DD6 /* Main.storyboard */; };
@@ -142,6 +143,7 @@
 		09725B18250CB50200012D42 /* conv_cabot_en.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = conv_cabot_en.swift; sourceTree = "<group>"; };
 		097845C12531E65B004DE1F6 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		097845C32531E685004DE1F6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		097CD7C72578B0210017B824 /* destinations_root.yaml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = destinations_root.yaml; sourceTree = "<group>"; };
 		7E29F009228B548100CA7DD6 /* CaBot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CaBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E29F00C228B548100CA7DD6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7E29F00E228B548100CA7DD6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -307,6 +309,7 @@
 				090EC9D62546BE5800A2D53E /* dlgviewcontroller_hnd.swift */,
 				095C322A25650FC20062F258 /* destinations_coredo_all.yaml */,
 				096C5C5425752EA200836CF4 /* dlgviewcontroller_coredo3.swift */,
+				097CD7C72578B0210017B824 /* destinations_root.yaml */,
 			);
 			path = CaBot;
 			sourceTree = "<group>";
@@ -494,6 +497,7 @@
 				7E29F069228B55C000CA7DD6 /* HLPSettingViewPickerCell.xib in Resources */,
 				09725B0224F8DCFB00012D42 /* Info.plist in Resources */,
 				096C5C512574C09000836CF4 /* destinations_coredo_4.yaml in Resources */,
+				097CD7C82578B0210017B824 /* destinations_root.yaml in Resources */,
 				096C5C4F2574C09000836CF4 /* destinations_coredo_2.yaml in Resources */,
 				7E29F06A228B55C000CA7DD6 /* HLPSettingViewSliderCell.xib in Resources */,
 				09725AE124F8DCFB00012D42 /* Localizable.strings in Resources */,

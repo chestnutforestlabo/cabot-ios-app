@@ -37,11 +37,31 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
     static let defaultHelper:HLPSettingHelper = HLPSettingHelper()
     static let destinationHelper:HLPSettingHelper = HLPSettingHelper()
     static let systemHelper:HLPSettingHelper = HLPSettingHelper()
+    static var destinationHelpers:[String:HLPSettingHelper] = [:]
+    static let name_destination_helper_root:String = "destinations_root"
     static var service:CaBotService!
     
     var centralConnected:Bool = false
     var faceappConnected:Bool = false
+    var dest_group_id:String = name_destination_helper_root
+    var next_group_id:String? = nil
     
+    static func load_destinationhelper(name:String){
+        if let yamlfile = Bundle.main.path(forResource: name, ofType: "yaml") {
+            if let yaml = try? String(contentsOfFile: yamlfile) {
+                if let destinations = try? Yams.load(yaml: yaml) as? [[String:String]] {
+                    let newhelper = HLPSettingHelper()
+                    for destination in destinations {
+                        newhelper.addActionTitle(destination["title"], name: destination["value"])
+                        if let val = destination["value"], val.hasPrefix("destinations_"){
+                            ViewController.load_destinationhelper(name:val)
+                        }
+                    }
+                    self.destinationHelpers[name] = newhelper
+                }
+            }
+        }
+    }
     static func initHelper(){
         
         service = CaBotService()
@@ -60,7 +80,8 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
         ViewController.defaultHelper.addSectionTitle("version: \(versionNo!) (\(buildNo!))")
 
         // load destination yaml and make destination list
-        if let yamlfile = Bundle.main.path(forResource: "destinations_coredo_all"/*"destinations"*/, ofType: "yaml") {
+        self.load_destinationhelper(name: name_destination_helper_root)
+        /*if let yamlfile = Bundle.main.path(forResource: "destinations_root"/*"destinations"*/, ofType: "yaml") {
             if let yaml = try? String(contentsOfFile: yamlfile) {
                 if let destinations = try? Yams.load(yaml: yaml) as? [[String:String]] {
                     for destination in destinations {
@@ -69,7 +90,7 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
                     }
                 }
             }
-        }
+        }*/
         
         // system settings
         ViewController.systemHelper.addSetting(with: .double, label: "Walking Speed", name: CaBotService.CABOT_SPEED_CONFIG,
@@ -79,38 +100,42 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
     }
     
     func actionPerformed(_ setting: HLPSetting!) {
-        if setting.name.hasPrefix("EDITOR_") {
-            if let destination = setting.name {
-                
-                DispatchQueue.main.async {
-                    NavUtil.showModalWaiting(withMessage: "waiting")
-                    if ViewController.service.send(destination: destination) {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                            self.navigationController?.popViewController(animated: true)
-                            NavUtil.hideModalWaiting()
+        if let name = setting.name{
+            if name.hasPrefix("EDITOR_") {
+                if let destination = setting.name {
+                    
+                    DispatchQueue.main.async {
+                        NavUtil.showModalWaiting(withMessage: "waiting")
+                        if ViewController.service.send(destination: destination) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                self.navigationController?.popViewController(animated: true)
+                                NavUtil.hideModalWaiting()
+                            }
+                        } else {
+                            let alertController = UIAlertController(title: "Error", message: "CaBot may not be connected", preferredStyle: .alert)
+                            let ok = UIAlertAction(title: "Okay", style: .default) { (action:UIAlertAction) in
+                                alertController.dismiss(animated: true, completion: {
+                                })
+                            }
+                            alertController.addAction(ok)
+                            self.present(alertController, animated: true, completion: nil)
                         }
-                    } else {
-                        let alertController = UIAlertController(title: "Error", message: "CaBot may not be connected", preferredStyle: .alert)
-                        let ok = UIAlertAction(title: "Okay", style: .default) { (action:UIAlertAction) in
-                            alertController.dismiss(animated: true, completion: {
-                            })
-                        }
-                        alertController.addAction(ok)
-                        self.present(alertController, animated: true, completion: nil)
                     }
                 }
-            }
-        } else if setting.name == "cancel_navigation" {
-            NavUtil.showModalWaiting(withMessage: "waiting")
-            DispatchQueue.main.async {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    NavUtil.hideModalWaiting()
+            } else if name == "cancel_navigation" {
+                NavUtil.showModalWaiting(withMessage: "waiting")
+                DispatchQueue.main.async {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        NavUtil.hideModalWaiting()
+                    }
+                    ViewController.service.send(destination: "__cancel__")
                 }
-
-                ViewController.service.send(destination: "__cancel__")
+            } else if name.hasPrefix("destinations_"){
+                self.next_group_id = name
+                self.performSegue(withIdentifier: "select_destination", sender: self)
+            } else {
+                self.performSegue(withIdentifier: setting.name, sender: self)
             }
-        } else {
-            self.performSegue(withIdentifier: setting.name, sender: self)
         }
     }
     
@@ -138,15 +163,16 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
         //navigationController?.navigationBar.prefersLargeTitles = true
         
         self.updateView()
-        if self.restorationIdentifier == "default_menu" {
-            helper = ViewController.defaultHelper
+        if let rid:String = self.restorationIdentifier{
+            if rid == "default_menu" {
+                helper = ViewController.defaultHelper
+            }else if rid == "select_destination" {
+                helper = ViewController.destinationHelpers[self.dest_group_id]
+            }else if rid == "system_settings" {
+                helper = ViewController.systemHelper
+            }
         }
-        if self.restorationIdentifier == "select_destination" {
-            helper = ViewController.destinationHelper
-        }
-        if self.restorationIdentifier == "system_settings" {
-            helper = ViewController.systemHelper
-        }
+        
         
         if let helper = helper {
             helper.delegate = self
@@ -162,36 +188,36 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
             
             var title:String = ""
             var accessibilityLabel:String = ""
-            if self.restorationIdentifier == "default_menu" {
-                title = "CaBot"
-                accessibilityLabel = "CaBot"
-                if self.centralConnected {
-                    title = title + "📱"
-                    accessibilityLabel = accessibilityLabel + " connected"
+            if let rid = self.restorationIdentifier{
+                if rid == "default_menu" {
+                    title = "CaBot"
+                    accessibilityLabel = "CaBot"
+                    if self.centralConnected {
+                        title = title + "📱"
+                        accessibilityLabel = accessibilityLabel + " connected"
 
-                    if self.faceappConnected {
-                        title = title + "🎒"
-                        accessibilityLabel = accessibilityLabel + ", backpack ready"
+                        if self.faceappConnected {
+                            title = title + "🎒"
+                            accessibilityLabel = accessibilityLabel + ", backpack ready"
+                        }
+                    } else {
+                        title = title + "📵"
+                        accessibilityLabel = accessibilityLabel + " not connected"
                     }
-                } else {
-                    title = title + "📵"
-                    accessibilityLabel = accessibilityLabel + " not connected"
-                }
-                
-                
-                //print(title)
-                if let settings = ViewController.defaultHelper.settings as! [HLPSetting]? {
-                    for setting in settings {
-                        setting.disabled = !self.centralConnected
+                    
+                    
+                    //print(title)
+                    if let settings = ViewController.defaultHelper.settings as! [HLPSetting]? {
+                        for setting in settings {
+                            setting.disabled = !self.centralConnected
+                        }
                     }
+                    self.tableView.reloadData()
+                }else if rid == "select_destination" {
+                    title = "Destinations"
+                }else if rid == "system_settings" {
+                    title = "Settings"
                 }
-                self.tableView.reloadData()
-            }
-            if self.restorationIdentifier == "select_destination" {
-                title = "Destinations"
-            }
-            if self.restorationIdentifier == "system_settings" {
-                title = "Settings"
             }
             
             titleLabel.text = title
@@ -203,6 +229,9 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let nextvc = segue.destination as? ViewController, let nextgroupid = self.next_group_id{
+            nextvc.dest_group_id = nextgroupid
+        }
         segue.destination.restorationIdentifier = segue.identifier
     }
 }
