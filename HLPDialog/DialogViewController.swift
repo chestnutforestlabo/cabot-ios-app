@@ -149,6 +149,15 @@ public class DialogViewController: UIViewController, UITableViewDelegate, UITabl
     
     override public func viewDidAppear(_ animated: Bool) {
         print(Date(), #function, #line)
+        if !UIAccessibility.isVoiceOverRunning {
+            restartConversation()
+            DialogManager.sharedManager().isActive = true
+        } else {
+            let timer = Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(start), userInfo: nil, repeats: false)
+        }
+    }
+
+    internal func start() {
         restartConversation()
         DialogManager.sharedManager().isActive = true
     }
