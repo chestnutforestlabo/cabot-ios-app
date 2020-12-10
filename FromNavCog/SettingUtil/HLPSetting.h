@@ -73,6 +73,7 @@ typedef NS_ENUM (NSUInteger, NavCogSettingType) {
 
 @property NavCogSettingType type;
 @property NSString *label;
+@property NSString *accLabel;
 @property NSString *name;
 @property HLPOptionGroup *group;
 @property NSObject *defaultValue;

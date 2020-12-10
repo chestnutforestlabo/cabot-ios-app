@@ -67,6 +67,7 @@
 
     
     self.title.text = self.setting.label;
+    self.title.accessibilityLabel = self.setting.accLabel;
     self.title.adjustsFontSizeToFitWidth = YES;
     self.title.isAccessibilityElement = NO;
     if (@available(iOS 13.0, *)) {

@@ -52,7 +52,7 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
                 if let destinations = try? Yams.load(yaml: yaml) as? [[String:String]] {
                     let newhelper = HLPSettingHelper()
                     for destination in destinations {
-                        newhelper.addActionTitle(destination["title"], name: destination["value"])
+                        newhelper.addActionTitle(destination["title"], accLabel: destination["pron"], name: destination["value"])
                         if let val = destination["value"], val.hasPrefix("destinations_"){
                             ViewController.load_destinationhelper(name:val)
                         }

@@ -231,12 +231,19 @@
     return s;
 }
 
-- (HLPSetting*)addActionTitle:(NSString *)title Name:(NSString*)name
+- (HLPSetting *)addActionTitle:(NSString *)title Name:(NSString *)name
+{
+    return [self addActionTitle:title accLabel:title Name:name];
+}
+
+- (HLPSetting*)addActionTitle:(NSString *)title accLabel:(NSString*)label Name:(NSString*)name
 {
     HLPSetting *s = [[HLPSetting alloc] init];
     s.type = NavCogSettingTypeAction;
     s.label = title;
+    s.accLabel = label;
     s.name = name;
+    s.accessibilityLabel = label;
     
     [self.settings addObject:s];
     return s;

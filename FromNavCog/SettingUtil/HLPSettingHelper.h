@@ -61,6 +61,7 @@
 
 - (HLPSetting*) addSectionTitle:(NSString*)title;
 - (HLPSetting*) addActionTitle:(NSString*)title Name:(NSString*)name;
+- (HLPSetting*) addActionTitle:(NSString*)title accLabel:(NSString*)label Name:(NSString*)name;
 - (void) removeAllSetting;
 
 - (NSInteger) numberOfSections;
