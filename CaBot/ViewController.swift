@@ -68,9 +68,15 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
         
         // main menu
         ViewController.defaultHelper.addSectionTitle("")
-        ViewController.defaultHelper.addActionTitle("Select Destination", name: "select_destination")
+        ViewController.defaultHelper.addActionTitle(NSLocalizedString("SELECT_DESTINATION",
+                                                                      tableName: "CaBotLocalizable",
+                                                                      comment: "Select Destintion Menu"),
+                                                    name: "select_destination")
         ViewController.defaultHelper.addSectionTitle("")
-        ViewController.defaultHelper.addActionTitle("Cancel Navigation", name: "cancel_navigation")
+        ViewController.defaultHelper.addActionTitle(NSLocalizedString("CANCEL_NAVIGATION",
+                                                                      tableName: "CaBotLocalizable",
+                                                                      comment: "Cancel Navigation Menu"),
+                                                    name: "cancel_navigation")
         //ViewController.defaultHelper.addActionTitle("System Settings", name: "system_settings")
         
         
@@ -209,14 +215,19 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
                     //print(title)
                     if let settings = ViewController.defaultHelper.settings as! [HLPSetting]? {
                         for setting in settings {
-                            setting.disabled = !self.centralConnected
+                            //setting.disabled = !self.centralConnected
+                            setting.disabled = false
                         }
                     }
                     self.tableView.reloadData()
                 }else if rid == "select_destination" {
-                    title = "Destinations"
+                    title = NSLocalizedString("DESTINATIONS_LABEL",
+                                              tableName: "CaBotLocalizable",
+                                              comment: "Destinations Label")
                 }else if rid == "system_settings" {
-                    title = "Settings"
+                    title = NSLocalizedString("SETTINGS_LABEL",
+                                              tableName: "CaBotLocalizable",
+                                              comment: "Settings Label")
                 }
             }
             

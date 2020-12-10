@@ -168,7 +168,7 @@ class SilverDefaultTTS: TTSProtocol {
     }
     
     func vibrate() {
-        //nop
+        AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
     }
     
     func playVoiceRecoStart() {

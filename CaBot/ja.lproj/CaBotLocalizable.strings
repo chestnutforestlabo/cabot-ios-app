@@ -1,0 +1,12 @@
+/* 
+  Localizable.strings
+  CaBot
+
+  Created by Daisuke Sato on 2020/12/09.
+  Copyright © 2020 CMU. All rights reserved.
+*/
+
+"SELECT_DESTINATION"="行き先を選択";
+"CANCEL_NAVIGATION"="ナビゲーションを中止";
+"DESTINATIONS_LABEL"="行き先";
+"SETTINGS_LABEL"="設定";

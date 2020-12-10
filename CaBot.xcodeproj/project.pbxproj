@@ -56,7 +56,6 @@
 		09725AE124F8DCFB00012D42 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 09725ACF24F8DCFB00012D42 /* Localizable.strings */; };
 		09725AE224F8DCFB00012D42 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 09725ACF24F8DCFB00012D42 /* Localizable.strings */; };
 		09725AE324F8DCFB00012D42 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 09725ACF24F8DCFB00012D42 /* Localizable.strings */; };
-		09725B0224F8DCFB00012D42 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 09725ADD24F8DCFB00012D42 /* Info.plist */; };
 		09725B0324F8DCFB00012D42 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 09725ADD24F8DCFB00012D42 /* Info.plist */; };
 		09725B0424F8DCFB00012D42 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 09725ADD24F8DCFB00012D42 /* Info.plist */; };
 		09725B0824FD5DF800012D42 /* conv_cabot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0724FD5DF800012D42 /* conv_cabot.swift */; };
@@ -87,6 +86,7 @@
 		7E29F06D228B55C000CA7DD6 /* NavDeviceTTS.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F062228B55C000CA7DD6 /* NavDeviceTTS.m */; };
 		7E29F071228B55FC00CA7DD6 /* destinations.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F06E228B55FC00CA7DD6 /* destinations.yaml */; };
 		7E29F072228B55FC00CA7DD6 /* CaBotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F070228B55FC00CA7DD6 /* CaBotService.swift */; };
+		7E557F002581C79B00B1B9CA /* CaBotLocalizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7E557EFE2581C79B00B1B9CA /* CaBotLocalizable.strings */; };
 		7EF5F1EA228DB07100788987 /* NavUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EF5F1E8228DB07100788987 /* NavUtil.m */; };
 /* End PBXBuildFile section */
 
@@ -181,6 +181,8 @@
 		7E29F06E228B55FC00CA7DD6 /* destinations.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = destinations.yaml; sourceTree = "<group>"; };
 		7E29F06F228B55FC00CA7DD6 /* bridging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bridging.h; sourceTree = "<group>"; };
 		7E29F070228B55FC00CA7DD6 /* CaBotService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaBotService.swift; sourceTree = "<group>"; };
+		7E557EFF2581C79B00B1B9CA /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/CaBotLocalizable.strings; sourceTree = "<group>"; };
+		7E557F042581C80E00B1B9CA /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/CaBotLocalizable.strings; sourceTree = "<group>"; };
 		7EF5F1E8228DB07100788987 /* NavUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NavUtil.m; sourceTree = "<group>"; };
 		7EF5F1E9228DB07100788987 /* NavUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NavUtil.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -310,6 +312,7 @@
 				095C322A25650FC20062F258 /* destinations_coredo_all.yaml */,
 				096C5C5425752EA200836CF4 /* dlgviewcontroller_coredo3.swift */,
 				097CD7C72578B0210017B824 /* destinations_root.yaml */,
+				7E557EFE2581C79B00B1B9CA /* CaBotLocalizable.strings */,
 			);
 			path = CaBot;
 			sourceTree = "<group>";
@@ -494,8 +497,8 @@
 				096C5C4D2574C09000836CF4 /* destinations_coredo_1.yaml in Resources */,
 				7E29F071228B55FC00CA7DD6 /* destinations.yaml in Resources */,
 				09725AB924F8DB1D00012D42 /* icons.xcassets in Resources */,
+				7E557F002581C79B00B1B9CA /* CaBotLocalizable.strings in Resources */,
 				7E29F069228B55C000CA7DD6 /* HLPSettingViewPickerCell.xib in Resources */,
-				09725B0224F8DCFB00012D42 /* Info.plist in Resources */,
 				096C5C512574C09000836CF4 /* destinations_coredo_4.yaml in Resources */,
 				097CD7C82578B0210017B824 /* destinations_root.yaml in Resources */,
 				096C5C4F2574C09000836CF4 /* destinations_coredo_2.yaml in Resources */,
@@ -684,6 +687,15 @@
 				7E29F05C228B55C000CA7DD6 /* en-US */,
 			);
 			name = HLPSettingView.strings;
+			sourceTree = "<group>";
+		};
+		7E557EFE2581C79B00B1B9CA /* CaBotLocalizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7E557EFF2581C79B00B1B9CA /* Base */,
+				7E557F042581C80E00B1B9CA /* ja */,
+			);
+			name = CaBotLocalizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
