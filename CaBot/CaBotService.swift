@@ -488,7 +488,7 @@ class CaBotSpeechChar: CaBotChar {
             guard let text = String(data: data, encoding: .utf8) else {
                 return
             }
-            guard let tts = self.tts else{//NavDeviceTTS.shared() else {
+            guard let tts = NavDeviceTTS.shared() else {
                 return
             }
             for line in text.split(separator: "\n") {
