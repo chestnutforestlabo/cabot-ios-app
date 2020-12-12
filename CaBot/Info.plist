@@ -25,8 +25,10 @@
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>CaBot app works as an peripheral device of your robot.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>This app uses your location always</string>
+	<string>This app uses your location always and When in use</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app uses your location when in use</string>
+	<key>NSLocationAlwaysUsageDescription</key>
 	<string>This app uses your location always</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app uses your microphone</string>

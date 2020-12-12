@@ -30,12 +30,14 @@
 
 import UIKit
 import AVKit
+import CoreLocation
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate {
 
     var window: UIWindow?
-
+    var locationManager: CLLocationManager?
+    var authorized: Bool = false
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         ViewController.initHelper()
@@ -105,6 +107,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
 
+        if authorized {
+            if let lm = locationManager {
+                lm.allowsBackgroundLocationUpdates = true
+                lm.startUpdatingLocation()
+            }
+        }
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {
@@ -131,18 +139,68 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
         do {
-            try AVAudioSession.sharedInstance().setCategory(.soloAmbient, mode: .default,
+            try AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default,
                                                             options: .allowBluetooth)
-            try AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
+            try AVAudioSession.sharedInstance().setActive(true)
+            
         } catch {
             print("audioSession properties weren't set because of an error.")
         }
+        
+        if locationManager == nil {
+            locationManager = CLLocationManager()
+            locationManager?.delegate = self
+        }
+        
+        if let lm = locationManager {
+            if authorized {
+                lm.stopUpdatingLocation()
+            } else {
+                lm.requestAlwaysAuthorization()
+            }
+        }
+        
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
+    func didChangeAuthorizationStatus(_ authorized: Bool) {
+        self.authorized = authorized
+    }
 
+    @available(iOS 14.0, *)
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        switch (manager.authorizationStatus) {
+        case CLAuthorizationStatus.denied,
+             CLAuthorizationStatus.restricted,
+             CLAuthorizationStatus.notDetermined:
+            self.didChangeAuthorizationStatus(false)
+            break
+        case CLAuthorizationStatus.authorizedWhenInUse,
+             CLAuthorizationStatus.authorizedAlways:
+            self.didChangeAuthorizationStatus(true)
+            break
+        @unknown default:
+            fatalError()
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        switch (status) {
+        case CLAuthorizationStatus.denied,
+             CLAuthorizationStatus.restricted,
+             CLAuthorizationStatus.notDetermined:
+            self.didChangeAuthorizationStatus(false)
+            break
+        case CLAuthorizationStatus.authorizedWhenInUse,
+             CLAuthorizationStatus.authorizedAlways:
+            self.didChangeAuthorizationStatus(true)
+            break
+        @unknown default:
+            fatalError()
+        }
+    }
 }
 
