@@ -59,14 +59,14 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     let uuid = CBUUID(string: String(format:UUID_FORMAT, 0x0000))
     var destinationChar:CaBotNotifyChar!
     var findPersonChar:CaBotNotifyChar!
-    var hearbeatChar:CaBotNotifyChar!
+    var heartbeatChar:CaBotNotifyChar!
     var peripheralManager:CBPeripheralManager!
     var characteristics:[CBCharacteristic] = []
     var chars:[CaBotChar] = []
     var delegate:CaBotServiceDelegate?
     var faceappReady:Bool = false
 
-    
+
     override init(){
         super.init()
         self.peripheralManager = CBPeripheralManager(delegate: self, queue: nil,
@@ -88,17 +88,18 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
         })
         self.chars.append(CaBotSpeechChar(service: self, handle:0x0200))
         
-        self.hearbeatChar = CaBotNotifyChar(service: self, handle:0x9999)
-        self.chars.append(self.hearbeatChar)
+        self.heartbeatChar = CaBotNotifyChar(service: self, handle:0x9999)
+        self.chars.append(self.heartbeatChar)
         
         self.startHeartBeat()
     }
     
     internal func startHeartBeat() {
-        Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { (timer) in
+        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { (timer) in
             DispatchQueue.main.async {
                 print("heartbeat")
-                if (!self.hearbeatChar.notify(value: "1")) {
+                self.checkAdvertisement();
+                if (!self.heartbeatChar.notify(value: "1")) {
                     self.delegate?.caBot(service: self, centralConnected: false)
                     self.delegate?.caBot(service: self, faceappConnected: false)
                 } else {
@@ -142,6 +143,21 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
         peripheralManager.add(service)
     }
     
+    private func checkAdvertisement()
+    {
+        if (self.heartbeatChar.characteristic_read.subscribedCentrals?.count ?? 0 > 0) {
+            if (self.peripheralManager.isAdvertising) {
+                self.peripheralManager.stopAdvertising();
+                print("Stop advertising")
+            }
+        } else {
+            if (!self.peripheralManager.isAdvertising) {
+                self.startAdvertising();
+                print("Start advertising")
+            }
+        }
+    }
+
     func peripheralManager(_ peripheral: CBPeripheralManager, didAdd service: CBService, error: Error?) {
         if let error = error {
             print("error: \(error)")
@@ -149,10 +165,13 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
         }
         
         print("service added: \(service)")
+        self.startAdvertising();
+    }
+
+    func startAdvertising() {
         let teamid:String? = settings._get_default_string("team_id")
         let advertisementData = [CBAdvertisementDataLocalNameKey: "CaBot" + (teamid != nil ? "-" + teamid! : "")]
         peripheralManager.startAdvertising(advertisementData)
-        
     }
     
     func peripheralManagerDidStartAdvertising(_ peripheral: CBPeripheralManager, error: Error?) {
