@@ -11,25 +11,17 @@
 		090EC9D72546BE5800A2D53E /* dlgviewcontroller_hnd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090EC9D62546BE5800A2D53E /* dlgviewcontroller_hnd.swift */; };
 		0929E0FE2527672A00D0C473 /* conv_cabot_mj.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0929E0FD2527672A00D0C473 /* conv_cabot_mj.swift */; };
 		0952AA33252D574D00A4458B /* dlgviewcontroller_muji.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0952AA32252D574D00A4458B /* dlgviewcontroller_muji.swift */; };
-		095C322B25650FC20062F258 /* destinations_coredo_all.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 095C322A25650FC20062F258 /* destinations_coredo_all.yaml */; };
-		096C5C4D2574C09000836CF4 /* destinations_coredo_1.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 096C5C482574C08F00836CF4 /* destinations_coredo_1.yaml */; };
-		096C5C4E2574C09000836CF4 /* destinations_coredo_0.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 096C5C492574C09000836CF4 /* destinations_coredo_0.yaml */; };
-		096C5C4F2574C09000836CF4 /* destinations_coredo_2.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 096C5C4A2574C09000836CF4 /* destinations_coredo_2.yaml */; };
-		096C5C502574C09000836CF4 /* destinations_coredo_3.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 096C5C4B2574C09000836CF4 /* destinations_coredo_3.yaml */; };
-		096C5C512574C09000836CF4 /* destinations_coredo_4.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 096C5C4C2574C09000836CF4 /* destinations_coredo_4.yaml */; };
 		096C5C532574F63A00836CF4 /* conv_cabot_coredo3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 096C5C522574F63A00836CF4 /* conv_cabot_coredo3.swift */; };
 		096C5C5525752EA200836CF4 /* dlgviewcontroller_coredo3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 096C5C5425752EA200836CF4 /* dlgviewcontroller_coredo3.swift */; };
 		09725A8824EEA62E00012D42 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 09725A8724EEA62E00012D42 /* Settings.bundle */; };
 		09725B0824FD5DF800012D42 /* conv_cabot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0724FD5DF800012D42 /* conv_cabot.swift */; };
 		09725B0A24FE4AC300012D42 /* dlgviewcontroller_cabot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0924FE4AC300012D42 /* dlgviewcontroller_cabot.swift */; };
 		09725B0C24FE573A00012D42 /* SliverDefaultTTS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0B24FE573A00012D42 /* SliverDefaultTTS.swift */; };
-		09725B102506313000012D42 /* en.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 09725B0E2506312F00012D42 /* en.yaml */; };
-		09725B112506313000012D42 /* ja.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 09725B0F2506312F00012D42 /* ja.yaml */; };
 		09725B19250CB50200012D42 /* conv_cabot_en.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B18250CB50200012D42 /* conv_cabot_en.swift */; };
 		097845C02531E65B004DE1F6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 097845C22531E65B004DE1F6 /* InfoPlist.strings */; };
-		097CD7C82578B0210017B824 /* destinations_root.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 097CD7C72578B0210017B824 /* destinations_root.yaml */; };
 		306C7F69265D431700E5928E /* HLPDialog in Frameworks */ = {isa = PBXBuildFile; productRef = 306C7F68265D431700E5928E /* HLPDialog */; };
 		306C7F6C265D435100E5928E /* Yams in Frameworks */ = {isa = PBXBuildFile; productRef = 306C7F6B265D435100E5928E /* Yams */; };
+		3099132B265DE50A000C1BFE /* Resource in Resources */ = {isa = PBXBuildFile; fileRef = 3099132A265DE50A000C1BFE /* Resource */; };
 		7E29F00D228B548100CA7DD6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00C228B548100CA7DD6 /* AppDelegate.swift */; };
 		7E29F00F228B548100CA7DD6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00E228B548100CA7DD6 /* ViewController.swift */; };
 		7E29F012228B548100CA7DD6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F010228B548100CA7DD6 /* Main.storyboard */; };
@@ -48,7 +40,6 @@
 		7E29F06B228B55C000CA7DD6 /* HLPSettingTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F05E228B55C000CA7DD6 /* HLPSettingTableView.m */; };
 		7E29F06C228B55C000CA7DD6 /* HLPSettingViewSubtitleCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F05F228B55C000CA7DD6 /* HLPSettingViewSubtitleCell.xib */; };
 		7E29F06D228B55C000CA7DD6 /* NavDeviceTTS.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F062228B55C000CA7DD6 /* NavDeviceTTS.m */; };
-		7E29F071228B55FC00CA7DD6 /* destinations.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F06E228B55FC00CA7DD6 /* destinations.yaml */; };
 		7E29F072228B55FC00CA7DD6 /* CaBotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F070228B55FC00CA7DD6 /* CaBotService.swift */; };
 		7E557F002581C79B00B1B9CA /* CaBotLocalizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7E557EFE2581C79B00B1B9CA /* CaBotLocalizable.strings */; };
 		7EF5F1EA228DB07100788987 /* NavUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EF5F1E8228DB07100788987 /* NavUtil.m */; };
@@ -76,28 +67,20 @@
 		090EC9D62546BE5800A2D53E /* dlgviewcontroller_hnd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dlgviewcontroller_hnd.swift; sourceTree = "<group>"; };
 		0929E0FD2527672A00D0C473 /* conv_cabot_mj.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = conv_cabot_mj.swift; sourceTree = "<group>"; };
 		0952AA32252D574D00A4458B /* dlgviewcontroller_muji.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dlgviewcontroller_muji.swift; sourceTree = "<group>"; };
-		095C322A25650FC20062F258 /* destinations_coredo_all.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = destinations_coredo_all.yaml; sourceTree = "<group>"; };
-		096C5C482574C08F00836CF4 /* destinations_coredo_1.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = destinations_coredo_1.yaml; sourceTree = "<group>"; };
-		096C5C492574C09000836CF4 /* destinations_coredo_0.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = destinations_coredo_0.yaml; sourceTree = "<group>"; };
-		096C5C4A2574C09000836CF4 /* destinations_coredo_2.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = destinations_coredo_2.yaml; sourceTree = "<group>"; };
-		096C5C4B2574C09000836CF4 /* destinations_coredo_3.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = destinations_coredo_3.yaml; sourceTree = "<group>"; };
-		096C5C4C2574C09000836CF4 /* destinations_coredo_4.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = destinations_coredo_4.yaml; sourceTree = "<group>"; };
 		096C5C522574F63A00836CF4 /* conv_cabot_coredo3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = conv_cabot_coredo3.swift; sourceTree = "<group>"; };
 		096C5C5425752EA200836CF4 /* dlgviewcontroller_coredo3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dlgviewcontroller_coredo3.swift; sourceTree = "<group>"; };
 		09725A8724EEA62E00012D42 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		09725B0724FD5DF800012D42 /* conv_cabot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = conv_cabot.swift; sourceTree = "<group>"; };
 		09725B0924FE4AC300012D42 /* dlgviewcontroller_cabot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dlgviewcontroller_cabot.swift; sourceTree = "<group>"; };
 		09725B0B24FE573A00012D42 /* SliverDefaultTTS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliverDefaultTTS.swift; sourceTree = "<group>"; };
-		09725B0E2506312F00012D42 /* en.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = en.yaml; sourceTree = "<group>"; };
-		09725B0F2506312F00012D42 /* ja.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = ja.yaml; sourceTree = "<group>"; };
 		09725B18250CB50200012D42 /* conv_cabot_en.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = conv_cabot_en.swift; sourceTree = "<group>"; };
 		097845C12531E65B004DE1F6 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		097845C32531E685004DE1F6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		097CD7C72578B0210017B824 /* destinations_root.yaml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = destinations_root.yaml; sourceTree = "<group>"; };
 		306A57DA265C4435006B510D /* Speech.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Speech.framework; path = System/Library/Frameworks/Speech.framework; sourceTree = SDKROOT; };
 		306A57DC265C4466006B510D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		306A57DE265C446B006B510D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		306A57E0265C4477006B510D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		3099132A265DE50A000C1BFE /* Resource */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resource; sourceTree = "<group>"; };
 		7E29F009228B548100CA7DD6 /* CaBot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CaBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E29F00C228B548100CA7DD6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7E29F00E228B548100CA7DD6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -132,7 +115,6 @@
 		7E29F060228B55C000CA7DD6 /* HLPSettingHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HLPSettingHelper.h; sourceTree = "<group>"; };
 		7E29F061228B55C000CA7DD6 /* HLPSettingViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HLPSettingViewCell.h; sourceTree = "<group>"; };
 		7E29F062228B55C000CA7DD6 /* NavDeviceTTS.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NavDeviceTTS.m; sourceTree = "<group>"; };
-		7E29F06E228B55FC00CA7DD6 /* destinations.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = destinations.yaml; sourceTree = "<group>"; };
 		7E29F06F228B55FC00CA7DD6 /* bridging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bridging.h; sourceTree = "<group>"; };
 		7E29F070228B55FC00CA7DD6 /* CaBotService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaBotService.swift; sourceTree = "<group>"; };
 		7E557EFF2581C79B00B1B9CA /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/CaBotLocalizable.strings; sourceTree = "<group>"; };
@@ -176,22 +158,31 @@
 				09725B18250CB50200012D42 /* conv_cabot_en.swift */,
 				090EC9D22542ACA000A2D53E /* conv_cabot_hnd.swift */,
 				096C5C522574F63A00836CF4 /* conv_cabot_coredo3.swift */,
+				0952AA32252D574D00A4458B /* dlgviewcontroller_muji.swift */,
+				090EC9D62546BE5800A2D53E /* dlgviewcontroller_hnd.swift */,
+				096C5C5425752EA200836CF4 /* dlgviewcontroller_coredo3.swift */,
+				09725B0924FE4AC300012D42 /* dlgviewcontroller_cabot.swift */,
 			);
 			path = HLPDialog;
 			sourceTree = "<group>";
 		};
-		09725B172506733900012D42 /* i18n */ = {
+		30991329265DE4C5000C1BFE /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				09725B0E2506312F00012D42 /* en.yaml */,
-				09725B0F2506312F00012D42 /* ja.yaml */,
+				7E29F013228B548200CA7DD6 /* Assets.xcassets */,
+				7E29F06F228B55FC00CA7DD6 /* bridging.h */,
+				7E29F018228B548200CA7DD6 /* Info.plist */,
+				097845C22531E65B004DE1F6 /* InfoPlist.strings */,
+				09725A8724EEA62E00012D42 /* Settings.bundle */,
+				7E557EFE2581C79B00B1B9CA /* CaBotLocalizable.strings */,
 			);
-			name = i18n;
+			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		7E29F000228B548100CA7DD6 = {
 			isa = PBXGroup;
 			children = (
+				3099132A265DE50A000C1BFE /* Resource */,
 				09725A8924F8D8DB00012D42 /* HLPDialog */,
 				7E29F04B228B55C000CA7DD6 /* FromNavCog */,
 				7E29F00B228B548100CA7DD6 /* CaBot */,
@@ -215,31 +206,13 @@
 		7E29F00B228B548100CA7DD6 /* CaBot */ = {
 			isa = PBXGroup;
 			children = (
-				096C5C492574C09000836CF4 /* destinations_coredo_0.yaml */,
-				096C5C482574C08F00836CF4 /* destinations_coredo_1.yaml */,
-				096C5C4A2574C09000836CF4 /* destinations_coredo_2.yaml */,
-				096C5C4B2574C09000836CF4 /* destinations_coredo_3.yaml */,
-				096C5C4C2574C09000836CF4 /* destinations_coredo_4.yaml */,
-				09725B172506733900012D42 /* i18n */,
+				30991329265DE4C5000C1BFE /* Supporting Files */,
 				7E29F00C228B548100CA7DD6 /* AppDelegate.swift */,
 				7E29F00E228B548100CA7DD6 /* ViewController.swift */,
 				7E29F070228B55FC00CA7DD6 /* CaBotService.swift */,
-				7E29F06F228B55FC00CA7DD6 /* bridging.h */,
-				7E29F06E228B55FC00CA7DD6 /* destinations.yaml */,
-				7E29F010228B548100CA7DD6 /* Main.storyboard */,
-				7E29F013228B548200CA7DD6 /* Assets.xcassets */,
-				7E29F015228B548200CA7DD6 /* LaunchScreen.storyboard */,
-				7E29F018228B548200CA7DD6 /* Info.plist */,
-				09725A8724EEA62E00012D42 /* Settings.bundle */,
-				09725B0924FE4AC300012D42 /* dlgviewcontroller_cabot.swift */,
 				09725B0B24FE573A00012D42 /* SliverDefaultTTS.swift */,
-				0952AA32252D574D00A4458B /* dlgviewcontroller_muji.swift */,
-				097845C22531E65B004DE1F6 /* InfoPlist.strings */,
-				090EC9D62546BE5800A2D53E /* dlgviewcontroller_hnd.swift */,
-				095C322A25650FC20062F258 /* destinations_coredo_all.yaml */,
-				096C5C5425752EA200836CF4 /* dlgviewcontroller_coredo3.swift */,
-				097CD7C72578B0210017B824 /* destinations_root.yaml */,
-				7E557EFE2581C79B00B1B9CA /* CaBotLocalizable.strings */,
+				7E29F010228B548100CA7DD6 /* Main.storyboard */,
+				7E29F015228B548200CA7DD6 /* LaunchScreen.storyboard */,
 			);
 			path = CaBot;
 			sourceTree = "<group>";
@@ -424,25 +397,16 @@
 			files = (
 				7E29F06C228B55C000CA7DD6 /* HLPSettingViewSubtitleCell.xib in Resources */,
 				7E29F017228B548200CA7DD6 /* LaunchScreen.storyboard in Resources */,
-				096C5C4E2574C09000836CF4 /* destinations_coredo_0.yaml in Resources */,
 				7E29F014228B548200CA7DD6 /* Assets.xcassets in Resources */,
-				09725B112506313000012D42 /* ja.yaml in Resources */,
-				09725B102506313000012D42 /* en.yaml in Resources */,
 				097845C02531E65B004DE1F6 /* InfoPlist.strings in Resources */,
-				096C5C502574C09000836CF4 /* destinations_coredo_3.yaml in Resources */,
 				7E29F012228B548100CA7DD6 /* Main.storyboard in Resources */,
 				7E29F065228B55C000CA7DD6 /* HLPSettingViewSwitchCell.xib in Resources */,
-				096C5C4D2574C09000836CF4 /* destinations_coredo_1.yaml in Resources */,
-				7E29F071228B55FC00CA7DD6 /* destinations.yaml in Resources */,
 				7E557F002581C79B00B1B9CA /* CaBotLocalizable.strings in Resources */,
 				7E29F069228B55C000CA7DD6 /* HLPSettingViewPickerCell.xib in Resources */,
-				096C5C512574C09000836CF4 /* destinations_coredo_4.yaml in Resources */,
-				097CD7C82578B0210017B824 /* destinations_root.yaml in Resources */,
-				096C5C4F2574C09000836CF4 /* destinations_coredo_2.yaml in Resources */,
 				7E29F06A228B55C000CA7DD6 /* HLPSettingViewSliderCell.xib in Resources */,
-				095C322B25650FC20062F258 /* destinations_coredo_all.yaml in Resources */,
 				7E29F064228B55C000CA7DD6 /* HLPSettingView.strings in Resources */,
 				09725A8824EEA62E00012D42 /* Settings.bundle in Resources */,
+				3099132B265DE50A000C1BFE /* Resource in Resources */,
 				7E29F068228B55C000CA7DD6 /* HLPSettingViewTextCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
