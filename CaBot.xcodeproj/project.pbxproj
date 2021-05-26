@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -20,44 +20,6 @@
 		096C5C532574F63A00836CF4 /* conv_cabot_coredo3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 096C5C522574F63A00836CF4 /* conv_cabot_coredo3.swift */; };
 		096C5C5525752EA200836CF4 /* dlgviewcontroller_coredo3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 096C5C5425752EA200836CF4 /* dlgviewcontroller_coredo3.swift */; };
 		09725A8824EEA62E00012D42 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 09725A8724EEA62E00012D42 /* Settings.bundle */; };
-		09725A9424F8D97200012D42 /* LocalContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725A8A24F8D97100012D42 /* LocalContext.swift */; };
-		09725A9524F8D97200012D42 /* LocalContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725A8A24F8D97100012D42 /* LocalContext.swift */; };
-		09725A9624F8D97200012D42 /* LocalContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725A8A24F8D97100012D42 /* LocalContext.swift */; };
-		09725A9A24F8D97200012D42 /* DialogViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725A8C24F8D97100012D42 /* DialogViewController.swift */; };
-		09725A9B24F8D97200012D42 /* DialogViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725A8C24F8D97100012D42 /* DialogViewController.swift */; };
-		09725A9C24F8D97200012D42 /* DialogViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725A8C24F8D97100012D42 /* DialogViewController.swift */; };
-		09725AA624F8D97200012D42 /* DialogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725A9024F8D97200012D42 /* DialogManager.swift */; };
-		09725AA724F8D97200012D42 /* DialogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725A9024F8D97200012D42 /* DialogManager.swift */; };
-		09725AA824F8D97200012D42 /* DialogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725A9024F8D97200012D42 /* DialogManager.swift */; };
-		09725AA924F8D97200012D42 /* CustomArrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725A9124F8D97200012D42 /* CustomArrow.swift */; };
-		09725AAA24F8D97200012D42 /* CustomArrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725A9124F8D97200012D42 /* CustomArrow.swift */; };
-		09725AAB24F8D97200012D42 /* CustomArrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725A9124F8D97200012D42 /* CustomArrow.swift */; };
-		09725AAC24F8D97200012D42 /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725A9224F8D97200012D42 /* CustomTableViewCell.swift */; };
-		09725AAD24F8D97200012D42 /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725A9224F8D97200012D42 /* CustomTableViewCell.swift */; };
-		09725AAE24F8D97200012D42 /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725A9224F8D97200012D42 /* CustomTableViewCell.swift */; };
-		09725AAF24F8D97200012D42 /* ConversationEx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725A9324F8D97200012D42 /* ConversationEx.swift */; };
-		09725AB024F8D97200012D42 /* ConversationEx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725A9324F8D97200012D42 /* ConversationEx.swift */; };
-		09725AB124F8D97200012D42 /* ConversationEx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725A9324F8D97200012D42 /* ConversationEx.swift */; };
-		09725AB924F8DB1D00012D42 /* icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 09725AB424F8DB1D00012D42 /* icons.xcassets */; };
-		09725ABA24F8DB1D00012D42 /* icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 09725AB424F8DB1D00012D42 /* icons.xcassets */; };
-		09725ABB24F8DB1D00012D42 /* icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 09725AB424F8DB1D00012D42 /* icons.xcassets */; };
-		09725ABC24F8DB1D00012D42 /* STTHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725AB524F8DB1D00012D42 /* STTHelper.swift */; };
-		09725ABD24F8DB1D00012D42 /* STTHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725AB524F8DB1D00012D42 /* STTHelper.swift */; };
-		09725ABE24F8DB1D00012D42 /* STTHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725AB524F8DB1D00012D42 /* STTHelper.swift */; };
-		09725ABF24F8DB1D00012D42 /* TextToSpeech.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725AB624F8DB1D00012D42 /* TextToSpeech.swift */; };
-		09725AC024F8DB1D00012D42 /* TextToSpeech.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725AB624F8DB1D00012D42 /* TextToSpeech.swift */; };
-		09725AC124F8DB1D00012D42 /* TextToSpeech.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725AB624F8DB1D00012D42 /* TextToSpeech.swift */; };
-		09725AC224F8DB1D00012D42 /* DialogViewHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725AB724F8DB1D00012D42 /* DialogViewHelper.swift */; };
-		09725AC324F8DB1D00012D42 /* DialogViewHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725AB724F8DB1D00012D42 /* DialogViewHelper.swift */; };
-		09725AC424F8DB1D00012D42 /* DialogViewHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725AB724F8DB1D00012D42 /* DialogViewHelper.swift */; };
-		09725AC524F8DB1D00012D42 /* AnimLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725AB824F8DB1D00012D42 /* AnimLayer.swift */; };
-		09725AC624F8DB1D00012D42 /* AnimLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725AB824F8DB1D00012D42 /* AnimLayer.swift */; };
-		09725AC724F8DB1D00012D42 /* AnimLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725AB824F8DB1D00012D42 /* AnimLayer.swift */; };
-		09725AE124F8DCFB00012D42 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 09725ACF24F8DCFB00012D42 /* Localizable.strings */; };
-		09725AE224F8DCFB00012D42 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 09725ACF24F8DCFB00012D42 /* Localizable.strings */; };
-		09725AE324F8DCFB00012D42 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 09725ACF24F8DCFB00012D42 /* Localizable.strings */; };
-		09725B0324F8DCFB00012D42 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 09725ADD24F8DCFB00012D42 /* Info.plist */; };
-		09725B0424F8DCFB00012D42 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 09725ADD24F8DCFB00012D42 /* Info.plist */; };
 		09725B0824FD5DF800012D42 /* conv_cabot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0724FD5DF800012D42 /* conv_cabot.swift */; };
 		09725B0A24FE4AC300012D42 /* dlgviewcontroller_cabot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0924FE4AC300012D42 /* dlgviewcontroller_cabot.swift */; };
 		09725B0C24FE573A00012D42 /* SliverDefaultTTS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0B24FE573A00012D42 /* SliverDefaultTTS.swift */; };
@@ -66,6 +28,8 @@
 		09725B19250CB50200012D42 /* conv_cabot_en.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B18250CB50200012D42 /* conv_cabot_en.swift */; };
 		097845C02531E65B004DE1F6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 097845C22531E65B004DE1F6 /* InfoPlist.strings */; };
 		097CD7C82578B0210017B824 /* destinations_root.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 097CD7C72578B0210017B824 /* destinations_root.yaml */; };
+		306C7F69265D431700E5928E /* HLPDialog in Frameworks */ = {isa = PBXBuildFile; productRef = 306C7F68265D431700E5928E /* HLPDialog */; };
+		306C7F6C265D435100E5928E /* Yams in Frameworks */ = {isa = PBXBuildFile; productRef = 306C7F6B265D435100E5928E /* Yams */; };
 		7E29F00D228B548100CA7DD6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00C228B548100CA7DD6 /* AppDelegate.swift */; };
 		7E29F00F228B548100CA7DD6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00E228B548100CA7DD6 /* ViewController.swift */; };
 		7E29F012228B548100CA7DD6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F010228B548100CA7DD6 /* Main.storyboard */; };
@@ -121,20 +85,6 @@
 		096C5C522574F63A00836CF4 /* conv_cabot_coredo3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = conv_cabot_coredo3.swift; sourceTree = "<group>"; };
 		096C5C5425752EA200836CF4 /* dlgviewcontroller_coredo3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dlgviewcontroller_coredo3.swift; sourceTree = "<group>"; };
 		09725A8724EEA62E00012D42 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
-		09725A8A24F8D97100012D42 /* LocalContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalContext.swift; sourceTree = "<group>"; };
-		09725A8C24F8D97100012D42 /* DialogViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DialogViewController.swift; sourceTree = "<group>"; };
-		09725A9024F8D97200012D42 /* DialogManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DialogManager.swift; sourceTree = "<group>"; };
-		09725A9124F8D97200012D42 /* CustomArrow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomArrow.swift; sourceTree = "<group>"; };
-		09725A9224F8D97200012D42 /* CustomTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTableViewCell.swift; sourceTree = "<group>"; };
-		09725A9324F8D97200012D42 /* ConversationEx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConversationEx.swift; sourceTree = "<group>"; };
-		09725AB424F8DB1D00012D42 /* icons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = icons.xcassets; sourceTree = "<group>"; };
-		09725AB524F8DB1D00012D42 /* STTHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = STTHelper.swift; sourceTree = "<group>"; };
-		09725AB624F8DB1D00012D42 /* TextToSpeech.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextToSpeech.swift; sourceTree = "<group>"; };
-		09725AB724F8DB1D00012D42 /* DialogViewHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DialogViewHelper.swift; sourceTree = "<group>"; };
-		09725AB824F8DB1D00012D42 /* AnimLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimLayer.swift; sourceTree = "<group>"; };
-		09725AD024F8DCFB00012D42 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
-		09725AD224F8DCFB00012D42 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		09725ADD24F8DCFB00012D42 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		09725B0724FD5DF800012D42 /* conv_cabot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = conv_cabot.swift; sourceTree = "<group>"; };
 		09725B0924FE4AC300012D42 /* dlgviewcontroller_cabot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dlgviewcontroller_cabot.swift; sourceTree = "<group>"; };
 		09725B0B24FE573A00012D42 /* SliverDefaultTTS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliverDefaultTTS.swift; sourceTree = "<group>"; };
@@ -144,6 +94,10 @@
 		097845C12531E65B004DE1F6 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		097845C32531E685004DE1F6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		097CD7C72578B0210017B824 /* destinations_root.yaml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = destinations_root.yaml; sourceTree = "<group>"; };
+		306A57DA265C4435006B510D /* Speech.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Speech.framework; path = System/Library/Frameworks/Speech.framework; sourceTree = SDKROOT; };
+		306A57DC265C4466006B510D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		306A57DE265C446B006B510D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		306A57E0265C4477006B510D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		7E29F009228B548100CA7DD6 /* CaBot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CaBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E29F00C228B548100CA7DD6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7E29F00E228B548100CA7DD6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -192,6 +146,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				306C7F6C265D435100E5928E /* Yams in Frameworks */,
+				306C7F69265D431700E5928E /* HLPDialog in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -215,14 +171,6 @@
 		09725A8924F8D8DB00012D42 /* HLPDialog */ = {
 			isa = PBXGroup;
 			children = (
-				09725B0624F8E06400012D42 /* Supporting Files */,
-				09725AB224F8D9B000012D42 /* stthelper */,
-				09725A9324F8D97200012D42 /* ConversationEx.swift */,
-				09725A9124F8D97200012D42 /* CustomArrow.swift */,
-				09725A9224F8D97200012D42 /* CustomTableViewCell.swift */,
-				09725A9024F8D97200012D42 /* DialogManager.swift */,
-				09725A8C24F8D97100012D42 /* DialogViewController.swift */,
-				09725A8A24F8D97100012D42 /* LocalContext.swift */,
 				09725B0724FD5DF800012D42 /* conv_cabot.swift */,
 				0929E0FD2527672A00D0C473 /* conv_cabot_mj.swift */,
 				09725B18250CB50200012D42 /* conv_cabot_en.swift */,
@@ -230,27 +178,6 @@
 				096C5C522574F63A00836CF4 /* conv_cabot_coredo3.swift */,
 			);
 			path = HLPDialog;
-			sourceTree = "<group>";
-		};
-		09725AB224F8D9B000012D42 /* stthelper */ = {
-			isa = PBXGroup;
-			children = (
-				09725AB824F8DB1D00012D42 /* AnimLayer.swift */,
-				09725AB724F8DB1D00012D42 /* DialogViewHelper.swift */,
-				09725AB424F8DB1D00012D42 /* icons.xcassets */,
-				09725AB524F8DB1D00012D42 /* STTHelper.swift */,
-				09725AB624F8DB1D00012D42 /* TextToSpeech.swift */,
-			);
-			path = stthelper;
-			sourceTree = "<group>";
-		};
-		09725B0624F8E06400012D42 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				09725ACF24F8DCFB00012D42 /* Localizable.strings */,
-				09725ADD24F8DCFB00012D42 /* Info.plist */,
-			);
-			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		09725B172506733900012D42 /* i18n */ = {
@@ -371,6 +298,10 @@
 		7E29F073228B5B5A00CA7DD6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				306A57E0265C4477006B510D /* UIKit.framework */,
+				306A57DE265C446B006B510D /* Foundation.framework */,
+				306A57DC265C4466006B510D /* AVFoundation.framework */,
+				306A57DA265C4435006B510D /* Speech.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -385,13 +316,16 @@
 				7E29F005228B548100CA7DD6 /* Sources */,
 				7E29F006228B548100CA7DD6 /* Frameworks */,
 				7E29F007228B548100CA7DD6 /* Resources */,
-				7E29F076228B5B8900CA7DD6 /* ShellScript */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = CaBot;
+			packageProductDependencies = (
+				306C7F68265D431700E5928E /* HLPDialog */,
+				306C7F6B265D435100E5928E /* Yams */,
+			);
 			productName = CaBot;
 			productReference = 7E29F009228B548100CA7DD6 /* CaBot.app */;
 			productType = "com.apple.product-type.application";
@@ -468,6 +402,10 @@
 				"en-US",
 			);
 			mainGroup = 7E29F000228B548100CA7DD6;
+			packageReferences = (
+				306C7F67265D431700E5928E /* XCRemoteSwiftPackageReference "HLPDialog" */,
+				306C7F6A265D435100E5928E /* XCRemoteSwiftPackageReference "Yams" */,
+			);
 			productRefGroup = 7E29F00A228B548100CA7DD6 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -496,14 +434,12 @@
 				7E29F065228B55C000CA7DD6 /* HLPSettingViewSwitchCell.xib in Resources */,
 				096C5C4D2574C09000836CF4 /* destinations_coredo_1.yaml in Resources */,
 				7E29F071228B55FC00CA7DD6 /* destinations.yaml in Resources */,
-				09725AB924F8DB1D00012D42 /* icons.xcassets in Resources */,
 				7E557F002581C79B00B1B9CA /* CaBotLocalizable.strings in Resources */,
 				7E29F069228B55C000CA7DD6 /* HLPSettingViewPickerCell.xib in Resources */,
 				096C5C512574C09000836CF4 /* destinations_coredo_4.yaml in Resources */,
 				097CD7C82578B0210017B824 /* destinations_root.yaml in Resources */,
 				096C5C4F2574C09000836CF4 /* destinations_coredo_2.yaml in Resources */,
 				7E29F06A228B55C000CA7DD6 /* HLPSettingViewSliderCell.xib in Resources */,
-				09725AE124F8DCFB00012D42 /* Localizable.strings in Resources */,
 				095C322B25650FC20062F258 /* destinations_coredo_all.yaml in Resources */,
 				7E29F064228B55C000CA7DD6 /* HLPSettingView.strings in Resources */,
 				09725A8824EEA62E00012D42 /* Settings.bundle in Resources */,
@@ -515,9 +451,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				09725B0324F8DCFB00012D42 /* Info.plist in Resources */,
-				09725ABA24F8DB1D00012D42 /* icons.xcassets in Resources */,
-				09725AE224F8DCFB00012D42 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -525,33 +458,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				09725B0424F8DCFB00012D42 /* Info.plist in Resources */,
-				09725ABB24F8DB1D00012D42 /* icons.xcassets in Resources */,
-				09725AE324F8DCFB00012D42 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		7E29F076228B5B8900CA7DD6 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/Carthage/Build/iOS/Yams.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/AssistantV1.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/RestKit.framework",
-			);
-			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/Yams.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "/usr/local/bin/carthage copy-frameworks\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		7E29F005228B548100CA7DD6 /* Sources */ = {
@@ -562,30 +472,20 @@
 				09725B0A24FE4AC300012D42 /* dlgviewcontroller_cabot.swift in Sources */,
 				7E29F066228B55C000CA7DD6 /* HLPSettingViewCell.m in Sources */,
 				090EC9D72546BE5800A2D53E /* dlgviewcontroller_hnd.swift in Sources */,
-				09725AAF24F8D97200012D42 /* ConversationEx.swift in Sources */,
 				096C5C5525752EA200836CF4 /* dlgviewcontroller_coredo3.swift in Sources */,
-				09725AA624F8D97200012D42 /* DialogManager.swift in Sources */,
 				7E29F067228B55C000CA7DD6 /* HLPSettingHelper.m in Sources */,
 				0952AA33252D574D00A4458B /* dlgviewcontroller_muji.swift in Sources */,
 				7E29F06D228B55C000CA7DD6 /* NavDeviceTTS.m in Sources */,
-				09725ABC24F8DB1D00012D42 /* STTHelper.swift in Sources */,
-				09725A9424F8D97200012D42 /* LocalContext.swift in Sources */,
 				090EC9D32542ACA000A2D53E /* conv_cabot_hnd.swift in Sources */,
 				7E29F00F228B548100CA7DD6 /* ViewController.swift in Sources */,
 				0929E0FE2527672A00D0C473 /* conv_cabot_mj.swift in Sources */,
 				7E29F00D228B548100CA7DD6 /* AppDelegate.swift in Sources */,
-				09725A9A24F8D97200012D42 /* DialogViewController.swift in Sources */,
-				09725AC524F8DB1D00012D42 /* AnimLayer.swift in Sources */,
 				7EF5F1EA228DB07100788987 /* NavUtil.m in Sources */,
 				7E29F063228B55C000CA7DD6 /* HLPSetting.m in Sources */,
 				09725B0824FD5DF800012D42 /* conv_cabot.swift in Sources */,
-				09725ABF24F8DB1D00012D42 /* TextToSpeech.swift in Sources */,
-				09725AAC24F8D97200012D42 /* CustomTableViewCell.swift in Sources */,
-				09725AC224F8DB1D00012D42 /* DialogViewHelper.swift in Sources */,
 				7E29F06B228B55C000CA7DD6 /* HLPSettingTableView.m in Sources */,
 				7E29F072228B55FC00CA7DD6 /* CaBotService.swift in Sources */,
 				09725B0C24FE573A00012D42 /* SliverDefaultTTS.swift in Sources */,
-				09725AA924F8D97200012D42 /* CustomArrow.swift in Sources */,
 				096C5C532574F63A00836CF4 /* conv_cabot_coredo3.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -594,17 +494,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				09725AAD24F8D97200012D42 /* CustomTableViewCell.swift in Sources */,
 				7E29F022228B548200CA7DD6 /* CaBotTests.swift in Sources */,
-				09725AB024F8D97200012D42 /* ConversationEx.swift in Sources */,
-				09725AAA24F8D97200012D42 /* CustomArrow.swift in Sources */,
-				09725AC324F8DB1D00012D42 /* DialogViewHelper.swift in Sources */,
-				09725AA724F8D97200012D42 /* DialogManager.swift in Sources */,
-				09725ABD24F8DB1D00012D42 /* STTHelper.swift in Sources */,
-				09725AC624F8DB1D00012D42 /* AnimLayer.swift in Sources */,
-				09725A9524F8D97200012D42 /* LocalContext.swift in Sources */,
-				09725AC024F8DB1D00012D42 /* TextToSpeech.swift in Sources */,
-				09725A9B24F8D97200012D42 /* DialogViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -612,17 +502,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				09725AAE24F8D97200012D42 /* CustomTableViewCell.swift in Sources */,
 				7E29F02D228B548200CA7DD6 /* CaBotUITests.swift in Sources */,
-				09725AB124F8D97200012D42 /* ConversationEx.swift in Sources */,
-				09725AAB24F8D97200012D42 /* CustomArrow.swift in Sources */,
-				09725AC424F8DB1D00012D42 /* DialogViewHelper.swift in Sources */,
-				09725AA824F8D97200012D42 /* DialogManager.swift in Sources */,
-				09725ABE24F8DB1D00012D42 /* STTHelper.swift in Sources */,
-				09725AC724F8DB1D00012D42 /* AnimLayer.swift in Sources */,
-				09725A9624F8D97200012D42 /* LocalContext.swift in Sources */,
-				09725AC124F8DB1D00012D42 /* TextToSpeech.swift in Sources */,
-				09725A9C24F8D97200012D42 /* DialogViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -642,15 +522,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		09725ACF24F8DCFB00012D42 /* Localizable.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				09725AD024F8DCFB00012D42 /* ja */,
-				09725AD224F8DCFB00012D42 /* en */,
-			);
-			name = Localizable.strings;
-			sourceTree = "<group>";
-		};
 		097845C22531E65B004DE1F6 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -704,7 +575,9 @@
 		7E29F02F228B548200CA7DD6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -752,10 +625,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -765,7 +638,9 @@
 		7E29F030228B548200CA7DD6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -807,9 +682,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -820,21 +696,25 @@
 		7E29F032228B548200CA7DD6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 76CMF53Q35;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				INFOPLIST_FILE = CaBot/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = CMU.CaBotRemote.CaBot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = CaBot/bridging.h;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -844,21 +724,25 @@
 		7E29F033228B548200CA7DD6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 76CMF53Q35;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				INFOPLIST_FILE = CaBot/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = CMU.CaBotRemote.CaBot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = CaBot/bridging.h;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -987,6 +871,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		306C7F67265D431700E5928E /* XCRemoteSwiftPackageReference "HLPDialog" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "file:///Users/cabot/src/HLPDialog";
+			requirement = {
+				branch = "swift-package";
+				kind = branch;
+			};
+		};
+		306C7F6A265D435100E5928E /* XCRemoteSwiftPackageReference "Yams" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/jpsim/Yams";
+			requirement = {
+				kind = exactVersion;
+				version = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		306C7F68265D431700E5928E /* HLPDialog */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 306C7F67265D431700E5928E /* XCRemoteSwiftPackageReference "HLPDialog" */;
+			productName = HLPDialog;
+		};
+		306C7F6B265D435100E5928E /* Yams */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 306C7F6A265D435100E5928E /* XCRemoteSwiftPackageReference "Yams" */;
+			productName = Yams;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 7E29F001228B548100CA7DD6 /* Project object */;
 }

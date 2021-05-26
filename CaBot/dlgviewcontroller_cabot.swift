@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import HLPDialog
 
 class tts_cabot : TTSProtocol{
     

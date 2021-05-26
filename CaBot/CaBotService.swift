@@ -30,6 +30,7 @@
 
 import Foundation
 import CoreBluetooth
+import HLPDialog
 
 protocol CaBotServiceDelegate {
     func caBot(service:CaBotService, centralConnected:Bool)

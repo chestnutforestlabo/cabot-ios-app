@@ -31,6 +31,7 @@
 import UIKit
 import AVKit
 import CoreLocation
+import HLPLocationManager
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate {

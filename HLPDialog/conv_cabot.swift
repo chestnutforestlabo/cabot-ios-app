@@ -23,9 +23,10 @@
 import Foundation
 import RestKit
 import AssistantV1
+import HLPDialog
 
 @objcMembers
-open class conv_cabot {
+open class conv_cabot: HLPConversation {
 
     fileprivate let domain = "hulop.navcog.ConversationV1"
     var running = false
@@ -35,7 +36,7 @@ open class conv_cabot {
     public init() {
     }
 
-    func errorResponseDecoder(data: Data, response: HTTPURLResponse) -> RestError {
+    public func errorResponseDecoder(data: Data, response: HTTPURLResponse) -> RestError {
 
         let statusCode = response.statusCode
         var errorMessage: String?
@@ -125,14 +126,9 @@ open class conv_cabot {
         ]
     }
     private let _msg_lock:NSLock = NSLock()
-    public func message(
-        _ text: String? = nil,
-        server: String? = nil,
-        api_key: String? = nil,
-        client_id: String? = nil,
-        context: Context? = nil,
-        completionHandler: @escaping (RestResponse<MessageResponse>?, Error?) -> Void)
-    {
+
+    public func message(_ text: String?, server: String, api_key: String, client_id: String?, context: Context?, completionHandler: @escaping (RestResponse<MessageResponse>?, Error?) -> Void) {
+   
         self._msg_lock.lock()
         defer{self._msg_lock.unlock()}
         if self.running {

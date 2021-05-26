@@ -31,6 +31,7 @@
 import UIKit
 import Yams
 import CoreBluetooth
+import HLPDialog
 
 class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServiceDelegate  {
 
@@ -63,7 +64,9 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
         }
     }
     static func initHelper(){
-        
+        DialogManager.sharedManager().config = ["conv_server": "dummy",
+                                                "conv_api_key": "dummy"]
+
         service = CaBotService()
         
         // main menu

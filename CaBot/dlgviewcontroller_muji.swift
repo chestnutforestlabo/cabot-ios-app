@@ -7,9 +7,10 @@
 //
 
 import Foundation
+import HLPDialog
 
 class dlgviewcontroller_muji : dlgviewcontroller_cabot{
-    internal override func getconversation(pre: Locale) -> conv_cabot{
+    override func getConversation(pre: Locale) -> HLPConversation {
         return conv_cabot_mj()
     }
 }
