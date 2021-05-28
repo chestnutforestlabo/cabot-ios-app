@@ -48,7 +48,7 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
     var next_group_id:String? = nil
     
     static func load_destinationhelper(name:String){
-        if let yamlfile = Bundle.main.path(forResource: name, ofType: "yaml") {
+        if let yamlfile = Bundle.main.path(forResource: name, ofType: "yaml", inDirectory: "Resource") {
             if let yaml = try? String(contentsOfFile: yamlfile) {
                 if let destinations = try? Yams.load(yaml: yaml) as? [[String:String]] {
                     let newhelper = HLPSettingHelper()

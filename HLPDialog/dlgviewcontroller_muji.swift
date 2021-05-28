@@ -11,6 +11,7 @@ import HLPDialog
 
 class dlgviewcontroller_muji : dlgviewcontroller_cabot{
     override func getConversation(pre: Locale) -> HLPConversation {
-        return conv_cabot_mj()
+        //return conv_cabot_mj()
+        return LocalConversation(withScript: "conv_cabot_mj")
     }
 }
