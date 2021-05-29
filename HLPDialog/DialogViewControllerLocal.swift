@@ -9,8 +9,10 @@
 import Foundation
 import HLPDialog
 
-class dlgviewcontroller_coredo3 : dlgviewcontroller_cabot{
+class DialogViewControllerLocal : DialogViewControllerCabot{
+    var identifier: String? = nil
+
     override func getConversation(pre: Locale) -> HLPConversation {
-        return conv_cabot_coredo3()
+        return LocalConversation(withScript: identifier ?? "")
     }
 }

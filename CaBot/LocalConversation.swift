@@ -25,6 +25,46 @@ import RestKit
 import AssistantV1
 import HLPDialog
 import JavaScriptCore
+import Yams
+
+@objc protocol JSBundleExport: JSExport {
+    func loadYaml(_ name: String) -> [[String: String]]
+    static func getInstance() -> JSBundle
+}
+
+class JSBundle: NSObject, JSBundleExport {
+    func loadYaml(_ name: String) -> [[String: String]] {
+        guard let path = Bundle.main.url(forResource: name, withExtension: "yaml", subdirectory: "Resource") else {
+            return []
+        }
+        do {
+            let content = try String(contentsOf: path)
+            let yaml = try Yams.load(yaml: content) as! [[String: String]]
+            return yaml
+        } catch {
+        }
+        print("Cannot load \(name).yaml")
+        return []
+    }
+    class func getInstance() -> JSBundle {
+        return JSBundle()
+    }
+}
+
+@objc protocol JSConsoleExport: JSExport {
+    func log(_ text: String) -> Void
+    static func getInstance() -> JSConsole
+}
+
+class JSConsole: NSObject, JSConsoleExport {
+    func log(_ text: String) {
+        print(text)
+    }
+    class func getInstance() -> JSConsole {
+        return JSConsole()
+    }
+}
+
 
 class LocalConversation: HLPConversation {
 
@@ -34,6 +74,7 @@ class LocalConversation: HLPConversation {
 
     init(withScript: String) {
         ctx = JSContext()
+        NSLog("loading \(withScript)")
         guard let jsFile = Bundle.main.url(forResource: withScript, withExtension: "js", subdirectory: "Resource") else {
             print("No such file \(withScript).js")
             exit(0)
@@ -47,10 +88,14 @@ class LocalConversation: HLPConversation {
                 let moreInfo = "\(withScript).js#L\(lineNumber)"
                 print("JS ERROR: \(value!) \(moreInfo)")
                 for i in (lineNumber-2)..<lineNumber {
-                    print(">",self.script.split(separator: "\n", omittingEmptySubsequences:false)[i])
+                    print("L\(i+1)",self.script.split(separator: "\n", omittingEmptySubsequences:false)[i])
                 }
                 exit(0)
             }
+            // set custom global objects
+            ctx.setObject(JSBundle.getInstance(), forKeyedSubscript: "Bundle" as (NSCopying & NSObjectProtocol))
+            ctx.setObject(JSConsole.getInstance(), forKeyedSubscript: "Console" as (NSCopying & NSObjectProtocol))
+            // load script
             ctx.evaluateScript(script)
         } catch {
             script = ""

@@ -19,30 +19,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *******************************************************************************/
-let tana = new RegExp("靴下|棚")
-let regi = new RegExp("レジ|精算")
-let find_person = new RegExp("(.*?)(さん|君|くん|ちゃん)?(を)?(探す|探して)")
+
+let anacounter = new RegExp("ANA|カウンター|アシスタンス")
+let busstop = new RegExp("バス")
 
 function get_response(request) {
     let text = request.input.text
-
+    
     var speak = "すみません。もう一度お願いします。"
     var navi = false
     var dest_info = null
     var find_info = null
-
+    
     if (text) {
-	if (tana.test(text)) {
+	if (anacounter.test(text)) {
             speak = "わかりました。"
             navi = true
             dest_info = {
-                "nodes": "EDITOR_node_1601605415482"
+                "nodes": "EDITOR_node_1603347807039"
             }
-        }else if (regi.test(text)) {
-            speak = "わかりました。レジに向かいます。"
+        }else if (busstop.test(text)) {
+            speak = "わかりました。バス停に向かいます。"
             navi = true
             dest_info = {
-                "nodes": "EDITOR_node_1482995134771"
+                "nodes": "EDITOR_node_1603347236396"
             }
         }
     }else{

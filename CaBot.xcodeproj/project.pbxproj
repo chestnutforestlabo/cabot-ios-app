@@ -7,14 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		090EC9D32542ACA000A2D53E /* conv_cabot_hnd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090EC9D22542ACA000A2D53E /* conv_cabot_hnd.swift */; };
-		090EC9D72546BE5800A2D53E /* dlgviewcontroller_hnd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090EC9D62546BE5800A2D53E /* dlgviewcontroller_hnd.swift */; };
-		0952AA33252D574D00A4458B /* dlgviewcontroller_muji.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0952AA32252D574D00A4458B /* dlgviewcontroller_muji.swift */; };
-		096C5C532574F63A00836CF4 /* conv_cabot_coredo3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 096C5C522574F63A00836CF4 /* conv_cabot_coredo3.swift */; };
-		096C5C5525752EA200836CF4 /* dlgviewcontroller_coredo3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 096C5C5425752EA200836CF4 /* dlgviewcontroller_coredo3.swift */; };
+		096C5C5525752EA200836CF4 /* DialogViewControllerLocal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 096C5C5425752EA200836CF4 /* DialogViewControllerLocal.swift */; };
 		09725A8824EEA62E00012D42 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 09725A8724EEA62E00012D42 /* Settings.bundle */; };
 		09725B0824FD5DF800012D42 /* conv_cabot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0724FD5DF800012D42 /* conv_cabot.swift */; };
-		09725B0A24FE4AC300012D42 /* dlgviewcontroller_cabot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0924FE4AC300012D42 /* dlgviewcontroller_cabot.swift */; };
+		09725B0A24FE4AC300012D42 /* DialogViewControllerCabot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */; };
 		09725B0C24FE573A00012D42 /* SliverDefaultTTS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0B24FE573A00012D42 /* SliverDefaultTTS.swift */; };
 		09725B19250CB50200012D42 /* conv_cabot_en.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B18250CB50200012D42 /* conv_cabot_en.swift */; };
 		097845C02531E65B004DE1F6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 097845C22531E65B004DE1F6 /* InfoPlist.strings */; };
@@ -22,6 +18,7 @@
 		306C7F6C265D435100E5928E /* Yams in Frameworks */ = {isa = PBXBuildFile; productRef = 306C7F6B265D435100E5928E /* Yams */; };
 		3099132B265DE50A000C1BFE /* Resource in Resources */ = {isa = PBXBuildFile; fileRef = 3099132A265DE50A000C1BFE /* Resource */; };
 		3099132D26603B10000C1BFE /* LocalConversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3099132C26603B10000C1BFE /* LocalConversation.swift */; };
+		3099132F2661E9CF000C1BFE /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3099132E2661E9CF000C1BFE /* TestViewController.swift */; };
 		7E29F00D228B548100CA7DD6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00C228B548100CA7DD6 /* AppDelegate.swift */; };
 		7E29F00F228B548100CA7DD6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00E228B548100CA7DD6 /* ViewController.swift */; };
 		7E29F012228B548100CA7DD6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F010228B548100CA7DD6 /* Main.storyboard */; };
@@ -63,14 +60,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		090EC9D22542ACA000A2D53E /* conv_cabot_hnd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = conv_cabot_hnd.swift; sourceTree = "<group>"; };
-		090EC9D62546BE5800A2D53E /* dlgviewcontroller_hnd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dlgviewcontroller_hnd.swift; sourceTree = "<group>"; };
-		0952AA32252D574D00A4458B /* dlgviewcontroller_muji.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dlgviewcontroller_muji.swift; sourceTree = "<group>"; };
-		096C5C522574F63A00836CF4 /* conv_cabot_coredo3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = conv_cabot_coredo3.swift; sourceTree = "<group>"; };
-		096C5C5425752EA200836CF4 /* dlgviewcontroller_coredo3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dlgviewcontroller_coredo3.swift; sourceTree = "<group>"; };
+		096C5C5425752EA200836CF4 /* DialogViewControllerLocal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogViewControllerLocal.swift; sourceTree = "<group>"; };
 		09725A8724EEA62E00012D42 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		09725B0724FD5DF800012D42 /* conv_cabot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = conv_cabot.swift; sourceTree = "<group>"; };
-		09725B0924FE4AC300012D42 /* dlgviewcontroller_cabot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dlgviewcontroller_cabot.swift; sourceTree = "<group>"; };
+		09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogViewControllerCabot.swift; sourceTree = "<group>"; };
 		09725B0B24FE573A00012D42 /* SliverDefaultTTS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliverDefaultTTS.swift; sourceTree = "<group>"; };
 		09725B18250CB50200012D42 /* conv_cabot_en.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = conv_cabot_en.swift; sourceTree = "<group>"; };
 		097845C12531E65B004DE1F6 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -81,6 +74,7 @@
 		306A57E0265C4477006B510D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		3099132A265DE50A000C1BFE /* Resource */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resource; sourceTree = "<group>"; };
 		3099132C26603B10000C1BFE /* LocalConversation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalConversation.swift; sourceTree = "<group>"; };
+		3099132E2661E9CF000C1BFE /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
 		7E29F009228B548100CA7DD6 /* CaBot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CaBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E29F00C228B548100CA7DD6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7E29F00E228B548100CA7DD6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -155,12 +149,8 @@
 			children = (
 				09725B0724FD5DF800012D42 /* conv_cabot.swift */,
 				09725B18250CB50200012D42 /* conv_cabot_en.swift */,
-				090EC9D22542ACA000A2D53E /* conv_cabot_hnd.swift */,
-				096C5C522574F63A00836CF4 /* conv_cabot_coredo3.swift */,
-				0952AA32252D574D00A4458B /* dlgviewcontroller_muji.swift */,
-				090EC9D62546BE5800A2D53E /* dlgviewcontroller_hnd.swift */,
-				096C5C5425752EA200836CF4 /* dlgviewcontroller_coredo3.swift */,
-				09725B0924FE4AC300012D42 /* dlgviewcontroller_cabot.swift */,
+				096C5C5425752EA200836CF4 /* DialogViewControllerLocal.swift */,
+				09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */,
 			);
 			path = HLPDialog;
 			sourceTree = "<group>";
@@ -208,6 +198,7 @@
 				30991329265DE4C5000C1BFE /* Supporting Files */,
 				7E29F00C228B548100CA7DD6 /* AppDelegate.swift */,
 				7E29F00E228B548100CA7DD6 /* ViewController.swift */,
+				3099132E2661E9CF000C1BFE /* TestViewController.swift */,
 				7E29F070228B55FC00CA7DD6 /* CaBotService.swift */,
 				09725B0B24FE573A00012D42 /* SliverDefaultTTS.swift */,
 				7E29F010228B548100CA7DD6 /* Main.storyboard */,
@@ -433,15 +424,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				09725B19250CB50200012D42 /* conv_cabot_en.swift in Sources */,
-				09725B0A24FE4AC300012D42 /* dlgviewcontroller_cabot.swift in Sources */,
+				09725B0A24FE4AC300012D42 /* DialogViewControllerCabot.swift in Sources */,
 				7E29F066228B55C000CA7DD6 /* HLPSettingViewCell.m in Sources */,
-				090EC9D72546BE5800A2D53E /* dlgviewcontroller_hnd.swift in Sources */,
 				3099132D26603B10000C1BFE /* LocalConversation.swift in Sources */,
-				096C5C5525752EA200836CF4 /* dlgviewcontroller_coredo3.swift in Sources */,
+				096C5C5525752EA200836CF4 /* DialogViewControllerLocal.swift in Sources */,
 				7E29F067228B55C000CA7DD6 /* HLPSettingHelper.m in Sources */,
-				0952AA33252D574D00A4458B /* dlgviewcontroller_muji.swift in Sources */,
 				7E29F06D228B55C000CA7DD6 /* NavDeviceTTS.m in Sources */,
-				090EC9D32542ACA000A2D53E /* conv_cabot_hnd.swift in Sources */,
 				7E29F00F228B548100CA7DD6 /* ViewController.swift in Sources */,
 				7E29F00D228B548100CA7DD6 /* AppDelegate.swift in Sources */,
 				7EF5F1EA228DB07100788987 /* NavUtil.m in Sources */,
@@ -450,7 +438,7 @@
 				7E29F06B228B55C000CA7DD6 /* HLPSettingTableView.m in Sources */,
 				7E29F072228B55FC00CA7DD6 /* CaBotService.swift in Sources */,
 				09725B0C24FE573A00012D42 /* SliverDefaultTTS.swift in Sources */,
-				096C5C532574F63A00836CF4 /* conv_cabot_coredo3.swift in Sources */,
+				3099132F2661E9CF000C1BFE /* TestViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

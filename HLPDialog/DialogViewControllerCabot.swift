@@ -34,7 +34,7 @@ class tts_cabot : TTSProtocol{
     }
 
 }
-class dlgviewcontroller_cabot : DialogViewController{
+class DialogViewControllerCabot : DialogViewController{
     private static let preflangid:[String:String] = [
         "ja": "ja-JP",
         "en": "en-US"
@@ -48,7 +48,7 @@ class dlgviewcontroller_cabot : DialogViewController{
     
     private func getpfeflangid() -> String{
         let pre = Locale(identifier: Locale.preferredLanguages[0])
-        return dlgviewcontroller_cabot.preflangid[pre.languageCode ?? "ja"] ?? "ja-JP"
+        return DialogViewControllerCabot.preflangid[pre.languageCode ?? "ja"] ?? "ja-JP"
     }
     var _tts:TTSProtocol? = nil
     private let _tts_lock:NSLock = NSLock()
@@ -58,7 +58,7 @@ class dlgviewcontroller_cabot : DialogViewController{
             defer{self._tts_lock.unlock()}
             let preflangid = self.getpfeflangid()
             if self._tts == nil{
-                self._tts = SilverDefaultTTS(delegate: self.dialogViewHelper, _langid: preflangid, _criteria: dlgviewcontroller_cabot.prefvoice[preflangid])//tts_cabot()
+                self._tts = SilverDefaultTTS(delegate: self.dialogViewHelper, _langid: preflangid, _criteria: DialogViewControllerCabot.prefvoice[preflangid])//tts_cabot()
             }
             return self._tts
         }

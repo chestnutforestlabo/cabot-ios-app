@@ -26,12 +26,12 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5kO-n3-RVI" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="965" y="-425"/>
+            <point key="canvasLocation" x="603" y="398"/>
         </scene>
-        <!--View Controller-->
+        <!--Test View Controller-->
         <scene sceneID="tbF-50-OXd">
             <objects>
-                <viewController id="Hgf-8w-NVB" sceneMemberID="viewController">
+                <viewController id="Hgf-8w-NVB" customClass="TestViewController" customModule="CaBot" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="47c-ut-mYC">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -53,17 +53,7 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="40"/>
                                 <state key="normal" title="Coredo3"/>
                                 <connections>
-                                    <segue destination="KAV-PN-Kki" kind="show" id="gUM-5S-mZk"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AKk-bB-83n">
-                                <rect key="frame" x="128" y="366" width="165" height="60"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <accessibility key="accessibilityConfiguration" label="Shopping"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="40"/>
-                                <state key="normal" title="Shopping"/>
-                                <connections>
-                                    <segue destination="R3m-ca-rbt" kind="show" id="sjY-Jp-n8G"/>
+                                    <segue destination="KAV-PN-Kki" kind="show" identifier="conv_cabot_coredo3" id="gUM-5S-mZk"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="paU-NN-hqx">
@@ -73,17 +63,17 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="40"/>
                                 <state key="normal" title="Airport"/>
                                 <connections>
-                                    <segue destination="222-PL-htB" kind="show" id="WTB-20-gWZ"/>
+                                    <segue destination="KAV-PN-Kki" kind="show" identifier="conv_cabot_hnd" id="qh6-wg-Wjk"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wH2-hq-UYj">
-                                <rect key="frame" x="150" y="292" width="110" height="60"/>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AKk-bB-83n">
+                                <rect key="frame" x="128" y="292" width="165" height="60"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <accessibility key="accessibilityConfiguration" label="Dialog"/>
+                                <accessibility key="accessibilityConfiguration" label="Shopping"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="40"/>
-                                <state key="normal" title="Dialog"/>
+                                <state key="normal" title="Shopping"/>
                                 <connections>
-                                    <segue destination="49U-6x-7J5" kind="show" id="cf8-Y8-zrY"/>
+                                    <segue destination="KAV-PN-Kki" kind="show" identifier="conv_cabot_mj" id="Lcl-Te-dwK"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -95,38 +85,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="V5O-oN-0tZ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1738" y="398"/>
-        </scene>
-        <!--Dlgviewcontroller cabot-->
-        <scene sceneID="BE8-VH-sB0">
-            <objects>
-                <viewController id="49U-6x-7J5" customClass="dlgviewcontroller_cabot" customModule="CaBot" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="cUM-Fd-rS5">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <viewLayoutGuide key="safeArea" id="uZt-gr-2K0"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="bp6-nJ-CCq"/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="05I-NP-juz" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1187" y="1217"/>
-        </scene>
-        <!--Dlgviewcontroller muji-->
-        <scene sceneID="uLc-dK-5JD">
-            <objects>
-                <viewController id="R3m-ca-rbt" customClass="dlgviewcontroller_muji" customModule="CaBot" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="JEX-1B-Rot">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <viewLayoutGuide key="safeArea" id="bQ3-8n-w8A"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="rd5-bB-oat"/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="XrY-km-Jsd" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1899" y="1254"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="ENn-5A-feV">
@@ -177,28 +135,12 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rB5-FK-cC4" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1955" y="-425"/>
+            <point key="canvasLocation" x="2883" y="-398"/>
         </scene>
-        <!--Dlgviewcontroller hnd-->
-        <scene sceneID="jIF-nQ-sEI">
-            <objects>
-                <viewController id="222-PL-htB" customClass="dlgviewcontroller_hnd" customModule="CaBot" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="vry-ya-swi">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <viewLayoutGuide key="safeArea" id="DoQ-SI-7Ez"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="ZRs-1g-E0M"/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="fmn-zh-2wh" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3242" y="-100"/>
-        </scene>
-        <!--Dlgviewcontroller coredo3-->
+        <!--Dialog View Controller Local-->
         <scene sceneID="uWa-6o-Stv">
             <objects>
-                <viewController id="KAV-PN-Kki" customClass="dlgviewcontroller_coredo3" customModule="CaBot" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="KAV-PN-Kki" customClass="DialogViewControllerLocal" customModule="CaBot" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="scu-LZ-NjO">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -209,9 +151,12 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="y7x-wf-ZyF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2848" y="907"/>
+            <point key="canvasLocation" x="2883" y="398"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="gUM-5S-mZk"/>
+    </inferredMetricsTieBreakers>
     <resources>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
