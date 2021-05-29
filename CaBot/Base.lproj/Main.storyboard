@@ -56,6 +56,26 @@
                                     <segue destination="KAV-PN-Kki" kind="show" identifier="conv_cabot_coredo3" id="gUM-5S-mZk"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AKk-bB-83n">
+                                <rect key="frame" x="128" y="292" width="165" height="60"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <accessibility key="accessibilityConfiguration" label="Shopping"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="40"/>
+                                <state key="normal" title="Shopping"/>
+                                <connections>
+                                    <segue destination="KAV-PN-Kki" kind="show" identifier="conv_cabot_mj" id="Lcl-Te-dwK"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Krn-Np-hwl">
+                                <rect key="frame" x="147" y="360" width="127" height="60"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <accessibility key="accessibilityConfiguration" label="Shopping"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="40"/>
+                                <state key="normal" title="Test(ja)"/>
+                                <connections>
+                                    <segue destination="KAV-PN-Kki" kind="show" identifier="conv_cabot_test_ja" id="wY7-E9-LcK"/>
+                                </connections>
+                            </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="paU-NN-hqx">
                                 <rect key="frame" x="147" y="224" width="117" height="60"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -66,14 +86,14 @@
                                     <segue destination="KAV-PN-Kki" kind="show" identifier="conv_cabot_hnd" id="qh6-wg-Wjk"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AKk-bB-83n">
-                                <rect key="frame" x="128" y="292" width="165" height="60"/>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6pz-fD-TC0">
+                                <rect key="frame" x="141" y="428" width="140" height="60"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <accessibility key="accessibilityConfiguration" label="Shopping"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="40"/>
-                                <state key="normal" title="Shopping"/>
+                                <state key="normal" title="Test(en)"/>
                                 <connections>
-                                    <segue destination="KAV-PN-Kki" kind="show" identifier="conv_cabot_mj" id="Lcl-Te-dwK"/>
+                                    <segue destination="KAV-PN-Kki" kind="show" identifier="conv_cabot_test_en" id="1yl-7o-2v4"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -155,7 +175,7 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="gUM-5S-mZk"/>
+        <segue reference="1yl-7o-2v4"/>
     </inferredMetricsTieBreakers>
     <resources>
         <systemColor name="systemBackgroundColor">

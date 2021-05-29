@@ -9,10 +9,8 @@
 /* Begin PBXBuildFile section */
 		096C5C5525752EA200836CF4 /* DialogViewControllerLocal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 096C5C5425752EA200836CF4 /* DialogViewControllerLocal.swift */; };
 		09725A8824EEA62E00012D42 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 09725A8724EEA62E00012D42 /* Settings.bundle */; };
-		09725B0824FD5DF800012D42 /* conv_cabot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0724FD5DF800012D42 /* conv_cabot.swift */; };
 		09725B0A24FE4AC300012D42 /* DialogViewControllerCabot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */; };
 		09725B0C24FE573A00012D42 /* SliverDefaultTTS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0B24FE573A00012D42 /* SliverDefaultTTS.swift */; };
-		09725B19250CB50200012D42 /* conv_cabot_en.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B18250CB50200012D42 /* conv_cabot_en.swift */; };
 		097845C02531E65B004DE1F6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 097845C22531E65B004DE1F6 /* InfoPlist.strings */; };
 		306C7F69265D431700E5928E /* HLPDialog in Frameworks */ = {isa = PBXBuildFile; productRef = 306C7F68265D431700E5928E /* HLPDialog */; };
 		306C7F6C265D435100E5928E /* Yams in Frameworks */ = {isa = PBXBuildFile; productRef = 306C7F6B265D435100E5928E /* Yams */; };
@@ -62,10 +60,8 @@
 /* Begin PBXFileReference section */
 		096C5C5425752EA200836CF4 /* DialogViewControllerLocal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogViewControllerLocal.swift; sourceTree = "<group>"; };
 		09725A8724EEA62E00012D42 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
-		09725B0724FD5DF800012D42 /* conv_cabot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = conv_cabot.swift; sourceTree = "<group>"; };
 		09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogViewControllerCabot.swift; sourceTree = "<group>"; };
 		09725B0B24FE573A00012D42 /* SliverDefaultTTS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliverDefaultTTS.swift; sourceTree = "<group>"; };
-		09725B18250CB50200012D42 /* conv_cabot_en.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = conv_cabot_en.swift; sourceTree = "<group>"; };
 		097845C12531E65B004DE1F6 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		097845C32531E685004DE1F6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		306A57DA265C4435006B510D /* Speech.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Speech.framework; path = System/Library/Frameworks/Speech.framework; sourceTree = SDKROOT; };
@@ -147,8 +143,6 @@
 		09725A8924F8D8DB00012D42 /* HLPDialog */ = {
 			isa = PBXGroup;
 			children = (
-				09725B0724FD5DF800012D42 /* conv_cabot.swift */,
-				09725B18250CB50200012D42 /* conv_cabot_en.swift */,
 				096C5C5425752EA200836CF4 /* DialogViewControllerLocal.swift */,
 				09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */,
 			);
@@ -423,7 +417,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				09725B19250CB50200012D42 /* conv_cabot_en.swift in Sources */,
 				09725B0A24FE4AC300012D42 /* DialogViewControllerCabot.swift in Sources */,
 				7E29F066228B55C000CA7DD6 /* HLPSettingViewCell.m in Sources */,
 				3099132D26603B10000C1BFE /* LocalConversation.swift in Sources */,
@@ -434,7 +427,6 @@
 				7E29F00D228B548100CA7DD6 /* AppDelegate.swift in Sources */,
 				7EF5F1EA228DB07100788987 /* NavUtil.m in Sources */,
 				7E29F063228B55C000CA7DD6 /* HLPSetting.m in Sources */,
-				09725B0824FD5DF800012D42 /* conv_cabot.swift in Sources */,
 				7E29F06B228B55C000CA7DD6 /* HLPSettingTableView.m in Sources */,
 				7E29F072228B55FC00CA7DD6 /* CaBotService.swift in Sources */,
 				09725B0C24FE573A00012D42 /* SliverDefaultTTS.swift in Sources */,
