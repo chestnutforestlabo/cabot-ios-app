@@ -39,6 +39,8 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
     var dest_group_id:String = "default"
     var next_group_id:String? = nil
 
+    var viewIdentifier:String? = nil
+
     static func initHelper(){
         DialogManager.sharedManager().config = ["conv_server": "dummy",
                                                 "conv_api_key": "dummy"]
@@ -179,7 +181,7 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
     
     func caBot(service: CaBotService, centralConnected: Bool) {
         self.centralConnected = centralConnected
-        //print(self.centralConnected)
+        //NSLog(self.centralConnected)
         DispatchQueue.main.async {
             self.updateView()
         }
@@ -187,7 +189,7 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
     
     func caBot(service: CaBotService, faceappConnected: Bool) {
         self.faceappConnected = faceappConnected
-        //print(self.centralConnected)
+        //NSLog(self.centralConnected)
         DispatchQueue.main.async {
             self.updateView()
         }
@@ -201,17 +203,17 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
         //navigationController?.navigationBar.prefersLargeTitles = true
         
         self.updateView()
-        if let rid:String = self.restorationIdentifier{
-            if rid == "default_menu" {
-                if ResourceManager.shared.hasDefaultModel {
-                    helper = ViewController.defaultHelper
-                } else {
-                    helper = ViewController.modelHelper
-                }
-            }else if rid == "select_destination" {
+        if let rid:String = self.viewIdentifier{
+            if rid == "select_destination" {
                 helper = ViewController.destinationHelpers[self.dest_group_id]
             }else if rid == "system_settings" {
                 helper = ViewController.systemHelper
+            }
+        } else {
+            if ResourceManager.shared.hasDefaultModel {
+                helper = ViewController.defaultHelper
+            } else {
+                helper = ViewController.modelHelper
             }
         }
         
@@ -229,7 +231,7 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
             
             var title:String = ""
             var accessibilityLabel:String = ""
-            if let rid = self.restorationIdentifier{
+            if let rid = self.viewIdentifier{
                 if rid == "default_menu" {
                     title = "CaBot"
                     accessibilityLabel = "CaBot"
@@ -247,7 +249,7 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
                     }
                     
                     
-                    //print(title)
+                    //NSLog(title)
                     if let settings = ViewController.defaultHelper.settings as! [HLPSetting]? {
                         for setting in settings {
                             //setting.disabled = !self.centralConnected
@@ -275,14 +277,16 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.destination is DialogViewController {
-            segue.destination.restorationIdentifier = ResourceManager.shared.currentModel?.id ?? ""
+        if let nextvc = segue.destination as? DialogViewControllerCabot {
+            nextvc.modelURL = ResourceManager.shared.currentModel?.coversationURL
         }
         else {
-            if let nextvc = segue.destination as? ViewController, let nextgroupid = self.next_group_id{
-                nextvc.dest_group_id = nextgroupid
+            if let nextvc = segue.destination as? ViewController {
+                if let nextgroupid = self.next_group_id {
+                    nextvc.dest_group_id = nextgroupid
+                }
+                nextvc.viewIdentifier = segue.identifier
             }
-            segue.destination.restorationIdentifier = segue.identifier
         }
     }
 }

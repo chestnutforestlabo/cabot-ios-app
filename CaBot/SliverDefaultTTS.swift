@@ -70,7 +70,7 @@ class Synthesizer {
         /*for tmp in AVSpeechSynthesisVoice.speechVoices() {
             if #available(iOS 10.0, *) {
                 if (tmp.language == voice!.language) {
-                    print(tmp.name)
+                    NSLog(tmp.name)
                 }
             }
         }*/
@@ -90,7 +90,7 @@ class Synthesizer {
         for rgx in criteria{
             if let vc = found[rgx]{
                 //debug
-                print("voice name = " + vc.name)
+                NSLog("voice name = " + vc.name)
                 self.voice = vc
                 return
             }

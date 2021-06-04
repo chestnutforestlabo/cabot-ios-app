@@ -35,6 +35,8 @@ class tts_cabot : TTSProtocol{
 
 }
 class DialogViewControllerCabot : DialogViewController{
+    var modelURL: URL?
+
     private static let preflangid:[String:String] = [
         "ja": "ja-JP",
         "en": "en-US"

@@ -43,7 +43,7 @@ class JSBundle: NSObject, JSBundleExport {
             return yaml
         } catch {
         }
-        print("Cannot load \(name).yaml")
+        NSLog("Cannot load \(name).yaml")
         return []
     }
     class func getInstance() -> JSBundle {
@@ -58,7 +58,7 @@ class JSBundle: NSObject, JSBundleExport {
 
 class JSConsole: NSObject, JSConsoleExport {
     func log(_ text: String) {
-        print(text)
+        NSLog(text)
     }
     class func getInstance() -> JSConsole {
         return JSConsole()
@@ -72,23 +72,20 @@ class LocalConversation: HLPConversation {
     let ctx: JSContext
     let script: String
 
-    init(withScript: String) {
+    init(withScript jsFile: URL) {
         ctx = JSContext()
-        NSLog("loading \(withScript)")
-        guard let jsFile = Bundle.main.url(forResource: withScript, withExtension: "js", subdirectory: "Resource") else {
-            print("No such file \(withScript).js")
-            exit(0)
-        }
+        NSLog("loading \(jsFile)")
+
         do {
             script = try String(contentsOf: jsFile, encoding: .utf8)
 
             // JavaScript syntax check
             ctx.exceptionHandler = { context, value in
                 let lineNumber:Int = Int(value!.objectForKeyedSubscript("line")!.toInt32())
-                let moreInfo = "\(withScript).js#L\(lineNumber)"
-                print("JS ERROR: \(value!) \(moreInfo)")
+                let moreInfo = "\(jsFile.path)#L\(lineNumber)"
+                NSLog("JS ERROR: \(value!) \(moreInfo)")
                 for i in (lineNumber-2)..<lineNumber {
-                    print("L\(i+1)",self.script.split(separator: "\n", omittingEmptySubsequences:false)[i])
+                    NSLog("L\(i+1)",self.script.split(separator: "\n", omittingEmptySubsequences:false)[i])
                 }
                 exit(0)
             }
@@ -99,7 +96,7 @@ class LocalConversation: HLPConversation {
             ctx.evaluateScript(script)
         } catch {
             script = ""
-            print("Cannot load the script \(withScript).js")
+            NSLog("Cannot load the script \(jsFile.path)")
             exit(0)
         }
     }
@@ -125,7 +122,7 @@ class LocalConversation: HLPConversation {
 
     public func _get_response(_ request: Any) -> [String:Any] {
         if let funk = ctx.objectForKeyedSubscript("get_response") {
-            print(request)
+            NSLog(request)
             if let ret = funk.call(withArguments: [request]) {
                 return ret.toDictionary() as! [String: Any]
             }

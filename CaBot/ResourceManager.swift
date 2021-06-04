@@ -146,12 +146,12 @@ class ResourceManager {
                             let model = try Model(at: dir)
                             list.append(model)
                         } catch (let error) {
-                            print(error)
+                            NSLog(error)
                         }
                     }
                 }
             } catch {
-                print("Could not get file list at \(path)")
+                NSLog("Could not get file list at \(path)")
             }
         }
         return list

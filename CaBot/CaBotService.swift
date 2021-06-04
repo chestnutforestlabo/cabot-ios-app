@@ -98,7 +98,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     internal func startHeartBeat() {
         Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { (timer) in
             DispatchQueue.main.async {
-                print("heartbeat")
+                NSLog("heartbeat")
                 self.checkAdvertisement();
                 if (!self.heartbeatChar.notify(value: "1")) {
                     self.delegate?.caBot(service: self, centralConnected: false)
@@ -111,12 +111,12 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     }
     
     public func send(destination: String) -> Bool {
-        print("destination \(destination)")
+        NSLog("destination \(destination)")
         return (self.destinationChar.notify(value: destination))
     }
     
     public func find(person: String) -> Bool {
-        print("person \(person)")
+        NSLog("person \(person)")
         return (self.findPersonChar.notify(value: "\(person);100000"))
     }
     
@@ -126,7 +126,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager)
     {
-        print("state: \(peripheral.state.rawValue)")
+        NSLog("state: \(peripheral.state.rawValue)")
         
         if peripheral.state == .poweredOn {
             DispatchQueue.main.asyncAfter(deadline: .now()+1) {
@@ -140,7 +140,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
         let service:CBMutableService = CBMutableService(type: self.uuid, primary: true)
         service.characteristics = self.characteristics
         
-        print("adding a service")
+        NSLog("adding a service")
         peripheralManager.add(service)
     }
     
@@ -149,23 +149,23 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
         if (self.heartbeatChar.characteristic_read.subscribedCentrals?.count ?? 0 > 0) {
             if (self.peripheralManager.isAdvertising) {
                 self.peripheralManager.stopAdvertising();
-                print("Stop advertising")
+                NSLog("Stop advertising")
             }
         } else {
             if (!self.peripheralManager.isAdvertising) {
                 self.startAdvertising();
-                print("Start advertising")
+                NSLog("Start advertising")
             }
         }
     }
 
     func peripheralManager(_ peripheral: CBPeripheralManager, didAdd service: CBService, error: Error?) {
         if let error = error {
-            print("error: \(error)")
+            NSLog("error: \(error)")
             return
         }
         
-        print("service added: \(service)")
+        NSLog("service added: \(service)")
         self.startAdvertising();
     }
 
@@ -178,14 +178,14 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     func peripheralManagerDidStartAdvertising(_ peripheral: CBPeripheralManager, error: Error?) {
         
         if let error = error {
-            print("Failed… error: \(error)")
+            NSLog("Failed… error: \(error)")
             return
         }
-        print("Succeeded!)")
+        NSLog("Succeeded!)")
     }
     
     func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveRead request: CBATTRequest) {
-        print("didReceiveRead \(request)")
+        NSLog("didReceiveRead \(request)")
         for char in self.chars {
             if char.canHandle(readRequest: request) {
                 break
@@ -194,7 +194,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     }
     
     func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveWrite requests: [CBATTRequest]) {
-        print("didReceiveWrite \(requests)")
+        NSLog("didReceiveWrite \(requests)")
         for request in requests
         {
             for char in self.chars {
@@ -207,7 +207,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     }
     
     func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didSubscribeTo characteristic: CBCharacteristic) {
-        print("subscribed centrals: \(central)")
+        NSLog("subscribed centrals: \(central)")
     }
     
 }
@@ -254,7 +254,7 @@ class CaBotNotifyChar: CaBotChar {
         }
 
         //while (!ret && count < retry) {
-        print("notify to "+self.characteristic_read.uuid.uuidString)
+        NSLog("notify to "+self.characteristic_read.uuid.uuidString)
             ret = self.service.peripheralManager.updateValue(data, for: self.characteristic_read, onSubscribedCentrals: nil)
             count += 1
         //}
@@ -405,7 +405,7 @@ class CaBotQueryChar: CaBotChar {
                     usleep(1000)
                 }
             }
-            print(String(format:"%.2f kbytes in %.2f secs = %.2f kbps", Double(dataLength) / 1024.0, duration, Double(dataLength)/duration*8/1024))
+            NSLog(String(format:"%.2f kbytes in %.2f secs = %.2f kbps", Double(dataLength) / 1024.0, duration, Double(dataLength)/duration*8/1024))
         }
     }
     
@@ -454,7 +454,7 @@ class CaBotFindPersonReadyChar: CaBotChar {
             self.service.faceappReady = ready
             self.service.delegate?.caBot(service: self.service, faceappConnected: ready)
             
-            print("Back pack ready:", text, ready)
+            NSLog("Back pack ready:", text, ready)
         }
     }
     

@@ -128,7 +128,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
             try AVAudioSession.sharedInstance().setActive(true, options: [])
             
         } catch {
-            print("audioSession properties weren't set because of an error.")
+            NSLog("audioSession properties weren't set because of an error.")
         }
     }
 
@@ -145,7 +145,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
             try AVAudioSession.sharedInstance().setActive(true)
             
         } catch {
-            print("audioSession properties weren't set because of an error.")
+            NSLog("audioSession properties weren't set because of an error.")
         }
         
         if locationManager == nil {
