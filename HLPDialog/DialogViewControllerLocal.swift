@@ -10,9 +10,7 @@ import Foundation
 import HLPDialog
 
 class DialogViewControllerLocal : DialogViewControllerCabot{
-    var identifier: String? = nil
-
     override func getConversation(pre: Locale) -> HLPConversation {
-        return LocalConversation(withScript: identifier ?? "")
+        return LocalConversation(withScript: self.restorationIdentifier ?? "")
     }
 }

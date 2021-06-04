@@ -20,14 +20,6 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-//
-//  ViewController.swift
-//  CaBot
-//
-//  Created by Daisuke Sato on 2019/05/08.
-//  Copyright © 2019 Daisuke Sato. All rights reserved.
-//
-
 import UIKit
 import Yams
 import CoreBluetooth
@@ -35,82 +27,129 @@ import HLPDialog
 
 class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServiceDelegate  {
 
+    static let modelHelper:HLPSettingHelper = HLPSettingHelper()
     static let defaultHelper:HLPSettingHelper = HLPSettingHelper()
-    static let destinationHelper:HLPSettingHelper = HLPSettingHelper()
-    static let systemHelper:HLPSettingHelper = HLPSettingHelper()
     static var destinationHelpers:[String:HLPSettingHelper] = [:]
-    static let name_destination_helper_root:String = "destinations_root"
+    static let systemHelper:HLPSettingHelper = HLPSettingHelper()
+
     static var service:CaBotService!
-    
+
     var centralConnected:Bool = false
     var faceappConnected:Bool = false
-    var dest_group_id:String = name_destination_helper_root
+    var dest_group_id:String = "default"
     var next_group_id:String? = nil
-    
-    static func load_destinationhelper(name:String){
-        if let yamlfile = Bundle.main.path(forResource: name, ofType: "yaml", inDirectory: "Resource") {
-            if let yaml = try? String(contentsOfFile: yamlfile) {
-                if let destinations = try? Yams.load(yaml: yaml) as? [[String:String]] {
-                    let newhelper = HLPSettingHelper()
-                    for destination in destinations {
-                        newhelper.addActionTitle(destination["title"], accLabel: destination["pron"], name: destination["value"])
-                        if let val = destination["value"], val.hasPrefix("destinations_"){
-                            ViewController.load_destinationhelper(name:val)
-                        }
-                    }
-                    self.destinationHelpers[name] = newhelper
-                }
-            }
-        }
-    }
+
     static func initHelper(){
         DialogManager.sharedManager().config = ["conv_server": "dummy",
                                                 "conv_api_key": "dummy"]
-
         service = CaBotService()
-        
-        // main menu
-        ViewController.defaultHelper.addSectionTitle("")
-        ViewController.defaultHelper.addActionTitle(NSLocalizedString("SELECT_DESTINATION",
-                                                                      tableName: "CaBotLocalizable",
-                                                                      comment: "Select Destintion Menu"),
-                                                    name: "select_destination")
-        ViewController.defaultHelper.addSectionTitle("")
-        ViewController.defaultHelper.addActionTitle(NSLocalizedString("CANCEL_NAVIGATION",
-                                                                      tableName: "CaBotLocalizable",
-                                                                      comment: "Cancel Navigation Menu"),
-                                                    name: "cancel_navigation")
-        //ViewController.defaultHelper.addActionTitle("System Settings", name: "system_settings")
-        
-        
+
+        initModels()
+        initSettings()
+
+        // show version number
         let versionNo = Bundle.main.infoDictionary?["CFBundleShortVersionString"]
         let buildNo = Bundle.main.infoDictionary?["CFBundleVersion"]
-        
-        ViewController.defaultHelper.addSectionTitle("version: \(versionNo!) (\(buildNo!))")
+        defaultHelper.addSectionTitle("version: \(versionNo!) (\(buildNo!))")
+    }
 
-        // load destination yaml and make destination list
-        self.load_destinationhelper(name: name_destination_helper_root)
-        /*if let yamlfile = Bundle.main.path(forResource: "destinations_root"/*"destinations"*/, ofType: "yaml") {
-            if let yaml = try? String(contentsOfFile: yamlfile) {
-                if let destinations = try? Yams.load(yaml: yaml) as? [[String:String]] {
-                    for destination in destinations {
-                        ViewController.destinationHelper.addActionTitle(destination["title"],
-                                                                        name: destination["value"])
+    static func initModels() {
+        modelHelper.removeAllSetting()
+        modelHelper.addSectionTitle("Select")
+        for dir in ResourceManager.shared.models {
+            modelHelper.addActionTitle(dir.name, name: "select_model_"+dir.id)
+        }
+    }
+
+    static func initDefaultMenus() {
+        defaultHelper.removeAllSetting()
+        defaultHelper.addSectionTitle("")
+
+        guard let cm = ResourceManager.shared.currentModel else {
+            return
+        }
+
+        if cm.coversationURL != nil {
+            defaultHelper.addActionTitle(NSLocalizedString("START_CONVERSATION",
+                                                           tableName: "CaBotLocalizable",
+                                                           comment: "Start Conversation Menu"),
+                                         name: "start_conversation")
+        }
+
+        if cm.destinationsURL != nil {
+            defaultHelper.addActionTitle(NSLocalizedString("SELECT_DESTINATION",
+                                                           tableName: "CaBotLocalizable",
+                                                           comment: "Select Destintion Menu"),
+                                         name: "select_destination")
+        }
+
+        // TODO add custom menus
+
+        defaultHelper.addSectionTitle("")
+        defaultHelper.addActionTitle(NSLocalizedString("CANCEL_NAVIGATION",
+                                                       tableName: "CaBotLocalizable",
+                                                       comment: "Cancel Navigation Menu"),
+                                     name: "cancel_navigation")
+        //defaultHelper.addActionTitle("System Settings", name: "system_settings")
+    }
+
+    static func initDestinations() {
+        guard let cm = ResourceManager.shared.currentModel else { return }
+        guard let dest = cm.destinationsURL else { return }
+        destinationHelpers.removeAll()
+
+        self.loadDestinations(at: dest, for: "default")
+    }
+
+    static func loadDestinations(at url: URL, for name:String){
+        // TODO move this to resource location
+        if let yaml = try? String(contentsOf: url) {
+            if let destinations = try? Yams.load(yaml: yaml) as? [[String:String]] {
+                let newhelper = HLPSettingHelper()
+                for destination in destinations {
+                    newhelper.addActionTitle(destination["title"], accLabel: destination["pron"], name: destination["value"])
+                    if let val = destination["value"], val.hasPrefix("destinations_"){
+                        let url2 = url.deletingLastPathComponent().appendingPathComponent(val)
+                        ViewController.loadDestinations(at: url2, for: val)
                     }
                 }
+                self.destinationHelpers[name] = newhelper
             }
-        }*/
-        
-        // system settings
-        ViewController.systemHelper.addSetting(with: .double, label: "Walking Speed", name: CaBotService.CABOT_SPEED_CONFIG,
+        }
+    }
+
+    static func initSettings() {
+        systemHelper.removeAllSetting()
+        systemHelper.addSetting(with: .double, label: "Walking Speed", name: CaBotService.CABOT_SPEED_CONFIG,
                                                 defaultValue: NSNumber(0.5), min: 0.25, max: 1.2, interval: 0.05)
-        ViewController.systemHelper.addSetting(with: .double, label: "Speech Speed", name: CaBotService.SPEECH_SPEED_CONFIG,
+        systemHelper.addSetting(with: .double, label: "Speech Speed", name: CaBotService.SPEECH_SPEED_CONFIG,
                                                 defaultValue: NSNumber(0.5), min: 0.1, max: 1.0, interval: 0.05)
     }
     
     func actionPerformed(_ setting: HLPSetting!) {
         if let name = setting.name{
-            if name.hasPrefix("EDITOR_") {
+            if name.hasPrefix("select_model_"){
+                let index = name.index(name.startIndex, offsetBy: "select_model_".count)
+                let id = String(name[index...])
+                ResourceManager.shared.selectModel(by: id)
+                ViewController.initDefaultMenus()
+                ViewController.initDestinations()
+                self.performSegue(withIdentifier: "default_menu", sender: self)
+            }
+            else if name.hasPrefix("destinations_"){
+                self.next_group_id = name
+                self.performSegue(withIdentifier: "select_destination", sender: self)
+            }
+            else if name == "cancel_navigation" {
+                NavUtil.showModalWaiting(withMessage: "waiting")
+                DispatchQueue.main.async {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        NavUtil.hideModalWaiting()
+                    }
+                    _ = ViewController.service.send(destination: "__cancel__")
+                }
+            }
+            else if name.hasPrefix("EDITOR_") {
                 if let destination = setting.name {
                     
                     DispatchQueue.main.async {
@@ -131,18 +170,8 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
                         }
                     }
                 }
-            } else if name == "cancel_navigation" {
-                NavUtil.showModalWaiting(withMessage: "waiting")
-                DispatchQueue.main.async {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        NavUtil.hideModalWaiting()
-                    }
-                    ViewController.service.send(destination: "__cancel__")
-                }
-            } else if name.hasPrefix("destinations_"){
-                self.next_group_id = name
-                self.performSegue(withIdentifier: "select_destination", sender: self)
-            } else {
+            }
+            else {
                 self.performSegue(withIdentifier: setting.name, sender: self)
             }
         }
@@ -174,7 +203,11 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
         self.updateView()
         if let rid:String = self.restorationIdentifier{
             if rid == "default_menu" {
-                helper = ViewController.defaultHelper
+                if ResourceManager.shared.hasDefaultModel {
+                    helper = ViewController.defaultHelper
+                } else {
+                    helper = ViewController.modelHelper
+                }
             }else if rid == "select_destination" {
                 helper = ViewController.destinationHelpers[self.dest_group_id]
             }else if rid == "system_settings" {
@@ -192,8 +225,7 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
     
     func updateView() {
         DispatchQueue.main.async {
-            
-            var titleLabel = UILabel()
+            let titleLabel = UILabel()
             
             var title:String = ""
             var accessibilityLabel:String = ""
@@ -243,10 +275,15 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if let nextvc = segue.destination as? ViewController, let nextgroupid = self.next_group_id{
-            nextvc.dest_group_id = nextgroupid
+        if segue.destination is DialogViewController {
+            segue.destination.restorationIdentifier = ResourceManager.shared.currentModel?.id ?? ""
         }
-        segue.destination.restorationIdentifier = segue.identifier
+        else {
+            if let nextvc = segue.destination as? ViewController, let nextgroupid = self.next_group_id{
+                nextvc.dest_group_id = nextgroupid
+            }
+            segue.destination.restorationIdentifier = segue.identifier
+        }
     }
 }
 

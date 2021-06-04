@@ -6,6 +6,7 @@
   Copyright © 2020 CMU. All rights reserved.
 */
 
+"START_CONVERSATION"="Start Conversation";
 "SELECT_DESTINATION"="Select Destination";
 "CANCEL_NAVIGATION"="Cancel Navigation";
 "DESTINATIONS_LABEL"="Destinations";

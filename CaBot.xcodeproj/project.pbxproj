@@ -16,7 +16,7 @@
 		306C7F6C265D435100E5928E /* Yams in Frameworks */ = {isa = PBXBuildFile; productRef = 306C7F6B265D435100E5928E /* Yams */; };
 		3099132B265DE50A000C1BFE /* Resource in Resources */ = {isa = PBXBuildFile; fileRef = 3099132A265DE50A000C1BFE /* Resource */; };
 		3099132D26603B10000C1BFE /* LocalConversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3099132C26603B10000C1BFE /* LocalConversation.swift */; };
-		3099132F2661E9CF000C1BFE /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3099132E2661E9CF000C1BFE /* TestViewController.swift */; };
+		30E99D9226681097001ACAAA /* ResourceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99D9126681097001ACAAA /* ResourceManager.swift */; };
 		7E29F00D228B548100CA7DD6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00C228B548100CA7DD6 /* AppDelegate.swift */; };
 		7E29F00F228B548100CA7DD6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00E228B548100CA7DD6 /* ViewController.swift */; };
 		7E29F012228B548100CA7DD6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F010228B548100CA7DD6 /* Main.storyboard */; };
@@ -70,7 +70,7 @@
 		306A57E0265C4477006B510D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		3099132A265DE50A000C1BFE /* Resource */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resource; sourceTree = "<group>"; };
 		3099132C26603B10000C1BFE /* LocalConversation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalConversation.swift; sourceTree = "<group>"; };
-		3099132E2661E9CF000C1BFE /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
+		30E99D9126681097001ACAAA /* ResourceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceManager.swift; sourceTree = "<group>"; };
 		7E29F009228B548100CA7DD6 /* CaBot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CaBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E29F00C228B548100CA7DD6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7E29F00E228B548100CA7DD6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -192,12 +192,12 @@
 				30991329265DE4C5000C1BFE /* Supporting Files */,
 				7E29F00C228B548100CA7DD6 /* AppDelegate.swift */,
 				7E29F00E228B548100CA7DD6 /* ViewController.swift */,
-				3099132E2661E9CF000C1BFE /* TestViewController.swift */,
 				7E29F070228B55FC00CA7DD6 /* CaBotService.swift */,
 				09725B0B24FE573A00012D42 /* SliverDefaultTTS.swift */,
 				7E29F010228B548100CA7DD6 /* Main.storyboard */,
 				7E29F015228B548200CA7DD6 /* LaunchScreen.storyboard */,
 				3099132C26603B10000C1BFE /* LocalConversation.swift */,
+				30E99D9126681097001ACAAA /* ResourceManager.swift */,
 			);
 			path = CaBot;
 			sourceTree = "<group>";
@@ -421,6 +421,7 @@
 				7E29F066228B55C000CA7DD6 /* HLPSettingViewCell.m in Sources */,
 				3099132D26603B10000C1BFE /* LocalConversation.swift in Sources */,
 				096C5C5525752EA200836CF4 /* DialogViewControllerLocal.swift in Sources */,
+				30E99D9226681097001ACAAA /* ResourceManager.swift in Sources */,
 				7E29F067228B55C000CA7DD6 /* HLPSettingHelper.m in Sources */,
 				7E29F06D228B55C000CA7DD6 /* NavDeviceTTS.m in Sources */,
 				7E29F00F228B548100CA7DD6 /* ViewController.swift in Sources */,
@@ -430,7 +431,6 @@
 				7E29F06B228B55C000CA7DD6 /* HLPSettingTableView.m in Sources */,
 				7E29F072228B55FC00CA7DD6 /* CaBotService.swift in Sources */,
 				09725B0C24FE573A00012D42 /* SliverDefaultTTS.swift in Sources */,
-				3099132F2661E9CF000C1BFE /* TestViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

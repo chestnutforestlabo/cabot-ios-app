@@ -6,6 +6,7 @@
   Copyright © 2020 CMU. All rights reserved.
 */
 
+"START_CONVERSATION"="対話を開始";
 "SELECT_DESTINATION"="行き先を選択";
 "CANCEL_NAVIGATION"="ナビゲーションを中止";
 "DESTINATIONS_LABEL"="行き先";
