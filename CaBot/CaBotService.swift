@@ -98,8 +98,8 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     internal func startHeartBeat() {
         Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { (timer) in
             DispatchQueue.main.async {
-                NSLog("heartbeat")
-                self.checkAdvertisement();
+                //NSLog("heartbeat")
+                //self.checkAdvertisement();
                 if (!self.heartbeatChar.notify(value: "1")) {
                     self.delegate?.caBot(service: self, centralConnected: false)
                     self.delegate?.caBot(service: self, faceappConnected: false)

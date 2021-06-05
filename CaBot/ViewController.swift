@@ -32,6 +32,8 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
     static var destinationHelpers:[String:HLPSettingHelper] = [:]
     static let systemHelper:HLPSettingHelper = HLPSettingHelper()
 
+    static var actionHandlers:[String: (ViewController, HLPSetting) -> Void] = [:]
+
     static var service:CaBotService!
 
     var centralConnected:Bool = false
@@ -57,67 +59,125 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
 
     static func initModels() {
         modelHelper.removeAllSetting()
-        modelHelper.addSectionTitle("Select")
+        modelHelper.addSectionTitle(NSLocalizedString("Select", tableName: "CaBotLocalizable", comment: ""))
         for dir in ResourceManager.shared.models {
             modelHelper.addActionTitle(dir.name, name: "select_model_"+dir.id)
+
+            actionHandlers["select_model_"+dir.id] = { view, setting in
+                ResourceManager.shared.selectModel(by: dir.id)
+                view.initDefaultMenus()
+                view.initDestinations()
+                view.performSegue(withIdentifier: "default_menu", sender: self)
+            }
         }
+
     }
 
-    static func initDefaultMenus() {
-        defaultHelper.removeAllSetting()
-        defaultHelper.addSectionTitle("")
+    func initDefaultMenus() {
+        ViewController.defaultHelper.removeAllSetting()
+        ViewController.defaultHelper.addSectionTitle("")
 
         guard let cm = ResourceManager.shared.currentModel else {
             return
         }
 
         if cm.coversationURL != nil {
-            defaultHelper.addActionTitle(NSLocalizedString("START_CONVERSATION",
+            ViewController.defaultHelper.addActionTitle(NSLocalizedString("START_CONVERSATION",
                                                            tableName: "CaBotLocalizable",
                                                            comment: "Start Conversation Menu"),
                                          name: "start_conversation")
         }
 
         if cm.destinationsURL != nil {
-            defaultHelper.addActionTitle(NSLocalizedString("SELECT_DESTINATION",
+            ViewController.defaultHelper.addActionTitle(NSLocalizedString("SELECT_DESTINATION",
                                                            tableName: "CaBotLocalizable",
                                                            comment: "Select Destintion Menu"),
                                          name: "select_destination")
         }
 
-        // TODO add custom menus
+        for menu in cm.customeMenus {
+            ViewController.defaultHelper.addActionTitle(menu.title,
+                                         name: menu.id)
+            ViewController.actionHandlers[menu.id] = { view, setting in
+                let jsHelper = JSHelper(withScript: cm.resolveURL(from: menu.script), withView: view)
+                _ = jsHelper.call(menu.function, withArguments: [])
+            }
+        }
 
-        defaultHelper.addSectionTitle("")
-        defaultHelper.addActionTitle(NSLocalizedString("CANCEL_NAVIGATION",
+        ViewController.defaultHelper.addSectionTitle("")
+        ViewController.defaultHelper.addActionTitle(NSLocalizedString("CANCEL_NAVIGATION",
                                                        tableName: "CaBotLocalizable",
                                                        comment: "Cancel Navigation Menu"),
                                      name: "cancel_navigation")
+        ViewController.actionHandlers["cancel_navigation"] = { view, setting in
+            NavUtil.showModalWaiting(withMessage: "waiting")
+            DispatchQueue.main.async {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    NavUtil.hideModalWaiting()
+                }
+                _ = ViewController.service.send(destination: "__cancel__")
+            }
+        }
         //defaultHelper.addActionTitle("System Settings", name: "system_settings")
     }
 
-    static func initDestinations() {
+    func initDestinations() {
         guard let cm = ResourceManager.shared.currentModel else { return }
         guard let dest = cm.destinationsURL else { return }
-        destinationHelpers.removeAll()
+        ViewController.destinationHelpers.removeAll()
 
         self.loadDestinations(at: dest, for: "default")
     }
 
-    static func loadDestinations(at url: URL, for name:String){
-        // TODO move this to resource location
-        if let yaml = try? String(contentsOf: url) {
-            if let destinations = try? Yams.load(yaml: yaml) as? [[String:String]] {
-                let newhelper = HLPSettingHelper()
-                for destination in destinations {
-                    newhelper.addActionTitle(destination["title"], accLabel: destination["pron"], name: destination["value"])
-                    if let val = destination["value"], val.hasPrefix("destinations_"){
-                        let url2 = url.deletingLastPathComponent().appendingPathComponent(val)
-                        ViewController.loadDestinations(at: url2, for: val)
+    func loadDestinations(at url: URL, for name:String){
+        guard let yaml = try? String(contentsOf: url) else { return }
+        guard let destinations = try? Yams.load(yaml: yaml) as? [[String:String]] else { return }
+        let newhelper = HLPSettingHelper()
+        for destination in destinations {
+            if let dest_id = destination["value"] {
+                newhelper.addActionTitle(destination["title"], accLabel: destination["pron"], name: dest_id)
+                ViewController.actionHandlers[dest_id] = { view, setting in
+                    DispatchQueue.main.async {
+                        NavUtil.showModalWaiting(withMessage: "waiting")
+                        if ViewController.service.send(destination: dest_id) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                view.navigationController?.popViewController(animated: true)
+                                NavUtil.hideModalWaiting()
+                            }
+                        } else {
+                            NavUtil.hideModalWaiting()
+                            let alertController = UIAlertController(title: NSLocalizedString("ERROR",
+                                                                                             tableName: "CaBotLocalizable",
+                                                                                             comment: "Alert Error Title"),
+                                                                    message: NSLocalizedString("CaBot may not be connected",
+                                                                                               tableName: "CaBotLocalizable",
+                                                                                               comment: "CaBot may not be connected"),
+                                                                    preferredStyle: .alert)
+                            let ok = UIAlertAction(title: NSLocalizedString("Okay",
+                                                                            tableName: "CaBotLocalizable",
+                                                                            comment: "Okay"),
+                                                   style: .default) { (action:UIAlertAction) in
+                                alertController.dismiss(animated: true, completion: {
+                                })
+                            }
+                            alertController.addAction(ok)
+                            view.present(alertController, animated: true, completion: nil)
+                        }
                     }
                 }
-                self.destinationHelpers[name] = newhelper
+            }
+            if let src = destination["src"] {
+                newhelper.addActionTitle(destination["title"], accLabel: destination["pron"], name: src)
+                ViewController.actionHandlers[src] = { view, setting in
+                    view.next_group_id = setting.name
+                    view.performSegue(withIdentifier: "select_destination", sender: view)
+                }
+
+                let url2 = url.deletingLastPathComponent().appendingPathComponent(src)
+                self.loadDestinations(at: url2, for: src)
             }
         }
+        ViewController.destinationHelpers[name] = newhelper
     }
 
     static func initSettings() {
@@ -129,53 +189,10 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
     }
     
     func actionPerformed(_ setting: HLPSetting!) {
-        if let name = setting.name{
-            if name.hasPrefix("select_model_"){
-                let index = name.index(name.startIndex, offsetBy: "select_model_".count)
-                let id = String(name[index...])
-                ResourceManager.shared.selectModel(by: id)
-                ViewController.initDefaultMenus()
-                ViewController.initDestinations()
-                self.performSegue(withIdentifier: "default_menu", sender: self)
-            }
-            else if name.hasPrefix("destinations_"){
-                self.next_group_id = name
-                self.performSegue(withIdentifier: "select_destination", sender: self)
-            }
-            else if name == "cancel_navigation" {
-                NavUtil.showModalWaiting(withMessage: "waiting")
-                DispatchQueue.main.async {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        NavUtil.hideModalWaiting()
-                    }
-                    _ = ViewController.service.send(destination: "__cancel__")
-                }
-            }
-            else if name.hasPrefix("EDITOR_") {
-                if let destination = setting.name {
-                    
-                    DispatchQueue.main.async {
-                        NavUtil.showModalWaiting(withMessage: "waiting")
-                        if ViewController.service.send(destination: destination) {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                                self.navigationController?.popViewController(animated: true)
-                                NavUtil.hideModalWaiting()
-                            }
-                        } else {
-                            let alertController = UIAlertController(title: "Error", message: "CaBot may not be connected", preferredStyle: .alert)
-                            let ok = UIAlertAction(title: "Okay", style: .default) { (action:UIAlertAction) in
-                                alertController.dismiss(animated: true, completion: {
-                                })
-                            }
-                            alertController.addAction(ok)
-                            self.present(alertController, animated: true, completion: nil)
-                        }
-                    }
-                }
-            }
-            else {
-                self.performSegue(withIdentifier: setting.name, sender: self)
-            }
+        if let handler = ViewController.actionHandlers[setting.name] {
+            handler(self, setting)
+        } else {
+            self.performSegue(withIdentifier: setting.name, sender: self)
         }
     }
     
@@ -237,15 +254,15 @@ class ViewController: UITableViewController, HLPSettingHelperDelegate, CaBotServ
                     accessibilityLabel = "CaBot"
                     if self.centralConnected {
                         title = title + "📱"
-                        accessibilityLabel = accessibilityLabel + " connected"
+                        accessibilityLabel = accessibilityLabel + NSLocalizedString(" connected", tableName: "CaBotLocalizabl", comment: "")
 
                         if self.faceappConnected {
                             title = title + "🎒"
-                            accessibilityLabel = accessibilityLabel + ", backpack ready"
+                            accessibilityLabel = accessibilityLabel + NSLocalizedString(", backpack ready", tableName: "CaBotLocalizabl", comment: "")
                         }
                     } else {
                         title = title + "📵"
-                        accessibilityLabel = accessibilityLabel + " not connected"
+                        accessibilityLabel = accessibilityLabel + NSLocalizedString(" not connected", tableName: "CaBotLocalizabl", comment: "")
                     }
                     
                     

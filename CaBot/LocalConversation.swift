@@ -24,81 +24,15 @@ import Foundation
 import RestKit
 import AssistantV1
 import HLPDialog
-import JavaScriptCore
-import Yams
-
-@objc protocol JSBundleExport: JSExport {
-    func loadYaml(_ name: String) -> [[String: String]]
-    static func getInstance() -> JSBundle
-}
-
-class JSBundle: NSObject, JSBundleExport {
-    func loadYaml(_ name: String) -> [[String: String]] {
-        guard let path = Bundle.main.url(forResource: name, withExtension: "yaml", subdirectory: "Resource") else {
-            return []
-        }
-        do {
-            let content = try String(contentsOf: path)
-            let yaml = try Yams.load(yaml: content) as! [[String: String]]
-            return yaml
-        } catch {
-        }
-        NSLog("Cannot load \(name).yaml")
-        return []
-    }
-    class func getInstance() -> JSBundle {
-        return JSBundle()
-    }
-}
-
-@objc protocol JSConsoleExport: JSExport {
-    func log(_ text: String) -> Void
-    static func getInstance() -> JSConsole
-}
-
-class JSConsole: NSObject, JSConsoleExport {
-    func log(_ text: String) {
-        NSLog(text)
-    }
-    class func getInstance() -> JSConsole {
-        return JSConsole()
-    }
-}
-
 
 class LocalConversation: HLPConversation {
 
     fileprivate let domain = "cabot.LocalConversation"
-    let ctx: JSContext
-    let script: String
 
-    init(withScript jsFile: URL) {
-        ctx = JSContext()
-        NSLog("loading \(jsFile)")
+    let jsHelper: JSHelper
 
-        do {
-            script = try String(contentsOf: jsFile, encoding: .utf8)
-
-            // JavaScript syntax check
-            ctx.exceptionHandler = { context, value in
-                let lineNumber:Int = Int(value!.objectForKeyedSubscript("line")!.toInt32())
-                let moreInfo = "\(jsFile.path)#L\(lineNumber)"
-                NSLog("JS ERROR: \(value!) \(moreInfo)")
-                for i in (lineNumber-2)..<lineNumber {
-                    NSLog("L\(i+1)",self.script.split(separator: "\n", omittingEmptySubsequences:false)[i])
-                }
-                exit(0)
-            }
-            // set custom global objects
-            ctx.setObject(JSBundle.getInstance(), forKeyedSubscript: "Bundle" as (NSCopying & NSObjectProtocol))
-            ctx.setObject(JSConsole.getInstance(), forKeyedSubscript: "Console" as (NSCopying & NSObjectProtocol))
-            // load script
-            ctx.evaluateScript(script)
-        } catch {
-            script = ""
-            NSLog("Cannot load the script \(jsFile.path)")
-            exit(0)
-        }
+    init(withScript jsFile: URL, withView view: UIViewController) {
+        jsHelper = JSHelper(withScript: jsFile, withView: view)
     }
 
     public func errorResponseDecoder(data: Data, response: HTTPURLResponse) -> RestError {
@@ -120,12 +54,9 @@ class LocalConversation: HLPConversation {
         }
     }
 
-    public func _get_response(_ request: Any) -> [String:Any] {
-        if let funk = ctx.objectForKeyedSubscript("get_response") {
-            NSLog(request)
-            if let ret = funk.call(withArguments: [request]) {
-                return ret.toDictionary() as! [String: Any]
-            }
+    public func _getResponse(_ request: Any) -> [String:Any] {
+        if let ret = jsHelper.call("getResponse", withArguments: [request]) {
+            return ret.toDictionary() as! [String: Any]
         }
         return [:]
     }
@@ -151,7 +82,7 @@ class LocalConversation: HLPConversation {
             return
         }
 
-        let json = try! JSONSerialization.data(withJSONObject: self._get_response(request), options: [])
+        let json = try! JSONSerialization.data(withJSONObject: self._getResponse(request), options: [])
         let resmsg:MessageResponse = try! JSONDecoder().decode(MessageResponse.self, from:json)
         var res:RestResponse<MessageResponse> = RestResponse<MessageResponse>(statusCode: 200)
         res.result = resmsg

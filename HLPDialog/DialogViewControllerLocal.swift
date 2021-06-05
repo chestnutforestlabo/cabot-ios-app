@@ -11,6 +11,6 @@ import HLPDialog
 
 class DialogViewControllerLocal : DialogViewControllerCabot{
     override func getConversation(pre: Locale) -> HLPConversation {
-        return LocalConversation(withScript: modelURL!)
+        return LocalConversation(withScript: modelURL!, withView: self)
     }
 }

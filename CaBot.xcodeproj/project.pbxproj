@@ -17,6 +17,9 @@
 		3099132B265DE50A000C1BFE /* Resource in Resources */ = {isa = PBXBuildFile; fileRef = 3099132A265DE50A000C1BFE /* Resource */; };
 		3099132D26603B10000C1BFE /* LocalConversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3099132C26603B10000C1BFE /* LocalConversation.swift */; };
 		30E99D9226681097001ACAAA /* ResourceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99D9126681097001ACAAA /* ResourceManager.swift */; };
+		30E99D94266A92EA001ACAAA /* JSHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99D93266A92EA001ACAAA /* JSHelper.swift */; };
+		30E99D96266A993E001ACAAA /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99D95266A993E001ACAAA /* Extension.swift */; };
+		30E99DA4266B2216001ACAAA /* BeaconSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99DA3266B2216001ACAAA /* BeaconSampler.swift */; };
 		7E29F00D228B548100CA7DD6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00C228B548100CA7DD6 /* AppDelegate.swift */; };
 		7E29F00F228B548100CA7DD6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00E228B548100CA7DD6 /* ViewController.swift */; };
 		7E29F012228B548100CA7DD6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F010228B548100CA7DD6 /* Main.storyboard */; };
@@ -71,6 +74,9 @@
 		3099132A265DE50A000C1BFE /* Resource */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resource; sourceTree = "<group>"; };
 		3099132C26603B10000C1BFE /* LocalConversation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalConversation.swift; sourceTree = "<group>"; };
 		30E99D9126681097001ACAAA /* ResourceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceManager.swift; sourceTree = "<group>"; };
+		30E99D93266A92EA001ACAAA /* JSHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSHelper.swift; sourceTree = "<group>"; };
+		30E99D95266A993E001ACAAA /* Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
+		30E99DA3266B2216001ACAAA /* BeaconSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeaconSampler.swift; sourceTree = "<group>"; };
 		7E29F009228B548100CA7DD6 /* CaBot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CaBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E29F00C228B548100CA7DD6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7E29F00E228B548100CA7DD6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -198,6 +204,9 @@
 				7E29F015228B548200CA7DD6 /* LaunchScreen.storyboard */,
 				3099132C26603B10000C1BFE /* LocalConversation.swift */,
 				30E99D9126681097001ACAAA /* ResourceManager.swift */,
+				30E99D93266A92EA001ACAAA /* JSHelper.swift */,
+				30E99D95266A993E001ACAAA /* Extension.swift */,
+				30E99DA3266B2216001ACAAA /* BeaconSampler.swift */,
 			);
 			path = CaBot;
 			sourceTree = "<group>";
@@ -420,9 +429,11 @@
 				09725B0A24FE4AC300012D42 /* DialogViewControllerCabot.swift in Sources */,
 				7E29F066228B55C000CA7DD6 /* HLPSettingViewCell.m in Sources */,
 				3099132D26603B10000C1BFE /* LocalConversation.swift in Sources */,
+				30E99D94266A92EA001ACAAA /* JSHelper.swift in Sources */,
 				096C5C5525752EA200836CF4 /* DialogViewControllerLocal.swift in Sources */,
 				30E99D9226681097001ACAAA /* ResourceManager.swift in Sources */,
 				7E29F067228B55C000CA7DD6 /* HLPSettingHelper.m in Sources */,
+				30E99D96266A993E001ACAAA /* Extension.swift in Sources */,
 				7E29F06D228B55C000CA7DD6 /* NavDeviceTTS.m in Sources */,
 				7E29F00F228B548100CA7DD6 /* ViewController.swift in Sources */,
 				7E29F00D228B548100CA7DD6 /* AppDelegate.swift in Sources */,
@@ -430,6 +441,7 @@
 				7E29F063228B55C000CA7DD6 /* HLPSetting.m in Sources */,
 				7E29F06B228B55C000CA7DD6 /* HLPSettingTableView.m in Sources */,
 				7E29F072228B55FC00CA7DD6 /* CaBotService.swift in Sources */,
+				30E99DA4266B2216001ACAAA /* BeaconSampler.swift in Sources */,
 				09725B0C24FE573A00012D42 /* SliverDefaultTTS.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -650,7 +662,7 @@
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				INFOPLIST_FILE = CaBot/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -678,7 +690,7 @@
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				INFOPLIST_FILE = CaBot/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

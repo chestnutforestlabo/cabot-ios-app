@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2021  Carnegie Mellon University
+ * Copyright (c) 2021  Carnegie Mellon University
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,11 +36,18 @@ class Model {
             let type: String
             let src: String
         }
+        struct CustomMenu: Decodable {
+            let title: String
+            let id: String
+            let script: String
+            let function: String
+        }
 
         let name: String
         let language: String
         let conversation: Source?
         let destinations: Source?
+        let custom_menus: [CustomMenu]?
 
         static func load(at url: URL) throws -> Metadata {
             do {
@@ -71,7 +78,7 @@ class Model {
     var coversationURL: URL? {
         get {
             if let c = metadata.conversation {
-                return path.appendingPathComponent(c.src)
+                return self.resolveURL(from: c.src)
             }
             return nil
         }
@@ -80,10 +87,23 @@ class Model {
     var destinationsURL: URL? {
         get {
             if let d = metadata.destinations {
-                return path.appendingPathComponent(d.src)
+                return self.resolveURL(from: d.src)
             }
             return nil
         }
+    }
+
+    var customeMenus: [Metadata.CustomMenu] {
+        get {
+            if let cm = metadata.custom_menus {
+                return cm
+            }
+            return []
+        }
+    }
+
+    func resolveURL(from file:String) -> URL {
+        return path.appendingPathComponent(file)
     }
 
     init(at url: URL) throws {
@@ -146,7 +166,7 @@ class ResourceManager {
                             let model = try Model(at: dir)
                             list.append(model)
                         } catch (let error) {
-                            NSLog(error)
+                            NSLog(error.localizedDescription)
                         }
                     }
                 }

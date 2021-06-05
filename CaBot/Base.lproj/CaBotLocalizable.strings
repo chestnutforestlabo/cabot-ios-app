@@ -6,8 +6,16 @@
   Copyright © 2020 CMU. All rights reserved.
 */
 
+"Okay"="Okay";
+"ERROR"="Error";
+"Select"="Select";
+"CaBot may not be connected"="CaBot may not be connected";
 "START_CONVERSATION"="Start Conversation";
 "SELECT_DESTINATION"="Select Destination";
 "CANCEL_NAVIGATION"="Cancel Navigation";
 "DESTINATIONS_LABEL"="Destinations";
 "SETTINGS_LABEL"="Settings";
+
+" connected"=" connected";
+", backpack ready"=", backpack ready";
+" not connected"=" not connected";
