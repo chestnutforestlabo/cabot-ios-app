@@ -25,6 +25,9 @@ import JavaScriptCore
 import Yams
 import UIKit
 
+// JavaScript custom global objests for extension
+//
+// Bundle for yaml resource loading
 @objc protocol JSBundleExport: JSExport {
     func loadYaml(_ name: String) -> [[String: String]]
     static func getInstance() -> JSBundle
@@ -49,6 +52,7 @@ class JSBundle: NSObject, JSBundleExport {
     }
 }
 
+// Console for logging
 @objc protocol JSConsoleExport: JSExport {
     func log(_ text: String) -> Void
     static func getInstance() -> JSConsole
@@ -63,6 +67,7 @@ class JSConsole: NSObject, JSConsoleExport {
     }
 }
 
+// Bluetooth for beacon scanning
 @objc protocol JSBluetoothExport: JSExport {
     func scanBeacons(_ uuid: JSValue, _ callback: JSValue)
     static func getInstance() -> JSBluetooth
@@ -114,26 +119,42 @@ class JSBluetooth: NSObject, JSBluetoothExport {
     }
 }
 
+// HTTPS for postJSON method
 @objc protocol JSHTTPSExport: JSExport {
-    func postJSON(_ host:JSValue, _ json: JSValue, _ callback: JSValue)
+    func postJSON(_ path:JSValue, _ json: JSValue, _ callback: JSValue)
     static func getInstance() -> JSHTTPS
 }
 
 class JSHTTPS: NSObject, JSHTTPSExport {
-    func postJSON(_ host:JSValue, _ json: JSValue, _ callback: JSValue) {
-        if let hostStr = host.toString() {
-            if let json = json.toDictionary() as? [String: Any?] {
+    func postJSON(_ path:JSValue, _ json: JSValue, _ callback: JSValue) {
+        guard let pathStr = path.toString(),
+              let url = URL(string: "https://\(pathStr)"),
+              let json = json.toDictionary() as? [String: Any?],
+              let data = try? JSONSerialization.data(withJSONObject: json)  else {
+            callback.call(withArguments: [])
+            return
+        }
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                    NSLog("%@, %@", hostStr, String(data: try! JSONSerialization.data(withJSONObject: json, options: .prettyPrinted), encoding: .utf8)!)
-                    callback.call(withArguments: [[
-                        "lat":40.44332302212961,
-                        "lng":-79.94531616803428,
-                        "floor":2.999999999999969
-                    ]])
+        NSLog("%@\n%@", url.absoluteString, String(data: try! JSONSerialization.data(withJSONObject: json, options: .prettyPrinted), encoding: .utf8)!)
+        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 15.0)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("\(data.count)", forHTTPHeaderField: "Content-Length")
+        request.httpBody = data
+
+        let session = URLSession.shared
+        let task = session.dataTask(with: request) { data, response, error in
+            if response != nil && error == nil {
+                if let data = data {
+                    if let json = try? JSONSerialization.jsonObject(with: data) {
+                        callback.call(withArguments: [json])
+                        return
+                    }
                 }
             }
+            callback.call(withArguments: [])
         }
+        task.resume()
     }
     class func getInstance() -> JSHTTPS {
         return JSHTTPS()
@@ -146,6 +167,7 @@ class JSHTTPS: NSObject, JSHTTPSExport {
     static func getInstance() -> JSDevice
 }
 
+// Device for device type and id
 class JSDevice: NSObject, JSDeviceExport {
     var type:String {
         get {
@@ -169,6 +191,7 @@ class JSDevice: NSObject, JSDeviceExport {
     static func getInstance(withView view: UIViewController) -> JSView
 }
 
+// View for modal wait message and alert
 class JSView: NSObject, JSViewExport {
     let view: UIViewController
     init(withView view: UIViewController) {
@@ -199,6 +222,7 @@ class JSView: NSObject, JSViewExport {
     }
 }
 
+// main class
 class JSHelper {
     let ctx: JSContext
     let script: String

@@ -197,15 +197,15 @@
 			children = (
 				30991329265DE4C5000C1BFE /* Supporting Files */,
 				7E29F00C228B548100CA7DD6 /* AppDelegate.swift */,
+				7E29F010228B548100CA7DD6 /* Main.storyboard */,
+				7E29F015228B548200CA7DD6 /* LaunchScreen.storyboard */,
+				30E99D95266A993E001ACAAA /* Extension.swift */,
 				7E29F00E228B548100CA7DD6 /* ViewController.swift */,
 				7E29F070228B55FC00CA7DD6 /* CaBotService.swift */,
 				09725B0B24FE573A00012D42 /* SliverDefaultTTS.swift */,
-				7E29F010228B548100CA7DD6 /* Main.storyboard */,
-				7E29F015228B548200CA7DD6 /* LaunchScreen.storyboard */,
 				3099132C26603B10000C1BFE /* LocalConversation.swift */,
 				30E99D9126681097001ACAAA /* ResourceManager.swift */,
 				30E99D93266A92EA001ACAAA /* JSHelper.swift */,
-				30E99D95266A993E001ACAAA /* Extension.swift */,
 				30E99DA3266B2216001ACAAA /* BeaconSampler.swift */,
 			);
 			path = CaBot;
