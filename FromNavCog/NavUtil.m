@@ -24,6 +24,29 @@
 #import <sys/utsname.h>
 #import <objc/runtime.h>
 
+@implementation UIWindow (Ext)
+
+- (UIViewController *)visibleViewController {
+    UIViewController *rootViewController = self.rootViewController;
+    return [UIWindow getVisibleViewControllerFrom:rootViewController];
+}
+
++ (UIViewController *) getVisibleViewControllerFrom:(UIViewController *) vc {
+    if ([vc isKindOfClass:[UINavigationController class]]) {
+        return [UIWindow getVisibleViewControllerFrom:[((UINavigationController *) vc) visibleViewController]];
+    } else if ([vc isKindOfClass:[UITabBarController class]]) {
+        return [UIWindow getVisibleViewControllerFrom:[((UITabBarController *) vc) selectedViewController]];
+    } else {
+        if (vc.presentedViewController) {
+            return [UIWindow getVisibleViewControllerFrom:vc.presentedViewController];
+        } else {
+            return vc;
+        }
+    }
+}
+
+@end
+
 @implementation UIMessageView
 
 @end
@@ -36,8 +59,9 @@ static NSMutableDictionary<NSString*, UIView*>* messageViewMap;
 +(void)showModalWaitingWithMessage:(NSString *)message
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSArray *subViews = [[[[UIApplication sharedApplication] delegate] window] subviews];
-        UIView *view = [subViews lastObject];
+        UIView *view = [[[UIApplication sharedApplication] windows][0] visibleViewController].view;
+        //NSArray *subViews = [[[[UIApplication sharedApplication] delegate] window] subviews];
+        //UIView *view = [subViews lastObject];
         [NavUtil showWaitingForView:view withMessage:message];
     });
 }
@@ -45,8 +69,9 @@ static NSMutableDictionary<NSString*, UIView*>* messageViewMap;
 +(void)hideModalWaiting
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSArray *subViews = [[[[UIApplication sharedApplication] delegate] window] subviews];
-        UIView *view = [subViews lastObject];
+        UIView *view = [[[UIApplication sharedApplication] windows][0] visibleViewController].view;
+        //NSArray *subViews = [[[[UIApplication sharedApplication] delegate] window] subviews];
+        //UIView *view = [subViews lastObject];
         [NavUtil hideWaitingForView:view];
     });
 }

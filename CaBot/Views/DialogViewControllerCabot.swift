@@ -21,29 +21,58 @@
  *******************************************************************************/
 
 
-import XCTest
+import Foundation
+import HLPDialog
 
-class CaBotUITests: XCTestCase {
+class CaBotTTS : TTSProtocol{
 
-    override func setUp() {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    var voice: AVSpeechSynthesisVoice?
 
-        // In UI tests it is usually best to stop immediately when a failure occurs.
-        continueAfterFailure = false
-
-        // UI tests must launch the application that they test. Doing this in setup will make sure it happens for each test method.
-        XCUIApplication().launch()
-
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
+    init(voice: AVSpeechSynthesisVoice?) {
+        self.voice = voice
     }
 
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    private let _tts:NavDeviceTTS = NavDeviceTTS.shared()
+
+    func speak(_ text: String?, callback: @escaping () -> Void) {
+        if let voice = self.voice {
+            self._tts.speak(text == nil ? "" : text, withOptions: ["voice": voice], completionHandler: callback)
+        } else {
+            self._tts.speak(text == nil ? "" : text, withOptions: [:], completionHandler: callback)
+        }
+    }
+    
+    func stop() {
+        self._tts.stop(true)
+    }
+    
+    func stop(_ immediate: Bool) {
+        self._tts.stop(immediate)
+    }
+    
+    func vibrate() {
+        //nop
+    }
+    
+    func playVoiceRecoStart() {
+        //nop
     }
 
-    func testExample() {
-        // Use recording to get started writing UI tests.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+}
+class DialogViewControllerCabot : DialogViewController{
+    var modelURL: URL?
+    var voice: AVSpeechSynthesisVoice?
+
+    override func viewDidLoad() {
+        self.tts = CaBotTTS(voice: self.voice!)
+        //self.tts = SilverDefaultTTS()
+
+        if self.baseHelper == nil {
+            self.baseHelper = DialogViewHelper()
+        }
     }
 
+    override func getConversation(pre: Locale) -> HLPConversation {
+        return LocalConversation(withScript: modelURL!)
+    }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019  Carnegie Mellon University
+ * Copyright (c) 2021  Carnegie Mellon University
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,9 +44,8 @@ typedef enum {
 @property SpeechSoundEffectType type;
 @property SpeechPriority priority;
 @property NSTimeInterval validBy;
-//@property HLPLocation* location;
 @property double validRadius; // in meter
-@property (strong, nonatomic) void (^completionHandler)();
+@property (strong, nonatomic) void (^completionHandler)(void);
 @property NSTimeInterval issued;
 @property NSTimeInterval speakStart;
 @property NSTimeInterval speakFinish;
@@ -66,12 +65,12 @@ typedef enum {
 + (instancetype) sharedTTS;
 + (NSString *)removeDots:(NSString *)str;
 
-- (AVSpeechUtterance*) speak:(NSString*)text withOptions:(NSDictionary*)options completionHandler:(void(^)())handler;
+- (AVSpeechUtterance*) speak:(NSString*)text withOptions:(NSDictionary*)options completionHandler:(void(^)(void))handler;
 
-- (AVSpeechUtterance*) speak:(NSString*)text completionHandler:(void(^)())handler __attribute__ ((deprecated));
-- (AVSpeechUtterance*) speak:(NSString*)text force:(BOOL)flag completionHandler:(void(^)())handler __attribute__ ((deprecated));
-- (AVSpeechUtterance*) selfspeak:(NSString*)text completionHandler:(void(^)())handler __attribute__ ((deprecated));
-- (AVSpeechUtterance*) selfspeak:(NSString*)text force:(BOOL)flag completionHandler:(void(^)())handler __attribute__ ((deprecated));
+- (AVSpeechUtterance*) speak:(NSString*)text completionHandler:(void(^)(void))handler __attribute__ ((deprecated));
+- (AVSpeechUtterance*) speak:(NSString*)text force:(BOOL)flag completionHandler:(void(^)(void))handler __attribute__ ((deprecated));
+- (AVSpeechUtterance*) selfspeak:(NSString*)text completionHandler:(void(^)(void))handler __attribute__ ((deprecated));
+- (AVSpeechUtterance*) selfspeak:(NSString*)text force:(BOOL)flag completionHandler:(void(^)(void))handler __attribute__ ((deprecated));
 
 - (void) pause:(double)duration;
 - (void) reset;

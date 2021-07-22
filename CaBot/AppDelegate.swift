@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019  Carnegie Mellon University
+ * Copyright (c) 2021  Carnegie Mellon University
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,20 +20,14 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-//
-//  AppDelegate.swift
-//  CaBot
-//
-//  Created by Daisuke Sato on 2019/05/08.
-//  Copyright © 2019 Daisuke Sato. All rights reserved.
-//
 
 import UIKit
 import AVKit
 import CoreLocation
 import HLPLocationManager
 
-@UIApplicationMain
+/*
+//@UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate {
 
     var window: UIWindow?
@@ -70,7 +64,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
                         NavUtil.hideModalWaiting()
                     }
                 } else {
-                    let alertController = UIAlertController(title: "Error", message: "CaBot may not be connected", preferredStyle: .alert)
+                    let alertController = UIAlertController(title: "Error", message: "Suitcase may not be connected", preferredStyle: .alert)
                     let ok = UIAlertAction(title: "Okay", style: .default) { (action:UIAlertAction) in
                         alertController.dismiss(animated: true, completion: {
                             NavUtil.hideModalWaiting()
@@ -91,7 +85,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
                         NavUtil.hideModalWaiting()
                     }
                 } else {
-                    let alertController = UIAlertController(title: "Error", message: "CaBot may not be connected", preferredStyle: .alert)
+                    let alertController = UIAlertController(title: "Error", message: "Suitcase may not be connected", preferredStyle: .alert)
                     let ok = UIAlertAction(title: "Okay", style: .default) { (action:UIAlertAction) in
                         alertController.dismiss(animated: true, completion: {
                             NavUtil.hideModalWaiting()
@@ -205,3 +199,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
     }
 }
 
+*/

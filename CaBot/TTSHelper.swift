@@ -1,3 +1,4 @@
+// please remove this line
 /*******************************************************************************
  * Copyright (c) 2021  Carnegie Mellon University
  *
@@ -20,5 +21,51 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-CFBundleDisplayName = "エーアイ スーツケース";
+import Foundation
+import AVKit
 
+struct Voice: Hashable {
+    static func == (lhs: Voice, rhs: Voice) -> Bool {
+        lhs.AVvoice.identifier == rhs.AVvoice.identifier
+    }
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(AVvoice.identifier)
+    }
+    var id: String {
+        get {
+            AVvoice.identifier
+        }
+    }
+
+    let AVvoice: AVSpeechSynthesisVoice
+
+}
+
+class TTSHelper {
+    static func getVoice(by id:String) -> Voice? {
+        for voice in AVSpeechSynthesisVoice.speechVoices() {
+            if voice.identifier == id {
+                return Voice(AVvoice: voice)
+            }
+        }
+        return nil
+    }
+    static func getVoices(by locale: Locale) -> [Voice] {
+        let search = locale.identifier
+
+        var voices:[Voice] = []
+        for voice in AVSpeechSynthesisVoice.speechVoices() {
+            if voice.language == search {
+                voices.append(Voice(AVvoice: voice))
+            }
+        }
+        return voices
+    }
+
+    static func playSample(of voice:Voice) {
+        NavDeviceTTS.shared().speak(NSLocalizedString("Hello Suitcase!", comment: ""),
+                                    withOptions: ["voice": voice.AVvoice, "force": true]) {
+
+        }
+    }
+}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2016  IBM Corporation, Carnegie Mellon University and others
+ * Copyright (c) 2021  Carnegie Mellon University
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,24 +20,44 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-/* confirmation message for delete alert */
-"Are you sure to delete %@？" = "本当に%@を消しますか？";
+import SwiftUI
 
-/* cancel */
-"Cancel" = "キャンセル";
+struct ResourceSelectView: View {
 
-/* message when it cannot be deleted */
-"Could not delete" = "削除できません";
+    @EnvironmentObject var model: CaBotAppModel
 
-/* title for delete alert */
-"Delete %@" = "%@を削除";
+    var body: some View {
+        Form {
+            Section(header:Text("Resource Selection")) {
+                ForEach (model.resourceManager.resources, id: \.self) { resource in
+                    Button(action: {
+                        withAnimation() {
+                            model.resource = resource
+                            model.displayedScene = .App
+                        }
+                    }) {
+                        HStack {
+                            Image(systemName: "folder")
+                            Text("\(resource.name)")
+                        }
+                    }
+                }
+                //.onDelete(perform: delete)
+            }
+        }
+        .onAppear(perform: {
+            if let _ = model.resource {
+                model.displayedScene = .App
+            }
+        })
+    }
+}
 
-/* prompt message for new option */
-"Input %@" = "%@を入力";
+struct ResourceSelectView_Previews: PreviewProvider {
+    static var previews: some View {
+        let model = CaBotAppModel()
 
-/* title for new option */
-"New %@" = "新規 %@";
-
-/* ok */
-"OK" = "OK";
-
+        ResourceSelectView()
+            .environmentObject(model)
+    }
+}

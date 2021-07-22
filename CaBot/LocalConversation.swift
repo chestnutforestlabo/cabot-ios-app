@@ -31,8 +31,8 @@ class LocalConversation: HLPConversation {
 
     let jsHelper: JSHelper
 
-    init(withScript jsFile: URL, withView view: UIViewController) {
-        jsHelper = JSHelper(withScript: jsFile, withView: view)
+    init(withScript jsFile: URL) {
+        jsHelper = JSHelper(withScript: jsFile)
     }
 
     public func errorResponseDecoder(data: Data, response: HTTPURLResponse) -> RestError {

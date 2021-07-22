@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019  Carnegie Mellon University
+ * Copyright (c) 2021  Carnegie Mellon University
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,18 +20,9 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-//
-//  bridging.h
-//  CaBot
-//
-//  Created by Daisuke Sato on 2019/05/10.
-//  Copyright © 2019 Daisuke Sato. All rights reserved.
-//
-
 #ifndef bridging_h
 #define bridging_h
 
-#include "HLPSettingHelper.h"
 #include "NavDeviceTTS.h"
 #include "NavUtil.h"
 

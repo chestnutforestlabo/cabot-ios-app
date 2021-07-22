@@ -188,15 +188,12 @@ class JSDevice: NSObject, JSDeviceExport {
     func showModalWaitingWithMessage(_ message: String)
     func hideModalWaiting()
     func alert(_ title: String, _ message: String)
-    static func getInstance(withView view: UIViewController) -> JSView
+    static func getInstance() -> JSView
 }
 
 // View for modal wait message and alert
 class JSView: NSObject, JSViewExport {
-    let view: UIViewController
-    init(withView view: UIViewController) {
-        self.view = view
-    }
+
     func showModalWaitingWithMessage(_ message: String) {
         NavUtil.showModalWaiting(withMessage: message)
     }
@@ -207,18 +204,21 @@ class JSView: NSObject, JSViewExport {
         DispatchQueue.main.async {
             let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
             let ok = UIAlertAction(title: NSLocalizedString("Okay",
-                                                            tableName: "CaBotLocalizable",
                                                             comment: "Okay"),
                                    style: .default) { (action:UIAlertAction) in
                 alertController.dismiss(animated: true, completion: {
                 })
             }
             alertController.addAction(ok)
-            self.view.present(alertController, animated: true, completion: nil)
+
+
+            if let view = UIApplication.shared.windows[0].visibleViewController {
+                view.present(alertController, animated: true, completion: nil)
+            }
         }
     }
-    class func getInstance(withView view: UIViewController) -> JSView {
-        return JSView(withView: view)
+    class func getInstance() -> JSView {
+        return JSView()
     }
 }
 
@@ -226,11 +226,9 @@ class JSView: NSObject, JSViewExport {
 class JSHelper {
     let ctx: JSContext
     let script: String
-    let view: UIViewController
 
-    init(withScript jsFile: URL, withView view: UIViewController) {
+    init(withScript jsFile: URL) {
         self.ctx = JSContext()
-        self.view = view
         NSLog("loading \(jsFile)")
 
         do {
@@ -253,7 +251,7 @@ class JSHelper {
             ctx.setObject(JSConsole.getInstance(), forKeyedSubscript: "Console" as (NSCopying & NSObjectProtocol))
             ctx.setObject(JSBluetooth.getInstance(), forKeyedSubscript: "Bluetooth" as (NSCopying & NSObjectProtocol))
             ctx.setObject(JSHTTPS.getInstance(), forKeyedSubscript: "HTTPS" as (NSCopying & NSObjectProtocol))
-            ctx.setObject(JSView.getInstance(withView: view), forKeyedSubscript: "View" as (NSCopying & NSObjectProtocol))
+            ctx.setObject(JSView.getInstance(), forKeyedSubscript: "View" as (NSCopying & NSObjectProtocol))
             ctx.setObject(JSDevice.getInstance(), forKeyedSubscript: "Device" as (NSCopying & NSObjectProtocol))
             // load script
             ctx.evaluateScript(script)

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015  IBM Corporation, Carnegie Mellon University and others
+ * Copyright (c) 2021  Carnegie Mellon University
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,27 +20,36 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-#import "HLPSettingTableView.h"
+import SwiftUI
+import CoreBluetooth
+import CoreLocation
+import HealthKit
+import os.log
 
-@implementation HLPSettingTableView
+@main
+struct CaBotApp: App {
+    @Environment(\.scenePhase) var scenePhase
+    
+    var modelData: CaBotAppModel = CaBotAppModel(preview: false)
 
-- (instancetype)initWithCoder:(NSCoder *)aDecoder {
-    self = [super initWithCoder:aDecoder];
-    
-    NSDictionary *cells = @{@"HLPSettingViewSwitchCell": @"switchCell",
-                            @"HLPSettingViewTextCell": @"textCell",
-                            @"HLPSettingViewSliderCell": @"sliderCell",
-                            @"HLPSettingViewSubtitleCell": @"subtitleCell",
-                            @"HLPSettingViewPickerCell": @"pickerCell"};
-    
-    for(NSString *nibName in cells) {
-        UINib *nib = [UINib nibWithNibName:nibName bundle:[NSBundle mainBundle]];
-        [self registerNib:nib forCellReuseIdentifier:cells[nibName]];
+    var body: some Scene {
+        WindowGroup {
+            RootView()
+                .environmentObject(modelData)
+        }.onChange(of: scenePhase) { newScenePhase in
+
+            modelData.onChange(of: newScenePhase)
+
+            switch newScenePhase {
+            case .background:
+                break
+            case .inactive:
+                break
+            case .active:
+                break
+            @unknown default:
+                break
+            }
+        }
     }
-    if (@available(iOS 13.0, *)) {
-        self.backgroundColor = [UIColor systemBackgroundColor];
-    }
-    return self;
 }
-
-@end

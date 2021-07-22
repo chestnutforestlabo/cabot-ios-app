@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>CaBot app works as an peripheral device of your robot.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
@@ -22,14 +20,16 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>This app works as an peripheral device of your robot.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>CaBot app works as an peripheral device of your robot.</string>
+	<string>This app works as an peripheral device of your robot.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>This app uses your location always and When in use</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app uses your location when in use</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>This app uses your location always</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app uses your location when in use</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app uses your microphone</string>
 	<key>NSSpeechRecognitionUsageDescription</key>

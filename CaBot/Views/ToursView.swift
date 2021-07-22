@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019  Carnegie Mellon University
+ * Copyright (c) 2021  Carnegie Mellon University
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,29 +20,37 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-#import <UIKit/UIKit.h>
-#import "HLPSetting.h"
+import SwiftUI
 
-@protocol HLPSettingViewCellDelegate
-- (void)actionPerformed:(HLPSetting*)setting;
-@end
+struct ToursView: View {
+    @EnvironmentObject var modelData: CaBotAppModel
+    
+    var url:URL
 
-@interface HLPSettingViewCell : UITableViewCell <UIPickerViewDataSource, UIPickerViewDelegate> {
+    var body: some View {
+        let tours = try! Tours(at: url)
 
+        Form {
+            Section(header: Text("SELECT_TOUR")) {
+                ForEach(tours.list, id: \.self) { tour in
+                    NavigationLink(
+                        destination: TourDetailView(tour: tour, showStartButton: true),
+                        label: {
+                            Text(tour.title)
+                        })
+                        .isDetailLink(false)
+                }
+            }
+        }.listStyle(PlainListStyle())
+    }
 }
 
-- (void) update:(HLPSetting*) setting;
+struct ToursView_Previews: PreviewProvider {
+    static var previews: some View {
+        let modelData = CaBotAppModel()
 
-@property HLPSetting *setting;
-@property (weak) id<HLPSettingViewCellDelegate> delegate;
-
-@property (weak, nonatomic) IBOutlet UIPickerView *pickerView;
-@property (weak, nonatomic) IBOutlet UIButton *addButton;
-@property (weak, nonatomic) IBOutlet UISwitch *switchView;
-@property (weak, nonatomic) IBOutlet UISlider *slider;
-@property (weak, nonatomic) IBOutlet UILabel *valueLabel;
-@property (weak, nonatomic) IBOutlet UILabel *title;
-@property (weak, nonatomic) IBOutlet UILabel *subtitle;
-@property (weak, nonatomic) IBOutlet UITextField *textInput;
-
-@end
+        let resource = modelData.resourceManager.resource(by: "place0")!
+        return ToursView(url: resource.toursURL!)
+            .environmentObject(modelData)
+    }
+}
