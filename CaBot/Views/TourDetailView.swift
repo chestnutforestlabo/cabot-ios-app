@@ -37,84 +37,80 @@ struct TourDetailView: View {
         let tourManager = modelData.tourManager
 
         Form {
-            Text(tour.title)
-                .font(Font.custom("", size: 24.0, relativeTo: .title))
-                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .center)
-
-            if showStartButton {
-                Button(action: {
-                    if tourManager.hasDestination {
-                        targetTour = tour
-                        isConfirming = true
-                    } else {
-                        // if there is no destination, start immediately
-                        tourManager.set(tour: tour)
-                        tourManager.nextDestination()
-                        presentationMode.wrappedValue.dismiss()
+            Section(header: Text("Actions")) {
+                if showStartButton {
+                    Button(action: {
+                        if tourManager.hasDestination {
+                            targetTour = tour
+                            isConfirming = true
+                        } else {
+                            tourManager.set(tour: tour)
+                            presentationMode.wrappedValue.dismiss()
+                        }
+                    }) {
+                        Label{
+                            Text("SET_TOUR")
+                        } icon: {
+                            Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                        }
                     }
-                }) {
-                    Label{
-                        Text("START_TOUR")
-                    } icon: {
-                        Image(systemName: "arrow.triangle.turn.up.right.diamond")
-                    }
-                }
-                .padding()
-                .actionSheet(isPresented: $isConfirming) {
-                    let message = String(format: NSLocalizedString("ADD_TOUR_MESSAGE", comment: ""),
-                                         arguments: [modelData.tourManager.destinationCount])
-                    return ActionSheet(title: Text("ADD_TOUR"),
-                                       message: Text(message),
-                                       buttons: [
-                                        .cancel(),
-                                        .destructive(
-                                            Text("OVERWRITE_TOUR"),
-                                            action: {
-                                                if let tour = targetTour {
-                                                    tourManager.set(tour: tour)
-                                                    tourManager.nextDestination()
-                                                    presentationMode.wrappedValue.dismiss()
-                                                    targetTour = nil
+                    .actionSheet(isPresented: $isConfirming) {
+                        let message = String(format: NSLocalizedString("ADD_TOUR_MESSAGE", comment: ""),
+                                             arguments: [modelData.tourManager.destinationCount])
+                        return ActionSheet(title: Text("ADD_TOUR"),
+                                           message: Text(message),
+                                           buttons: [
+                                            .cancel(),
+                                            .destructive(
+                                                Text("OVERWRITE_TOUR"),
+                                                action: {
+                                                    if let tour = targetTour {
+                                                        tourManager.set(tour: tour)
+                                                        presentationMode.wrappedValue.dismiss()
+                                                        targetTour = nil
+                                                    }
                                                 }
-                                            }
-                                        )
-                                       ])
-                }
-            }
-            if let cd = tour.currentDestination {
-                Label(cd.title, systemImage: "arrow.triangle.turn.up.right.diamond")
-            }
-
-            ForEach(tour.destinations, id: \.self) { dest in
-                Label(dest.title, systemImage: "mappin.and.ellipse")
-            }
-
-            if showCancelButton {
-                Button(action: {
-                    isConfirming = true
-                }) {
-                    Label{
-                        Text("CANCEL_NAVIGATION")
-                    } icon: {
-                        Image(systemName: "xmark.circle")
+                                            )
+                                           ])
                     }
                 }
-                .actionSheet(isPresented: $isConfirming) {
-                    let message = String(format: NSLocalizedString("CANCEL_NAVIGATION_MESSAGE", comment: ""),
-                                         arguments: [modelData.tourManager.destinationCount])
-                    return ActionSheet(title: Text("CANCEL_NAVIGATION"),
-                                       message: Text(message),
-                                       buttons: [
-                                        .cancel(),
-                                        .destructive(
-                                            Text("CANCEL_ALL"),
-                                            action: {
-                                                modelData.tourManager.clearAll()
-                                                presentationMode.wrappedValue.dismiss()
-                                            }
-                                        )
-                                       ]
-                    )
+
+                if showCancelButton {
+                    Button(action: {
+                        isConfirming = true
+                    }) {
+                        Label{
+                            Text("CANCEL_NAVIGATION")
+                        } icon: {
+                            Image(systemName: "xmark.circle")
+                        }
+                    }
+                    .actionSheet(isPresented: $isConfirming) {
+                        let message = String(format: NSLocalizedString("CANCEL_NAVIGATION_MESSAGE", comment: ""),
+                                             arguments: [modelData.tourManager.destinationCount])
+                        return ActionSheet(title: Text("CANCEL_NAVIGATION"),
+                                           message: Text(message),
+                                           buttons: [
+                                            .cancel(),
+                                            .destructive(
+                                                Text("CANCEL_ALL"),
+                                                action: {
+                                                    modelData.tourManager.clearAll()
+                                                    presentationMode.wrappedValue.dismiss()
+                                                }
+                                            )
+                                           ]
+                        )
+                    }
+                }
+            }
+            Section(header: Text(tour.title)) {
+                if let cd = tour.currentDestination {
+                    Label(cd.title, systemImage: "arrow.triangle.turn.up.right.diamond")
+                }
+
+                ForEach(tour.destinations, id: \.self) { dest in
+                    Label(dest.title, systemImage: "mappin.and.ellipse")
                 }
             }
         }

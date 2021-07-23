@@ -43,31 +43,8 @@ struct RootView: View {
                 }
             }
             .navigationTitle("AI Suitcase")
-            .onChange(of: modelData.suitcaseConnected) { value in
-                let text = value ? NSLocalizedString("Suitcase has been connected", comment: "") :
-                    NSLocalizedString("Suitcase has been disconnected", comment: "")
-
-                UIAccessibility.post(notification: .announcement, argument: text)
-            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    if modelData.suitcaseConnected {
-                        if modelData.backpackConnected {
-                            Image(systemName: "antenna.radiowaves.left.and.right")
-                                .accessibility(label: Text("Suitcase and Backpack Connected"))
-                        } else {
-                            Image(systemName: "antenna.radiowaves.left.and.right")
-                                .accessibility(label: Text("Suitcase Connected"))
-                        }
-                    } else {
-                        Image(systemName: "antenna.radiowaves.left.and.right")
-                            .opacity(0.1)
-                            .accessibility(label: Text("Suitcase Not Connected"))
-
-                    }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-
                     if modelData.displayedScene == .App {
                         NavigationLink (destination: SettingView()
                                             .environmentObject(modelData)

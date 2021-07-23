@@ -33,8 +33,27 @@ struct OnboardGrantAccess: View {
     var body: some View {
 
         return VStack {
-            Text("Please allow the app to access the Bluetooth device to connect to the scale and use notification.")
+            Text("ONBOARD_MESSAGE")
                 .padding()
+
+            Button(action: {
+                userAction = true
+                modelData.locationManager.requestAlwaysAuthorization()
+            }) {
+                switch(modelData.locationState) {
+                case .Init:
+                    Label(NSLocalizedString("Enable Location Update", comment: ""), systemImage:"circle")
+                case .Granted:
+                    Label(NSLocalizedString("Location Update Enabled", comment: ""), systemImage:"checkmark.circle")
+                case .Denied:
+                    Label(NSLocalizedString("Location Update Denied", comment: ""), systemImage:"multiply.circle")
+                case .Off:
+                    Label(NSLocalizedString("ERROR", comment: ""), systemImage:"multiply.circle")
+                }
+            }
+            .padding()
+            .disabled(modelData.locationState != .Init)
+            .frame(width:250, alignment: .leading)
 
             Button(action: {
                 userAction = true
@@ -43,15 +62,15 @@ struct OnboardGrantAccess: View {
             }) {
                 switch(modelData.bluetoothState) {
                 case .unknown:
-                    Label("Enable Bluetooth", systemImage: "circle")
+                    Label(NSLocalizedString("Enable Bluetooth", comment: ""), systemImage: "circle")
                 case .unauthorized:
-                    Label("Bluetooth Denied", systemImage: "multiply.circle")
+                    Label(NSLocalizedString("Bluetooth Denied", comment: ""), systemImage: "multiply.circle")
                 case .poweredOn:
-                    Label("Bluetooth Enabled", systemImage: "checkmark.circle")
+                    Label(NSLocalizedString("Bluetooth Enabled", comment: ""), systemImage: "checkmark.circle")
                 case .poweredOff:
-                    Label("Bluetooth is Off", systemImage: "circle")
+                    Label(NSLocalizedString("Bluetooth is Off", comment: ""), systemImage: "circle")
                 case .unsupported:
-                    Label("Running on Simulator?",
+                    Label(NSLocalizedString("Running on Simulator?", comment: ""),
                           systemImage: "multiply.circle")
                 default:
                     Text("bluetoothState error")
@@ -75,30 +94,19 @@ struct OnboardGrantAccess: View {
             }) {
                 switch(modelData.notificationState) {
                 case .Init:
-                    Label("Enable Notification", systemImage:"circle")
+                    Label(NSLocalizedString("Enable Notification", comment: ""), systemImage:"circle")
                 case .Granted:
-                    Label("Notification Enabled", systemImage:"checkmark.circle")
+                    Label(NSLocalizedString("Notification Enabled", comment: ""), systemImage:"checkmark.circle")
                 case .Denied:
-                    Label("Notification Denied", systemImage:"multiply.circle")
+                    Label(NSLocalizedString("Notification Denied", comment: ""), systemImage:"multiply.circle")
                 case .Off:
-                    Label("ERROR", systemImage:"multiply.circle")
+                    Label(NSLocalizedString("ERROR", comment: ""), systemImage:"multiply.circle")
                 }
             }
             .padding()
             .disabled(modelData.notificationState != .Init)
             .frame(width:250, alignment: .leading)
 
-            /*
-            HStack {
-                Spacer()
-                Button("Next") {
-                    modelData.displayedScene = .ResourceSelect
-                }
-                .padding()
-                .disabled(modelData.bluetoothState != .poweredOn ||
-             modelData.notificationState == .Init)
-            }
- */
         }
         .onChange(of: modelData.bluetoothState, perform: { value in
             checkCondition()
@@ -122,7 +130,9 @@ struct OnboardGrantAccess: View {
 
     func checkCondition() {
         if modelData.bluetoothState == .poweredOn &&
-            modelData.notificationState != .Init {
+            modelData.notificationState != .Init &&
+            modelData.locationState != .Init
+            {
             if userAction {
                 withAnimation() {
                     modelData.displayedScene = .ResourceSelect

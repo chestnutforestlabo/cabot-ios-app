@@ -46,9 +46,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
 
     private let selectedResourceKey = "SelectedResourceKey"
     private let selectedVoiceKey = "SelectedVoiceKey"
+    private let speechRateKey = "speechRateKey"
     private let teamIDKey = "team_id"
     private let menuDebugKey = "menu_debug"
 
+    @Published var locationState: GrantState = .Init
     @Published var bluetoothState: CBManagerState = .unknown
     @Published var notificationState: GrantState = .Init
     @Published var displayedScene: DisplayedScene = .Onboard
@@ -83,6 +85,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
             }
         }
     }
+    @Published var speechRate: Double = 0.5 {
+        didSet {
+            UserDefaults.standard.setValue(speechRate, forKey: speechRateKey)
+            UserDefaults.standard.synchronize()
+            service.tts.rate = speechRate
+        }
+    }
 
     @Published var suitcaseConnected: Bool = false
     @Published var backpackConnected: Bool = false
@@ -113,7 +122,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     let notificationCenter: UNUserNotificationCenter
 
     let locationManager: CLLocationManager
-    let locationUpdateTimeLimit: CFAbsoluteTime = 30//60*15
+    let locationUpdateTimeLimit: CFAbsoluteTime = 60*15
     var locationUpdateStartTime: CFAbsoluteTime = 0
     var audioAvailableEstimate: Bool = false
 
@@ -143,6 +152,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         if let menuDebug = UserDefaults.standard.value(forKey: menuDebugKey) as? Bool {
             self.menuDebug = menuDebug
         }
+        if let speechRate = UserDefaults.standard.value(forKey: speechRateKey) as? Double {
+            self.speechRate = speechRate
+        }
     }
 
     func onChange(of newScenePhase: ScenePhase) {
@@ -150,9 +162,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         case .background:
             do {
                 try AVAudioSession.sharedInstance().setCategory(.playback,
-                                                                mode: .spokenAudio,
+                                                                mode: .default,
                                                                 policy: .default,
-                                                                options: [])
+                                                                options: [.allowBluetooth, .allowBluetoothA2DP])
                 try AVAudioSession.sharedInstance().setActive(true, options: [])
             } catch {
                 NSLog("audioSession properties weren't set because of an error.")
@@ -167,16 +179,15 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
             audioAvailableEstimate = true
             self.initNotification()
             do {
-                try AVAudioSession.sharedInstance().setCategory(.soloAmbient,
-                                                                mode: .spokenAudio,
+                try AVAudioSession.sharedInstance().setCategory(.playback,
+                                                                mode: .default,
                                                                 policy: .default,
-                                                                options: [])
+                                                                options: [.allowBluetooth, .allowBluetoothA2DP])
                 try AVAudioSession.sharedInstance().setActive(true, options: [])
             } catch {
                 NSLog("audioSession properties weren't set because of an error.")
             }
 
-            locationManager.requestAlwaysAuthorization()
             locationManager.stopUpdatingLocation()
             break
         @unknown default:
@@ -201,8 +212,24 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
 
     }
 
-
     // MARK: LocationManagerDelegate
+
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        switch(manager.authorizationStatus) {
+        case .notDetermined:
+            locationState = .Init
+        case .restricted:
+            locationState = .Denied
+        case .denied:
+            locationState = .Denied
+        case .authorizedAlways:
+            locationState = .Granted
+        case .authorizedWhenInUse:
+            locationState = .Denied
+        @unknown default:
+            locationState = .Off
+        }
+    }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if suitcaseConnected {
@@ -233,7 +260,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         if let dest = destination {
             if let dest_id = dest.value {
                 if !send(destination: dest_id) {
-                    manager.stopCurrent()
+                    manager.cannotStartCurrent()
+                } else {
+                    service.tts.speak(String(format:NSLocalizedString("Going to %@", comment: ""), arguments: [dest.pron ?? dest.title])) {
+                        
+                    }
                 }
             }
         } else {
@@ -282,6 +313,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     func caBot(service: CaBotService, centralConnected: Bool) {
         if self.suitcaseConnected != centralConnected {
             self.suitcaseConnected = centralConnected
+
+            let text = centralConnected ? NSLocalizedString("Suitcase has been connected", comment: "") :
+                NSLocalizedString("Suitcase has been disconnected", comment: "")
+
+            service.tts.speak(text, force: true) {
+            }
         }
     }
 
@@ -311,7 +348,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
             tourManager.nextDestination()
             break
         case .arrived:
-            tourManager.clearCurrent()
+            if let cd = tourManager.currentDestination {
+                self.service.tts.speak(String(format:NSLocalizedString("You have arrived at %@", comment: ""), arguments: [cd.pron ?? cd.title])) {
+                }
+            }
+            tourManager.arrivedCurrent()
             break
         }
     }

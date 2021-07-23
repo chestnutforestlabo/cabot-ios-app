@@ -28,6 +28,8 @@ struct SettingView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @EnvironmentObject var modelData: CaBotAppModel
 
+    @State var timer:Timer?
+
     var body: some View {
         return Form {
             Section(header: Text("Speech Voice")) {
@@ -41,6 +43,22 @@ struct SettingView: View {
                     }
                 })
                 .pickerStyle(DefaultPickerStyle())
+            }
+
+            Section(header: Text("Speech Speed")) {
+                HStack {
+                    Slider(value: $modelData.speechRate,
+                           in: 0...1,
+                           step: 0.05,
+                           onEditingChanged: { editing in
+                            timer?.invalidate()
+                            timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
+                                TTSHelper.playSample(of: modelData.voice!, at: modelData.speechRate)
+                            }
+                    })
+                        .accessibility(value: Text(String(format:"%.0f %%", arguments:[modelData.speechRate*100.0])))
+                    Text(String(format:"%.0f %%", arguments:[modelData.speechRate*100.0]))
+                }
             }
             Section(header: Text("Connection")) {
 

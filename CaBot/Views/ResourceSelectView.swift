@@ -28,7 +28,7 @@ struct ResourceSelectView: View {
 
     var body: some View {
         Form {
-            Section(header:Text("Resource Selection")) {
+            Section(header:Text("Select Resource")) {
                 ForEach (model.resourceManager.resources, id: \.self) { resource in
                     Button(action: {
                         withAnimation() {

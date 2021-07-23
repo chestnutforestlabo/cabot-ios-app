@@ -25,6 +25,10 @@
 "ERROR"="Error";
 "Select"="Select";
 "Settings"="Settings";
+"Select Resource"="Select Resource";
+"Actions"="Actions";
+"Status"="Status";
+
 "Suitcase may not be connected"="Suitcase may not be connected";
 "Suitcase has been connected"="Suitcase has been connected";
 "Suitcase has been disconnected"="Suitcase has been disconnected";
@@ -38,11 +42,11 @@
 "CANCEL_NAVIGATION"="Cancel Navigation";
 "CANCEL_NAVIGATION_MESSAGE"="You have %d destination(s). Are you sure to cancel all?";
 "CANCEL_ALL"="Cancel all destination";
-"RESUME"="Resume Navigation";
+"START"="Start Navigation";
 
 "Destinations"="Destinations";
 "SETTINGS_LABEL"="Settings";
-"START_TOUR"="Start Tour";
+"SET_TOUR"="Set Tour";
 "ADD_A_DESTINATION"="Add a destination";
 "ADD_A_DESTINATION_MESSAGE"="You already have %d destination(s). What do you want to do?";
 "CLEAR_ALL_THEN_ADD"="Clear All then Add";
@@ -64,3 +68,19 @@
 
 "processing..."="processing...";
 "Navigating to %@"="Navigating to %@";
+"Going to %@"="Going to %@";
+"You have arrived at %@"="You have arrived at %@";
+
+"ONBOARD_MESSAGE"="Please allow the app to access Location, Bluetooth device and Notification.";
+"Enable Location Update"="Enable Location Update";
+"Location Update Enabled"="Location Update Enabled";
+"Location Update Denied"="Location Update Denied";
+"Enable Bluetooth"="Enable Bluetooth";
+"Bluetooth Denied"="Bluetooth Denied";
+"Bluetooth Enabled"="Bluetooth Enabled";
+"Bluetooth is Off"="Bluetooth is Off";
+"Running on Simulator?"="Running on Simulator?";
+"bluetoothState error"="bluetoothState error";
+"Enable Notification"="Enable Notification";
+"Notification Enabled"="Notification Enabled";
+"Notification Denied"="Notification Denied";

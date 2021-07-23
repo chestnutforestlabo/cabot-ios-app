@@ -29,6 +29,9 @@ struct MainMenuView: View {
 
     var body: some View {
         let maxDestinationNumber = 2 + (modelData.tourManager.currentDestination==nil ? 1 : 0)
+        let versionNo = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
+        let buildNo = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
+
         VStack {
             Form {
                 if modelData.tourManager.hasDestination {
@@ -41,74 +44,60 @@ struct MainMenuView: View {
                                 Text("PAUSE_NAVIGATION")
                             }
 
-                            HStack {
-                                Label(cd.title,
-                                      systemImage: "arrow.triangle.turn.up.right.diamond")
-                                    .accessibilityLabel(String(format: NSLocalizedString("Navigating to %@", comment: ""),
-                                                               arguments: [cd.title]))
-                            }
+                            Label(cd.title,
+                                  systemImage: "arrow.triangle.turn.up.right.diamond")
+                                .accessibilityLabel(String(format: NSLocalizedString("Navigating to %@", comment: ""),
+                                                           arguments: [cd.title]))
                         } else if modelData.tourManager.destinations.count > 0 {
                             Button(action: {
                                 modelData.tourManager.nextDestination()
                             }) {
                                 Label{
-                                    Text("RESUME")
+                                    Text("START")
                                 } icon: {
                                     Image(systemName: "arrow.triangle.turn.up.right.diamond")
                                 }
                             }
                         }
-                        if modelData.tourManager.destinations.count <= maxDestinationNumber {
-                            ForEach(modelData.tourManager.destinations, id: \.self) { dest in
-                                Label(dest.title, systemImage: "mappin.and.ellipse")
-                            }
-
-                            if modelData.tourManager.currentDestination != nil {
-                                Button(action: {
-                                    isConfirming = true
-                                }) {
-                                    Text("CANCEL_NAVIGATION")
-                                }
-                                .actionSheet(isPresented: $isConfirming) {
-                                    let message = String(format: NSLocalizedString("CANCEL_NAVIGATION_MESSAGE", comment: ""),
-                                                         arguments: [modelData.tourManager.destinationCount])
-                                    return ActionSheet(title: Text("CANCEL_NAVIGATION"),
-                                                message: Text(message),
-                                                buttons: [
-                                                    .cancel(),
-                                                    .destructive(
-                                                        Text("CANCEL_ALL"),
-                                                        action: {
-                                                            modelData.tourManager.clearAll()
-                                                        }
-                                                    )
-                                                ]
-                                    )
-                                }
-                            }
-                        } else {
-                            ForEach(modelData.tourManager.first(n: maxDestinationNumber-1), id: \.self) {dest in
-                                Label(dest.title, systemImage: "mappin.and.ellipse")
-                            }
-                            if modelData.tourManager.destinations.count > maxDestinationNumber-1 {
-                                NavigationLink(
-                                    destination: TourDetailView(tour: modelData.tourManager,
-                                                                showStartButton: false,
-                                                                showCancelButton: true),
-                                    label: {
-                                        HStack {
-                                            Text("...")
-                                            Spacer()
-                                            Text("See detail")
-                                        }
-                                    })
-                            }
+                        ForEach(modelData.tourManager.first(n: maxDestinationNumber-1), id: \.self) {dest in
+                            Label(dest.title, systemImage: "mappin.and.ellipse")
+                        }
+                        if modelData.tourManager.destinations.count > 0 {
+                            NavigationLink(
+                                destination: TourDetailView(tour: modelData.tourManager,
+                                                            showStartButton: false,
+                                                            showCancelButton: true),
+                                label: {
+                                    HStack {
+                                        Spacer()
+                                        Text("See detail")
+                                    }
+                                })
                         }
                     }
                 }
                 MainMenus()
                     .environmentObject(modelData)
                     .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
+
+                Section(header:Text("Status")) {
+                    HStack {
+                        if modelData.suitcaseConnected {
+                            if modelData.backpackConnected {
+                                Image(systemName: "antenna.radiowaves.left.and.right")
+                                Text("Suitcase and Backpack Connected")
+                            } else {
+                                Image(systemName: "antenna.radiowaves.left.and.right")
+                                Text("Suitcase Connected")
+                            }
+                        } else {
+                            Image(systemName: "antenna.radiowaves.left.and.right")
+                                .opacity(0.1)
+                            Text("Suitcase Not Connected")
+                        }
+                    }
+                    Text("Version: \(versionNo) (\(buildNo))")
+                }
             }
         }
     }
@@ -145,13 +134,15 @@ struct MainMenus: View {
             }
 
 
-            Section(header: Text("Others")) {
-                ForEach (cm.customeMenus, id: \.self) {
-                    menu in
+            if cm.customeMenus.count > 0 {
+                Section(header: Text("Others")) {
+                    ForEach (cm.customeMenus, id: \.self) {
+                        menu in
 
-                    Button(menu.title) {
-                        let jsHelper = JSHelper(withScript: cm.resolveURL(from: menu.script))
-                        _ = jsHelper.call(menu.function, withArguments: [])
+                        Button(menu.title) {
+                            let jsHelper = JSHelper(withScript: cm.resolveURL(from: menu.script))
+                            _ = jsHelper.call(menu.function, withArguments: [])
+                        }
                     }
                 }
             }
@@ -163,11 +154,11 @@ struct ContentView_Previews: PreviewProvider {
     
     static var previews: some View {
         preview_tour
-        preview_tour2
-        preview_tour3
+        //preview_tour2
+        //preview_tour3
         preview_tour4
-        preview
-        preview_ja
+        //preview
+        //preview_ja
     }
 
     static var preview_tour: some View {

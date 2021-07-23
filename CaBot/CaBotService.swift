@@ -52,6 +52,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     public var teamID:String? = nil
     public var faceappReady:Bool = false
     public var peripheralManager:CBPeripheralManager!
+    public var tts:CaBotTTS = CaBotTTS(voice: nil)
 
     private let uuid = CBUUID(string: String(format:UUID_FORMAT, 0x0000))
     private var destinationChar:CaBotNotifyChar!
@@ -122,7 +123,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     }
 
     public func setVoice(_ voice: AVSpeechSynthesisVoice) {
-        self.speechChar.setVoice(voice)
+        tts.voice = voice
     }
     
     public func send(destination: String) -> Bool {
@@ -501,8 +502,7 @@ class CaBotFindPersonReadyChar: CaBotChar {
 class CaBotSpeechChar: CaBotChar {
     let uuid:CBUUID
     let characteristic: CBMutableCharacteristic
-    
-    var tts:CaBotTTS = CaBotTTS(voice: nil)
+
 
     init(service: CaBotService,
          handle:Int) {
@@ -519,10 +519,6 @@ class CaBotSpeechChar: CaBotChar {
         super.init(service: service)
     }
 
-    func setVoice(_ voice:AVSpeechSynthesisVoice) {
-        tts.voice = voice
-    }
-    
     private func request(_ request:CBATTRequest) {
         DispatchQueue.main.async {
             guard let data = request.value else {
@@ -531,15 +527,14 @@ class CaBotSpeechChar: CaBotChar {
             guard let text = String(data: data, encoding: .utf8) else {
                 return
             }
-            guard let tts = NavDeviceTTS.shared() else {
-                return
-            }
+            let tts = self.service.tts
 
             for line in text.split(separator: "\n") {
                 if line == "__force_stop__" {
-                    tts.speak("", withOptions: ["force": true], completionHandler: nil)
+                    tts.speak("") {
+                    }
                 } else {
-                    tts.speak(String(line), withOptions: [:]) {
+                    tts.speak(String(line)) {
                     }
                 }
             }

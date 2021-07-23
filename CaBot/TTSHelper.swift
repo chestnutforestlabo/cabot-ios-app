@@ -23,6 +23,52 @@
 
 import Foundation
 import AVKit
+import HLPDialog
+
+class CaBotTTS : TTSProtocol{
+
+    var voice: AVSpeechSynthesisVoice?
+    var rate: Double = 0.6
+
+    init(voice: AVSpeechSynthesisVoice?) {
+        self.voice = voice
+    }
+
+    private let _tts:NavDeviceTTS = NavDeviceTTS.shared()
+
+    func speak(_ text: String?, force: Bool, callback: @escaping () -> Void) {
+        if let voice = self.voice {
+            self._tts.speak(text == nil ? "" : text, withOptions: ["voice": voice, "rate": rate, "selfspeak": true, "force": force], completionHandler: callback)
+        } else {
+            self._tts.speak(text == nil ? "" : text, withOptions: ["rate": rate, "selfspeak": true, "force": force], completionHandler: callback)
+        }
+    }
+
+    func speak(_ text: String?, callback: @escaping () -> Void) {
+        if let voice = self.voice {
+            self._tts.speak(text == nil ? "" : text, withOptions: ["voice": voice, "rate": rate, "selfspeak": true], completionHandler: callback)
+        } else {
+            self._tts.speak(text == nil ? "" : text, withOptions: ["rate": rate, "selfspeak": true], completionHandler: callback)
+        }
+    }
+
+    func stop() {
+        self._tts.stop(true)
+    }
+
+    func stop(_ immediate: Bool) {
+        self._tts.stop(immediate)
+    }
+
+    func vibrate() {
+        //nop
+    }
+
+    func playVoiceRecoStart() {
+        //nop
+    }
+}
+
 
 struct Voice: Hashable {
     static func == (lhs: Voice, rhs: Voice) -> Bool {
@@ -62,9 +108,11 @@ class TTSHelper {
         return voices
     }
 
-    static func playSample(of voice:Voice) {
-        NavDeviceTTS.shared().speak(NSLocalizedString("Hello Suitcase!", comment: ""),
-                                    withOptions: ["voice": voice.AVvoice, "force": true]) {
+    static func playSample(of voice:Voice, at rate: Double = 0.5) {
+        let tts = CaBotTTS(voice: voice.AVvoice)
+        tts.rate = rate
+
+        tts.speak(NSLocalizedString("Hello Suitcase!", comment: ""), force: true) {
 
         }
     }

@@ -25,6 +25,10 @@
 "ERROR"="エラー";
 "Select"="選択してください";
 "Settings"="設定";
+"Select Resource"="リソースの選択";
+"Actions"="アクション";
+"Status"="ステータス";
+
 "Suitcase may not be connected"="スーツケースが接続されていません";
 "Suitcase has been connected"="スーツケースが接続されました";
 "Suitcase has been disconnected"="スーツケースの接続が解除されました";
@@ -38,11 +42,11 @@
 "CANCEL_NAVIGATION"="ナビゲーションを中止";
 "CANCEL_NAVIGATION_MESSAGE"="%d個の目的地が設定されています。全てキャンセルしてよろしいですか？";
 "CANCEL_ALL"="全ての目的地を中止";
-"RESUME"="ナビゲーションを再開";
+"START"="ナビゲーションを開始";
 
 "Destinations"="目的地";
 "SETTINGS_LABEL"="設定";
-"START_TOUR"="ツアーを開始する";
+"SET_TOUR"="ツアーを設定する";
 "ADD_A_DESTINATION"="目的地を追加する";
 "ADD_A_DESTINATION_MESSAGE"="既に%d個の目的地が設定されています。どのようにしますか？";
 "CLEAR_ALL_THEN_ADD"="全部消してから追加する";
@@ -64,4 +68,20 @@
 "Suitcase Not Connected"="スーツケース接続なし";
 
 "processing..."="処理中...";
-"Navigating to %@"="%@にナビゲーションちゅう";
+"Navigating to %@"="%@に移動ちゅう";
+"Going to %@"="%@に移動します";
+"You have arrived at %@"="%@に到着しました";
+
+"ONBOARD_MESSAGE"="位置情報、Bluetooth、通知の利用を許可してください";
+"Enable Location Update"="位置情報を許可する";
+"Location Update Enabled"="位置情報が許可されました";
+"Location Update Denied"="位置情報が許可されませんでした";
+"Enable Bluetooth"="Bluetoothを許可する";
+"Bluetooth Denied"="Bluetoothが許可されませんでした";
+"Bluetooth Enabled"="Bluetoothが許可されました";
+"Bluetooth is Off"="Bluetoothがオフです";
+"Running on Simulator?"="シミュレーターで実行中？";
+"bluetoothState error"="bluetoothStateのエラー";
+"Enable Notification"="通知を許可する";
+"Notification Enabled"="通知が許可されました";
+"Notification Denied"="通知が許可されませんでした";

@@ -85,12 +85,25 @@ class TourManager: TourProtocol {
         delegate?.tourUpdated(manager: self)
     }
 
+    func cannotStartCurrent() {
+        if let cd = _currentDestination {
+            addToFirst(destination: cd)
+            _currentDestination = nil
+            delegate?.tourUpdated(manager: self)
+        }
+    }
+
     func stopCurrent() {
         if let cd = _currentDestination {
             addToFirst(destination: cd)
             _currentDestination = nil
             delegate?.tour(manager: self, destinationChanged: nil)
         }
+    }
+
+    func arrivedCurrent() {
+        _currentDestination = nil
+        delegate?.tourUpdated(manager: self)
     }
 
     func clearCurrent() {

@@ -24,41 +24,6 @@
 import Foundation
 import HLPDialog
 
-class CaBotTTS : TTSProtocol{
-
-    var voice: AVSpeechSynthesisVoice?
-
-    init(voice: AVSpeechSynthesisVoice?) {
-        self.voice = voice
-    }
-
-    private let _tts:NavDeviceTTS = NavDeviceTTS.shared()
-
-    func speak(_ text: String?, callback: @escaping () -> Void) {
-        if let voice = self.voice {
-            self._tts.speak(text == nil ? "" : text, withOptions: ["voice": voice], completionHandler: callback)
-        } else {
-            self._tts.speak(text == nil ? "" : text, withOptions: [:], completionHandler: callback)
-        }
-    }
-    
-    func stop() {
-        self._tts.stop(true)
-    }
-    
-    func stop(_ immediate: Bool) {
-        self._tts.stop(immediate)
-    }
-    
-    func vibrate() {
-        //nop
-    }
-    
-    func playVoiceRecoStart() {
-        //nop
-    }
-
-}
 class DialogViewControllerCabot : DialogViewController{
     var modelURL: URL?
     var voice: AVSpeechSynthesisVoice?
