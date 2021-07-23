@@ -9,11 +9,10 @@
 /* Begin PBXBuildFile section */
 		09725B0A24FE4AC300012D42 /* DialogViewControllerCabot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */; };
 		097845C02531E65B004DE1F6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 097845C22531E65B004DE1F6 /* InfoPlist.strings */; };
+		3009AC3126AA3F4000370873 /* HLPDialog in Frameworks */ = {isa = PBXBuildFile; productRef = 3009AC3026AA3F4000370873 /* HLPDialog */; };
 		3013614026A0BF590050CF9E /* PreviewResource in Resources */ = {isa = PBXBuildFile; fileRef = 3013613F26A0BF590050CF9E /* PreviewResource */; };
 		3013614326A0F8E10050CF9E /* TourDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3013614226A0F8E10050CF9E /* TourDetailView.swift */; };
 		3013614726A1E77B0050CF9E /* WebContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3013614626A1E77B0050CF9E /* WebContentView.swift */; };
-		3013615126A283E50050CF9E /* SliverDefaultTTS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3013615026A283E50050CF9E /* SliverDefaultTTS.swift */; };
-		306C7F69265D431700E5928E /* HLPDialog in Frameworks */ = {isa = PBXBuildFile; productRef = 306C7F68265D431700E5928E /* HLPDialog */; };
 		306C7F6C265D435100E5928E /* Yams in Frameworks */ = {isa = PBXBuildFile; productRef = 306C7F6B265D435100E5928E /* Yams */; };
 		3096BF1426A5C29F0066F256 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3096BF1326A5C29F0066F256 /* SettingView.swift */; };
 		3096BF1826A5D0990066F256 /* TTSHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3096BF1726A5D0990066F256 /* TTSHelper.swift */; };
@@ -34,10 +33,7 @@
 		30E99D94266A92EA001ACAAA /* JSHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99D93266A92EA001ACAAA /* JSHelper.swift */; };
 		30E99D96266A993E001ACAAA /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99D95266A993E001ACAAA /* Extension.swift */; };
 		30E99DA4266B2216001ACAAA /* BeaconSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99DA3266B2216001ACAAA /* BeaconSampler.swift */; };
-		7E29F00D228B548100CA7DD6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00C228B548100CA7DD6 /* AppDelegate.swift */; };
-		7E29F012228B548100CA7DD6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F010228B548100CA7DD6 /* Main.storyboard */; };
 		7E29F014228B548200CA7DD6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F013228B548200CA7DD6 /* Assets.xcassets */; };
-		7E29F017228B548200CA7DD6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F015228B548200CA7DD6 /* LaunchScreen.storyboard */; };
 		7E29F022228B548200CA7DD6 /* CaBotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F021228B548200CA7DD6 /* CaBotTests.swift */; };
 		7E29F02D228B548200CA7DD6 /* CaBotUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F02C228B548200CA7DD6 /* CaBotUITests.swift */; };
 		7E29F06D228B55C000CA7DD6 /* NavDeviceTTS.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F062228B55C000CA7DD6 /* NavDeviceTTS.m */; };
@@ -71,7 +67,6 @@
 		3013614226A0F8E10050CF9E /* TourDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TourDetailView.swift; sourceTree = "<group>"; };
 		3013614626A1E77B0050CF9E /* WebContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebContentView.swift; sourceTree = "<group>"; };
 		3013614A26A2262B0050CF9E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		3013615026A283E50050CF9E /* SliverDefaultTTS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SliverDefaultTTS.swift; sourceTree = "<group>"; };
 		306A57DA265C4435006B510D /* Speech.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Speech.framework; path = System/Library/Frameworks/Speech.framework; sourceTree = SDKROOT; };
 		306A57DC265C4466006B510D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		306A57DE265C446B006B510D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -96,10 +91,7 @@
 		30E99D95266A993E001ACAAA /* Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
 		30E99DA3266B2216001ACAAA /* BeaconSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeaconSampler.swift; sourceTree = "<group>"; };
 		7E29F009228B548100CA7DD6 /* CaBot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CaBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		7E29F00C228B548100CA7DD6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		7E29F011228B548100CA7DD6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		7E29F013228B548200CA7DD6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		7E29F016228B548200CA7DD6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7E29F018228B548200CA7DD6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7E29F01D228B548200CA7DD6 /* CaBotTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CaBotTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E29F021228B548200CA7DD6 /* CaBotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaBotTests.swift; sourceTree = "<group>"; };
@@ -123,7 +115,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				306C7F6C265D435100E5928E /* Yams in Frameworks */,
-				306C7F69265D431700E5928E /* HLPDialog in Frameworks */,
+				3009AC3126AA3F4000370873 /* HLPDialog in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -211,12 +203,9 @@
 			isa = PBXGroup;
 			children = (
 				30991329265DE4C5000C1BFE /* Supporting Files */,
-				7E29F00C228B548100CA7DD6 /* AppDelegate.swift */,
 				30E50DCD269F75DB00729ABD /* CaBotApp.swift */,
 				30E50DCF269F76F000729ABD /* CaBotAppModel.swift */,
 				30E50DD2269F77BE00729ABD /* Views */,
-				7E29F010228B548100CA7DD6 /* Main.storyboard */,
-				7E29F015228B548200CA7DD6 /* LaunchScreen.storyboard */,
 				30E99D95266A993E001ACAAA /* Extension.swift */,
 				7E29F070228B55FC00CA7DD6 /* CaBotService.swift */,
 				3099132C26603B10000C1BFE /* LocalConversation.swift */,
@@ -224,7 +213,6 @@
 				30E99D93266A92EA001ACAAA /* JSHelper.swift */,
 				30E99DA3266B2216001ACAAA /* BeaconSampler.swift */,
 				30E50DCB269F672800729ABD /* TourManager.swift */,
-				3013615026A283E50050CF9E /* SliverDefaultTTS.swift */,
 				3096BF1726A5D0990066F256 /* TTSHelper.swift */,
 			);
 			path = CaBot;
@@ -287,8 +275,8 @@
 			);
 			name = CaBot;
 			packageProductDependencies = (
-				306C7F68265D431700E5928E /* HLPDialog */,
 				306C7F6B265D435100E5928E /* Yams */,
+				3009AC3026AA3F4000370873 /* HLPDialog */,
 			);
 			productName = CaBot;
 			productReference = 7E29F009228B548100CA7DD6 /* CaBot.app */;
@@ -365,8 +353,8 @@
 			);
 			mainGroup = 7E29F000228B548100CA7DD6;
 			packageReferences = (
-				306C7F67265D431700E5928E /* XCRemoteSwiftPackageReference "HLPDialog" */,
 				306C7F6A265D435100E5928E /* XCRemoteSwiftPackageReference "Yams" */,
+				3009AC2F26AA3F4000370873 /* XCRemoteSwiftPackageReference "HLPDialog" */,
 			);
 			productRefGroup = 7E29F00A228B548100CA7DD6 /* Products */;
 			projectDirPath = "";
@@ -385,10 +373,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				3013614026A0BF590050CF9E /* PreviewResource in Resources */,
-				7E29F017228B548200CA7DD6 /* LaunchScreen.storyboard in Resources */,
 				7E29F014228B548200CA7DD6 /* Assets.xcassets in Resources */,
 				097845C02531E65B004DE1F6 /* InfoPlist.strings in Resources */,
-				7E29F012228B548100CA7DD6 /* Main.storyboard in Resources */,
 				7E557F002581C79B00B1B9CA /* Localizable.strings in Resources */,
 				3099132B265DE50A000C1BFE /* Resource in Resources */,
 			);
@@ -429,12 +415,10 @@
 				7E29F06D228B55C000CA7DD6 /* NavDeviceTTS.m in Sources */,
 				3013614326A0F8E10050CF9E /* TourDetailView.swift in Sources */,
 				30E50DD4269F77CE00729ABD /* RootView.swift in Sources */,
-				7E29F00D228B548100CA7DD6 /* AppDelegate.swift in Sources */,
 				7EF5F1EA228DB07100788987 /* NavUtil.m in Sources */,
 				30E50DDF26A0B21200729ABD /* ConversationView.swift in Sources */,
 				3096BF1426A5C29F0066F256 /* SettingView.swift in Sources */,
 				30E50DD8269F784A00729ABD /* MainMenuView.swift in Sources */,
-				3013615126A283E50050CF9E /* SliverDefaultTTS.swift in Sources */,
 				3096BF1826A5D0990066F256 /* TTSHelper.swift in Sources */,
 				30E50DDB269F7E3800729ABD /* CaBot.xcdatamodeld in Sources */,
 				30E50DDD269FCBC200729ABD /* ResourceSelectView.swift in Sources */,
@@ -483,22 +467,6 @@
 				097845C32531E685004DE1F6 /* en */,
 			);
 			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		7E29F010228B548100CA7DD6 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				7E29F011228B548100CA7DD6 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		7E29F015228B548200CA7DD6 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				7E29F016228B548200CA7DD6 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
 		7E557EFE2581C79B00B1B9CA /* Localizable.strings */ = {
@@ -823,9 +791,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		306C7F67265D431700E5928E /* XCRemoteSwiftPackageReference "HLPDialog" */ = {
+		3009AC2F26AA3F4000370873 /* XCRemoteSwiftPackageReference "HLPDialog" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "file:///Users/cabot/src/HLPDialog";
+			repositoryURL = "https://github.com/hulop/HLPDialog";
 			requirement = {
 				branch = "swift-package";
 				kind = branch;
@@ -842,9 +810,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		306C7F68265D431700E5928E /* HLPDialog */ = {
+		3009AC3026AA3F4000370873 /* HLPDialog */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 306C7F67265D431700E5928E /* XCRemoteSwiftPackageReference "HLPDialog" */;
+			package = 3009AC2F26AA3F4000370873 /* XCRemoteSwiftPackageReference "HLPDialog" */;
 			productName = HLPDialog;
 		};
 		306C7F6B265D435100E5928E /* Yams */ = {
