@@ -62,15 +62,45 @@ struct RootView: View {
                     }
                 }
             }
+            .sheet(isPresented: $modelData.isContentPresenting, content: {
+                if let url = modelData.contentURL {
+                    VStack {
+                        HStack {
+                            Spacer()
+                            Button(action: {
+                                modelData.isContentPresenting = false
+                            }, label: {
+                                Image(systemName: "xmark")
+                                    .frame(width: 50, height: 50, alignment: .center)
+                                    .accessibility(label: Text("Close"))
+                            })
+                        }
+                        WebContentView(url: url, handlers: [:])
+                            .environmentObject(modelData)
+                    }
+                }
+            })
         }
     }
 }
 
 struct RootView_Previews: PreviewProvider {
     static var previews: some View {
+        previewContent
         previewSelect
         previewApp
         preview
+    }
+
+    static var previewContent: some View {
+        let modelData = CaBotAppModel()
+        modelData.displayedScene = .App
+        modelData.isContentPresenting = true
+        modelData.contentURL = URL(string: "content://place0/test.html")!
+
+        return RootView()
+            .environmentObject(modelData)
+
     }
 
     static var preview: some View {

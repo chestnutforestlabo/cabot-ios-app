@@ -25,37 +25,29 @@ import SwiftUI
 import WebKit
 
 struct WebContentView: UIViewRepresentable {
-    let request: URLRequest
+    @EnvironmentObject var modelData: CaBotAppModel
+    let url: URL
     let handlers: [String: WKScriptMessageHandlerWithReply]
 
     func makeUIView(context: Context) -> WKWebView  {
         let configuration = WKWebViewConfiguration()
         let userContentController = WKUserContentController()
 
-        if let embedjs = Bundle.main.url(forResource: "embed", withExtension: "js") {
-            let script = try! String(contentsOf: embedjs)
-            let userScript = WKUserScript(source: script,
-                                          injectionTime: WKUserScriptInjectionTime.atDocumentEnd,
-                                          forMainFrameOnly: true)
-            userContentController.addUserScript(userScript)
-        }
-
         for (_, tuple) in handlers.enumerated() {
             userContentController.addScriptMessageHandler(tuple.1, contentWorld: .page, name: tuple.0)
         }
         configuration.userContentController = userContentController
-        let webView = WKWebView(frame: CGRect.zero, configuration: configuration)
+        let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 320, height: 320), configuration: configuration)
 
         return webView
     }
 
     func updateUIView(_ uiView: WKWebView, context: Context) {
-        if let url = request.url {
-            if url.absoluteString.starts(with:"file://") {
-                uiView.loadFileURL(url, allowingReadAccessTo: url)
-            }
+        if let localURL = modelData.resourceManager.resolveContentURL(url: url) {
+            uiView.loadFileURL(localURL, allowingReadAccessTo: modelData.resourceManager.getResourceRoot())
+        } else {
+            uiView.load(URLRequest(url: url))
         }
-        uiView.load(request)
     }
 }
 
@@ -63,10 +55,10 @@ struct WebView_Previews : PreviewProvider {
     static var previews: some View {
         let modelData = CaBotAppModel()
 
-        let resource = modelData.resourceManager.resources[0]
-        let test = resource.resolveURL(from: "test.html")
+        let contentURL = URL(string: "content://place0/test.html")!
+        let url = modelData.resourceManager.resolveContentURL(url: contentURL)!
 
-        WebContentView(request: URLRequest(url: test),
+        return WebContentView(url: url,
                        handlers: ["Test": TestHandler()])
     }
 }

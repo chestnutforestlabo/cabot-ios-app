@@ -276,6 +276,16 @@ class ResourceManager {
         updateResources()
     }
 
+    public func resolveContentURL(url: URL) -> URL? {
+        let abs = url.absoluteString
+        if abs.starts(with: "content://") == false {
+            return nil
+        }
+
+        let path = abs[abs.index(abs.startIndex, offsetBy: 10)...]
+        return getResourceRoot().appendingPathComponent(String(path))
+    }
+
     public func updateResources() {
         _resources = listAllResources()
         _resourceMap = [:]
@@ -294,7 +304,7 @@ class ResourceManager {
         return nil
     }
 
-    private func getResourceRoot() -> URL {
+    func getResourceRoot() -> URL {
         if preview {
             let path = Bundle.main.resourceURL
             return path!.appendingPathComponent("PreviewResource")

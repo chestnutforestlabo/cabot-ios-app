@@ -211,7 +211,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     }
     
     func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveRead request: CBATTRequest) {
-        NSLog("didReceiveRead \(request)")
+        //NSLog("didReceiveRead \(request)")
         for char in self.chars {
             if char.canHandle(readRequest: request) {
                 break

@@ -113,6 +113,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     }
 
     @Published var hasDestination: Bool = false
+    @Published var isContentPresenting:Bool = false
+    @Published var contentURL: URL? = nil
 
     let service: CaBotService
     let preview: Bool
@@ -338,8 +340,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         #endif
     }
 
-    func cabot(service: CaBotService, openRequest: URL) {
-
+    func cabot(service: CaBotService, openRequest url: URL) {
+        NSLog("open request: %@", url.absoluteString)
+        contentURL = url
+        isContentPresenting = true
     }
 
     func cabot(service: CaBotService, notification: NavigationNotification) {
