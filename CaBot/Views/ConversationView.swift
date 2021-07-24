@@ -24,9 +24,36 @@ import SwiftUI
 import HLPDialog
 
 struct ConversationView: UIViewControllerRepresentable {
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @EnvironmentObject var modelData: CaBotAppModel
 
+    let REQUEST_START_NAVIGATION:Notification.Name = Notification.Name(rawValue:"request_start_navigation")
+
     var url: URL
+
+    class Observer {
+        static var shared: Observer? = nil
+        let owner:ConversationView
+
+        static func getInstance(owner: ConversationView) -> Observer {
+            Observer.shared = Observer(owner: owner)
+            return Observer.shared!
+        }
+        init(owner: ConversationView) {
+            self.owner = owner
+        }
+        @objc func request_start_navigation(note: Notification) {
+            if let toID = note.userInfo?["toID"] as? String {
+                let title = note.userInfo?["title"] as? String ?? "From Conversation"
+                let pron = note.userInfo?["pron"] as? String
+                owner.modelData.tourManager.addToLast(destination: Destination(title: title, value: toID, pron: pron, file: nil))
+                owner.modelData.tourManager.nextDestination()
+            }
+            DispatchQueue.main.async {
+                self.owner.presentationMode.wrappedValue.dismiss()
+            }
+        }
+    }
 
     func makeUIViewController(context: Context) -> DialogViewController {
         // put dummy config for local converstation
@@ -38,19 +65,17 @@ struct ConversationView: UIViewControllerRepresentable {
         view.voice = modelData.voice!.AVvoice
         view.modelURL = url
 
+        let observer = Observer.getInstance(owner:self)
+        NotificationCenter.default.addObserver(observer,
+                                               selector: #selector(Observer.request_start_navigation),
+                                               name: REQUEST_START_NAVIGATION, object: nil)
+
         return view
     }
 
     func updateUIViewController(_ uiViewController: DialogViewController, context: Context) {
-        // todo
-        let audioSession:AVAudioSession = AVAudioSession.sharedInstance()
-        do {
-            try audioSession.setCategory(AVAudioSession.Category.playAndRecord, mode: AVAudioSession.Mode.default, options: [.defaultToSpeaker, .mixWithOthers,.allowBluetooth, .allowBluetoothA2DP])
-            try audioSession.setActive(true)
-        } catch {
-            _ = print("Error in audio session setting")
-        }
     }
+
 }
 
 struct ConversationView_Previews: PreviewProvider {

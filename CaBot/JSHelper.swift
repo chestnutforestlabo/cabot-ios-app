@@ -30,14 +30,17 @@ import UIKit
 // Bundle for yaml resource loading
 @objc protocol JSBundleExport: JSExport {
     func loadYaml(_ name: String) -> [[String: String]]
-    static func getInstance() -> JSBundle
+    static func getInstance(root: URL) -> JSBundle
 }
 
 class JSBundle: NSObject, JSBundleExport {
+    let root: URL
+    init(root: URL) {
+        self.root = root
+    }
     func loadYaml(_ name: String) -> [[String: String]] {
-        guard let path = Bundle.main.url(forResource: name, withExtension: "yaml", subdirectory: "Resource") else {
-            return []
-        }
+        let path = root.appendingPathComponent(name).appendingPathExtension("yaml")
+
         do {
             let content = try String(contentsOf: path)
             let yaml = try Yams.load(yaml: content) as! [[String: String]]
@@ -47,8 +50,8 @@ class JSBundle: NSObject, JSBundleExport {
         NSLog("Cannot load \(name).yaml")
         return []
     }
-    class func getInstance() -> JSBundle {
-        return JSBundle()
+    class func getInstance(root: URL) -> JSBundle {
+        return JSBundle(root: root)
     }
 }
 
@@ -246,8 +249,9 @@ class JSHelper {
                 }
                 exit(0)
             }
+            let parent = jsFile.deletingLastPathComponent()
             // set custom global objects
-            ctx.setObject(JSBundle.getInstance(), forKeyedSubscript: "Bundle" as (NSCopying & NSObjectProtocol))
+            ctx.setObject(JSBundle.getInstance(root: parent), forKeyedSubscript: "Bundle" as (NSCopying & NSObjectProtocol))
             ctx.setObject(JSConsole.getInstance(), forKeyedSubscript: "Console" as (NSCopying & NSObjectProtocol))
             ctx.setObject(JSBluetooth.getInstance(), forKeyedSubscript: "Bluetooth" as (NSCopying & NSObjectProtocol))
             ctx.setObject(JSHTTPS.getInstance(), forKeyedSubscript: "HTTPS" as (NSCopying & NSObjectProtocol))

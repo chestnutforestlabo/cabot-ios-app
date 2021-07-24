@@ -111,7 +111,8 @@ struct MainMenus: View {
             Section(header: Text("Navigation")) {
                 if let url = cm.conversationURL{
                     NavigationLink(
-                        destination: ConversationView(url: url),
+                        destination: ConversationView(url: url)
+                            .environmentObject(modelData),
                         label: {
                             Text("START_CONVERSATION")
                         })
@@ -126,7 +127,8 @@ struct MainMenus: View {
                 }
                 if let url = cm.toursURL {
                     NavigationLink(
-                        destination: ToursView(url: url),
+                        destination: ToursView(url: url)
+                            .environmentObject(modelData),
                         label: {
                             Text("SELECT_TOUR")
                         })

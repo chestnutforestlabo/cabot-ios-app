@@ -293,6 +293,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
             DispatchQueue.main.async {
                 let title = NSLocalizedString("ERROR", comment: "")
                 let message = NSLocalizedString("Suitcase may not be connected", comment: "")
+
+                self.service.tts.speak(message) {}
+                /*
                 let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
                 let ok = UIAlertAction(title: NSLocalizedString("Okay",
                                                                 comment: "Okay"),
@@ -305,6 +308,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                 if let view = UIApplication.shared.windows[0].visibleViewController {
                     view.present(alertController, animated: true, completion: nil)
                 }
+                 */
             }
             return false
         }
