@@ -70,6 +70,7 @@
 "Navigating to %@"="Navigating to %@";
 "Going to %@"="Going to %@";
 "You have arrived at %@"="You have arrived at %@";
+"Open Content for %@"="Open Content for %@";
 
 "ONBOARD_MESSAGE"="Please allow the app to access Location, Bluetooth device and Notification.";
 "Enable Location Update"="Enable Location Update";

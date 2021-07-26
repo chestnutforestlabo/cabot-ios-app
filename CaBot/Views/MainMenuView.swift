@@ -157,6 +157,17 @@ struct StatusMenus: View {
                         .opacity(0.1)
                 }
             }
+
+            if let cd = modelData.currentDestination,
+               let contentURL = cd.content?.url {
+                Button(action: {
+                    modelData.cabot(service: modelData.service, openRequest: contentURL)
+                }) {
+                    Label(String(format:NSLocalizedString("Open Content for %@", comment: ""), arguments: [cd.title]),
+                          systemImage: "newspaper")
+                }
+            }
+
             Text("Version: \(versionNo) (\(buildNo))")
         }
     }

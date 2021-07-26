@@ -112,9 +112,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         }
     }
 
-    @Published var hasDestination: Bool = false
-    @Published var isContentPresenting:Bool = false
+    @Published var isContentPresenting: Bool = false
     @Published var contentURL: URL? = nil
+    @Published var currentDestination: Destination? = nil
 
     let service: CaBotService
     let preview: Bool
@@ -255,7 +255,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
 
     // MARK: TourManagerDelegate
     func tourUpdated(manager: TourManager) {
-        hasDestination = manager.hasDestination
+        if let cd = manager.currentDestination {
+            currentDestination = cd
+        } else {
+            currentDestination = currentDestination
+        }
     }
 
     func tour(manager: TourManager, destinationChanged destination: Destination?) {

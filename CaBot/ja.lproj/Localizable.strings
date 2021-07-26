@@ -71,6 +71,7 @@
 "Navigating to %@"="%@に移動ちゅう";
 "Going to %@"="%@に移動します";
 "You have arrived at %@"="%@に到着しました";
+"Open Content for %@"="%@の説明ページを開く";
 
 "ONBOARD_MESSAGE"="位置情報、Bluetooth、通知の利用を許可してください";
 "Enable Location Update"="位置情報を許可する";
