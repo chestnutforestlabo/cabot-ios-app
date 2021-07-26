@@ -29,9 +29,6 @@ struct MainMenuView: View {
 
     var body: some View {
         let maxDestinationNumber = 2 + (modelData.tourManager.currentDestination==nil ? 1 : 0)
-        let versionNo = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
-        let buildNo = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
-
         VStack {
             Form {
                 if modelData.tourManager.hasDestination {
@@ -79,25 +76,8 @@ struct MainMenuView: View {
                 MainMenus()
                     .environmentObject(modelData)
                     .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
-
-                Section(header:Text("Status")) {
-                    HStack {
-                        if modelData.suitcaseConnected {
-                            if modelData.backpackConnected {
-                                Image(systemName: "antenna.radiowaves.left.and.right")
-                                Text("Suitcase and Backpack Connected")
-                            } else {
-                                Image(systemName: "antenna.radiowaves.left.and.right")
-                                Text("Suitcase Connected")
-                            }
-                        } else {
-                            Image(systemName: "antenna.radiowaves.left.and.right")
-                                .opacity(0.1)
-                            Text("Suitcase Not Connected")
-                        }
-                    }
-                    Text("Version: \(versionNo) (\(buildNo))")
-                }
+                StatusMenus()
+                    .environmentObject(modelData)
             }
         }
     }
@@ -148,6 +128,34 @@ struct MainMenus: View {
                     }
                 }
             }
+        }
+    }
+}
+
+struct StatusMenus: View {
+    @EnvironmentObject var modelData: CaBotAppModel
+
+    var body: some View {
+        let versionNo = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
+        let buildNo = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
+
+        Section(header:Text("Status")) {
+            HStack {
+                if modelData.suitcaseConnected {
+                    if modelData.backpackConnected {
+                        Image(systemName: "antenna.radiowaves.left.and.right")
+                        Text("Suitcase and Backpack Connected")
+                    } else {
+                        Image(systemName: "antenna.radiowaves.left.and.right")
+                        Text("Suitcase Connected")
+                    }
+                } else {
+                    Image(systemName: "antenna.radiowaves.left.and.right")
+                        .opacity(0.1)
+                    Text("Suitcase Not Connected")
+                }
+            }
+            Text("Version: \(versionNo) (\(buildNo))")
         }
     }
 }
