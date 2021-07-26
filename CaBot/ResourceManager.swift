@@ -34,9 +34,46 @@ enum SourceType: String, Decodable {
     case remote
 }
 
+extension CodingUserInfoKey {
+    static let base = CodingUserInfoKey(rawValue: "base")!
+}
+
 struct Source: Decodable {
+    let base: URL?
     let type: SourceType
     let src: String
+
+    var url: URL? {
+        get {
+            switch(type) {
+            case .local:
+                return base?.appendingPathComponent(src)
+            case .remote:
+                return URL(string:src)
+            }
+        }
+    }
+
+    var content: String? {
+        get {
+            if let url = url {
+                return try? String(contentsOf: url)
+            }
+            return nil
+        }
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case type
+        case src
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        type = try container.decode(SourceType.self, forKey: .type)
+        src = try container.decode(String.self, forKey: .src)
+        base = decoder.userInfo[.base] as? URL
+    }
 }
 
 struct CustomMenu: Decodable, Hashable {
@@ -67,35 +104,23 @@ struct Metadata: Decodable{
             let str = try String(contentsOf: url)
             guard let yaml = try Yams.load(yaml: str) as? [String: Any?] else { throw MetadataError.yamlParseError }
             let json = try JSONSerialization.data(withJSONObject: yaml)
-            return try JSONDecoder().decode(Metadata.self, from: json)
+            let decoder = JSONDecoder()
+            decoder.userInfo[.base] = url.deletingLastPathComponent()
+            return try decoder.decode(Metadata.self, from: json)
         } catch is YamlError {
             throw MetadataError.yamlParseError
         }
     }
 }
 
-class URLResolvable {
+class Resource: Hashable {
     let base: URL
 
-    init(at url:URL) throws {
+    init(at url: URL) throws {
         base = url
+        metadata = try Metadata.load(at: url.appendingPathComponent(Resource.METADATA_FILE_NAME))
     }
 
-    func resolveURL(from src:String) -> URL {
-        return base.appendingPathComponent(src)
-    }
-
-    func resolveURL(from src:Source) -> URL {
-        switch(src.type) {
-        case .local:
-            return base.appendingPathComponent(src.src)
-        case .remote:
-            return URL(fileURLWithPath: src.src)
-        }
-    }
-}
-
-class Resource: URLResolvable, Hashable {
     static func == (lhs: Resource, rhs: Resource) -> Bool {
         lhs.id == rhs.id
     }
@@ -134,7 +159,7 @@ class Resource: URLResolvable, Hashable {
     var conversationURL: URL? {
         get {
             if let c = metadata.conversation {
-                return self.resolveURL(from: c)
+                return c.url
             }
             return nil
         }
@@ -143,7 +168,7 @@ class Resource: URLResolvable, Hashable {
     var destinationsURL: URL? {
         get {
             if let d = metadata.destinations {
-                return self.resolveURL(from: d)
+                return d.url
             }
             return nil
         }
@@ -151,8 +176,8 @@ class Resource: URLResolvable, Hashable {
 
     var toursURL: URL? {
         get {
-            if let d = metadata.tours {
-                return self.resolveURL(from: d)
+            if let t = metadata.tours {
+                return t.url
             }
             return nil
         }
@@ -166,11 +191,12 @@ class Resource: URLResolvable, Hashable {
             return []
         }
     }
+}
 
-    override init(at url: URL) throws {
-        metadata = try Metadata.load(at: url.appendingPathComponent(Resource.METADATA_FILE_NAME))
-        try super.init(at: url)
-    }
+struct SimpleDestination: Decodable {
+    let title:String
+    let value:String?
+    let pron:String?
 }
 
 struct Destination: Decodable, Hashable {
@@ -199,22 +225,26 @@ struct Destination: Decodable, Hashable {
     let title:String
     let value:String?
     let pron:String?
-    let file: Source?
+    let file:Source?
+    let message:Source?
+    let content:Source?
+    let waitingDestination:SimpleDestination?
 }
 
-class Destinations: URLResolvable {
+class Destinations {
     let list: [Destination]
 
-    override init(at url: URL) throws {
+    init(at url: URL) throws {
         do {
             let str = try String(contentsOf: url)
             guard let yaml = try Yams.load(yaml: str) else { throw MetadataError.yamlParseError }
             let json = try JSONSerialization.data(withJSONObject: yaml)
-            list = try JSONDecoder().decode([Destination].self, from: json)
+            let decoder = JSONDecoder()
+            decoder.userInfo[.base] = url.deletingLastPathComponent()
+            list = try decoder.decode([Destination].self, from: json)
         } catch is YamlError {
             throw MetadataError.yamlParseError
         }
-        try super.init(at: url.deletingLastPathComponent())
     }
 }
 
@@ -242,19 +272,20 @@ struct Tour: Decodable, Hashable, TourProtocol {
     var currentDestination: Destination? = nil
 }
 
-class Tours: URLResolvable {
+class Tours {
     let list: [Tour]
 
-    override init(at url: URL) throws {
+    init(at url: URL) throws {
         do {
             let str = try String(contentsOf: url)
             guard let yaml = try Yams.load(yaml: str) else { throw MetadataError.yamlParseError }
             let json = try JSONSerialization.data(withJSONObject: yaml)
-            list = try JSONDecoder().decode([Tour].self, from: json)
+            let decoder = JSONDecoder()
+            decoder.userInfo[.base] = url.deletingLastPathComponent()
+            list = try decoder.decode([Tour].self, from: json)
         } catch is YamlError {
             throw MetadataError.yamlParseError
         }
-        try super.init(at: url.deletingLastPathComponent())
     }
 }
 

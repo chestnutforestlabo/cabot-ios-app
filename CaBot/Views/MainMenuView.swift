@@ -121,9 +121,11 @@ struct MainMenus: View {
                     ForEach (cm.customeMenus, id: \.self) {
                         menu in
 
-                        Button(menu.title) {
-                            let jsHelper = JSHelper(withScript: cm.resolveURL(from: menu.script))
-                            _ = jsHelper.call(menu.function, withArguments: [])
+                        if let url = menu.script.url {
+                            Button(menu.title) {
+                                let jsHelper = JSHelper(withScript: url)
+                                _ = jsHelper.call(menu.function, withArguments: [])
+                            }
                         }
                     }
                 }
@@ -143,16 +145,16 @@ struct StatusMenus: View {
             HStack {
                 if modelData.suitcaseConnected {
                     if modelData.backpackConnected {
-                        Image(systemName: "antenna.radiowaves.left.and.right")
-                        Text("Suitcase and Backpack Connected")
+                        Label(LocalizedStringKey("Suitcase and Backpack Connected"),
+                              systemImage: "antenna.radiowaves.left.and.right")
                     } else {
-                        Image(systemName: "antenna.radiowaves.left.and.right")
-                        Text("Suitcase Connected")
+                        Label(LocalizedStringKey("Suitcase Connected"),
+                              systemImage: "antenna.radiowaves.left.and.right")
                     }
                 } else {
-                    Image(systemName: "antenna.radiowaves.left.and.right")
+                    Label(LocalizedStringKey("Suitcase Not Connected"),
+                          systemImage: "antenna.radiowaves.left.and.right")
                         .opacity(0.1)
-                    Text("Suitcase Not Connected")
                 }
             }
             Text("Version: \(versionNo) (\(buildNo))")

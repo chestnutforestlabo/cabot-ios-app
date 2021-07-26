@@ -65,10 +65,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                 } else {
                     self.voice = TTSHelper.getVoices(by: resource.locale)[0]
                 }
-
-                if let voice = self.voice {
-                    self.service.setVoice(voice.AVvoice)
-                }
             }
 
             UserDefaults.standard.setValue(resource?.name, forKey: selectedResourceKey)
@@ -82,6 +78,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                 let key = "\(selectedVoiceKey)_\(resource?.locale.identifier ?? "en-US")"
                 UserDefaults.standard.setValue(id, forKey: key)
                 UserDefaults.standard.synchronize()
+
+                if let voice = self.voice {
+                    self.service.setVoice(voice.AVvoice)
+                }
             }
         }
     }
@@ -166,7 +166,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                 try AVAudioSession.sharedInstance().setCategory(.playback,
                                                                 mode: .default,
                                                                 policy: .default,
-                                                                options: [.allowBluetooth, .allowBluetoothA2DP])
+                                                                options: [.allowBluetooth])
                 try AVAudioSession.sharedInstance().setActive(true, options: [])
             } catch {
                 NSLog("audioSession properties weren't set because of an error.")
@@ -184,7 +184,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                 try AVAudioSession.sharedInstance().setCategory(.playback,
                                                                 mode: .default,
                                                                 policy: .default,
-                                                                options: [.allowBluetooth, .allowBluetoothA2DP])
+                                                                options: [.allowBluetooth])
                 try AVAudioSession.sharedInstance().setActive(true, options: [])
             } catch {
                 NSLog("audioSession properties weren't set because of an error.")
@@ -265,7 +265,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                     manager.cannotStartCurrent()
                 } else {
                     service.tts.speak(String(format:NSLocalizedString("Going to %@", comment: ""), arguments: [dest.pron ?? dest.title])) {
-                        
+                        if let content = dest.message?.content {
+                            self.service.tts.speak(content){
+
+                            }
+                        }
                     }
                 }
             }
@@ -358,6 +362,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         case .arrived:
             if let cd = tourManager.currentDestination {
                 self.service.tts.speak(String(format:NSLocalizedString("You have arrived at %@", comment: ""), arguments: [cd.pron ?? cd.title])) {
+                }
+                if let contentURL = cd.content?.url {
+                    self.cabot(service: self.service, openRequest: contentURL)
                 }
             }
             tourManager.arrivedCurrent()

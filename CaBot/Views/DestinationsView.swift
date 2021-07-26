@@ -38,9 +38,9 @@ struct DestinationsView: View {
             Section(header: Text("SELECT_DESTINATION")) {
                 ForEach(destinations.list, id: \.self) { destination in
 
-                    if let file = destination.file {
+                    if let url = destination.file?.url {
                         NavigationLink(
-                            destination: DestinationsView(url: destinations.resolveURL(from: file)),
+                            destination: DestinationsView(url: url),
                             label: {
                                 Text(destination.title)
                                     .accessibilityLabel(destination.pron ?? destination.title)
@@ -152,7 +152,7 @@ struct DestinationsView_Previews: PreviewProvider {
 
         let destinations = try! Destinations(at: resource.destinationsURL!)
 
-        return DestinationsView(url: destinations.resolveURL(from: destinations.list[0].file!))
+        return DestinationsView(url: destinations.list[0].file!.url!)
             .environmentObject(modelData)
     }
 }
