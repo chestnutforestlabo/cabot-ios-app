@@ -41,6 +41,11 @@ class TourManager: TourProtocol {
             _currentDestination
         }
     }
+    var arrivedDestination: Destination? {
+        get {
+            _arrivedDestination
+        }
+    }
     var hasDestination: Bool {
         get {
             return _destinations.count > 0 || _currentDestination != nil
@@ -54,6 +59,7 @@ class TourManager: TourProtocol {
 
     private var _destinations: [Destination]
     private var _currentDestination: Destination?
+    private var _arrivedDestination: Destination?
     var delegate:TourManagerDelegate?
 
     init() {
@@ -77,6 +83,7 @@ class TourManager: TourProtocol {
     func set(tour: TourProtocol) {
         _destinations.removeAll()
         _currentDestination = nil
+        _arrivedDestination = nil
         self.title = tour.title
         self.pron = tour.pron
         for d in tour.destinations {
@@ -102,6 +109,7 @@ class TourManager: TourProtocol {
     }
 
     func arrivedCurrent() {
+        _arrivedDestination = _currentDestination
         _currentDestination = nil
         delegate?.tourUpdated(manager: self)
     }
@@ -115,6 +123,7 @@ class TourManager: TourProtocol {
     func clearAll() {
         _destinations.removeAll()
         _currentDestination = nil
+        _arrivedDestination = nil
         delegate?.tourUpdated(manager: self)
         delegate?.tour(manager: self, destinationChanged: nil)
     }
@@ -126,6 +135,7 @@ class TourManager: TourProtocol {
             //delegate?.tour(manager: self, destinationChanged: nil)
             return
         }
+        self._arrivedDestination = nil
         self._currentDestination = pop()
         delegate?.tourUpdated(manager: self)
         delegate?.tour(manager: self, destinationChanged: currentDestination)

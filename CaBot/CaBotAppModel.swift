@@ -114,7 +114,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
 
     @Published var isContentPresenting: Bool = false
     @Published var contentURL: URL? = nil
-    @Published var currentDestination: Destination? = nil
+    @Published var tourUpdated: Bool = false
 
     let service: CaBotService
     let preview: Bool
@@ -214,6 +214,39 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
 
     }
 
+    // MARK: public functions
+
+    func open(content: URL) {
+        contentURL = content
+        isContentPresenting = true
+    }
+
+    func summon(destination: String) -> Bool {
+        DispatchQueue.main.async {
+            print("Show modal waiting")
+            NavUtil.showModalWaiting(withMessage: NSLocalizedString("processing...", comment: ""))
+        }
+        if self.service.summon(destination: destination) {
+            self.service.tts.speak(NSLocalizedString("Sending the command to the suitcase", comment: "")) {}
+            DispatchQueue.main.async {
+                print("hide modal waiting")
+                NavUtil.hideModalWaiting()
+            }
+            return true
+        } else {
+            DispatchQueue.main.async {
+                print("hide modal waiting")
+                NavUtil.hideModalWaiting()
+            }
+            DispatchQueue.main.async {
+                let message = NSLocalizedString("Suitcase may not be connected", comment: "")
+
+                self.service.tts.speak(message) {}
+            }
+            return false
+        }
+    }
+
     // MARK: LocationManagerDelegate
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
@@ -255,11 +288,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
 
     // MARK: TourManagerDelegate
     func tourUpdated(manager: TourManager) {
-        if let cd = manager.currentDestination {
-            currentDestination = cd
-        } else {
-            currentDestination = currentDestination
-        }
+        tourUpdated = true
     }
 
     func tour(manager: TourManager, destinationChanged destination: Destination?) {
@@ -299,24 +328,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                 NavUtil.hideModalWaiting()
             }
             DispatchQueue.main.async {
-                let title = NSLocalizedString("ERROR", comment: "")
                 let message = NSLocalizedString("Suitcase may not be connected", comment: "")
 
                 self.service.tts.speak(message) {}
-                /*
-                let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-                let ok = UIAlertAction(title: NSLocalizedString("Okay",
-                                                                comment: "Okay"),
-                                       style: .default) { (action:UIAlertAction) in
-                    alertController.dismiss(animated: true, completion: {
-                    })
-                }
-                alertController.addAction(ok)
-
-                if let view = UIApplication.shared.windows[0].visibleViewController {
-                    view.present(alertController, animated: true, completion: nil)
-                }
-                 */
             }
             return false
         }
@@ -354,8 +368,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
 
     func cabot(service: CaBotService, openRequest url: URL) {
         NSLog("open request: %@", url.absoluteString)
-        contentURL = url
-        isContentPresenting = true
+        self.open(content: url)
     }
 
     func cabot(service: CaBotService, notification: NavigationNotification) {
@@ -368,7 +381,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                 self.service.tts.speak(String(format:NSLocalizedString("You have arrived at %@", comment: ""), arguments: [cd.pron ?? cd.title])) {
                 }
                 if let contentURL = cd.content?.url {
-                    self.cabot(service: self.service, openRequest: contentURL)
+                    self.open(content: contentURL)
                 }
             }
             tourManager.arrivedCurrent()

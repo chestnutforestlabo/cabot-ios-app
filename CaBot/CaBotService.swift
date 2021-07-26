@@ -55,6 +55,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     public var tts:CaBotTTS = CaBotTTS(voice: nil)
 
     private let uuid = CBUUID(string: String(format:UUID_FORMAT, 0x0000))
+    private var summonsChar:CaBotNotifyChar!
     private var destinationChar:CaBotNotifyChar!
     private var findPersonChar:CaBotNotifyChar!
     private var naviChar:CaBotNaviChar!
@@ -63,6 +64,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     private var characteristics:[CBCharacteristic] = []
     private var chars:[CaBotChar] = []
     private let peripheralRestoreKey:String = UUID().uuidString
+    private var serviceAdded:Bool = false
 
     override init(){
         super.init()
@@ -78,6 +80,9 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
 
         self.chars.append(CaBotStoreChar(service: self, handles:[0x0001, 0x0002], configKey:CaBotService.CABOT_SPEED_CONFIG))
         self.chars.append(CaBotStoreChar(service: self, handles:[0x0003, 0x0004], configKey:CaBotService.SPEECH_SPEED_CONFIG))
+
+        self.summonsChar = CaBotNotifyChar(service: self, handle:0x0009)
+        self.chars.append(self.summonsChar)
 
         self.destinationChar = CaBotNotifyChar(service: self, handle:0x0010)
         self.chars.append(self.destinationChar)
@@ -130,6 +135,11 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
         NSLog("destination \(destination)")
         return (self.destinationChar.notify(value: destination))
     }
+
+    public func summon(destination: String) -> Bool {
+        NSLog("summons \(destination)")
+        return (self.summonsChar.notify(value: destination))
+    }
     
     public func find(person: String) -> Bool {
         NSLog("person \(person)")
@@ -156,6 +166,10 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     
     private func addService()
     {
+        if serviceAdded {
+            startAdvertising()
+            return
+        }
         let service:CBMutableService = CBMutableService(type: self.uuid, primary: true)
         service.characteristics = self.characteristics
         
@@ -179,6 +193,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
         }
         
         NSLog("service added: \(service)")
+        self.serviceAdded = true
         self.startAdvertising();
     }
 

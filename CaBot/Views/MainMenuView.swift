@@ -40,11 +40,35 @@ struct MainMenuView: View {
                             }) {
                                 Text("PAUSE_NAVIGATION")
                             }
+                            .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
 
-                            Label(cd.title,
-                                  systemImage: "arrow.triangle.turn.up.right.diamond")
-                                .accessibilityLabel(String(format: NSLocalizedString("Navigating to %@", comment: ""),
-                                                           arguments: [cd.title]))
+                            HStack {
+                                Label(cd.title,
+                                      systemImage: "arrow.triangle.turn.up.right.diamond")
+                                    .accessibilityLabel(String(format: NSLocalizedString("Navigating to %@", comment: ""),
+                                                               arguments: [cd.title]))
+                                if modelData.menuDebug {
+                                    Spacer()
+                                    Button(action: {
+                                        isConfirming = true
+                                    }) {
+                                        Image(systemName: "checkmark.seal")
+                                    }
+                                    .actionSheet(isPresented: $isConfirming) {
+                                        return ActionSheet(title: Text("Complete Destination"),
+                                                           message: Text("Complete Destination Message"),
+                                                           buttons: [
+                                                            .cancel(),
+                                                            .destructive(
+                                                                Text("Complete Destination"),
+                                                                action: {
+                                                                    modelData.tourManager.arrivedCurrent()
+                                                                }
+                                                            )
+                                                           ])
+                                    }
+                                }
+                            }
                         } else if modelData.tourManager.destinations.count > 0 {
                             Button(action: {
                                 modelData.tourManager.nextDestination()
@@ -55,6 +79,7 @@ struct MainMenuView: View {
                                     Image(systemName: "arrow.triangle.turn.up.right.diamond")
                                 }
                             }
+                            .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
                         }
                         ForEach(modelData.tourManager.first(n: maxDestinationNumber-1), id: \.self) {dest in
                             Label(dest.title, systemImage: "mappin.and.ellipse")
@@ -158,13 +183,25 @@ struct StatusMenus: View {
                 }
             }
 
-            if let cd = modelData.currentDestination,
-               let contentURL = cd.content?.url {
-                Button(action: {
-                    modelData.cabot(service: modelData.service, openRequest: contentURL)
-                }) {
-                    Label(String(format:NSLocalizedString("Open Content for %@", comment: ""), arguments: [cd.title]),
-                          systemImage: "newspaper")
+            if let ad = modelData.tourManager.arrivedDestination {
+                if let contentURL = ad.content?.url {
+                    Button(action: {
+                        modelData.open(content: contentURL)
+                    }) {
+                        Label(String(format:NSLocalizedString("Open Content for %@", comment: ""), arguments: [ad.title]),
+                              systemImage: "newspaper")
+                    }
+                }
+                if modelData.tourManager.currentDestination == nil,
+                   let destination = ad.waitingDestination?.value,
+                   let title = ad.waitingDestination?.title {
+                    Button(action: {
+                        _ = modelData.summon(destination: destination)
+                    }) {
+                        Label(String(format:NSLocalizedString("Let the suitcase wait at %@", comment: ""), arguments: [title]),
+                              systemImage: "arrow.triangle.turn.up.right.diamond")
+                    }
+                    .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
                 }
             }
 
