@@ -27,6 +27,14 @@ struct WebContentView: UIViewRepresentable {
     @EnvironmentObject var modelData: CaBotAppModel
     let url: URL
     let handlers: [String: WKScriptMessageHandlerWithReply]
+    let uiDelegateHandler = UIDelegateHandler()
+
+    class UIDelegateHandler: NSObject, WKUIDelegate {
+        var owner:WebContentView?
+        func webViewDidClose(_ webView: WKWebView) {
+            owner?.modelData.isContentPresenting = false
+        }
+    }
 
     func makeUIView(context: Context) -> WKWebView  {
         let configuration = WKWebViewConfiguration()
@@ -37,6 +45,8 @@ struct WebContentView: UIViewRepresentable {
         }
         configuration.userContentController = userContentController
         let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 320, height: 320), configuration: configuration)
+        uiDelegateHandler.owner = self
+        webView.uiDelegate = uiDelegateHandler
 
         return webView
     }
