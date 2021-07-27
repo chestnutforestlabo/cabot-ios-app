@@ -162,16 +162,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     func onChange(of newScenePhase: ScenePhase) {
         switch newScenePhase {
         case .background:
-            do {
-                try AVAudioSession.sharedInstance().setCategory(.playback,
-                                                                mode: .default,
-                                                                policy: .default,
-                                                                options: [.allowBluetooth])
-                try AVAudioSession.sharedInstance().setActive(true, options: [])
-            } catch {
-                NSLog("audioSession properties weren't set because of an error.")
-            }
-
+            resetAudioSession()
             locationManager.allowsBackgroundLocationUpdates = true
             locationManager.startUpdatingLocation()
             break
@@ -180,16 +171,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         case .active:
             audioAvailableEstimate = true
             self.initNotification()
-            do {
-                try AVAudioSession.sharedInstance().setCategory(.playback,
-                                                                mode: .default,
-                                                                policy: .default,
-                                                                options: [.allowBluetooth])
-                try AVAudioSession.sharedInstance().setActive(true, options: [])
-            } catch {
-                NSLog("audioSession properties weren't set because of an error.")
-            }
-
+            self.resetAudioSession()
             locationManager.stopUpdatingLocation()
             break
         @unknown default:
@@ -215,6 +197,18 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     }
 
     // MARK: public functions
+
+    func resetAudioSession() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback,
+                                                            mode: .default,
+                                                            policy: .default,
+                                                            options: [.allowBluetooth])
+            try AVAudioSession.sharedInstance().setActive(true, options: [])
+        } catch {
+            NSLog("audioSession properties weren't set because of an error.")
+        }
+    }
 
     func open(content: URL) {
         contentURL = content

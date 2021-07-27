@@ -117,6 +117,9 @@ struct MainMenus: View {
                 if let url = cm.conversationURL{
                     NavigationLink(
                         destination: ConversationView(url: url)
+                            .onDisappear(){
+                                modelData.resetAudioSession()
+                            }
                             .environmentObject(modelData),
                         label: {
                             Text("START_CONVERSATION")
