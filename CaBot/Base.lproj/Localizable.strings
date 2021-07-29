@@ -58,6 +58,9 @@
 "SELECT_RESOURCE"="Select Resource";
 
 "Speech Voice"="Speech Voice";
+"Speech Speed"="Speech Speed";
+"Audio Effect"="Audio Effect";
+"Arrived"="Arrived";
 "Others"="Others";
 "Navigation"="Navigation";
 "Connection"="Connection";
@@ -91,3 +94,5 @@
 "Complete Destination"="Complete Destination";
 "Complete Destination Message"="Are you sure to complete the current destination?";
 
+"You can check detail of %@ on the phone"="You can check detail of %@ on the phone";
+"You can continue the tour by pressing the right button of the suitcase handle"="You can continue the tour by pressing the right button of the suitcase handle";

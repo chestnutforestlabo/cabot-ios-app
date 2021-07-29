@@ -49,6 +49,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     private let speechRateKey = "speechRateKey"
     private let teamIDKey = "team_id"
     private let menuDebugKey = "menu_debug"
+    private let arrivedSoundKey = "arrivedSoundKey"
 
     @Published var locationState: GrantState = .Init
     @Published var bluetoothState: CBManagerState = .unknown
@@ -116,6 +117,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     @Published var contentURL: URL? = nil
     @Published var tourUpdated: Bool = false
 
+    @Published var arrivedSound: String = "/System/Library/Audio/UISounds/nano/HummingbirdNotification_Haptic.caf" {
+        didSet {
+            UserDefaults.standard.setValue(arrivedSound, forKey: arrivedSoundKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
+
     let service: CaBotService
     let preview: Bool
     let resourceManager: ResourceManager
@@ -127,6 +135,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     let locationUpdateTimeLimit: CFAbsoluteTime = 60*15
     var locationUpdateStartTime: CFAbsoluteTime = 0
     var audioAvailableEstimate: Bool = false
+    var audioPlayer: AVAudioPlayer = AVAudioPlayer()
 
     convenience override init() {
         self.init(preview: true)
@@ -156,6 +165,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         }
         if let speechRate = UserDefaults.standard.value(forKey: speechRateKey) as? Double {
             self.speechRate = speechRate
+        }
+        if let arrivedSound = UserDefaults.standard.value(forKey: arrivedSoundKey) as? String {
+            self.arrivedSound = arrivedSound
         }
     }
 
@@ -238,6 +250,18 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                 self.service.tts.speak(message) {}
             }
             return false
+        }
+    }
+
+    func playAudio(file: String) {
+        DispatchQueue.main.async {
+            let fileURL: URL = URL(fileURLWithPath: file)
+            do {
+                self.audioPlayer = try AVAudioPlayer(contentsOf: fileURL)
+                self.audioPlayer.play()
+            } catch {
+                print("\(error)")
+            }
         }
     }
 
@@ -372,10 +396,17 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
             break
         case .arrived:
             if let cd = tourManager.currentDestination {
+                self.playAudio(file: self.arrivedSound)
                 self.service.tts.speak(String(format:NSLocalizedString("You have arrived at %@", comment: ""), arguments: [cd.pron ?? cd.title])) {
                 }
                 if let contentURL = cd.content?.url {
                     self.open(content: contentURL)
+                    self.service.tts.speak(String(format:NSLocalizedString("You can check detail of %@ on the phone", comment: ""), arguments: [cd.pron ?? cd.title])) {
+                    }
+                }
+                if tourManager.hasDestination {
+                    self.service.tts.speak(NSLocalizedString("You can continue the tour by pressing the right button of the suitcase handle", comment: "")) {
+                    }
                 }
             }
             tourManager.arrivedCurrent()

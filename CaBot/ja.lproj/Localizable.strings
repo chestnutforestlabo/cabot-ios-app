@@ -59,6 +59,9 @@
 "Hello Suitcase!"="こんにちは、スーツケース";
 
 "Speech Voice"="読み上げ音声の選択";
+"Speech Speed"="読み上げ速度";
+"Audio Effect"="効果音";
+"Arrived"="到着";
 "Others"="その他";
 "Navigation"="ナビゲーション";
 "Connection"="接続";
@@ -91,3 +94,6 @@
 
 "Complete Destination"="目的地に到着";
 "Complete Destination Message"="目的地に到着したことにしてよろしいですか？";
+
+"You can check detail of %@ on the phone"="%@の詳細についてスマホを使って読むことができます。";
+"You can continue the tour by pressing the right button of the suitcase handle"="ツアーを進めるにはスーツケースハンドルの右ボタンを押してください。";

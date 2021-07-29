@@ -29,6 +29,17 @@ struct SettingView: View {
 
     @State var timer:Timer?
 
+    let arrivedSounds:[String] = [
+        "/System/Library/Audio/UISounds/nano/HummingbirdNotification_Haptic.caf",
+        "/System/Library/Audio/UISounds/nano/Alarm_Nightstand_Haptic.caf",
+        "/System/Library/Audio/UISounds/nano/WorkoutStartAutodetect.caf",
+        "/System/Library/Audio/UISounds/nano/Alert_MapsDirectionsInApp_Haptic.caf",
+        "/System/Library/Audio/UISounds/nano/WorkoutSaved_Haptic.caf",
+        "/System/Library/Audio/UISounds/nano/MultiwayInvitation.caf",
+        "/System/Library/Audio/UISounds/nano/SiriStopSuccess_Haptic.caf",
+        "/System/Library/Audio/UISounds/nano/NavigationGenericManeuver_Haptic.caf",
+    ]
+
     var body: some View {
         return Form {
             Section(header: Text("Speech Voice")) {
@@ -57,6 +68,15 @@ struct SettingView: View {
                     })
                         .accessibility(value: Text(String(format:"%.0f %%", arguments:[modelData.speechRate*100.0])))
                     Text(String(format:"%.0f %%", arguments:[modelData.speechRate*100.0]))
+                }
+            }
+            Section(header: Text("Audio Effect")) {
+                Picker("Arrived", selection: $modelData.arrivedSound) {
+                    ForEach(arrivedSounds, id: \.self) { sound in
+                        Text(NSString(string: sound).lastPathComponent).tag(sound)
+                    }
+                }.onChange(of: modelData.arrivedSound) { value in
+                    modelData.playAudio(file: value)
                 }
             }
             Section(header: Text("Connection")) {
