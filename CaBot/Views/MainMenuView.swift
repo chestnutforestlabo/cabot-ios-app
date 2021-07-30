@@ -66,7 +66,7 @@ struct MainMenuView: View {
                                                             .destructive(
                                                                 Text("Complete Destination"),
                                                                 action: {
-                                                                    modelData.tourManager.arrivedCurrent()
+                                                                    modelData.cabot(service: modelData.service, notification: .arrived)
                                                                 }
                                                             )
                                                            ])
