@@ -49,6 +49,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     private let speechRateKey = "speechRateKey"
     private let teamIDKey = "team_id"
     private let menuDebugKey = "menu_debug"
+    private let noSuitcaseDebugKey = "noSuitcaseDebugKey"
     private let arrivedSoundKey = "arrivedSoundKey"
 
     @Published var locationState: GrantState = .Init
@@ -110,6 +111,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         didSet {
             UserDefaults.standard.setValue(menuDebug, forKey: menuDebugKey)
             UserDefaults.standard.synchronize()
+        }
+    }
+    @Published var noSuitcaseDebug: Bool = false {
+        didSet {
+            UserDefaults.standard.setValue(noSuitcaseDebug, forKey: noSuitcaseDebugKey)
+            UserDefaults.standard.synchronize()
+            suitcaseConnected = true
         }
     }
 
@@ -232,7 +240,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
             print("Show modal waiting")
             NavUtil.showModalWaiting(withMessage: NSLocalizedString("processing...", comment: ""))
         }
-        if self.service.summon(destination: destination) {
+        if self.service.summon(destination: destination) || self.noSuitcaseDebug {
             self.service.tts.speak(NSLocalizedString("Sending the command to the suitcase", comment: "")) {}
             DispatchQueue.main.async {
                 print("hide modal waiting")
@@ -334,7 +342,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
             print("Show modal waiting")
             NavUtil.showModalWaiting(withMessage: NSLocalizedString("processing...", comment: ""))
         }
-        if service.send(destination: destination) {
+        if service.send(destination: destination) || self.noSuitcaseDebug  {
             DispatchQueue.main.async {
                 print("hide modal waiting")
                 NavUtil.hideModalWaiting()

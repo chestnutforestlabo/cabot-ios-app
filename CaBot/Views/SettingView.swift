@@ -96,6 +96,7 @@ struct SettingView: View {
                     Text("SELECT_RESOURCE")
                 }
                 Toggle("Menu Debug", isOn: $modelData.menuDebug)
+                Toggle("No Suitcase Debug", isOn: $modelData.noSuitcaseDebug)
             }
         }
     }

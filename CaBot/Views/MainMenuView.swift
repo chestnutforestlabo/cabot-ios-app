@@ -31,6 +31,10 @@ struct MainMenuView: View {
         let maxDestinationNumber = 2 + (modelData.tourManager.currentDestination==nil ? 1 : 0)
         VStack {
             Form {
+                if modelData.noSuitcaseDebug {
+                    Label("No Suitcase Debug mode (better to restart app to connect to a suitcase)", systemImage: "exclamationmark.triangle")
+                        .foregroundColor(.red)
+                }
                 if modelData.tourManager.hasDestination {
                     Section(header: Text("Destinations")) {
 
