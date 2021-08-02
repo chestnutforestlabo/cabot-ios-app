@@ -405,6 +405,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         case .arrived:
             if let cd = tourManager.currentDestination {
                 self.playAudio(file: self.arrivedSound)
+                tourManager.arrivedCurrent()
                 self.service.tts.speak(String(format:NSLocalizedString("You have arrived at %@", comment: ""), arguments: [cd.pron ?? cd.title])) {
                 }
                 if let contentURL = cd.content?.url {
@@ -417,7 +418,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                     }
                 }
             }
-            tourManager.arrivedCurrent()
             break
         }
     }
