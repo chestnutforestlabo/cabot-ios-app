@@ -128,17 +128,18 @@ class TourManager: TourProtocol {
         delegate?.tour(manager: self, destinationChanged: nil)
     }
 
-    func nextDestination() {
+    func nextDestination() -> Bool {
         if _destinations.count == 0  {
             self._currentDestination = nil
             delegate?.tourUpdated(manager: self)
             //delegate?.tour(manager: self, destinationChanged: nil)
-            return
+            return false
         }
         self._arrivedDestination = nil
         self._currentDestination = pop()
         delegate?.tourUpdated(manager: self)
         delegate?.tour(manager: self, destinationChanged: currentDestination)
+        return true
     }
 
     func pop() -> Destination {

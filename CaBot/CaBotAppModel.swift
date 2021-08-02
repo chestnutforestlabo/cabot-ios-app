@@ -400,7 +400,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     func cabot(service: CaBotService, notification: NavigationNotification) {
         switch(notification){
         case .next:
-            tourManager.nextDestination()
+            if tourManager.nextDestination() == false {
+                self.service.tts.speak(NSLocalizedString("No destination is selected", comment: "")) {
+                }
+            }
             break
         case .arrived:
             if let cd = tourManager.currentDestination {
