@@ -38,7 +38,6 @@ struct ToursView: View {
                         label: {
                             Text(tour.title)
                         })
-                        .isDetailLink(false)
                 }
             }
         }.listStyle(PlainListStyle())

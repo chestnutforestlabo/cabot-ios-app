@@ -23,87 +23,97 @@
 import SwiftUI
 
 struct DestinationsView: View {
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @EnvironmentObject var modelData: CaBotAppModel
     @State private var isConfirming = false
     @State private var targetDestination: Destination?
 
     var url: URL
+    var destination: Destination?
 
     var body: some View {
         let tourManager = modelData.tourManager
         let destinations = try! Destinations(at: url)
 
         Form {
-            Section(header: Text("SELECT_DESTINATION")) {
+            Section(header: Text(destination?.title ?? NSLocalizedString("SELECT_DESTINATION", comment: ""))) {
                 ForEach(destinations.list, id: \.self) { destination in
 
                     if let url = destination.file?.url {
                         NavigationLink(
-                            destination: DestinationsView(url: url),
+                            destination: DestinationsView(url: url, destination: destination)
+                                .environmentObject(modelData),
                             label: {
                                 Text(destination.title)
                                     .accessibilityLabel(destination.pron ?? destination.title)
                             })
-                            .isDetailLink(false)
                     } else {
-                        Button(action: {
-                            if modelData.tourManager.hasDestination {
-                                targetDestination = destination
-                                isConfirming = true
-                            } else {
-                                // if there is no destination, start immediately
-                                tourManager.addToLast(destination: destination)
-                                tourManager.nextDestination()
-                                presentationMode.wrappedValue.dismiss()
+                        if let _ = destination.message {
+                            NavigationLink(
+                                destination: DestinationDetailView(destination: destination)
+                                    .environmentObject(modelData),
+                                label: {
+                                    Text(destination.title)
+                                        .accessibilityLabel(destination.pron ?? destination.title)
+                                })
+                        } else {
+                            Button(action: {
+                                if modelData.tourManager.hasDestination {
+                                    targetDestination = destination
+                                    isConfirming = true
+                                } else {
+                                    // if there is no destination, start immediately
+                                    tourManager.addToLast(destination: destination)
+                                    tourManager.nextDestination()
+                                    NavigationUtil.popToRootView()
+                                }
+                            }){
+                                Text(destination.title)
+                                    .accessibilityLabel(destination.pron ?? destination.title)
                             }
-                        }){
-                            Text(destination.title)
-                                .accessibilityLabel(destination.pron ?? destination.title)
-                        }
-                        // deprecated
-                        .actionSheet(isPresented: $isConfirming) {
-                            let message = String(format: NSLocalizedString("ADD_A_DESTINATION_MESSAGE", comment: ""),
-                                                 arguments: [modelData.tourManager.destinationCount])
-                            return ActionSheet(title: Text("ADD_A_DESTINATION"),
-                                        message: Text(message),
-                                        buttons: [
-                                            .cancel(),
-                                            .destructive(
-                                                Text("CLEAR_ALL_THEN_ADD"),
-                                                action: {
-                                                    if let dest = targetDestination {
-                                                        tourManager.clearAll()
-                                                        tourManager.addToLast(destination: dest)
-                                                        targetDestination = nil
-                                                        presentationMode.wrappedValue.dismiss()
+                            // deprecated
+                            .actionSheet(isPresented: $isConfirming) {
+                                let message = String(format: NSLocalizedString("ADD_A_DESTINATION_MESSAGE", comment: ""),
+                                                     arguments: [modelData.tourManager.destinationCount])
+                                return ActionSheet(title: Text("ADD_A_DESTINATION"),
+                                            message: Text(message),
+                                            buttons: [
+                                                .cancel(),
+                                                .destructive(
+                                                    Text("CLEAR_ALL_THEN_ADD"),
+                                                    action: {
+                                                        if let dest = targetDestination {
+                                                            tourManager.clearAll()
+                                                            tourManager.addToLast(destination: dest)
+                                                            targetDestination = nil
+                                                            NavigationUtil.popToRootView()
+                                                        }
                                                     }
-                                                }
-                                            ),
-                                            .default(
-                                                Text("ADD_TO_FIRST"),
-                                                action: {
-                                                    if let dest = targetDestination {
-                                                        tourManager.stopCurrent()
-                                                        tourManager.addToFirst(destination: dest)
-                                                        tourManager.nextDestination()
-                                                        targetDestination = nil
-                                                        presentationMode.wrappedValue.dismiss()
+                                                ),
+                                                .default(
+                                                    Text("ADD_TO_FIRST"),
+                                                    action: {
+                                                        if let dest = targetDestination {
+                                                            tourManager.stopCurrent()
+                                                            tourManager.addToFirst(destination: dest)
+                                                            tourManager.nextDestination()
+                                                            targetDestination = nil
+                                                            NavigationUtil.popToRootView()
+                                                        }
                                                     }
-                                                }
-                                            ),
-                                            .default(
-                                                Text("ADD_TO_LAST"),
-                                                action: {
-                                                    if let dest = targetDestination {
-                                                        tourManager.addToLast(destination: dest)
-                                                        targetDestination = nil
-                                                        presentationMode.wrappedValue.dismiss()
+                                                ),
+                                                .default(
+                                                    Text("ADD_TO_LAST"),
+                                                    action: {
+                                                        if let dest = targetDestination {
+                                                            tourManager.addToLast(destination: dest)
+                                                            targetDestination = nil
+                                                            NavigationUtil.popToRootView()
+                                                        }
                                                     }
-                                                }
-                                            )
-                                        ]
-                            )
+                                                )
+                                            ]
+                                )
+                            }
                         }
 
                         /* for iOS 15

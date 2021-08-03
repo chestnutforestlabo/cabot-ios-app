@@ -18,6 +18,7 @@
 		3096BF1826A5D0990066F256 /* TTSHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3096BF1726A5D0990066F256 /* TTSHelper.swift */; };
 		3099132B265DE50A000C1BFE /* Resource in Resources */ = {isa = PBXBuildFile; fileRef = 3099132A265DE50A000C1BFE /* Resource */; };
 		3099132D26603B10000C1BFE /* LocalConversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3099132C26603B10000C1BFE /* LocalConversation.swift */; };
+		30C3059E26B9036A00A1383A /* DestinationDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C3059D26B9036A00A1383A /* DestinationDetailView.swift */; };
 		30E50DCC269F672800729ABD /* TourManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DCB269F672800729ABD /* TourManager.swift */; };
 		30E50DCE269F75DB00729ABD /* CaBotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DCD269F75DB00729ABD /* CaBotApp.swift */; };
 		30E50DD0269F76F000729ABD /* CaBotAppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DCF269F76F000729ABD /* CaBotAppModel.swift */; };
@@ -75,6 +76,7 @@
 		3096BF1726A5D0990066F256 /* TTSHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTSHelper.swift; sourceTree = "<group>"; };
 		3099132A265DE50A000C1BFE /* Resource */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resource; sourceTree = "<group>"; };
 		3099132C26603B10000C1BFE /* LocalConversation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalConversation.swift; sourceTree = "<group>"; };
+		30C3059D26B9036A00A1383A /* DestinationDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DestinationDetailView.swift; sourceTree = "<group>"; };
 		30E50DCB269F672800729ABD /* TourManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TourManager.swift; sourceTree = "<group>"; };
 		30E50DCD269F75DB00729ABD /* CaBotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaBotApp.swift; sourceTree = "<group>"; };
 		30E50DCF269F76F000729ABD /* CaBotAppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaBotAppModel.swift; sourceTree = "<group>"; };
@@ -168,6 +170,7 @@
 				30E50DDE26A0B21200729ABD /* ConversationView.swift */,
 				09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */,
 				30E50DE126A0BA5200729ABD /* DestinationsView.swift */,
+				30C3059D26B9036A00A1383A /* DestinationDetailView.swift */,
 				30E50DE726A0BBE900729ABD /* ToursView.swift */,
 				3013614226A0F8E10050CF9E /* TourDetailView.swift */,
 				3013614626A1E77B0050CF9E /* WebContentView.swift */,
@@ -425,6 +428,7 @@
 				7E29F072228B55FC00CA7DD6 /* CaBotService.swift in Sources */,
 				30E50DCC269F672800729ABD /* TourManager.swift in Sources */,
 				30E99DA4266B2216001ACAAA /* BeaconSampler.swift in Sources */,
+				30C3059E26B9036A00A1383A /* DestinationDetailView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

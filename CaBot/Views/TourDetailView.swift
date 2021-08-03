@@ -23,7 +23,6 @@
 import SwiftUI
 
 struct TourDetailView: View {
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @EnvironmentObject var modelData: CaBotAppModel
     @State private var isConfirming = false
     @State private var targetTour: TourProtocol?
@@ -44,7 +43,7 @@ struct TourDetailView: View {
                             isConfirming = true
                         } else {
                             tourManager.set(tour: tour)
-                            presentationMode.wrappedValue.dismiss()
+                            NavigationUtil.popToRootView()
                         }
                     }) {
                         Label{
@@ -65,7 +64,7 @@ struct TourDetailView: View {
                                                 action: {
                                                     if let tour = targetTour {
                                                         tourManager.set(tour: tour)
-                                                        presentationMode.wrappedValue.dismiss()
+                                                        NavigationUtil.popToRootView()
                                                         targetTour = nil
                                                     }
                                                 }
@@ -95,7 +94,7 @@ struct TourDetailView: View {
                                                 Text("CANCEL_ALL"),
                                                 action: {
                                                     modelData.tourManager.clearAll()
-                                                    presentationMode.wrappedValue.dismiss()
+                                                    NavigationUtil.popToRootView()
                                                 }
                                             )
                                            ]
