@@ -80,7 +80,24 @@ struct RootView: View {
                     }
                 }
             })
+            .actionSheet(isPresented: $modelData.isConfirmingSummons) {
+                let ad = modelData.tourManager.arrivedDestination
+                let destination = ad!.waitingDestination!.value!
+                let title = ad!.waitingDestination!.title
+                return ActionSheet(title: Text("Let the suitcase wait"),
+                                   message: Text(String(format:NSLocalizedString("Let the suitcase wait message", comment: ""), arguments: [title])),
+                                   buttons: [
+                                    .cancel(),
+                                    .destructive(
+                                        Text("Yes"),
+                                        action: {
+                                            _ = modelData.summon(destination: destination)
+                                        }
+                                    )
+                                   ])
+            }
         }
+        
     }
 }
 

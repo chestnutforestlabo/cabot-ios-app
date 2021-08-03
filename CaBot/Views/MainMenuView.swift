@@ -200,7 +200,7 @@ struct StatusMenus: View {
                     }
                 }
                 if modelData.tourManager.currentDestination == nil,
-                   let destination = ad.waitingDestination?.value,
+                   let _ = ad.waitingDestination?.value,
                    let title = ad.waitingDestination?.title {
                     Button(action: {
                         modelData.isConfirmingSummons = true
@@ -209,19 +209,6 @@ struct StatusMenus: View {
                               systemImage: "arrow.triangle.turn.up.right.diamond")
                     }
                     .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
-                    .actionSheet(isPresented: $modelData.isConfirmingSummons) {
-                        return ActionSheet(title: Text("Let the suitcase wait"),
-                                           message: Text(String(format:NSLocalizedString("Let the suitcase wait message", comment: ""), arguments: [title])),
-                                           buttons: [
-                                            .cancel(),
-                                            .destructive(
-                                                Text("Yes"),
-                                                action: {
-                                                    _ = modelData.summon(destination: destination)
-                                                }
-                                            )
-                                           ])
-                    }
                 }
             }
 
