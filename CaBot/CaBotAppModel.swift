@@ -122,6 +122,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     }
 
     @Published var isContentPresenting: Bool = false
+    @Published var isConfirmingSummons: Bool = false
     @Published var contentURL: URL? = nil
     @Published var tourUpdated: Bool = false
 

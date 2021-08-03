@@ -203,12 +203,25 @@ struct StatusMenus: View {
                    let destination = ad.waitingDestination?.value,
                    let title = ad.waitingDestination?.title {
                     Button(action: {
-                        _ = modelData.summon(destination: destination)
+                        modelData.isConfirmingSummons = true
                     }) {
                         Label(String(format:NSLocalizedString("Let the suitcase wait at %@", comment: ""), arguments: [title]),
                               systemImage: "arrow.triangle.turn.up.right.diamond")
                     }
                     .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
+                    .actionSheet(isPresented: $modelData.isConfirmingSummons) {
+                        return ActionSheet(title: Text("Let the suitcase wait"),
+                                           message: Text(String(format:NSLocalizedString("Let the suitcase wait message", comment: ""), arguments: [title])),
+                                           buttons: [
+                                            .cancel(),
+                                            .destructive(
+                                                Text("Yes"),
+                                                action: {
+                                                    _ = modelData.summon(destination: destination)
+                                                }
+                                            )
+                                           ])
+                    }
                 }
             }
 
