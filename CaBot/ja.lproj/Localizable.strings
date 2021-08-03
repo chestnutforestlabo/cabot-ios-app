@@ -78,6 +78,7 @@
 "Let the suitcase wait"="スーツケースを待たせる";
 "Let the suitcase wait message"="%@にスーツケースを待たせるコマンドを送ろうとしています。よろしいですか？";
 "Yes"="はい";
+"No"="いいえ";
 "Let the suitcase wait at %@"="%@にスーツケースを待たせる";
 "Sending the command to the suitcase"="スーツケースに指示を送っています。ハンドルから手を離してください。";
 

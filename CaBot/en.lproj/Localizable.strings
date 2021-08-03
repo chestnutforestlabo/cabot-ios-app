@@ -77,6 +77,7 @@
 "Let the suitcase wait"="Let the suitcase wait";
 "Let the suitcase wait message"="You are going to send a command to let the suitcase wait at %@. Are you okay with it?";
 "Yes"="Yes";
+"No"="No";
 "Let the suitcase wait at %@"="Let the suitcase wait at %@";
 "Sending the command to the suitcase"="Sending the command to the suitcase. Please let the suitcase go.";
 
