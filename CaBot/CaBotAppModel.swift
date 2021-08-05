@@ -405,7 +405,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     func cabot(service: CaBotService, notification: NavigationNotification) {
         switch(notification){
         case .next:
-            if tourManager.nextDestination() == false {
+            if tourManager.nextDestination() {
+                isContentPresenting = false
+            } else {
                 self.service.tts.speak(NSLocalizedString("No destination is selected", comment: "")) {
                 }
             }
@@ -417,12 +419,19 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                 self.service.tts.speak(String(format:NSLocalizedString("You have arrived at %@", comment: ""), arguments: [cd.pron ?? cd.title])) {
                 }
                 if let contentURL = cd.content?.url {
-                    self.open(content: contentURL)
                     self.service.tts.speak(String(format:NSLocalizedString("You can check detail of %@ on the phone", comment: ""), arguments: [cd.pron ?? cd.title])) {
+                        if self.tourManager.hasDestination {
+                            self.service.tts.speak(NSLocalizedString("You can continue the tour by pressing the right button of the suitcase handle", comment: "")) {
+                                self.open(content: contentURL)
+                            }
+                        } else {
+                            self.open(content: contentURL)
+                        }
                     }
-                }
-                if tourManager.hasDestination {
-                    self.service.tts.speak(NSLocalizedString("You can continue the tour by pressing the right button of the suitcase handle", comment: "")) {
+                } else {
+                    if tourManager.hasDestination {
+                        self.service.tts.speak(NSLocalizedString("You can continue the tour by pressing the right button of the suitcase handle", comment: "")) {
+                        }
                     }
                 }
             }
