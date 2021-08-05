@@ -35,20 +35,25 @@ class CaBotTTS : TTSProtocol{
 
     private let _tts:NavDeviceTTS = NavDeviceTTS.shared()
 
-    func speak(_ text: String?, force: Bool, callback: @escaping () -> Void) {
+    func speak(_ text: String?, forceSelfvoice: Bool, force: Bool, callback: @escaping () -> Void) {
+        let isForeground = UIApplication.shared.applicationState == .active
+        let isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
+        let selfspeak = forceSelfvoice || !isForeground || !isVoiceOverRunning
+
         if let voice = self.voice {
-            self._tts.speak(text == nil ? "" : text, withOptions: ["voice": voice, "rate": rate, "selfspeak": true, "force": force], completionHandler: callback)
+            self._tts.speak(text == nil ? "" : text, withOptions: ["voice": voice, "rate": rate, "selfspeak": selfspeak, "force": force], completionHandler: callback)
         } else {
-            self._tts.speak(text == nil ? "" : text, withOptions: ["rate": rate, "selfspeak": true, "force": force], completionHandler: callback)
+            self._tts.speak(text == nil ? "" : text, withOptions: ["rate": rate, "selfspeak": selfspeak, "force": force], completionHandler: callback)
         }
+
+    }
+
+    func speak(_ text: String?, force: Bool, callback: @escaping () -> Void) {
+        self.speak(text, forceSelfvoice: false, force: force, callback: callback)
     }
 
     func speak(_ text: String?, callback: @escaping () -> Void) {
-        if let voice = self.voice {
-            self._tts.speak(text == nil ? "" : text, withOptions: ["voice": voice, "rate": rate, "selfspeak": true], completionHandler: callback)
-        } else {
-            self._tts.speak(text == nil ? "" : text, withOptions: ["rate": rate, "selfspeak": true], completionHandler: callback)
-        }
+        self.speak(text, forceSelfvoice: false, force: false, callback: callback)
     }
 
     func stop() {
@@ -111,7 +116,7 @@ class TTSHelper {
         let tts = CaBotTTS(voice: voice.AVvoice)
         tts.rate = rate
 
-        tts.speak(NSLocalizedString("Hello Suitcase!", comment: ""), force: true) {
+        tts.speak(NSLocalizedString("Hello Suitcase!", comment: ""), forceSelfvoice:true, force:true) {
 
         }
     }

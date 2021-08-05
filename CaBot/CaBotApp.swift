@@ -46,6 +46,10 @@ struct CaBotApp: App {
             case .inactive:
                 break
             case .active:
+                let isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
+                if isVoiceOverRunning {
+                    modelData.service.tts.stop()
+                }
                 break
             @unknown default:
                 break

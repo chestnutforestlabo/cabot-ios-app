@@ -220,14 +220,18 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     // MARK: public functions
 
     func resetAudioSession() {
+        let audioSession = AVAudioSession.sharedInstance()
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback,
-                                                            mode: .default,
-                                                            policy: .default,
-                                                            options: [.allowBluetooth])
-            try AVAudioSession.sharedInstance().setActive(true, options: [])
+            try audioSession.setCategory(.playback,
+                                         mode: .spokenAudio,
+                                         options: [])
         } catch {
-            NSLog("audioSession properties weren't set because of an error.")
+            NSLog("audioSession category weren't set because of an error. \(error)")
+        }
+        do {
+            try audioSession.setActive(true, options: [])
+        } catch {
+            NSLog("audioSession cannot be set active. \(error)")
         }
     }
 
