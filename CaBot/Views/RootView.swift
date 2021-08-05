@@ -65,6 +65,8 @@ struct RootView: View {
             .sheet(isPresented: $modelData.isContentPresenting, content: {
                 if let url = modelData.contentURL {
                     VStack {
+                        WebContentView(url: url, handlers: [:])
+                            .environmentObject(modelData)
                         HStack {
                             Spacer()
                             Button(action: {
@@ -75,8 +77,6 @@ struct RootView: View {
                                     .accessibility(label: Text("Close"))
                             })
                         }
-                        WebContentView(url: url, handlers: [:])
-                            .environmentObject(modelData)
                     }
                 }
             })

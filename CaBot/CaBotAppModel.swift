@@ -329,9 +329,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                     manager.cannotStartCurrent()
                 } else {
                     service.tts.speak(String(format:NSLocalizedString("Going to %@", comment: ""), arguments: [dest.pron ?? dest.title])) {
-                        if let content = dest.message?.content {
-                            self.service.tts.speak(content){
+                        self.isContentPresenting = false
+                        // wait 2 seconds. hopefully closing content window and reading the content by voice over will be ended by then
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                            if let content = dest.message?.content {
+                                self.service.tts.speak(content){
 
+                                }
                             }
                         }
                     }
@@ -405,9 +409,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     func cabot(service: CaBotService, notification: NavigationNotification) {
         switch(notification){
         case .next:
-            if tourManager.nextDestination() {
-                isContentPresenting = false
-            } else {
+            if tourManager.nextDestination() == false {
                 self.service.tts.speak(NSLocalizedString("No destination is selected", comment: "")) {
                 }
             }
