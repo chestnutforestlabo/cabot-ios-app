@@ -320,6 +320,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     // MARK: TourManagerDelegate
     func tourUpdated(manager: TourManager) {
         tourUpdated = true
+        UIApplication.shared.isIdleTimerDisabled = manager.hasDestination
     }
 
     func tour(manager: TourManager, destinationChanged destination: Destination?) {
