@@ -25,87 +25,20 @@ import CoreData
 
 struct MainMenuView: View {
     @EnvironmentObject var modelData: CaBotAppModel
-    @State private var isConfirming = false
 
     var body: some View {
-        let maxDestinationNumber = 2 + (modelData.tourManager.currentDestination==nil ? 1 : 0)
         VStack {
             Form {
                 if modelData.noSuitcaseDebug {
                     Label("No Suitcase Debug mode (better to restart app to connect to a suitcase)", systemImage: "exclamationmark.triangle")
                         .foregroundColor(.red)
                 }
-                if modelData.tourManager.hasDestination {
-                    Section(header: Text("Destinations")) {
-
-                        if let cd = modelData.tourManager.currentDestination {
-                            if modelData.menuDebug {
-                                Button(action: {
-                                    modelData.tourManager.stopCurrent()
-                                }) {
-                                    Text("PAUSE_NAVIGATION")
-                                }
-                                .disabled(!modelData.suitcaseConnected)
-                            }
-
-                            HStack {
-                                Label(cd.title,
-                                      systemImage: "arrow.triangle.turn.up.right.diamond")
-                                    .accessibilityLabel(String(format: NSLocalizedString("Navigating to %@", comment: ""),
-                                                               arguments: [cd.title]))
-                                if modelData.menuDebug {
-                                    Spacer()
-                                    Button(action: {
-                                        isConfirming = true
-                                    }) {
-                                        Image(systemName: "checkmark.seal")
-                                    }
-                                    .actionSheet(isPresented: $isConfirming) {
-                                        return ActionSheet(title: Text("Complete Destination"),
-                                                           message: Text("Complete Destination Message"),
-                                                           buttons: [
-                                                            .cancel(),
-                                                            .destructive(
-                                                                Text("Complete Destination"),
-                                                                action: {
-                                                                    modelData.cabot(service: modelData.service, notification: .arrived)
-                                                                }
-                                                            )
-                                                           ])
-                                    }
-                                }
-                            }
-                        } else if modelData.tourManager.destinations.count > 0 {
-                            if modelData.menuDebug {
-                                Button(action: {
-                                    modelData.tourManager.nextDestination()
-                                }) {
-                                    Label{
-                                        Text("START")
-                                    } icon: {
-                                        Image(systemName: "arrow.triangle.turn.up.right.diamond")
-                                    }
-                                }
-                                .disabled(!modelData.suitcaseConnected)
-                            }
-                        }
-                        ForEach(modelData.tourManager.first(n: maxDestinationNumber-1), id: \.self) {dest in
-                            Label(dest.title, systemImage: "mappin.and.ellipse")
-                        }
-                        if modelData.tourManager.destinations.count > 0 {
-                            NavigationLink(
-                                destination: TourDetailView(tour: modelData.tourManager,
-                                                            showStartButton: false,
-                                                            showCancelButton: true),
-                                label: {
-                                    HStack {
-                                        Spacer()
-                                        Text("See detail")
-                                    }
-                                })
-                        }
-                    }
+                if hasAnyAction() {
+                    ActionMenus()
+                    .environmentObject(modelData)
                 }
+                DestinationMenus()
+                    .environmentObject(modelData)
                 MainMenus()
                     .environmentObject(modelData)
                     .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
@@ -113,6 +46,134 @@ struct MainMenuView: View {
                     .environmentObject(modelData)
                 SettingMenus()
                     .environmentObject(modelData)
+            }
+        }
+    }
+
+    func hasAnyAction() -> Bool {
+        if modelData.tourManager.hasDestination && modelData.menuDebug {
+            return true
+        }
+        if let ad = modelData.tourManager.arrivedDestination {
+            if let _ = ad.content?.url {
+                return true
+            }
+            if modelData.tourManager.currentDestination == nil,
+               let _ = ad.waitingDestination?.value,
+               let _ = ad.waitingDestination?.title {
+                return true
+            }
+        }
+        return false
+    }
+}
+
+struct ActionMenus: View {
+    @EnvironmentObject var modelData: CaBotAppModel
+
+    var body: some View {
+        Section(header: Text("Actions")) {
+            if modelData.tourManager.hasDestination && modelData.menuDebug {
+                if let _ = modelData.tourManager.currentDestination {
+                    Button(action: {
+                        modelData.tourManager.stopCurrent()
+                    }) {
+                        Text("PAUSE_NAVIGATION")
+                    }
+                    .disabled(!modelData.suitcaseConnected)
+                } else if modelData.tourManager.destinations.count > 0 {
+                    Button(action: {
+                        _ = modelData.tourManager.nextDestination()
+                    }) {
+                        Label{
+                            Text("START")
+                        } icon: {
+                            Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                        }
+                    }
+                    .disabled(!modelData.suitcaseConnected)
+               }
+            }
+
+            if let ad = modelData.tourManager.arrivedDestination {
+                if let contentURL = ad.content?.url {
+                    Button(action: {
+                        modelData.open(content: contentURL)
+                    }) {
+                        Label(String(format:NSLocalizedString("Open Content for %@", comment: ""), arguments: [ad.title]),
+                              systemImage: "newspaper")
+                    }
+                }
+                if modelData.tourManager.currentDestination == nil,
+                   let _ = ad.waitingDestination?.value,
+                   let title = ad.waitingDestination?.title {
+                    Button(action: {
+                        modelData.isConfirmingSummons = true
+                    }) {
+                        Label(String(format:NSLocalizedString("Let the suitcase wait at %@", comment: ""), arguments: [title]),
+                              systemImage: "arrow.triangle.turn.up.right.diamond")
+                    }
+                    .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
+                }
+            }
+        }
+    }
+}
+
+struct DestinationMenus: View {
+    @EnvironmentObject var modelData: CaBotAppModel
+    @State private var isConfirming = false
+
+    var body: some View {
+        let maxDestinationNumber = 2 + (modelData.tourManager.currentDestination==nil ? 1 : 0)
+
+        if modelData.tourManager.hasDestination {
+            Section(header: Text("Destinations")) {
+
+                if let cd = modelData.tourManager.currentDestination {
+                    HStack {
+                        Label(cd.title,
+                              systemImage: "arrow.triangle.turn.up.right.diamond")
+                            .accessibilityLabel(String(format: NSLocalizedString("Navigating to %@", comment: ""),
+                                                       arguments: [cd.title]))
+                        if modelData.menuDebug {
+                            Spacer()
+                            Button(action: {
+                                isConfirming = true
+                            }) {
+                                Image(systemName: "checkmark.seal")
+                            }
+                            .actionSheet(isPresented: $isConfirming) {
+                                return ActionSheet(title: Text("Complete Destination"),
+                                                   message: Text("Complete Destination Message"),
+                                                   buttons: [
+                                                    .cancel(),
+                                                    .destructive(
+                                                        Text("Complete Destination"),
+                                                        action: {
+                                                            modelData.cabot(service: modelData.service, notification: .arrived)
+                                                        }
+                                                    )
+                                                   ])
+                            }
+                        }
+                    }
+                }
+                ForEach(modelData.tourManager.first(n: maxDestinationNumber-1), id: \.self) {dest in
+                    Label(dest.title, systemImage: "mappin.and.ellipse")
+                }
+                if modelData.tourManager.destinations.count > 0 {
+                    NavigationLink(
+                        destination: TourDetailView(tour: modelData.tourManager,
+                                                    showStartButton: false,
+                                                    showCancelButton: true),
+                        label: {
+                            HStack {
+                                Spacer()
+                                Text("See detail")
+                            }
+                        })
+                }
             }
         }
     }
@@ -190,28 +251,6 @@ struct StatusMenus: View {
                     Label(LocalizedStringKey("Suitcase Not Connected"),
                           systemImage: "antenna.radiowaves.left.and.right")
                         .opacity(0.1)
-                }
-            }
-
-            if let ad = modelData.tourManager.arrivedDestination {
-                if let contentURL = ad.content?.url {
-                    Button(action: {
-                        modelData.open(content: contentURL)
-                    }) {
-                        Label(String(format:NSLocalizedString("Open Content for %@", comment: ""), arguments: [ad.title]),
-                              systemImage: "newspaper")
-                    }
-                }
-                if modelData.tourManager.currentDestination == nil,
-                   let _ = ad.waitingDestination?.value,
-                   let title = ad.waitingDestination?.title {
-                    Button(action: {
-                        modelData.isConfirmingSummons = true
-                    }) {
-                        Label(String(format:NSLocalizedString("Let the suitcase wait at %@", comment: ""), arguments: [title]),
-                              systemImage: "arrow.triangle.turn.up.right.diamond")
-                    }
-                    .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
                 }
             }
         }
