@@ -329,7 +329,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                 if !send(destination: dest_id) {
                     manager.cannotStartCurrent()
                 } else {
-                    service.tts.speak(String(format:NSLocalizedString("Going to %@", comment: ""), arguments: [dest.pron ?? dest.title])) {
+                    service.tts.speak(String(format:NSLocalizedString("Going to %@", comment: ""), arguments: [dest.pron ?? dest.title]), force: true) {
                         self.isContentPresenting = false
                         // wait 2 seconds. hopefully closing content window and reading the content by voice over will be ended by then
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -429,8 +429,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                 }
 
                 self.service.tts.speak(announce) {
-                    if let contentURL = cd.content?.url {
-                        self.open(content: contentURL)
+                    // if this speech is interrupted by next destination command, it will not open content
+                    if self.tourManager.currentDestination == nil {
+                        if let contentURL = cd.content?.url {
+                            self.open(content: contentURL)
+                        }
                     }
                 }
             }

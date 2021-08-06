@@ -73,7 +73,7 @@
 "processing..."="処理中...";
 "Navigating to %@"="%@に移動ちゅう";
 "Going to %@"="%@に移動します";
-"You have arrived at %@"="%@に到着しました";
+"You have arrived at %@"="%@に到着しました。";
 "Open Content for %@"="%@の説明ページを開く";
 "Let the suitcase wait"="スーツケースを待たせる";
 "Let the suitcase wait message"="%@にスーツケースを待たせるコマンドを送ろうとしています。よろしいですか？";
