@@ -110,6 +110,9 @@ static NavDeviceTTS *instance = nil;
         isSpeaking = NO;
         [voice stopSpeakingAtBoundary:immediate?AVSpeechBoundaryImmediate:AVSpeechBoundaryWord];
     }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"");
+    });
 }
 
 - (BOOL)isSpeaking

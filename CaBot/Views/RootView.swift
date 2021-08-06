@@ -42,26 +42,7 @@ struct RootView: View {
                         .environment(\.locale, modelData.resource?.locale ?? .init(identifier: "base"))
                 }
             }
-            .navigationTitle("AI Suitcase")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    if modelData.displayedScene == .App {
-                        NavigationLink (destination: SettingView()
-                                            .environmentObject(modelData)
-                                            .environment(\.locale, modelData.resource?.locale ?? .init(identifier: "base"))) {
-                            HStack {
-                                Text("")
-                                    .accessibilityHidden(true)
-
-                                Image(systemName: "gearshape")
-                                    .accessibilityElement()
-                                    .accessibility(label: Text("Settings"))
-                                    .frame(width: 30, height: 30, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
-                            }
-                        }
-                    }
-                }
-            }
+            .navigationTitle(modelData.displayedScene.text)
             .sheet(isPresented: $modelData.isContentPresenting, content: {
                 if let url = modelData.contentURL {
                     VStack {

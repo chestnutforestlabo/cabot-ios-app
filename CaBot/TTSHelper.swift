@@ -28,12 +28,21 @@ class CaBotTTS : TTSProtocol{
 
     var voice: AVSpeechSynthesisVoice?
     var rate: Double = 0.6
+    var isSpeaking: Bool {
+        get {
+            self._tts.isSpeaking()
+        }
+    }
 
     init(voice: AVSpeechSynthesisVoice?) {
         self.voice = voice
     }
 
     private let _tts:NavDeviceTTS = NavDeviceTTS.shared()
+
+    func reset() {
+        self._tts.reset()
+    }
 
     func speak(_ text: String?, forceSelfvoice: Bool, force: Bool, callback: @escaping () -> Void) {
         let isForeground = UIApplication.shared.applicationState == .active

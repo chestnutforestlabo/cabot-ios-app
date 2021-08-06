@@ -21,6 +21,7 @@
  *******************************************************************************/
 
 
+"Main Menu"="メインメニュー";
 "Okay"="OK";
 "ERROR"="エラー";
 "Select"="選択してください";
@@ -28,6 +29,7 @@
 "Select Resource"="リソースの選択";
 "Actions"="アクション";
 "Status"="ステータス";
+"System"="システム";
 
 "Suitcase may not be connected"="スーツケースが接続されていません";
 "Suitcase has been connected"="スーツケースが接続されました";
@@ -58,8 +60,9 @@
 "SELECT_RESOURCE"="リソースの選択";
 "Hello Suitcase!"="こんにちは、スーツケース";
 
-"Speech Voice"="読み上げ音声の選択";
-"Speech Speed"="読み上げ速度";
+"Speech Voice"="読み上げ音声";
+"Voice"="音声";
+"Speech Speed"="速度";
 "Audio Effect"="効果音";
 "Arrived"="到着";
 "Others"="その他";
@@ -72,7 +75,7 @@
 
 "processing..."="処理中...";
 "Navigating to %@"="%@に移動ちゅう";
-"Going to %@"="%@に移動します";
+"Going to %@"="%@に移動します。";
 "You have arrived at %@"="%@に到着しました。";
 "Open Content for %@"="%@の説明ページを開く";
 "Let the suitcase wait"="スーツケースを待たせる";
@@ -106,3 +109,8 @@
 
 "Show more detail"="詳細を表示する";
 "Add to destinations"="目的地に追加する";
+
+"VoiceOver adjustment"="VoiceOver 調整";
+"Delay after closing browser"="ブラウザを閉じた後の待ち時間";
+"%.1f seconds"="%.1f秒";
+"%.1f sec"="%.1f秒";

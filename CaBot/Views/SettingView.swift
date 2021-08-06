@@ -43,7 +43,7 @@ struct SettingView: View {
     var body: some View {
         return Form {
             Section(header: Text("Speech Voice")) {
-                Picker("Voice", selection: $modelData.voice) {
+                Picker(NSLocalizedString("Voice", comment:""), selection: $modelData.voice) {
                     ForEach(TTSHelper.getVoices(by: locale), id: \.self) { voice in
                         Text(voice.AVvoice.name).tag(voice as Voice?)
                     }
@@ -53,10 +53,10 @@ struct SettingView: View {
                     }
                 })
                 .pickerStyle(DefaultPickerStyle())
-            }
 
-            Section(header: Text("Speech Speed")) {
                 HStack {
+                    Text("Speech Speed")
+                        .accessibility(hidden: true)
                     Slider(value: $modelData.speechRate,
                            in: 0...1,
                            step: 0.05,
@@ -66,8 +66,10 @@ struct SettingView: View {
                                 TTSHelper.playSample(of: modelData.voice!, at: modelData.speechRate)
                             }
                     })
+                        .accessibility(label: Text("Speech Speed"))
                         .accessibility(value: Text(String(format:"%.0f %%", arguments:[modelData.speechRate*100.0])))
                     Text(String(format:"%.0f %%", arguments:[modelData.speechRate*100.0]))
+                        .accessibility(hidden: true)
                 }
             }
             Section(header: Text("Audio Effect")) {
@@ -86,6 +88,21 @@ struct SettingView: View {
                     TextField("Team ID", text: $modelData.teamID)
                 }
             }
+            Section(header: Text("VoiceOver adjustment")) {
+                VStack {
+                    Text("Delay after closing browser")
+                        .accessibility(hidden: true)
+                    HStack {
+                        Slider(value: $modelData.browserCloseDelay,
+                               in: 1...2,
+                               step: 0.1)
+                            .accessibility(label: Text("Delay after closing browser"))
+                            .accessibility(value: Text(String(format:NSLocalizedString("%.1f seconds", comment:""), arguments:[modelData.browserCloseDelay])))
+                        Text(String(format:NSLocalizedString("%.1f sec", comment:""), arguments:[modelData.browserCloseDelay]))
+                            .accessibility(hidden: true)
+                    }
+                }
+            }
 
             Section(header: Text("Others")) {
                 Button(action: {
@@ -95,6 +112,7 @@ struct SettingView: View {
                 }) {
                     Text("SELECT_RESOURCE")
                 }
+
                 Toggle("Menu Debug", isOn: $modelData.menuDebug)
                 Toggle("No Suitcase Debug", isOn: $modelData.noSuitcaseDebug)
             }

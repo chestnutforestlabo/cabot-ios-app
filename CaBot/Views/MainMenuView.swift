@@ -39,12 +39,14 @@ struct MainMenuView: View {
                     Section(header: Text("Destinations")) {
 
                         if let cd = modelData.tourManager.currentDestination {
-                            Button(action: {
-                                modelData.tourManager.stopCurrent()
-                            }) {
-                                Text("PAUSE_NAVIGATION")
+                            if modelData.menuDebug {
+                                Button(action: {
+                                    modelData.tourManager.stopCurrent()
+                                }) {
+                                    Text("PAUSE_NAVIGATION")
+                                }
+                                .disabled(!modelData.suitcaseConnected)
                             }
-                            .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
 
                             HStack {
                                 Label(cd.title,
@@ -74,16 +76,18 @@ struct MainMenuView: View {
                                 }
                             }
                         } else if modelData.tourManager.destinations.count > 0 {
-                            Button(action: {
-                                modelData.tourManager.nextDestination()
-                            }) {
-                                Label{
-                                    Text("START")
-                                } icon: {
-                                    Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                            if modelData.menuDebug {
+                                Button(action: {
+                                    modelData.tourManager.nextDestination()
+                                }) {
+                                    Label{
+                                        Text("START")
+                                    } icon: {
+                                        Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                                    }
                                 }
+                                .disabled(!modelData.suitcaseConnected)
                             }
-                            .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
                         }
                         ForEach(modelData.tourManager.first(n: maxDestinationNumber-1), id: \.self) {dest in
                             Label(dest.title, systemImage: "mappin.and.ellipse")
@@ -106,6 +110,8 @@ struct MainMenuView: View {
                     .environmentObject(modelData)
                     .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
                 StatusMenus()
+                    .environmentObject(modelData)
+                SettingMenus()
                     .environmentObject(modelData)
             }
         }
@@ -170,9 +176,6 @@ struct StatusMenus: View {
     @EnvironmentObject var modelData: CaBotAppModel
 
     var body: some View {
-        let versionNo = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
-        let buildNo = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
-
         Section(header:Text("Status")) {
             HStack {
                 if modelData.suitcaseConnected {
@@ -209,6 +212,25 @@ struct StatusMenus: View {
                               systemImage: "arrow.triangle.turn.up.right.diamond")
                     }
                     .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
+                }
+            }
+        }
+    }
+}
+
+struct SettingMenus: View {
+    @EnvironmentObject var modelData: CaBotAppModel
+
+    var body: some View {
+        let versionNo = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
+        let buildNo = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
+
+        Section(header:Text("System")) {
+            NavigationLink (destination: SettingView()
+                                .environmentObject(modelData)
+                                .environment(\.locale, modelData.resource?.locale ?? .init(identifier: "base"))) {
+                HStack {
+                    Label(NSLocalizedString("Settings", comment: ""), systemImage: "gearshape")
                 }
             }
 

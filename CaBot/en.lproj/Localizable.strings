@@ -21,6 +21,7 @@
  *******************************************************************************/
 
 
+"Main Menu"="Main Menu";
 "Okay"="Okay";
 "ERROR"="Error";
 "Select"="Select";
@@ -28,6 +29,7 @@
 "Select Resource"="Select Resource";
 "Actions"="Actions";
 "Status"="Status";
+"System"="System";
 
 "Suitcase may not be connected"="Suitcase may not be connected";
 "Suitcase has been connected"="Suitcase has been connected";
@@ -58,7 +60,8 @@
 "SELECT_RESOURCE"="Select Resource";
 
 "Speech Voice"="Speech Voice";
-"Speech Speed"="Speech Speed";
+"Voice"="Voice";
+"Speech Speed"="Speed";
 "Audio Effect"="Audio Effect";
 "Arrived"="Arrived";
 "Others"="Others";
@@ -71,8 +74,8 @@
 
 "processing..."="processing...";
 "Navigating to %@"="Navigating to %@";
-"Going to %@"="Going to %@";
-"You have arrived at %@"="You have arrived at %@";
+"Going to %@"="Going to %@. ";
+"You have arrived at %@"="You have arrived at %@. ";
 "Open Content for %@"="Open Content for %@";
 "Let the suitcase wait"="Let the suitcase wait";
 "Let the suitcase wait message"="You are going to send a command to let the suitcase wait at %@. Are you okay with it?";
@@ -98,10 +101,15 @@
 "Complete Destination"="Complete Destination";
 "Complete Destination Message"="Are you sure to complete the current destination?";
 
-"You can check detail of %@ on the phone"="You can check detail of %@ on the phone";
-"You can continue the tour by pressing the right button of the suitcase handle"="You can continue the tour by pressing the right button of the suitcase handle";
+"You can check detail of %@ on the phone"="You can check detail of %@ on the phone. ";
+"You can continue the tour by pressing the right button of the suitcase handle"="You can continue the tour by pressing the right button of the suitcase handle. ";
 
 "No destination is selected"="No destination is selected";
 
 "Show more detail"="Show more detail";
 "Add to destinations"="Add to destinations";
+
+"VoiceOver adjustment"="VoiceOver adjustment";
+"Delay after closing browser"="Delay after closing browser";
+"%.1f seconds"="%.1f seconds";
+"%.1f sec"="%.1f sec";

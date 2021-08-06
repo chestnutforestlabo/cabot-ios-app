@@ -40,6 +40,19 @@ enum DisplayedScene {
     case Onboard
     case ResourceSelect
     case App
+
+    var text: Text {
+        get {
+            switch self {
+            case .Onboard:
+                return Text("")
+            case .ResourceSelect:
+                return Text("Select Resource")
+            case .App:
+                return Text("Main Menu")
+            }
+        }
+    }
 }
 
 final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, TourManagerDelegate, CLLocationManagerDelegate {
@@ -51,6 +64,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     private let menuDebugKey = "menu_debug"
     private let noSuitcaseDebugKey = "noSuitcaseDebugKey"
     private let arrivedSoundKey = "arrivedSoundKey"
+    private let browserCloseDelayKey = "browserCloseDelayKey"
 
     @Published var locationState: GrantState = .Init
     @Published var bluetoothState: CBManagerState = .unknown
@@ -118,6 +132,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
             UserDefaults.standard.setValue(noSuitcaseDebug, forKey: noSuitcaseDebugKey)
             UserDefaults.standard.synchronize()
             suitcaseConnected = true
+        }
+    }
+    @Published var browserCloseDelay: Double = 1.2 {
+        didSet {
+            UserDefaults.standard.setValue(browserCloseDelay, forKey: browserCloseDelayKey)
+            UserDefaults.standard.synchronize()
         }
     }
 
@@ -329,15 +349,23 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                 if !send(destination: dest_id) {
                     manager.cannotStartCurrent()
                 } else {
-                    service.tts.speak(String(format:NSLocalizedString("Going to %@", comment: ""), arguments: [dest.pron ?? dest.title]), force: true) {
-                        self.isContentPresenting = false
-                        // wait 2 seconds. hopefully closing content window and reading the content by voice over will be ended by then
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                            if let content = dest.message?.content {
-                                self.service.tts.speak(content){
+                    // cancel all announcement
+                    var delay = self.service.tts.isSpeaking ? 1.0 : 0
 
-                                }
-                            }
+                    self.service.tts.stop(true)
+
+                    if self.isContentPresenting {
+                        self.isContentPresenting = false
+                        delay = self.browserCloseDelay
+                    }
+                    // wait at least 1.0 seconds if tts was speaking
+                    // wait 1.0 ~ 2.0 seconds if browser was open.
+                    // hopefully closing browser and reading the content by voice over will be ended by then
+                    DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                        let announce = String(format:NSLocalizedString("Going to %@", comment: ""), arguments: [dest.pron ?? dest.title])
+                            + (dest.message?.content ?? "")
+
+                        self.service.tts.speak(announce){
                         }
                     }
                 }
@@ -429,7 +457,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                 }
 
                 self.service.tts.speak(announce) {
-                    // if this speech is interrupted by next destination command, it will not open content
+                    // if user pressed the next button while reading announce, skip open content
                     if self.tourManager.currentDestination == nil {
                         if let contentURL = cd.content?.url {
                             self.open(content: contentURL)
