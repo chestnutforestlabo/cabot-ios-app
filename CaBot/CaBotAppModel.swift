@@ -419,22 +419,18 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
             if let cd = tourManager.currentDestination {
                 self.playAudio(file: self.arrivedSound)
                 tourManager.arrivedCurrent()
-                self.service.tts.speak(String(format:NSLocalizedString("You have arrived at %@", comment: ""), arguments: [cd.pron ?? cd.title])) {
+
+                var announce = String(format:NSLocalizedString("You have arrived at %@", comment: ""), arguments: [cd.pron ?? cd.title])
+                if let _ = cd.content?.url {
+                    announce += String(format:NSLocalizedString("You can check detail of %@ on the phone", comment: ""), arguments: [cd.pron ?? cd.title])
                 }
-                if let contentURL = cd.content?.url {
-                    self.service.tts.speak(String(format:NSLocalizedString("You can check detail of %@ on the phone", comment: ""), arguments: [cd.pron ?? cd.title])) {
-                        if self.tourManager.hasDestination {
-                            self.service.tts.speak(NSLocalizedString("You can continue the tour by pressing the right button of the suitcase handle", comment: "")) {
-                                self.open(content: contentURL)
-                            }
-                        } else {
-                            self.open(content: contentURL)
-                        }
-                    }
-                } else {
-                    if tourManager.hasDestination {
-                        self.service.tts.speak(NSLocalizedString("You can continue the tour by pressing the right button of the suitcase handle", comment: "")) {
-                        }
+                if tourManager.hasDestination {
+                    announce += NSLocalizedString("You can continue the tour by pressing the right button of the suitcase handle", comment: "")
+                }
+
+                self.service.tts.speak(announce) {
+                    if let contentURL = cd.content?.url {
+                        self.open(content: contentURL)
                     }
                 }
             }
