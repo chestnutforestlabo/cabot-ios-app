@@ -106,7 +106,8 @@ struct SettingView: View {
 
             Section(header: Text("Others")) {
                 Button(action: {
-                    modelData.resource = nil
+                    UserDefaults.standard.setValue(false, forKey: ResourceSelectView.resourceSelectedKey)
+                    UserDefaults.standard.synchronize()
                     modelData.displayedScene = .ResourceSelect
                     presentationMode.wrappedValue.dismiss()
                 }) {

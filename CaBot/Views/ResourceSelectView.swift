@@ -23,6 +23,7 @@
 import SwiftUI
 
 struct ResourceSelectView: View {
+    static public let resourceSelectedKey = "resourceSelectedKey"
 
     @EnvironmentObject var model: CaBotAppModel
 
@@ -32,6 +33,8 @@ struct ResourceSelectView: View {
                 ForEach (model.resourceManager.resources, id: \.self) { resource in
                     Button(action: {
                         withAnimation() {
+                            UserDefaults.standard.setValue(true, forKey: ResourceSelectView.resourceSelectedKey)
+                            UserDefaults.standard.synchronize()
                             model.resource = resource
                             model.displayedScene = .App
                         }
@@ -46,8 +49,10 @@ struct ResourceSelectView: View {
             }
         }
         .onAppear(perform: {
-            if let _ = model.resource {
-                model.displayedScene = .App
+            if let value = UserDefaults.standard.value(forKey: ResourceSelectView.resourceSelectedKey) as? Bool {
+                if value {
+                    model.displayedScene = .App
+                }
             }
         })
     }

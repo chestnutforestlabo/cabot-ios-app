@@ -198,6 +198,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         if let arrivedSound = UserDefaults.standard.value(forKey: arrivedSoundKey) as? String {
             self.arrivedSound = arrivedSound
         }
+        if let browserCloseDelay = UserDefaults.standard.value(forKey: browserCloseDelayKey) as? Double {
+            self.browserCloseDelay = browserCloseDelay
+        }
     }
 
     func onChange(of newScenePhase: ScenePhase) {
