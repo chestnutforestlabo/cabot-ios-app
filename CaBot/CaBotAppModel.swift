@@ -301,6 +301,15 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         }
     }
 
+    func needToStartAnnounce(wait: Bool) {
+        let delay = wait ? self.browserCloseDelay : 0
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            self.service.tts.speak(NSLocalizedString("You can proceed by pressing the right button of the suitcase handle", comment: "")) {
+            }
+        }
+    }
+
     // MARK: LocationManagerDelegate
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
@@ -456,7 +465,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                     announce += String(format:NSLocalizedString("You can check detail of %@ on the phone", comment: ""), arguments: [cd.pron ?? cd.title])
                 }
                 if tourManager.hasDestination {
-                    announce += NSLocalizedString("You can continue the tour by pressing the right button of the suitcase handle", comment: "")
+                    announce += NSLocalizedString("You can proceed by pressing the right button of the suitcase handle", comment: "")
                 }
 
                 self.service.tts.speak(announce) {

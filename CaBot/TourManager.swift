@@ -132,7 +132,6 @@ class TourManager: TourProtocol {
         if _destinations.count == 0  {
             self._currentDestination = nil
             delegate?.tourUpdated(manager: self)
-            //delegate?.tour(manager: self, destinationChanged: nil)
             return false
         }
         self._arrivedDestination = nil

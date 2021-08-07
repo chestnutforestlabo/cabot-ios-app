@@ -43,6 +43,7 @@ struct TourDetailView: View {
                             isConfirming = true
                         } else {
                             tourManager.set(tour: tour)
+                            modelData.needToStartAnnounce(wait: true)
                             NavigationUtil.popToRootView()
                         }
                     }) {

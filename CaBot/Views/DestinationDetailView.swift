@@ -49,7 +49,7 @@ struct DestinationDetailView: View {
                     } else {
                         // if there is no destination, start immediately
                         tourManager.addToLast(destination: destination)
-                        tourManager.nextDestination()
+                        modelData.needToStartAnnounce(wait: true)
                         NavigationUtil.popToRootView()
                     }
                 }
@@ -77,7 +77,6 @@ struct DestinationDetailView: View {
                                             if let dest = targetDestination {
                                                 tourManager.stopCurrent()
                                                 tourManager.addToFirst(destination: dest)
-                                                tourManager.nextDestination()
                                                 targetDestination = nil
                                                 NavigationUtil.popToRootView()
                                             }
