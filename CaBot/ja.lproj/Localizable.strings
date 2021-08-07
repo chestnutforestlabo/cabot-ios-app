@@ -64,7 +64,10 @@
 "Voice"="音声";
 "Speech Speed"="速度";
 "Audio Effect"="効果音";
+"Start"="開始";
 "Arrived"="到着";
+"SpeedUp"="速度上";
+"SpeedDown"="速度下";
 "Others"="その他";
 "Navigation"="ナビゲーション";
 "Connection"="接続";

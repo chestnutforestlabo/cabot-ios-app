@@ -35,6 +35,7 @@ protocol CaBotServiceDelegate {
     func caBot(service:CaBotService, faceappConnected:Bool)
     func cabot(service:CaBotService, bluetoothStateUpdated: CBManagerState)
     func cabot(service:CaBotService, openRequest:URL)
+    func cabot(service:CaBotService, soundRequest:String)
     func cabot(service:CaBotService, notification:NavigationNotification)
 }
 
@@ -102,6 +103,8 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
         self.chars.append(self.naviChar)
 
         self.chars.append(CaBotWebContentChar(service: self, handle:0x0400))
+
+        self.chars.append(CaBotSoundEffectChar(service: self, handle:0x0500))
 
         self.heartbeatChar = CaBotNotifyChar(service: self, handle:0x9999)
         //self.heartbeatChar = CaBotHeartBeatChar(service: self, handle:0x9999)
@@ -549,7 +552,11 @@ class CaBotSpeechChar: CaBotChar {
                     tts.speak("") {
                     }
                 } else {
-                    tts.speak(String(line)) {
+                    if !tts.isSpeaking {
+                        tts.speak(String(line)) {
+                        }
+                    } else {
+                        NSLog("TTS is busy and skip speaking: \(line)")
                     }
                 }
             }
@@ -660,3 +667,47 @@ class CaBotWebContentChar: CaBotChar {
     }
 }
 
+
+class CaBotSoundEffectChar: CaBotChar {
+    let uuid:CBUUID
+    let characteristic: CBMutableCharacteristic
+
+    init(service: CaBotService,
+         handle:Int) {
+        self.uuid = service.generateUUID(handle: handle)
+
+        self.characteristic = CBMutableCharacteristic(
+            type: self.uuid,
+            properties: [.write],
+            value: nil,
+            permissions: [.writeable])
+
+        service.add(characteristic: self.characteristic)
+
+        super.init(service: service)
+    }
+
+    private func request(_ request:CBATTRequest) {
+        DispatchQueue.main.async {
+            guard let data = request.value else {
+                return
+            }
+            guard let text = String(data: data, encoding: .utf8) else {
+                return
+            }
+
+            self.service.delegate?.cabot(service: self.service, soundRequest: text)
+        }
+    }
+
+    override func canHandle(writeRequest: CBATTRequest) -> Bool {
+        if writeRequest.characteristic.uuid.isEqual(self.characteristic.uuid) {
+            self.request(writeRequest)
+            self.service.peripheralManager.respond(
+                to: writeRequest,
+                withResult: .success)
+            return true
+        }
+        return false
+    }
+}

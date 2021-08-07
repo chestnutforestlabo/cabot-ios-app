@@ -29,6 +29,12 @@ struct SettingView: View {
 
     @State var timer:Timer?
 
+    let startSounds:[String] = [
+        "/System/Library/Audio/UISounds/nano/3rdParty_Success_Haptic.caf",
+        "/System/Library/Audio/UISounds/nano/3rdParty_Start_Haptic.caf",
+        "/System/Library/Audio/UISounds/nano/Alert_SpartanConnecting_Haptic.caf",
+        "/System/Library/Audio/UISounds/nano/Warsaw_Haptic.caf",
+    ]
     let arrivedSounds:[String] = [
         "/System/Library/Audio/UISounds/nano/HummingbirdNotification_Haptic.caf",
         "/System/Library/Audio/UISounds/nano/Alarm_Nightstand_Haptic.caf",
@@ -38,6 +44,16 @@ struct SettingView: View {
         "/System/Library/Audio/UISounds/nano/MultiwayInvitation.caf",
         "/System/Library/Audio/UISounds/nano/SiriStopSuccess_Haptic.caf",
         "/System/Library/Audio/UISounds/nano/NavigationGenericManeuver_Haptic.caf",
+    ]
+    let speedUpSounds:[String] = [
+        "/System/Library/Audio/UISounds/nano/WalkieTalkieActiveStart_Haptic.caf",
+        "/System/Library/Audio/UISounds/nano/3rdParty_DirectionUp_Haptic.caf",
+        "/System/Library/Audio/UISounds/nano/WalkieTalkieReceiveStart_Haptic.caf",
+    ]
+    let speedDownSounds:[String] = [
+        "/System/Library/Audio/UISounds/nano/ET_RemoteTap_Receive_Haptic.caf",
+        "/System/Library/Audio/UISounds/nano/3rdParty_DirectionDown_Haptic.caf",
+        "/System/Library/Audio/UISounds/nano/WalkieTalkieReceiveEnd_Haptic.caf",
     ]
 
     var body: some View {
@@ -73,11 +89,32 @@ struct SettingView: View {
                 }
             }
             Section(header: Text("Audio Effect")) {
+                Picker("Start", selection: $modelData.startSound) {
+                    ForEach(startSounds, id: \.self) { sound in
+                        Text(NSString(string: sound).lastPathComponent).tag(sound)
+                    }
+                }.onChange(of: modelData.startSound) { value in
+                    modelData.playAudio(file: value)
+                }
                 Picker("Arrived", selection: $modelData.arrivedSound) {
                     ForEach(arrivedSounds, id: \.self) { sound in
                         Text(NSString(string: sound).lastPathComponent).tag(sound)
                     }
                 }.onChange(of: modelData.arrivedSound) { value in
+                    modelData.playAudio(file: value)
+                }
+                Picker("SpeedUp", selection: $modelData.speedUpSound) {
+                    ForEach(speedUpSounds, id: \.self) { sound in
+                        Text(NSString(string: sound).lastPathComponent).tag(sound)
+                    }
+                }.onChange(of: modelData.speedUpSound) { value in
+                    modelData.playAudio(file: value)
+                }
+                Picker("SpeedDown", selection: $modelData.speedDownSound) {
+                    ForEach(speedDownSounds, id: \.self) { sound in
+                        Text(NSString(string: sound).lastPathComponent).tag(sound)
+                    }
+                }.onChange(of: modelData.speedDownSound) { value in
                     modelData.playAudio(file: value)
                 }
             }

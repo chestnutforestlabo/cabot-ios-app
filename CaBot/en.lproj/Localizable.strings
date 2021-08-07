@@ -63,7 +63,10 @@
 "Voice"="Voice";
 "Speech Speed"="Speed";
 "Audio Effect"="Audio Effect";
+"Start"="Start";
 "Arrived"="Arrived";
+"SpeedUp"="Spd Up";
+"SpeedDown"="Spd Dwn";
 "Others"="Others";
 "Navigation"="Navigation";
 "Connection"="Connection";

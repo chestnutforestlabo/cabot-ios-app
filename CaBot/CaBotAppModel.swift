@@ -63,7 +63,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     private let teamIDKey = "team_id"
     private let menuDebugKey = "menu_debug"
     private let noSuitcaseDebugKey = "noSuitcaseDebugKey"
+    private let startSoundKey = "startSoundKey"
     private let arrivedSoundKey = "arrivedSoundKey"
+    private let speedUpSoundKey = "speedUpSoundKey"
+    private let speedDownSoundKey = "speedDownSoundKey"
     private let browserCloseDelayKey = "browserCloseDelayKey"
 
     @Published var locationState: GrantState = .Init
@@ -146,9 +149,27 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     @Published var contentURL: URL? = nil
     @Published var tourUpdated: Bool = false
 
+    @Published var startSound: String = "/System/Library/Audio/UISounds/nano/3rdParty_Success_Haptic.caf" {
+        didSet {
+            UserDefaults.standard.setValue(startSound, forKey: startSoundKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
     @Published var arrivedSound: String = "/System/Library/Audio/UISounds/nano/HummingbirdNotification_Haptic.caf" {
         didSet {
             UserDefaults.standard.setValue(arrivedSound, forKey: arrivedSoundKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
+    @Published var speedUpSound: String = "/System/Library/Audio/UISounds/nano/WalkieTalkieActiveStart_Haptic.caf" {
+        didSet {
+            UserDefaults.standard.setValue(speedUpSound, forKey: speedUpSoundKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
+    @Published var speedDownSound: String = "/System/Library/Audio/UISounds/nano/ET_RemoteTap_Receive_Haptic.caf" {
+        didSet {
+            UserDefaults.standard.setValue(speedDownSound, forKey: speedDownSoundKey)
             UserDefaults.standard.synchronize()
         }
     }
@@ -353,6 +374,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     func tourUpdated(manager: TourManager) {
         tourUpdated = true
         UIApplication.shared.isIdleTimerDisabled = manager.hasDestination
+
     }
 
     func tour(manager: TourManager, destinationChanged destination: Destination?) {
@@ -447,10 +469,25 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         self.open(content: url)
     }
 
+    func cabot(service: CaBotService, soundRequest: String) {
+        switch(soundRequest) {
+        case "SpeedUp":
+            playAudio(file: speedUpSound)
+            break
+        case "SpeedDown":
+            playAudio(file: speedDownSound)
+            break
+        default:
+            NSLog("\"\(soundRequest)\" is unknown sound")
+        }
+    }
+
     func cabot(service: CaBotService, notification: NavigationNotification) {
         switch(notification){
         case .next:
-            if tourManager.nextDestination() == false {
+            if tourManager.nextDestination() {
+                self.playAudio(file: self.startSound)
+            }else {
                 self.service.tts.speak(NSLocalizedString("No destination is selected", comment: "")) {
                 }
             }
