@@ -24,6 +24,7 @@ import CoreData
 import SwiftUI
 import Foundation
 import CoreBluetooth
+import CoreLocation
 import UserNotifications
 import Combine
 import os.log
