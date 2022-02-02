@@ -21,7 +21,7 @@ speech|0x200|IN|text|speak input text
 navi|0x300|IN|text|navigation status, next or arrived
 content|0x400|IN|text|open text as URL in browser
 sound|0x500|IN|text|play specified sound, speedUp or speedDown
-heat_beat|0x9999|OUT|text|send heart beat every second
+heart_beat|0x9999|OUT|text|send heart beat every second
 
 ## How to build
 
