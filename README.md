@@ -3,7 +3,7 @@
 
 - CaBot app is a bluetooth peripheral app of CaBot. 
 - The user need to specify a **team name** in the setting view
-  - The app will advertise BLE service as **CaBot-<team name>** when it is in foreground
+  - The app will advertise BLE service as **`CaBot-<team name>`** when it is in foreground
 - CaBot's ros1 system needs to be launched with `-e <team name>` option
   - CaBot scans the name and tries to connect when found
 - There are multiple IN/OUT characteristics (subject to be changed)
