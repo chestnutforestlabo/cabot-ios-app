@@ -20,10 +20,5 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-#ifndef bridging_h
-#define bridging_h
+CFBundleDisplayName = "エーアイ スーツケース";
 
-#include "NavDeviceTTS.h"
-#include "NavUtil.h"
-
-#endif /* bridging_h */

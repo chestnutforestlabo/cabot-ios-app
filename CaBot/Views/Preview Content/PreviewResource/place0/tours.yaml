@@ -1,0 +1,32 @@
+-
+  title: Tour 0
+  id: tour_0
+  destinations:
+    -
+      title: point A
+      value: Node_ID_FOR_A
+    -
+      title: point B
+      value: Node_ID_FOR_B
+    -
+      title: point C
+      value: Node_ID_FOR_C
+    -
+      title: point D
+      value: Node_ID_FOR_D
+    -
+      title: point E
+      value: Node_ID_FOR_E
+-
+  title: Tour 1
+  id: tour_1
+  destinations:
+    -
+      title: point D
+      value: Node_ID_FOR_D
+    -
+      title: point E
+      value: Node_ID_FOR_E
+    -
+      title: point F
+      value: Node_ID_FOR_F

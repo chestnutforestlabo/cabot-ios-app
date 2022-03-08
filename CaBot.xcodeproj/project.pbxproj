@@ -3,33 +3,43 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2EA29375279802F2C659809A /* libPods-CaBot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 56BE4BD043FAE871B580CD67 /* libPods-CaBot.a */; };
-		7E29F00D228B548100CA7DD6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00C228B548100CA7DD6 /* AppDelegate.swift */; };
-		7E29F00F228B548100CA7DD6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F00E228B548100CA7DD6 /* ViewController.swift */; };
-		7E29F012228B548100CA7DD6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F010228B548100CA7DD6 /* Main.storyboard */; };
+		09725B0A24FE4AC300012D42 /* DialogViewControllerCabot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */; };
+		097845C02531E65B004DE1F6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 097845C22531E65B004DE1F6 /* InfoPlist.strings */; };
+		3009AC3126AA3F4000370873 /* HLPDialog in Frameworks */ = {isa = PBXBuildFile; productRef = 3009AC3026AA3F4000370873 /* HLPDialog */; };
+		3013614026A0BF590050CF9E /* PreviewResource in Resources */ = {isa = PBXBuildFile; fileRef = 3013613F26A0BF590050CF9E /* PreviewResource */; };
+		3013614326A0F8E10050CF9E /* TourDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3013614226A0F8E10050CF9E /* TourDetailView.swift */; };
+		3013614726A1E77B0050CF9E /* WebContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3013614626A1E77B0050CF9E /* WebContentView.swift */; };
+		306C7F6C265D435100E5928E /* Yams in Frameworks */ = {isa = PBXBuildFile; productRef = 306C7F6B265D435100E5928E /* Yams */; };
+		3096BF1426A5C29F0066F256 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3096BF1326A5C29F0066F256 /* SettingView.swift */; };
+		3096BF1826A5D0990066F256 /* TTSHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3096BF1726A5D0990066F256 /* TTSHelper.swift */; };
+		3099132B265DE50A000C1BFE /* Resource in Resources */ = {isa = PBXBuildFile; fileRef = 3099132A265DE50A000C1BFE /* Resource */; };
+		3099132D26603B10000C1BFE /* LocalConversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3099132C26603B10000C1BFE /* LocalConversation.swift */; };
+		30C3059E26B9036A00A1383A /* DestinationDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C3059D26B9036A00A1383A /* DestinationDetailView.swift */; };
+		30E50DCC269F672800729ABD /* TourManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DCB269F672800729ABD /* TourManager.swift */; };
+		30E50DCE269F75DB00729ABD /* CaBotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DCD269F75DB00729ABD /* CaBotApp.swift */; };
+		30E50DD0269F76F000729ABD /* CaBotAppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DCF269F76F000729ABD /* CaBotAppModel.swift */; };
+		30E50DD4269F77CE00729ABD /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DD3269F77CE00729ABD /* RootView.swift */; };
+		30E50DD7269F784A00729ABD /* OnboardGrantAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DD5269F784A00729ABD /* OnboardGrantAccess.swift */; };
+		30E50DD8269F784A00729ABD /* MainMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DD6269F784A00729ABD /* MainMenuView.swift */; };
+		30E50DDB269F7E3800729ABD /* CaBot.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DD9269F7E3800729ABD /* CaBot.xcdatamodeld */; };
+		30E50DDD269FCBC200729ABD /* ResourceSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DDC269FCBC200729ABD /* ResourceSelectView.swift */; };
+		30E50DDF26A0B21200729ABD /* ConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DDE26A0B21200729ABD /* ConversationView.swift */; };
+		30E50DE226A0BA5200729ABD /* DestinationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DE126A0BA5200729ABD /* DestinationsView.swift */; };
+		30E50DE826A0BBE900729ABD /* ToursView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DE726A0BBE900729ABD /* ToursView.swift */; };
+		30E99D9226681097001ACAAA /* ResourceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99D9126681097001ACAAA /* ResourceManager.swift */; };
+		30E99D94266A92EA001ACAAA /* JSHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99D93266A92EA001ACAAA /* JSHelper.swift */; };
+		30E99D96266A993E001ACAAA /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99D95266A993E001ACAAA /* Extension.swift */; };
+		30E99DA4266B2216001ACAAA /* BeaconSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99DA3266B2216001ACAAA /* BeaconSampler.swift */; };
 		7E29F014228B548200CA7DD6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F013228B548200CA7DD6 /* Assets.xcassets */; };
-		7E29F017228B548200CA7DD6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F015228B548200CA7DD6 /* LaunchScreen.storyboard */; };
 		7E29F022228B548200CA7DD6 /* CaBotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F021228B548200CA7DD6 /* CaBotTests.swift */; };
 		7E29F02D228B548200CA7DD6 /* CaBotUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F02C228B548200CA7DD6 /* CaBotUITests.swift */; };
-		7E29F063228B55C000CA7DD6 /* HLPSetting.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F04E228B55C000CA7DD6 /* HLPSetting.m */; };
-		7E29F064228B55C000CA7DD6 /* HLPSettingView.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F04F228B55C000CA7DD6 /* HLPSettingView.strings */; };
-		7E29F065228B55C000CA7DD6 /* HLPSettingViewSwitchCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F052228B55C000CA7DD6 /* HLPSettingViewSwitchCell.xib */; };
-		7E29F066228B55C000CA7DD6 /* HLPSettingViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F055228B55C000CA7DD6 /* HLPSettingViewCell.m */; };
-		7E29F067228B55C000CA7DD6 /* HLPSettingHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F057228B55C000CA7DD6 /* HLPSettingHelper.m */; };
-		7E29F068228B55C000CA7DD6 /* HLPSettingViewTextCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F059228B55C000CA7DD6 /* HLPSettingViewTextCell.xib */; };
-		7E29F069228B55C000CA7DD6 /* HLPSettingViewPickerCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F05B228B55C000CA7DD6 /* HLPSettingViewPickerCell.xib */; };
-		7E29F06A228B55C000CA7DD6 /* HLPSettingViewSliderCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F05D228B55C000CA7DD6 /* HLPSettingViewSliderCell.xib */; };
-		7E29F06B228B55C000CA7DD6 /* HLPSettingTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F05E228B55C000CA7DD6 /* HLPSettingTableView.m */; };
-		7E29F06C228B55C000CA7DD6 /* HLPSettingViewSubtitleCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F05F228B55C000CA7DD6 /* HLPSettingViewSubtitleCell.xib */; };
 		7E29F06D228B55C000CA7DD6 /* NavDeviceTTS.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F062228B55C000CA7DD6 /* NavDeviceTTS.m */; };
-		7E29F071228B55FC00CA7DD6 /* destinations.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F06E228B55FC00CA7DD6 /* destinations.yaml */; };
 		7E29F072228B55FC00CA7DD6 /* CaBotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F070228B55FC00CA7DD6 /* CaBotService.swift */; };
-		7E29F075228B5B5B00CA7DD6 /* Yams.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E29F074228B5B5B00CA7DD6 /* Yams.framework */; };
-		7E29F078228CB2EA00CA7DD6 /* HLPLocationManager.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E29F077228CB2EA00CA7DD6 /* HLPLocationManager.framework */; };
+		7E557F002581C79B00B1B9CA /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7E557EFE2581C79B00B1B9CA /* Localizable.strings */; };
 		7EF5F1EA228DB07100788987 /* NavUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EF5F1E8228DB07100788987 /* NavUtil.m */; };
 /* End PBXBuildFile section */
 
@@ -51,14 +61,39 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		35ECB82D33B1989C1B8B8CC7 /* Pods-CaBot.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CaBot.release.xcconfig"; path = "Pods/Target Support Files/Pods-CaBot/Pods-CaBot.release.xcconfig"; sourceTree = "<group>"; };
-		56BE4BD043FAE871B580CD67 /* libPods-CaBot.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CaBot.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogViewControllerCabot.swift; sourceTree = "<group>"; };
+		097845C12531E65B004DE1F6 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		097845C32531E685004DE1F6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		3013613F26A0BF590050CF9E /* PreviewResource */ = {isa = PBXFileReference; lastKnownFileType = folder; path = PreviewResource; sourceTree = "<group>"; };
+		3013614226A0F8E10050CF9E /* TourDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TourDetailView.swift; sourceTree = "<group>"; };
+		3013614626A1E77B0050CF9E /* WebContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebContentView.swift; sourceTree = "<group>"; };
+		3013614A26A2262B0050CF9E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		306A57DA265C4435006B510D /* Speech.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Speech.framework; path = System/Library/Frameworks/Speech.framework; sourceTree = SDKROOT; };
+		306A57DC265C4466006B510D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		306A57DE265C446B006B510D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		306A57E0265C4477006B510D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		3096BF1326A5C29F0066F256 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
+		3096BF1726A5D0990066F256 /* TTSHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTSHelper.swift; sourceTree = "<group>"; };
+		3099132A265DE50A000C1BFE /* Resource */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resource; sourceTree = "<group>"; };
+		3099132C26603B10000C1BFE /* LocalConversation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalConversation.swift; sourceTree = "<group>"; };
+		30C3059D26B9036A00A1383A /* DestinationDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DestinationDetailView.swift; sourceTree = "<group>"; };
+		30E50DCB269F672800729ABD /* TourManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TourManager.swift; sourceTree = "<group>"; };
+		30E50DCD269F75DB00729ABD /* CaBotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaBotApp.swift; sourceTree = "<group>"; };
+		30E50DCF269F76F000729ABD /* CaBotAppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaBotAppModel.swift; sourceTree = "<group>"; };
+		30E50DD3269F77CE00729ABD /* RootView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		30E50DD5269F784A00729ABD /* OnboardGrantAccess.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnboardGrantAccess.swift; sourceTree = "<group>"; };
+		30E50DD6269F784A00729ABD /* MainMenuView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainMenuView.swift; sourceTree = "<group>"; };
+		30E50DDA269F7E3800729ABD /* CaBot.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CaBot.xcdatamodel; sourceTree = "<group>"; };
+		30E50DDC269FCBC200729ABD /* ResourceSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceSelectView.swift; sourceTree = "<group>"; };
+		30E50DDE26A0B21200729ABD /* ConversationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationView.swift; sourceTree = "<group>"; };
+		30E50DE126A0BA5200729ABD /* DestinationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DestinationsView.swift; sourceTree = "<group>"; };
+		30E50DE726A0BBE900729ABD /* ToursView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToursView.swift; sourceTree = "<group>"; };
+		30E99D9126681097001ACAAA /* ResourceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceManager.swift; sourceTree = "<group>"; };
+		30E99D93266A92EA001ACAAA /* JSHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSHelper.swift; sourceTree = "<group>"; };
+		30E99D95266A993E001ACAAA /* Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
+		30E99DA3266B2216001ACAAA /* BeaconSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeaconSampler.swift; sourceTree = "<group>"; };
 		7E29F009228B548100CA7DD6 /* CaBot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CaBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		7E29F00C228B548100CA7DD6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		7E29F00E228B548100CA7DD6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		7E29F011228B548100CA7DD6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		7E29F013228B548200CA7DD6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		7E29F016228B548200CA7DD6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7E29F018228B548200CA7DD6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7E29F01D228B548200CA7DD6 /* CaBotTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CaBotTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E29F021228B548200CA7DD6 /* CaBotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaBotTests.swift; sourceTree = "<group>"; };
@@ -67,34 +102,13 @@
 		7E29F02C228B548200CA7DD6 /* CaBotUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaBotUITests.swift; sourceTree = "<group>"; };
 		7E29F02E228B548200CA7DD6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7E29F04C228B55C000CA7DD6 /* NavDeviceTTS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NavDeviceTTS.h; sourceTree = "<group>"; };
-		7E29F04E228B55C000CA7DD6 /* HLPSetting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HLPSetting.m; sourceTree = "<group>"; };
-		7E29F050228B55C000CA7DD6 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/HLPSettingView.strings"; sourceTree = "<group>"; };
-		7E29F051228B55C000CA7DD6 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/HLPSettingView.strings; sourceTree = "<group>"; };
-		7E29F052228B55C000CA7DD6 /* HLPSettingViewSwitchCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HLPSettingViewSwitchCell.xib; sourceTree = "<group>"; };
-		7E29F053228B55C000CA7DD6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/HLPSettingView.strings; sourceTree = "<group>"; };
-		7E29F054228B55C000CA7DD6 /* HLPSettingTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HLPSettingTableView.h; sourceTree = "<group>"; };
-		7E29F055228B55C000CA7DD6 /* HLPSettingViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HLPSettingViewCell.m; sourceTree = "<group>"; };
-		7E29F056228B55C000CA7DD6 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/HLPSettingView.strings; sourceTree = "<group>"; };
-		7E29F057228B55C000CA7DD6 /* HLPSettingHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HLPSettingHelper.m; sourceTree = "<group>"; };
-		7E29F058228B55C000CA7DD6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/HLPSettingView.strings; sourceTree = "<group>"; };
-		7E29F059228B55C000CA7DD6 /* HLPSettingViewTextCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HLPSettingViewTextCell.xib; sourceTree = "<group>"; };
-		7E29F05A228B55C000CA7DD6 /* HLPSetting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HLPSetting.h; sourceTree = "<group>"; };
-		7E29F05B228B55C000CA7DD6 /* HLPSettingViewPickerCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HLPSettingViewPickerCell.xib; sourceTree = "<group>"; };
-		7E29F05C228B55C000CA7DD6 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/HLPSettingView.strings"; sourceTree = "<group>"; };
-		7E29F05D228B55C000CA7DD6 /* HLPSettingViewSliderCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HLPSettingViewSliderCell.xib; sourceTree = "<group>"; };
-		7E29F05E228B55C000CA7DD6 /* HLPSettingTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HLPSettingTableView.m; sourceTree = "<group>"; };
-		7E29F05F228B55C000CA7DD6 /* HLPSettingViewSubtitleCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HLPSettingViewSubtitleCell.xib; sourceTree = "<group>"; };
-		7E29F060228B55C000CA7DD6 /* HLPSettingHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HLPSettingHelper.h; sourceTree = "<group>"; };
-		7E29F061228B55C000CA7DD6 /* HLPSettingViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HLPSettingViewCell.h; sourceTree = "<group>"; };
 		7E29F062228B55C000CA7DD6 /* NavDeviceTTS.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NavDeviceTTS.m; sourceTree = "<group>"; };
-		7E29F06E228B55FC00CA7DD6 /* destinations.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = destinations.yaml; sourceTree = "<group>"; };
 		7E29F06F228B55FC00CA7DD6 /* bridging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bridging.h; sourceTree = "<group>"; };
 		7E29F070228B55FC00CA7DD6 /* CaBotService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaBotService.swift; sourceTree = "<group>"; };
-		7E29F074228B5B5B00CA7DD6 /* Yams.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Yams.framework; path = Carthage/Build/iOS/Yams.framework; sourceTree = "<group>"; };
-		7E29F077228CB2EA00CA7DD6 /* HLPLocationManager.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HLPLocationManager.framework; path = Carthage/Build/iOS/HLPLocationManager.framework; sourceTree = "<group>"; };
+		7E557EFF2581C79B00B1B9CA /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
+		7E557F042581C80E00B1B9CA /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		7EF5F1E8228DB07100788987 /* NavUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NavUtil.m; sourceTree = "<group>"; };
 		7EF5F1E9228DB07100788987 /* NavUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NavUtil.h; sourceTree = "<group>"; };
-		B903843AD4ECBA9B22E1A569 /* Pods-CaBot.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CaBot.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CaBot/Pods-CaBot.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,9 +116,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7E29F078228CB2EA00CA7DD6 /* HLPLocationManager.framework in Frameworks */,
-				7E29F075228B5B5B00CA7DD6 /* Yams.framework in Frameworks */,
-				2EA29375279802F2C659809A /* libPods-CaBot.a in Frameworks */,
+				306C7F6C265D435100E5928E /* Yams in Frameworks */,
+				3009AC3126AA3F4000370873 /* HLPDialog in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,25 +138,57 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		34934AE706D8EADF308BC169 /* Pods */ = {
+		3013613E26A0BE7E0050CF9E /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
-				B903843AD4ECBA9B22E1A569 /* Pods-CaBot.debug.xcconfig */,
-				35ECB82D33B1989C1B8B8CC7 /* Pods-CaBot.release.xcconfig */,
+				3013613F26A0BF590050CF9E /* PreviewResource */,
 			);
-			name = Pods;
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		30991329265DE4C5000C1BFE /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				7E29F013228B548200CA7DD6 /* Assets.xcassets */,
+				7E29F06F228B55FC00CA7DD6 /* bridging.h */,
+				7E29F018228B548200CA7DD6 /* Info.plist */,
+				097845C22531E65B004DE1F6 /* InfoPlist.strings */,
+				7E557EFE2581C79B00B1B9CA /* Localizable.strings */,
+				30E50DD9269F7E3800729ABD /* CaBot.xcdatamodeld */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		30E50DD2269F77BE00729ABD /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				3013613E26A0BE7E0050CF9E /* Preview Content */,
+				30E50DD3269F77CE00729ABD /* RootView.swift */,
+				30E50DD5269F784A00729ABD /* OnboardGrantAccess.swift */,
+				30E50DDC269FCBC200729ABD /* ResourceSelectView.swift */,
+				30E50DD6269F784A00729ABD /* MainMenuView.swift */,
+				30E50DDE26A0B21200729ABD /* ConversationView.swift */,
+				09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */,
+				30E50DE126A0BA5200729ABD /* DestinationsView.swift */,
+				30C3059D26B9036A00A1383A /* DestinationDetailView.swift */,
+				30E50DE726A0BBE900729ABD /* ToursView.swift */,
+				3013614226A0F8E10050CF9E /* TourDetailView.swift */,
+				3013614626A1E77B0050CF9E /* WebContentView.swift */,
+				3096BF1326A5C29F0066F256 /* SettingView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		7E29F000228B548100CA7DD6 = {
 			isa = PBXGroup;
 			children = (
+				3099132A265DE50A000C1BFE /* Resource */,
 				7E29F04B228B55C000CA7DD6 /* FromNavCog */,
 				7E29F00B228B548100CA7DD6 /* CaBot */,
 				7E29F020228B548200CA7DD6 /* CaBotTests */,
 				7E29F02B228B548200CA7DD6 /* CaBotUITests */,
 				7E29F00A228B548100CA7DD6 /* Products */,
 				7E29F073228B5B5A00CA7DD6 /* Frameworks */,
-				34934AE706D8EADF308BC169 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -160,15 +205,18 @@
 		7E29F00B228B548100CA7DD6 /* CaBot */ = {
 			isa = PBXGroup;
 			children = (
-				7E29F00C228B548100CA7DD6 /* AppDelegate.swift */,
-				7E29F00E228B548100CA7DD6 /* ViewController.swift */,
+				30991329265DE4C5000C1BFE /* Supporting Files */,
+				30E50DCD269F75DB00729ABD /* CaBotApp.swift */,
+				30E50DCF269F76F000729ABD /* CaBotAppModel.swift */,
+				30E50DD2269F77BE00729ABD /* Views */,
+				30E99D95266A993E001ACAAA /* Extension.swift */,
 				7E29F070228B55FC00CA7DD6 /* CaBotService.swift */,
-				7E29F06F228B55FC00CA7DD6 /* bridging.h */,
-				7E29F06E228B55FC00CA7DD6 /* destinations.yaml */,
-				7E29F010228B548100CA7DD6 /* Main.storyboard */,
-				7E29F013228B548200CA7DD6 /* Assets.xcassets */,
-				7E29F015228B548200CA7DD6 /* LaunchScreen.storyboard */,
-				7E29F018228B548200CA7DD6 /* Info.plist */,
+				3099132C26603B10000C1BFE /* LocalConversation.swift */,
+				30E99D9126681097001ACAAA /* ResourceManager.swift */,
+				30E99D93266A92EA001ACAAA /* JSHelper.swift */,
+				30E99DA3266B2216001ACAAA /* BeaconSampler.swift */,
+				30E50DCB269F672800729ABD /* TourManager.swift */,
+				3096BF1726A5D0990066F256 /* TTSHelper.swift */,
 			);
 			path = CaBot;
 			sourceTree = "<group>";
@@ -194,7 +242,6 @@
 		7E29F04B228B55C000CA7DD6 /* FromNavCog */ = {
 			isa = PBXGroup;
 			children = (
-				7E29F04D228B55C000CA7DD6 /* SettingUtil */,
 				7E29F04C228B55C000CA7DD6 /* NavDeviceTTS.h */,
 				7E29F062228B55C000CA7DD6 /* NavDeviceTTS.m */,
 				7EF5F1E9228DB07100788987 /* NavUtil.h */,
@@ -203,33 +250,13 @@
 			path = FromNavCog;
 			sourceTree = "<group>";
 		};
-		7E29F04D228B55C000CA7DD6 /* SettingUtil */ = {
-			isa = PBXGroup;
-			children = (
-				7E29F04E228B55C000CA7DD6 /* HLPSetting.m */,
-				7E29F04F228B55C000CA7DD6 /* HLPSettingView.strings */,
-				7E29F052228B55C000CA7DD6 /* HLPSettingViewSwitchCell.xib */,
-				7E29F054228B55C000CA7DD6 /* HLPSettingTableView.h */,
-				7E29F055228B55C000CA7DD6 /* HLPSettingViewCell.m */,
-				7E29F057228B55C000CA7DD6 /* HLPSettingHelper.m */,
-				7E29F059228B55C000CA7DD6 /* HLPSettingViewTextCell.xib */,
-				7E29F05A228B55C000CA7DD6 /* HLPSetting.h */,
-				7E29F05B228B55C000CA7DD6 /* HLPSettingViewPickerCell.xib */,
-				7E29F05D228B55C000CA7DD6 /* HLPSettingViewSliderCell.xib */,
-				7E29F05E228B55C000CA7DD6 /* HLPSettingTableView.m */,
-				7E29F05F228B55C000CA7DD6 /* HLPSettingViewSubtitleCell.xib */,
-				7E29F060228B55C000CA7DD6 /* HLPSettingHelper.h */,
-				7E29F061228B55C000CA7DD6 /* HLPSettingViewCell.h */,
-			);
-			path = SettingUtil;
-			sourceTree = "<group>";
-		};
 		7E29F073228B5B5A00CA7DD6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				7E29F077228CB2EA00CA7DD6 /* HLPLocationManager.framework */,
-				7E29F074228B5B5B00CA7DD6 /* Yams.framework */,
-				56BE4BD043FAE871B580CD67 /* libPods-CaBot.a */,
+				306A57E0265C4477006B510D /* UIKit.framework */,
+				306A57DE265C446B006B510D /* Foundation.framework */,
+				306A57DC265C4466006B510D /* AVFoundation.framework */,
+				306A57DA265C4435006B510D /* Speech.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -241,18 +268,19 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7E29F031228B548200CA7DD6 /* Build configuration list for PBXNativeTarget "CaBot" */;
 			buildPhases = (
-				344AFD22189AB0DD2AE2C797 /* [CP] Check Pods Manifest.lock */,
 				7E29F005228B548100CA7DD6 /* Sources */,
 				7E29F006228B548100CA7DD6 /* Frameworks */,
 				7E29F007228B548100CA7DD6 /* Resources */,
-				7E29F076228B5B8900CA7DD6 /* ShellScript */,
-				50E93E96BF6CB2BF6BCE6CFC /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = CaBot;
+			packageProductDependencies = (
+				306C7F6B265D435100E5928E /* Yams */,
+				3009AC3026AA3F4000370873 /* HLPDialog */,
+			);
 			productName = CaBot;
 			productReference = 7E29F009228B548100CA7DD6 /* CaBot.app */;
 			productType = "com.apple.product-type.application";
@@ -300,8 +328,8 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1020;
-				LastUpgradeCheck = 1020;
-				ORGANIZATIONNAME = CMU;
+				LastUpgradeCheck = 1250;
+				ORGANIZATIONNAME = "Carnegie Mellon University";
 				TargetAttributes = {
 					7E29F008228B548100CA7DD6 = {
 						CreatedOnToolsVersion = 10.2.1;
@@ -323,12 +351,14 @@
 			knownRegions = (
 				en,
 				Base,
-				"zh-Hans",
 				ja,
-				ko,
 				"en-US",
 			);
 			mainGroup = 7E29F000228B548100CA7DD6;
+			packageReferences = (
+				306C7F6A265D435100E5928E /* XCRemoteSwiftPackageReference "Yams" */,
+				3009AC2F26AA3F4000370873 /* XCRemoteSwiftPackageReference "HLPDialog" */,
+			);
 			productRefGroup = 7E29F00A228B548100CA7DD6 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -345,16 +375,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7E29F06C228B55C000CA7DD6 /* HLPSettingViewSubtitleCell.xib in Resources */,
-				7E29F017228B548200CA7DD6 /* LaunchScreen.storyboard in Resources */,
+				3013614026A0BF590050CF9E /* PreviewResource in Resources */,
 				7E29F014228B548200CA7DD6 /* Assets.xcassets in Resources */,
-				7E29F012228B548100CA7DD6 /* Main.storyboard in Resources */,
-				7E29F065228B55C000CA7DD6 /* HLPSettingViewSwitchCell.xib in Resources */,
-				7E29F071228B55FC00CA7DD6 /* destinations.yaml in Resources */,
-				7E29F069228B55C000CA7DD6 /* HLPSettingViewPickerCell.xib in Resources */,
-				7E29F06A228B55C000CA7DD6 /* HLPSettingViewSliderCell.xib in Resources */,
-				7E29F064228B55C000CA7DD6 /* HLPSettingView.strings in Resources */,
-				7E29F068228B55C000CA7DD6 /* HLPSettingViewTextCell.xib in Resources */,
+				097845C02531E65B004DE1F6 /* InfoPlist.strings in Resources */,
+				7E557F002581C79B00B1B9CA /* Localizable.strings in Resources */,
+				3099132B265DE50A000C1BFE /* Resource in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -374,75 +399,36 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		344AFD22189AB0DD2AE2C797 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-CaBot-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		50E93E96BF6CB2BF6BCE6CFC /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-CaBot/Pods-CaBot-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-CaBot/Pods-CaBot-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CaBot/Pods-CaBot-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		7E29F076228B5B8900CA7DD6 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/Carthage/Build/iOS/Yams.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/HLPLocationManager.framework",
-			);
-			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/Yams.framework",
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/HLPLocationManager.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "/usr/local/bin/carthage copy-frameworks\n";
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		7E29F005228B548100CA7DD6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7E29F066228B55C000CA7DD6 /* HLPSettingViewCell.m in Sources */,
-				7E29F067228B55C000CA7DD6 /* HLPSettingHelper.m in Sources */,
+				09725B0A24FE4AC300012D42 /* DialogViewControllerCabot.swift in Sources */,
+				30E50DD0269F76F000729ABD /* CaBotAppModel.swift in Sources */,
+				30E50DD7269F784A00729ABD /* OnboardGrantAccess.swift in Sources */,
+				30E50DE226A0BA5200729ABD /* DestinationsView.swift in Sources */,
+				3099132D26603B10000C1BFE /* LocalConversation.swift in Sources */,
+				30E50DE826A0BBE900729ABD /* ToursView.swift in Sources */,
+				30E99D94266A92EA001ACAAA /* JSHelper.swift in Sources */,
+				30E50DCE269F75DB00729ABD /* CaBotApp.swift in Sources */,
+				30E99D9226681097001ACAAA /* ResourceManager.swift in Sources */,
+				30E99D96266A993E001ACAAA /* Extension.swift in Sources */,
+				3013614726A1E77B0050CF9E /* WebContentView.swift in Sources */,
 				7E29F06D228B55C000CA7DD6 /* NavDeviceTTS.m in Sources */,
-				7E29F00F228B548100CA7DD6 /* ViewController.swift in Sources */,
-				7E29F00D228B548100CA7DD6 /* AppDelegate.swift in Sources */,
+				3013614326A0F8E10050CF9E /* TourDetailView.swift in Sources */,
+				30E50DD4269F77CE00729ABD /* RootView.swift in Sources */,
 				7EF5F1EA228DB07100788987 /* NavUtil.m in Sources */,
-				7E29F063228B55C000CA7DD6 /* HLPSetting.m in Sources */,
-				7E29F06B228B55C000CA7DD6 /* HLPSettingTableView.m in Sources */,
+				30E50DDF26A0B21200729ABD /* ConversationView.swift in Sources */,
+				3096BF1426A5C29F0066F256 /* SettingView.swift in Sources */,
+				30E50DD8269F784A00729ABD /* MainMenuView.swift in Sources */,
+				3096BF1826A5D0990066F256 /* TTSHelper.swift in Sources */,
+				30E50DDB269F7E3800729ABD /* CaBot.xcdatamodeld in Sources */,
+				30E50DDD269FCBC200729ABD /* ResourceSelectView.swift in Sources */,
 				7E29F072228B55FC00CA7DD6 /* CaBotService.swift in Sources */,
+				30E50DCC269F672800729ABD /* TourManager.swift in Sources */,
+				30E99DA4266B2216001ACAAA /* BeaconSampler.swift in Sources */,
+				30C3059E26B9036A00A1383A /* DestinationDetailView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -478,33 +464,23 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		7E29F010228B548100CA7DD6 /* Main.storyboard */ = {
+		097845C22531E65B004DE1F6 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				7E29F011228B548100CA7DD6 /* Base */,
+				097845C12531E65B004DE1F6 /* ja */,
+				097845C32531E685004DE1F6 /* en */,
 			);
-			name = Main.storyboard;
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		7E29F015228B548200CA7DD6 /* LaunchScreen.storyboard */ = {
+		7E557EFE2581C79B00B1B9CA /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				7E29F016228B548200CA7DD6 /* Base */,
+				7E557EFF2581C79B00B1B9CA /* Base */,
+				7E557F042581C80E00B1B9CA /* ja */,
+				3013614A26A2262B0050CF9E /* en */,
 			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-		7E29F04F228B55C000CA7DD6 /* HLPSettingView.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				7E29F050228B55C000CA7DD6 /* zh-Hans */,
-				7E29F051228B55C000CA7DD6 /* ja */,
-				7E29F053228B55C000CA7DD6 /* en */,
-				7E29F056228B55C000CA7DD6 /* ko */,
-				7E29F058228B55C000CA7DD6 /* Base */,
-				7E29F05C228B55C000CA7DD6 /* en-US */,
-			);
-			name = HLPSettingView.strings;
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -513,7 +489,10 @@
 		7E29F02F228B548200CA7DD6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -536,6 +515,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -561,7 +541,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -574,7 +554,10 @@
 		7E29F030228B548200CA7DD6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -597,6 +580,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -616,9 +600,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -628,23 +613,28 @@
 		};
 		7E29F032228B548200CA7DD6 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B903843AD4ECBA9B22E1A569 /* Pods-CaBot.debug.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = B98QB5W4Z4;
+				DEVELOPMENT_ASSET_PATHS = "\"CaBot/Views/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				INFOPLIST_FILE = CaBot/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = CMU.CaBotRemote.CaBot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = CaBot/bridging.h;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -653,23 +643,28 @@
 		};
 		7E29F033228B548200CA7DD6 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 35ECB82D33B1989C1B8B8CC7 /* Pods-CaBot.release.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = B98QB5W4Z4;
+				DEVELOPMENT_ASSET_PATHS = "\"CaBot/Views/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				INFOPLIST_FILE = CaBot/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = CMU.CaBotRemote.CaBot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = CaBot/bridging.h;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -798,6 +793,51 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3009AC2F26AA3F4000370873 /* XCRemoteSwiftPackageReference "HLPDialog" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hulop/HLPDialog";
+			requirement = {
+				branch = "swift-package";
+				kind = branch;
+			};
+		};
+		306C7F6A265D435100E5928E /* XCRemoteSwiftPackageReference "Yams" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/jpsim/Yams";
+			requirement = {
+				kind = exactVersion;
+				version = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3009AC3026AA3F4000370873 /* HLPDialog */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3009AC2F26AA3F4000370873 /* XCRemoteSwiftPackageReference "HLPDialog" */;
+			productName = HLPDialog;
+		};
+		306C7F6B265D435100E5928E /* Yams */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 306C7F6A265D435100E5928E /* XCRemoteSwiftPackageReference "Yams" */;
+			productName = Yams;
+		};
+/* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		30E50DD9269F7E3800729ABD /* CaBot.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				30E50DDA269F7E3800729ABD /* CaBot.xcdatamodel */,
+			);
+			currentVersion = 30E50DDA269F7E3800729ABD /* CaBot.xcdatamodel */;
+			path = CaBot.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 7E29F001228B548100CA7DD6 /* Project object */;
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019  Carnegie Mellon University
+ * Copyright (c) 2021  Carnegie Mellon University
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,13 +20,6 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-//
-//  CaBotUITests.swift
-//  CaBotUITests
-//
-//  Created by Daisuke Sato on 2019/05/14.
-//  Copyright © 2019 CMU. All rights reserved.
-//
 
 import XCTest
 

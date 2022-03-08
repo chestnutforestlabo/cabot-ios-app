@@ -20,10 +20,36 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-#ifndef bridging_h
-#define bridging_h
+import SwiftUI
 
-#include "NavDeviceTTS.h"
-#include "NavUtil.h"
+struct ToursView: View {
+    @EnvironmentObject var modelData: CaBotAppModel
+    
+    var url:URL
 
-#endif /* bridging_h */
+    var body: some View {
+        let tours = try! Tours(at: url)
+
+        Form {
+            Section(header: Text("SELECT_TOUR")) {
+                ForEach(tours.list, id: \.self) { tour in
+                    NavigationLink(
+                        destination: TourDetailView(tour: tour, showStartButton: true),
+                        label: {
+                            Text(tour.title)
+                        })
+                }
+            }
+        }.listStyle(PlainListStyle())
+    }
+}
+
+struct ToursView_Previews: PreviewProvider {
+    static var previews: some View {
+        let modelData = CaBotAppModel()
+
+        let resource = modelData.resourceManager.resource(by: "place0")!
+        return ToursView(url: resource.toursURL!)
+            .environmentObject(modelData)
+    }
+}

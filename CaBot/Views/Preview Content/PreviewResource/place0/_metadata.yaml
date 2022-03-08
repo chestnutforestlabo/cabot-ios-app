@@ -1,0 +1,25 @@
+name: place0
+language: en-US
+conversation:
+  type: local
+  src: place0.js
+destinations:
+  type: local
+  src: destinations_root.yaml
+tours:
+  type: local
+  src: tours.yaml
+custom_menus:
+  -
+    title: Custom Menu 0
+    id: custom_menu0
+    script:
+      type: local
+      src: place0.js
+    function: callCustomFunc
+location:
+  ibeacon-uuids:
+    - 474D7244-7A8E-1801-A53A-001C4D5092F6
+  lat: 35.6195
+  lng: 139.777
+  dist: 4000

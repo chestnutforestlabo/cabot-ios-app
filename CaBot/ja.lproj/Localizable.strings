@@ -1,0 +1,119 @@
+/*******************************************************************************
+ * Copyright (c) 2021  Carnegie Mellon University
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *******************************************************************************/
+
+
+"Main Menu"="メインメニュー";
+"Okay"="OK";
+"ERROR"="エラー";
+"Select"="選択してください";
+"Settings"="設定";
+"Select Resource"="リソースの選択";
+"Actions"="アクション";
+"Status"="ステータス";
+"System"="システム";
+
+"Suitcase may not be connected"="スーツケースが接続されていません";
+"Suitcase has been connected"="スーツケースが接続されました";
+"Suitcase has been disconnected"="スーツケースの接続が解除されました";
+
+"START_CONVERSATION"="対話を開始";
+"SELECT_DESTINATION"="行き先を選択";
+"SELECT_TOUR"="ツアーを選択";
+"See detail"="詳細を見る";
+
+"PAUSE_NAVIGATION"="ナビゲーションを一時停止";
+"CANCEL_NAVIGATION"="ナビゲーションを中止";
+"CANCEL_NAVIGATION_MESSAGE"="%d個の目的地が設定されています。全てキャンセルしてよろしいですか？";
+"CANCEL_ALL"="全ての目的地を中止";
+"START"="ナビゲーションを開始";
+
+"Destinations"="目的地";
+"SETTINGS_LABEL"="設定";
+"SET_TOUR"="ツアーを設定する";
+"ADD_A_DESTINATION"="目的地を追加する";
+"ADD_A_DESTINATION_MESSAGE"="既に%d個の目的地が設定されています。どのようにしますか？";
+"CLEAR_ALL_THEN_ADD"="全部消してから追加する";
+"ADD_TO_FIRST"="最初に追加する";
+"ADD_TO_LAST"="最後に追加する";
+"ADD_TOUR"="これらの行先を追加する";
+"ADD_TOUR_MESSAGE"="既に%d個の目的地が設定されていますが、上書きしてよろしいですか？";
+"OVERWRITE_TOUR"="上書きする";
+"SELECT_RESOURCE"="リソースの選択";
+"Hello Suitcase!"="こんにちは、スーツケース";
+
+"Speech Voice"="読み上げ音声";
+"Voice"="音声";
+"Speech Speed"="速度";
+"Audio Effect"="効果音";
+"Start"="開始";
+"Arrived"="到着";
+"SpeedUp"="速度上";
+"SpeedDown"="速度下";
+"Others"="その他";
+"Navigation"="ナビゲーション";
+"Connection"="接続";
+
+"Suitcase Connected"="スーツケース接続あり";
+"Suitcase and Backpack Connected"="スーツケース、バックパック接続あり";
+"Suitcase Not Connected"="スーツケース接続なし";
+
+"processing..."="処理中...";
+"Navigating to %@"="%@に移動ちゅう";
+"Going to %@"="%@に移動します。";
+"You have arrived at %@"="%@に到着しました。";
+"Open Content for %@"="%@の説明ページを開く";
+"Let the suitcase wait"="スーツケースを待たせる";
+"Let the suitcase wait message"="%@にスーツケースを待たせるコマンドを送ろうとしています。よろしいですか？";
+"Yes"="はい";
+"No"="いいえ";
+"Let the suitcase wait at %@"="%@にスーツケースを待たせる";
+"Sending the command to the suitcase"="スーツケースに指示を送っています。ハンドルから手を離してください。";
+
+"ONBOARD_MESSAGE"="位置情報、Bluetooth、通知の利用を許可してください";
+"Enable Location Update"="位置情報を許可する";
+"Location Update Enabled"="位置情報が許可されました";
+"Location Update Denied"="位置情報が許可されませんでした";
+"Enable Bluetooth"="Bluetoothを許可する";
+"Bluetooth Denied"="Bluetoothが許可されませんでした";
+"Bluetooth Enabled"="Bluetoothが許可されました";
+"Bluetooth is Off"="Bluetoothがオフです";
+"Running on Simulator?"="シミュレーターで実行中？";
+"bluetoothState error"="bluetoothStateのエラー";
+"Enable Notification"="通知を許可する";
+"Notification Enabled"="通知が許可されました";
+"Notification Denied"="通知が許可されませんでした";
+
+"Complete Destination"="目的地に到着";
+"Complete Destination Message"="目的地に到着したことにしてよろしいですか？";
+
+"You can check detail of %@ on the phone"="%@の詳細についてスマホを使って読むことができます。";
+"You can proceed by pressing the right button of the suitcase handle"="スーツケースハンドルの右ボタンを押すと進みます。";
+
+"No destination is selected"="目的地が設定されていません";
+
+"Show more detail"="詳細を表示する";
+"Add to destinations"="目的地に追加する";
+
+"VoiceOver adjustment"="VoiceOver 調整";
+"Delay after closing browser"="ブラウザを閉じた後の待ち時間";
+"%.1f seconds"="%.1f秒";
+"%.1f sec"="%.1f秒";

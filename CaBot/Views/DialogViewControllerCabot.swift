@@ -20,10 +20,24 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-#ifndef bridging_h
-#define bridging_h
 
-#include "NavDeviceTTS.h"
-#include "NavUtil.h"
+import Foundation
+import HLPDialog
 
-#endif /* bridging_h */
+class DialogViewControllerCabot : DialogViewController{
+    var modelURL: URL?
+    var voice: AVSpeechSynthesisVoice?
+
+    override func viewDidLoad() {
+        self.tts = CaBotTTS(voice: self.voice!)
+        //self.tts = SilverDefaultTTS()
+
+        if self.baseHelper == nil {
+            self.baseHelper = DialogViewHelper()
+        }
+    }
+
+    override func getConversation(pre: Locale) -> HLPConversation {
+        return LocalConversation(withScript: modelURL!)
+    }
+}

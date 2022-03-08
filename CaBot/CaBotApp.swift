@@ -20,10 +20,40 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-#ifndef bridging_h
-#define bridging_h
+import SwiftUI
+import CoreBluetooth
+import CoreLocation
+import HealthKit
+import os.log
 
-#include "NavDeviceTTS.h"
-#include "NavUtil.h"
+@main
+struct CaBotApp: App {
+    @Environment(\.scenePhase) var scenePhase
+    
+    var modelData: CaBotAppModel = CaBotAppModel(preview: false)
 
-#endif /* bridging_h */
+    var body: some Scene {
+        WindowGroup {
+            RootView()
+                .environmentObject(modelData)
+        }.onChange(of: scenePhase) { newScenePhase in
+
+            modelData.onChange(of: newScenePhase)
+
+            switch newScenePhase {
+            case .background:
+                break
+            case .inactive:
+                break
+            case .active:
+                let isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
+                if isVoiceOverRunning {
+                    modelData.service.tts.stop()
+                }
+                break
+            @unknown default:
+                break
+            }
+        }
+    }
+}

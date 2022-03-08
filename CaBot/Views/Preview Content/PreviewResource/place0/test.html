@@ -1,0 +1,29 @@
+<html>
+<head>
+<script>
+function setStatus(text) {
+  document.getElementById("status").innerHTML += text + "<br>"
+}
+
+function test() {
+    try {
+        setStatus("calling")
+        var promise = window.webkit.messageHandlers.Test.postMessage({name: "Test", value: 100})
+        setStatus("called")
+        promise.then(function(result) {
+          setStatus("promised "+JSON.stringify(result))
+        })
+    } catch (e) {
+        setStatus("exception "+e.message)
+    }
+}
+</script>
+<meta name="viewport" content="width=device-width">
+</head>
+<body>
+<h1>Preview Content Test</h1>
+<div id="status"></div>
+<button onclick="test()"/>Push to call native</button>
+</body>
+</html>
+

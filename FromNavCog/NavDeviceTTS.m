@@ -56,7 +56,7 @@ static NavDeviceTTS *instance = nil;
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(voiceOverStatusChanged)
-                                                 name:UIAccessibilityVoiceOverStatusChanged
+                                                 name:UIAccessibilityVoiceOverStatusDidChangeNotification
                                                object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -90,7 +90,7 @@ static NavDeviceTTS *instance = nil;
     voice.delegate = self;
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        speakTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(processSpeak:) userInfo:nil repeats:YES];
+        self->speakTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(processSpeak:) userInfo:nil repeats:YES];
     });
 }
 
@@ -110,6 +110,9 @@ static NavDeviceTTS *instance = nil;
         isSpeaking = NO;
         [voice stopSpeakingAtBoundary:immediate?AVSpeechBoundaryImmediate:AVSpeechBoundaryWord];
     }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"");
+    });
 }
 
 - (BOOL)isSpeaking
@@ -174,38 +177,46 @@ static NavDeviceTTS *instance = nil;
     }
 }
 
-- (AVSpeechUtterance *)speak:(NSString *)text withOptions:(NSDictionary *)options completionHandler:(void (^)())handler
+- (AVSpeechUtterance *)speak:(NSString *)text withOptions:(NSDictionary *)options completionHandler:(void (^)(void))handler
 {
     BOOL force = [options[@"force"] boolValue];
     BOOL selfspeak = [options[@"selfspeak"] boolValue];
     BOOL nohistory = [options[@"nohistory"] boolValue];
     BOOL quickAnswer = [options[@"quickAnswer"] boolValue];
+    double speechRate = 0.5;
+
     AVSpeechSynthesisVoice *aVoice = nil;
     if (options[@"lang"]) {
         aVoice = [NavDeviceTTS getVoiceOfLang:options[@"lang"]];
     }
-    
-    return [self _speak:text force:force selfvoicing:selfspeak nohistory:nohistory quickAnswer:quickAnswer voice:aVoice completionHandler:handler];
+    if (options[@"voice"]) {
+        aVoice = options[@"voice"];
+    }
+    if (options[@"rate"]) {
+        speechRate = [options[@"rate"] doubleValue];
+    }
+
+    return [self _speak:text force:force selfvoicing:selfspeak nohistory:nohistory quickAnswer:quickAnswer rate:speechRate voice:aVoice completionHandler:handler];
 }
 
-- (AVSpeechUtterance *)selfspeak:(NSString *)text completionHandler:(void (^)())handler
+- (AVSpeechUtterance *)selfspeak:(NSString *)text completionHandler:(void (^)(void))handler
 {
     return [self selfspeak:text force:NO completionHandler:handler];
 }
 
-- (AVSpeechUtterance *)selfspeak:(NSString *)text force:(BOOL)flag completionHandler:(void (^)())handler
+- (AVSpeechUtterance *)selfspeak:(NSString *)text force:(BOOL)flag completionHandler:(void (^)(void))handler
 {
-    return [self _speak:text force:flag selfvoicing:YES nohistory:YES quickAnswer:NO voice:nil completionHandler:handler];
+    return [self _speak:text force:flag selfvoicing:YES nohistory:YES quickAnswer:NO rate:0.5 voice:nil completionHandler:handler];
 }
 
-- (AVSpeechUtterance*) speak: (NSString*) text completionHandler:(void (^)())handler
+- (AVSpeechUtterance*) speak: (NSString*) text completionHandler:(void (^)(void))handler
 {
     return [self speak:text force:NO completionHandler:handler];
 }
 
-- (AVSpeechUtterance*) speak:(NSString*)text force:(BOOL)flag completionHandler:(void (^)())handler
+- (AVSpeechUtterance*) speak:(NSString*)text force:(BOOL)flag completionHandler:(void (^)(void))handler
 {
-    return [self _speak:text force:flag selfvoicing:NO nohistory:NO quickAnswer:NO voice:nil completionHandler:handler];
+    return [self _speak:text force:flag selfvoicing:NO nohistory:NO quickAnswer:NO rate:0.5 voice:nil completionHandler:handler];
 }
 
 - (AVSpeechUtterance*) _speak:(NSString*)text
@@ -213,8 +224,9 @@ static NavDeviceTTS *instance = nil;
                   selfvoicing:(BOOL)selfvoicing
                     nohistory:(BOOL)nohistory
                   quickAnswer:(BOOL)quickAnswer
+                         rate:(double)speechRate
                         voice:(AVSpeechSynthesisVoice*)voice_
-            completionHandler:(void (^)())handler
+            completionHandler:(void (^)(void))handler
 {
     if (text == nil) {
         handler();
@@ -228,14 +240,18 @@ static NavDeviceTTS *instance = nil;
     int keep = 0;
     int start = 0;
     BOOL isFirst = YES;
-    NSString *pauseStr = NSLocalizedStringFromTable(@"TTS_PAUSE_CHAR", @"BlindView", @"");
+    NSLog(@"voice language = %@", voice_.language);
+    NSString *pauseStr = @".";
+    if ([voice_.language isEqualToString:@"ja-JP"]) {
+        pauseStr = @"。";
+    }
     for(int i = 0; i < [text length]; i++) {
         if ([[text substringWithRange:NSMakeRange(i, 1)] isEqualToString:pauseStr]) {
             keep++;
         } else if ([[text substringWithRange:NSMakeRange(i, 1)] isEqualToString:@" "]) {
         } else {
             if (keep >= 3) {
-                [self _speak:[text substringWithRange:NSMakeRange(start, i-keep)] force:flag && isFirst selfvoicing:selfvoicing nohistory:nohistory quickAnswer:quickAnswer voice:nil completionHandler:nil];
+                [self _speak:[text substringWithRange:NSMakeRange(start, i-keep)] force:flag && isFirst selfvoicing:selfvoicing nohistory:nohistory quickAnswer:quickAnswer rate:speechRate voice:nil completionHandler:nil];
                 [self pause:0.1*keep];
                 text = [text substringFromIndex:i];
                 flag = NO;
@@ -244,8 +260,6 @@ static NavDeviceTTS *instance = nil;
             keep = 0;
         }
     }
-    
-    double speechRate = [[NSUserDefaults standardUserDefaults] doubleForKey:SPEECH_SPEED];
     
     NSLog(@"speak_queue,%@,%@,%f", text, flag?@"Force":@"", NSDate.date.timeIntervalSince1970);
     HLPSpeechEntry *se = [[HLPSpeechEntry alloc] init];
@@ -300,7 +314,7 @@ static NavDeviceTTS *instance = nil;
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(se.pauseDuration * NSEC_PER_SEC));
         //NSLog(@"speak_pause(%.2f)", se.pauseDuration);
         dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-            isProcessing = NO;
+            self->isProcessing = NO;
         });
         return;
     }
