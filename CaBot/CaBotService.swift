@@ -47,13 +47,17 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     func generateUUID(handle:Int) -> CBUUID {
         return CBUUID(string: String(format:CaBotService.UUID_FORMAT, handle))
     }
-    
+
+    fileprivate var tts:CaBotTTS
+
+    init(with tts:CaBotTTS) {
+        self.tts = tts
+    }
 
     public var delegate:CaBotServiceDelegate?
     public var teamID:String? = nil
     public var faceappReady:Bool = false
     public var peripheralManager:CBPeripheralManager!
-    public var tts:CaBotTTS = CaBotTTS(voice: nil)
 
     private let uuid = CBUUID(string: String(format:UUID_FORMAT, 0x0000))
     private var summonsChar:CaBotNotifyChar!
@@ -67,10 +71,9 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     private let peripheralRestoreKey:String = UUID().uuidString
     private var serviceAdded:Bool = false
 
-    override init(){
-        super.init()
+    func startIfAuthorized() {
         if (CBCentralManager.authorization == .allowedAlways) {
-            start(); 
+            self.start();
         }
     }
 
@@ -128,10 +131,6 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
                 }
             }
         }
-    }
-
-    public func setVoice(_ voice: AVSpeechSynthesisVoice) {
-        tts.voice = voice
     }
     
     public func send(destination: String) -> Bool {

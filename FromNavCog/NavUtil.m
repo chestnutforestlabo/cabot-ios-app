@@ -59,20 +59,22 @@ static NSMutableDictionary<NSString*, UIView*>* messageViewMap;
 +(void)showModalWaitingWithMessage:(NSString *)message
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        UIView *view = [[[UIApplication sharedApplication] windows][0] visibleViewController].view;
-        //NSArray *subViews = [[[[UIApplication sharedApplication] delegate] window] subviews];
-        //UIView *view = [subViews lastObject];
-        [NavUtil showWaitingForView:view withMessage:message];
+        NSArray* windows = [[UIApplication sharedApplication] windows];
+        if (windows.count > 0) {
+            UIView *view = [windows[0] visibleViewController].view;
+            [NavUtil showWaitingForView:view withMessage:message];
+        }
     });
 }
 
 +(void)hideModalWaiting
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        UIView *view = [[[UIApplication sharedApplication] windows][0] visibleViewController].view;
-        //NSArray *subViews = [[[[UIApplication sharedApplication] delegate] window] subviews];
-        //UIView *view = [subViews lastObject];
-        [NavUtil hideWaitingForView:view];
+        NSArray* windows = [[UIApplication sharedApplication] windows];
+        if (windows.count > 0) {
+            UIView *view = [windows[0] visibleViewController].view;
+            [NavUtil hideWaitingForView:view];
+        }
     });
 }
 

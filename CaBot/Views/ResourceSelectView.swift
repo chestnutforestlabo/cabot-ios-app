@@ -32,10 +32,10 @@ struct ResourceSelectView: View {
             Section(header:Text("Select Resource")) {
                 ForEach (model.resourceManager.resources, id: \.self) { resource in
                     Button(action: {
+                        UserDefaults.standard.setValue(true, forKey: ResourceSelectView.resourceSelectedKey)
+                        UserDefaults.standard.synchronize()
+                        model.resource = resource
                         withAnimation() {
-                            UserDefaults.standard.setValue(true, forKey: ResourceSelectView.resourceSelectedKey)
-                            UserDefaults.standard.synchronize()
-                            model.resource = resource
                             model.displayedScene = .App
                         }
                     }) {
@@ -45,16 +45,8 @@ struct ResourceSelectView: View {
                         }
                     }
                 }
-                //.onDelete(perform: delete)
             }
         }
-        .onAppear(perform: {
-            if let value = UserDefaults.standard.value(forKey: ResourceSelectView.resourceSelectedKey) as? Bool {
-                if value {
-                    model.displayedScene = .App
-                }
-            }
-        })
     }
 }
 

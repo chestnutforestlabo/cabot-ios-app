@@ -27,26 +27,24 @@ struct MainMenuView: View {
     @EnvironmentObject var modelData: CaBotAppModel
 
     var body: some View {
-        VStack {
-            Form {
-                if modelData.noSuitcaseDebug {
-                    Label("No Suitcase Debug mode (better to restart app to connect to a suitcase)", systemImage: "exclamationmark.triangle")
-                        .foregroundColor(.red)
-                }
-                if hasAnyAction() {
-                    ActionMenus()
-                    .environmentObject(modelData)
-                }
-                DestinationMenus()
-                    .environmentObject(modelData)
-                MainMenus()
-                    .environmentObject(modelData)
-                    .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
-                StatusMenus()
-                    .environmentObject(modelData)
-                SettingMenus()
+        Form {
+            if modelData.noSuitcaseDebug {
+                Label("No Suitcase Debug mode (better to restart app to connect to a suitcase)", systemImage: "exclamationmark.triangle")
+                    .foregroundColor(.red)
+            }
+            if hasAnyAction() {
+                ActionMenus()
                     .environmentObject(modelData)
             }
+            DestinationMenus()
+                .environmentObject(modelData)
+            MainMenus()
+                .environmentObject(modelData)
+                .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
+            StatusMenus()
+                .environmentObject(modelData)
+            SettingMenus()
+                .environmentObject(modelData)
         }
     }
 
@@ -151,7 +149,7 @@ struct DestinationMenus: View {
                                                     .destructive(
                                                         Text("Complete Destination"),
                                                         action: {
-                                                            modelData.cabot(service: modelData.service, notification: .arrived)
+                                                            modelData.debugCabotArrived()
                                                         }
                                                     )
                                                    ])
@@ -284,19 +282,22 @@ struct ContentView_Previews: PreviewProvider {
         preview_tour
         //preview_tour2
         //preview_tour3
-        preview_tour4
+        //preview_tour4
         //preview
         //preview_ja
     }
 
     static var preview_tour: some View {
         let modelData = CaBotAppModel()
+        modelData.menuDebug = true
+        modelData.noSuitcaseDebug = true
 
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
             if let url = r.toursURL {
                 if let tours = try? Tours(at: url) {
                     modelData.tourManager.set(tour: tours.list[0])
+                    modelData.tourManager.nextDestination()
                 }
             }
         }
@@ -313,7 +314,6 @@ struct ContentView_Previews: PreviewProvider {
             if let url = r.toursURL {
                 if let tours = try? Tours(at: url) {
                     modelData.tourManager.set(tour: tours.list[0])
-                    modelData.tourManager.nextDestination()
                 }
             }
         }
@@ -346,7 +346,6 @@ struct ContentView_Previews: PreviewProvider {
             if let url = r.toursURL {
                 if let tours = try? Tours(at: url) {
                     modelData.tourManager.set(tour: tours.list[1])
-                    modelData.tourManager.nextDestination()
                 }
             }
         }

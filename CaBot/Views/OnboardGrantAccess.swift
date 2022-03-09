@@ -38,7 +38,7 @@ struct OnboardGrantAccess: View {
 
             Button(action: {
                 userAction = true
-                modelData.locationManager.requestAlwaysAuthorization()
+                modelData.requestLocationAuthorization()
             }) {
                 switch(modelData.locationState) {
                 case .Init:
@@ -57,8 +57,7 @@ struct OnboardGrantAccess: View {
 
             Button(action: {
                 userAction = true
-                modelData.service.start()
-                modelData.service.startAdvertising()
+                modelData.requestBluetoothAuthorization()
             }) {
                 switch(modelData.bluetoothState) {
                 case .unknown:
@@ -82,15 +81,7 @@ struct OnboardGrantAccess: View {
 
             Button(action: {
                 userAction = true
-                let center = UNUserNotificationCenter.current()
-
-                center.requestAuthorization(options:[UNAuthorizationOptions.alert,
-                                                     UNAuthorizationOptions.sound]) {
-                    (granted, error) in
-                    DispatchQueue.main.async {
-                        modelData.notificationState = granted ? .Granted : .Denied
-                    }
-                }
+                modelData.requestNotificationAuthorization()
             }) {
                 switch(modelData.notificationState) {
                 case .Init:
@@ -106,40 +97,6 @@ struct OnboardGrantAccess: View {
             .padding()
             .disabled(modelData.notificationState != .Init)
             .frame(width:250, alignment: .leading)
-
-        }
-        .onChange(of: modelData.bluetoothState, perform: { value in
-            checkCondition()
-        })
-        .onChange(of: modelData.notificationState, perform: { value in
-            checkCondition()
-        })
-        .onAppear(perform: {
-            let center = UNUserNotificationCenter.current()
-            center.getNotificationSettings { settings in
-                DispatchQueue.main.async {
-                    if settings.alertSetting == .enabled &&
-                        settings.soundSetting == .enabled {
-                        modelData.notificationState = .Granted
-                    } else {
-                    }
-                }
-            }
-        })
-    }
-
-    func checkCondition() {
-        if modelData.bluetoothState == .poweredOn &&
-            modelData.notificationState != .Init &&
-            modelData.locationState != .Init
-            {
-            if userAction {
-                withAnimation() {
-                    modelData.displayedScene = .ResourceSelect
-                }
-            } else {
-                modelData.displayedScene = .ResourceSelect
-            }
         }
     }
 }

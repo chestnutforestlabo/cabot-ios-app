@@ -70,10 +70,43 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     private let speedDownSoundKey = "speedDownSoundKey"
     private let browserCloseDelayKey = "browserCloseDelayKey"
 
-    @Published var locationState: GrantState = .Init
-    @Published var bluetoothState: CBManagerState = .unknown
-    @Published var notificationState: GrantState = .Init
+    @Published var locationState: GrantState = .Init {
+        didSet {
+            self.checkOnboardCondition()
+        }
+    }
+    @Published var bluetoothState: CBManagerState = .unknown {
+        didSet {
+            self.checkOnboardCondition()
+        }
+    }
+    @Published var notificationState: GrantState = .Init {
+        didSet {
+            self.checkOnboardCondition()
+        }
+    }
+    func checkOnboardCondition() {
+        if self.bluetoothState == .poweredOn &&
+            self.notificationState != .Init &&
+            self.locationState != .Init
+            {
+            if authRequestedByUser {
+                withAnimation() {
+                    self.displayedScene = .ResourceSelect
+                }
+            } else {
+                self.displayedScene = .ResourceSelect
+            }
+        }
+        if self.displayedScene == .ResourceSelect {
+            guard let value = UserDefaults.standard.value(forKey: ResourceSelectView.resourceSelectedKey) as? Bool else { return }
+            if value {
+                displayedScene = .App
+            }
+        }
+    }
     @Published var displayedScene: DisplayedScene = .Onboard
+    var authRequestedByUser: Bool = false
 
     @Published var resource: Resource? = nil {
         didSet {
@@ -100,7 +133,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                 UserDefaults.standard.synchronize()
 
                 if let voice = self.voice {
-                    self.service.setVoice(voice.AVvoice)
+                    self.tts.voice = voice.AVvoice
                 }
             }
         }
@@ -109,7 +142,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         didSet {
             UserDefaults.standard.setValue(speechRate, forKey: speechRateKey)
             UserDefaults.standard.synchronize()
-            service.tts.rate = speechRate
+            self.tts.rate = speechRate
         }
     }
 
@@ -120,9 +153,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         didSet {
             UserDefaults.standard.setValue(teamID, forKey: teamIDKey)
             UserDefaults.standard.synchronize()
-            service.stopAdvertising()
-            service.teamID = self.teamID
-            service.startAdvertising()
+            bleService.stopAdvertising()
+            bleService.teamID = self.teamID
+            bleService.startAdvertising()
         }
     }
     @Published var menuDebug: Bool = false {
@@ -175,7 +208,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         }
     }
 
-    let service: CaBotService
+    private let bleService: CaBotService
+    private let tts: CaBotTTS
     let preview: Bool
     let resourceManager: ResourceManager
     let tourManager: TourManager
@@ -194,16 +228,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
 
     init(preview: Bool) {
         self.preview = preview
-        self.service = CaBotService()
+        self.tts = CaBotTTS(voice: nil)
+        self.bleService = CaBotService(with: self.tts)
         self.resourceManager = ResourceManager(preview: preview)
         self.tourManager = TourManager()
         self.dialogViewHelper = DialogViewHelper()
         self.locationManager =  CLLocationManager()
         self.notificationCenter = UNUserNotificationCenter.current()
         super.init()
-        self.tourManager.delegate = self
-        self.service.delegate = self
-        self.locationManager.delegate = self
 
         if let selectedName = UserDefaults.standard.value(forKey: selectedResourceKey) as? String {
             self.resource = resourceManager.resource(by: selectedName)
@@ -223,6 +255,24 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         if let browserCloseDelay = UserDefaults.standard.value(forKey: browserCloseDelayKey) as? Double {
             self.browserCloseDelay = browserCloseDelay
         }
+
+        // services
+        self.locationManager.delegate = self
+        self.locationManagerDidChangeAuthorization(self.locationManager)
+
+        self.bleService.delegate = self
+        self.bleService.startIfAuthorized()
+
+        self.notificationCenter.getNotificationSettings { settings in
+            if settings.alertSetting == .enabled &&
+                settings.soundSetting == .enabled {
+                self.notificationState = .Granted
+            }
+            self.checkOnboardCondition()
+        }
+
+        // tour manager
+        self.tourManager.delegate = self
     }
 
     func onChange(of newScenePhase: ScenePhase) {
@@ -253,81 +303,26 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         notificationCenter.setNotificationCategories([generalCategory])
     }
 
+    // MARK: onboading
 
-    func requestAuthorization() {
-        self.service.startAdvertising()
+    func requestLocationAuthorization() {
+        self.authRequestedByUser = true
+        self.locationManager.requestAlwaysAuthorization()
     }
 
-    func centralManagerDidUpdateState(_ central: CBCentralManager) {
-
+    func requestBluetoothAuthorization() {
+        self.authRequestedByUser = true
+        self.bleService.start()
+        self.bleService.startAdvertising()
     }
 
-    // MARK: public functions
-
-    func resetAudioSession() {
-        let audioSession = AVAudioSession.sharedInstance()
-        do {
-            try audioSession.setCategory(.playback,
-                                         mode: .spokenAudio,
-                                         options: [])
-        } catch {
-            NSLog("audioSession category weren't set because of an error. \(error)")
-        }
-        do {
-            try audioSession.setActive(true, options: [])
-        } catch {
-            NSLog("audioSession cannot be set active. \(error)")
-        }
-    }
-
-    func open(content: URL) {
-        contentURL = content
-        isContentPresenting = true
-    }
-
-    func summon(destination: String) -> Bool {
-        DispatchQueue.main.async {
-            print("Show modal waiting")
-            NavUtil.showModalWaiting(withMessage: NSLocalizedString("processing...", comment: ""))
-        }
-        if self.service.summon(destination: destination) || self.noSuitcaseDebug {
-            self.service.tts.speak(NSLocalizedString("Sending the command to the suitcase", comment: "")) {}
+    func requestNotificationAuthorization() {
+        self.authRequestedByUser = true
+        self.notificationCenter.requestAuthorization(options:[UNAuthorizationOptions.alert,
+                                             UNAuthorizationOptions.sound]) {
+            (granted, error) in
             DispatchQueue.main.async {
-                print("hide modal waiting")
-                NavUtil.hideModalWaiting()
-            }
-            return true
-        } else {
-            DispatchQueue.main.async {
-                print("hide modal waiting")
-                NavUtil.hideModalWaiting()
-            }
-            DispatchQueue.main.async {
-                let message = NSLocalizedString("Suitcase may not be connected", comment: "")
-
-                self.service.tts.speak(message) {}
-            }
-            return false
-        }
-    }
-
-    func playAudio(file: String) {
-        DispatchQueue.main.async {
-            let fileURL: URL = URL(fileURLWithPath: file)
-            do {
-                self.audioPlayer = try AVAudioPlayer(contentsOf: fileURL)
-                self.audioPlayer.play()
-            } catch {
-                print("\(error)")
-            }
-        }
-    }
-
-    func needToStartAnnounce(wait: Bool) {
-        let delay = wait ? self.browserCloseDelay : 0
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            self.service.tts.speak(NSLocalizedString("You can proceed by pressing the right button of the suitcase handle", comment: "")) {
+                self.notificationState = granted ? .Granted : .Denied
             }
         }
     }
@@ -371,6 +366,89 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     }
 
 
+
+    // MARK: public functions
+
+    func resetAudioSession() {
+        let audioSession = AVAudioSession.sharedInstance()
+        do {
+            try audioSession.setCategory(.playback,
+                                         mode: .spokenAudio,
+                                         options: [])
+        } catch {
+            NSLog("audioSession category weren't set because of an error. \(error)")
+        }
+        do {
+            try audioSession.setActive(true, options: [])
+        } catch {
+            NSLog("audioSession cannot be set active. \(error)")
+        }
+    }
+
+    func open(content: URL) {
+        contentURL = content
+        isContentPresenting = true
+    }
+
+    func summon(destination: String) -> Bool {
+        DispatchQueue.main.async {
+            print("Show modal waiting")
+            NavUtil.showModalWaiting(withMessage: NSLocalizedString("processing...", comment: ""))
+        }
+        if self.bleService.summon(destination: destination) || self.noSuitcaseDebug {
+            self.speak(NSLocalizedString("Sending the command to the suitcase", comment: "")) {}
+            DispatchQueue.main.async {
+                print("hide modal waiting")
+                NavUtil.hideModalWaiting()
+            }
+            return true
+        } else {
+            DispatchQueue.main.async {
+                print("hide modal waiting")
+                NavUtil.hideModalWaiting()
+            }
+            DispatchQueue.main.async {
+                let message = NSLocalizedString("Suitcase may not be connected", comment: "")
+
+                self.speak(message) {}
+            }
+            return false
+        }
+    }
+
+    func speak(_ text:String, callback: @escaping () -> Void) {
+        if (preview) {
+            print("previewing speak - \(text)")
+        } else {
+            self.tts.speak(text, callback: callback)
+        }
+    }
+
+    func stopSpeak() {
+        self.tts.stop()
+    }
+
+    func playAudio(file: String) {
+        DispatchQueue.main.async {
+            let fileURL: URL = URL(fileURLWithPath: file)
+            do {
+                self.audioPlayer = try AVAudioPlayer(contentsOf: fileURL)
+                self.audioPlayer.play()
+            } catch {
+                print("\(error)")
+            }
+        }
+    }
+
+    func needToStartAnnounce(wait: Bool) {
+        let delay = wait ? self.browserCloseDelay : 0
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            self.speak(NSLocalizedString("You can proceed by pressing the right button of the suitcase handle", comment: "")) {
+            }
+        }
+    }
+
     // MARK: TourManagerDelegate
     func tourUpdated(manager: TourManager) {
         tourUpdated = true
@@ -385,9 +463,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                     manager.cannotStartCurrent()
                 } else {
                     // cancel all announcement
-                    var delay = self.service.tts.isSpeaking ? 1.0 : 0
+                    var delay = self.tts.isSpeaking ? 1.0 : 0
 
-                    self.service.tts.stop(true)
+                    self.tts.stop(true)
 
                     if self.isContentPresenting {
                         self.isContentPresenting = false
@@ -400,7 +478,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                         let announce = String(format:NSLocalizedString("Going to %@", comment: ""), arguments: [dest.pron ?? dest.title])
                             + (dest.message?.content ?? "")
 
-                        self.service.tts.speak(announce){
+                        self.speak(announce){
                         }
                     }
                 }
@@ -415,7 +493,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
             print("Show modal waiting")
             NavUtil.showModalWaiting(withMessage: NSLocalizedString("processing...", comment: ""))
         }
-        if service.send(destination: destination) || self.noSuitcaseDebug  {
+        if bleService.send(destination: destination) || self.noSuitcaseDebug  {
             DispatchQueue.main.async {
                 print("hide modal waiting")
                 NavUtil.hideModalWaiting()
@@ -429,7 +507,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
             DispatchQueue.main.async {
                 let message = NSLocalizedString("Suitcase may not be connected", comment: "")
 
-                self.service.tts.speak(message) {}
+                self.speak(message) {}
             }
             return false
         }
@@ -444,7 +522,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
             let text = centralConnected ? NSLocalizedString("Suitcase has been connected", comment: "") :
                 NSLocalizedString("Suitcase has been disconnected", comment: "")
 
-            service.tts.speak(text, force: true) {
+            self.tts.speak(text, force: true) {
             }
         }
     }
@@ -489,7 +567,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
             if tourManager.nextDestination() {
                 self.playAudio(file: self.startSound)
             }else {
-                self.service.tts.speak(NSLocalizedString("No destination is selected", comment: "")) {
+                self.speak(NSLocalizedString("No destination is selected", comment: "")) {
                 }
             }
             break
@@ -506,7 +584,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                     announce += NSLocalizedString("You can proceed by pressing the right button of the suitcase handle", comment: "")
                 }
 
-                self.service.tts.speak(announce) {
+                self.speak(announce) {
                     // if user pressed the next button while reading announce, skip open content
                     if self.tourManager.currentDestination == nil {
                         if let contentURL = cd.content?.url {
@@ -517,6 +595,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
             }
             break
         }
+    }
+
+    func debugCabotArrived() {
+        self.cabot(service: self.bleService, notification: .arrived)
     }
 }
 

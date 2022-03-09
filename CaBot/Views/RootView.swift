@@ -81,10 +81,21 @@ struct RootView: View {
 
 struct RootView_Previews: PreviewProvider {
     static var previews: some View {
+        previewApp
         previewContent
         previewSelect
-        previewApp
-        preview
+        previewOnboard
+    }
+
+    static var previewApp: some View {
+        let modelData = CaBotAppModel()
+        modelData.displayedScene = .ResourceSelect
+        modelData.suitcaseConnected = false
+        modelData.backpackConnected = false
+        modelData.resource = modelData.resourceManager.resource(by: "place0")
+
+        return RootView()
+            .environmentObject(modelData)
     }
 
     static var previewContent: some View {
@@ -98,15 +109,6 @@ struct RootView_Previews: PreviewProvider {
 
     }
 
-    static var preview: some View {
-        let modelData = CaBotAppModel()
-        modelData.suitcaseConnected = false
-        modelData.backpackConnected = false
-
-        return RootView()
-            .environmentObject(modelData)
-    }
-
     static var previewSelect: some View {
         let modelData = CaBotAppModel()
         modelData.displayedScene = .ResourceSelect
@@ -118,12 +120,10 @@ struct RootView_Previews: PreviewProvider {
             .environmentObject(modelData)
     }
 
-    static var previewApp: some View {
+    static var previewOnboard: some View {
         let modelData = CaBotAppModel()
-        modelData.displayedScene = .App
         modelData.suitcaseConnected = false
         modelData.backpackConnected = false
-        modelData.resource = modelData.resourceManager.resource(by: "place0")
 
         return RootView()
             .environmentObject(modelData)
