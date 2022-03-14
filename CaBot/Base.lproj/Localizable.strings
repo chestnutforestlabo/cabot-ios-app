@@ -31,9 +31,17 @@
 "Status"="Status";
 "System"="System";
 
+"Device Status"="Device Status";
+"System Status"="System Status";
+"OK"="OK";
+"NG"="NG";
+"Unknown"="Unknown";
+"Starting"="Starting";
+
 "Suitcase may not be connected"="Suitcase may not be connected";
 "Suitcase has been connected"="Suitcase has been connected";
 "Suitcase has been disconnected"="Suitcase has been disconnected";
+"Protocol mismatch %@"="Protocol mismatch %@";
 
 "START_CONVERSATION"="Start Conversation";
 "SELECT_DESTINATION"="Select Destination";

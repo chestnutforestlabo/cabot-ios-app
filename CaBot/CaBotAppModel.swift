@@ -20,6 +20,7 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
+import Collections
 import CoreData
 import SwiftUI
 import Foundation
@@ -56,6 +57,45 @@ enum DisplayedScene {
     }
 }
 
+enum CaBotDeviceStatus:String {
+    case Unknown
+    case OK
+    case NG
+
+    var icon: String {
+        get {
+            switch (self) {
+            case .Unknown:
+                return "questionmark.circle"
+            case .OK:
+                return "checkmark.circle"
+            case .NG:
+                return "exclamationmark.triangle"
+            }
+        }
+    }
+}
+
+enum CaBotSystemStatus:String {
+    case Unknown
+    case OK
+    case Starting
+    case NG
+
+    var icon: String {
+        switch (self) {
+        case .OK:
+            return "checkmark.circle"
+        case .NG:
+            return "exclamationmark.triangle"
+        case .Unknown:
+            return "questionmark.circle"
+        case .Starting:
+            return "hourglass"
+        }
+    }
+}
+
 final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, TourManagerDelegate, CLLocationManagerDelegate {
 
     private let selectedResourceKey = "SelectedResourceKey"
@@ -64,11 +104,15 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     private let teamIDKey = "team_id"
     private let menuDebugKey = "menu_debug"
     private let noSuitcaseDebugKey = "noSuitcaseDebugKey"
+    private let adminModeKey = "adminModeKey"
     private let startSoundKey = "startSoundKey"
     private let arrivedSoundKey = "arrivedSoundKey"
     private let speedUpSoundKey = "speedUpSoundKey"
     private let speedDownSoundKey = "speedDownSoundKey"
     private let browserCloseDelayKey = "browserCloseDelayKey"
+
+    @Published var versionMatched: Bool = false
+    @Published var serverBLEVersion: String? = nil
 
     @Published var locationState: GrantState = .Init {
         didSet {
@@ -171,6 +215,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
             suitcaseConnected = true
         }
     }
+    @Published var adminMode: Bool = true {
+        didSet {
+            UserDefaults.standard.setValue(noSuitcaseDebug, forKey: adminModeKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
     @Published var browserCloseDelay: Double = 1.2 {
         didSet {
             UserDefaults.standard.setValue(browserCloseDelay, forKey: browserCloseDelayKey)
@@ -207,6 +257,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
             UserDefaults.standard.synchronize()
         }
     }
+
+    @Published var deviceStatus: CaBotDeviceStatus = .Unknown
+    @Published var systemStatus: CaBotSystemStatus = .Unknown
+    @Published var deviceStatusDetail: OrderedDictionary<String, StatusEntry> = [:]
+    @Published var systemStatusDetail: OrderedDictionary<String, StatusEntry> = [:]
 
     private let bleService: CaBotService
     private let tts: CaBotTTS
@@ -449,6 +504,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         }
     }
 
+    func systemManageCommand(command: CaBotManageCommand) {
+        self.bleService.manage(command: command)
+    }
+
     // MARK: TourManagerDelegate
     func tourUpdated(manager: TourManager) {
         tourUpdated = true
@@ -514,6 +573,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     }
 
     // MARK: CaBotServiceDelegate
+
+    func caBot(service: CaBotService, versionMatched: Bool, with version: String) {
+        self.versionMatched = versionMatched
+        self.serverBLEVersion = version
+    }
 
     func caBot(service: CaBotService, centralConnected: Bool) {
         if self.suitcaseConnected != centralConnected {
@@ -594,6 +658,40 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                 }
             }
             break
+        }
+    }
+
+    func cabot(service: CaBotService, deviceStatus: [StatusEntry]) -> Void {
+        if deviceStatus.count == 0 {
+            self.deviceStatus = .Unknown
+            return
+        }
+        var allOK:Bool = true
+        for entry in deviceStatus {
+            allOK = allOK && entry.status
+            self.deviceStatusDetail[entry.name] = entry
+        }
+        if allOK {
+            self.deviceStatus = .OK
+        } else {
+            self.deviceStatus = .NG
+        }
+    }
+
+    func cabot(service: CaBotService, systemStatus: [StatusEntry]) -> Void {
+        if systemStatus.count == 0 {
+            self.systemStatus = .Unknown
+            return
+        }
+        var allOK:Bool = true
+        for entry in systemStatus {
+            allOK = allOK && entry.status
+            self.systemStatusDetail[entry.name] = entry
+        }
+        if allOK {
+            self.systemStatus = .OK
+        } else {
+            self.systemStatus = .NG
         }
     }
 

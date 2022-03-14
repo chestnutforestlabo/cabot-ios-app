@@ -31,9 +31,17 @@
 "Status"="ステータス";
 "System"="システム";
 
+"Device Status"="デバイス状態";
+"System Status"="システム状態";
+"OK"="正常";
+"NG"="異常";
+"Unknown"="不明";
+"Starting"="起動中";
+
 "Suitcase may not be connected"="スーツケースが接続されていません";
 "Suitcase has been connected"="スーツケースが接続されました";
 "Suitcase has been disconnected"="スーツケースの接続が解除されました";
+"Protocol mismatch %@"="通信規格の不一致 %@";
 
 "START_CONVERSATION"="対話を開始";
 "SELECT_DESTINATION"="行き先を選択";

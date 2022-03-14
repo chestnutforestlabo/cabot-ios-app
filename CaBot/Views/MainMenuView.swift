@@ -245,11 +245,43 @@ struct StatusMenus: View {
                         Label(LocalizedStringKey("Suitcase Connected"),
                               systemImage: "antenna.radiowaves.left.and.right")
                     }
+                    if let version = modelData.serverBLEVersion {
+                        Text("(\(version))")
+                    }
                 } else {
                     Label(LocalizedStringKey("Suitcase Not Connected"),
                           systemImage: "antenna.radiowaves.left.and.right")
                         .opacity(0.1)
                 }
+            }
+            if modelData.suitcaseConnected {
+                if modelData.versionMatched == false {
+                    Label(LocalizedStringKey("Protocol mismatch \(CaBotService.CABOT_BLE_VERSION)"),
+                          systemImage: "exclamationmark.triangle")
+                        .foregroundColor(Color.red)
+                }
+                NavigationLink(
+                    destination: DeviceStatusView().environmentObject(modelData),
+                    label: {
+                        HStack {
+                            Label(LocalizedStringKey("Device Status"),
+                                  systemImage: modelData.deviceStatus.icon)
+                            Text(":")
+                            Text(LocalizedStringKey(modelData.deviceStatus.rawValue))
+                        }
+                    }
+                )
+                NavigationLink(
+                    destination: SystemStatusView().environmentObject(modelData),
+                    label: {
+                        HStack {
+                            Label(LocalizedStringKey("System Status"),
+                                  systemImage: modelData.systemStatus.icon)
+                            Text(":")
+                            Text(LocalizedStringKey(modelData.systemStatus.rawValue))
+                        }
+                    }
+                )
             }
         }
     }
@@ -271,7 +303,7 @@ struct SettingMenus: View {
                 }
             }
 
-            Text("Version: \(versionNo) (\(buildNo))")
+            Text("Version: \(versionNo) (\(buildNo)) - \(CaBotService.CABOT_BLE_VERSION)")
         }
     }
 }
@@ -279,12 +311,33 @@ struct SettingMenus: View {
 struct ContentView_Previews: PreviewProvider {
     
     static var previews: some View {
-        preview_tour
+        Group {
+            preview_connected
+            preview_connected
+        }
+        //preview_tour
         //preview_tour2
         //preview_tour3
         //preview_tour4
         //preview
         //preview_ja
+    }
+
+    static var preview_connected: some View {
+        let modelData = CaBotAppModel()
+        modelData.suitcaseConnected = true
+        modelData.deviceStatus = .OK
+        modelData.systemStatus = .Unknown
+        modelData.versionMatched = true
+        modelData.serverBLEVersion = "20220315"
+
+        if let r = modelData.resourceManager.resource(by: "place0") {
+            modelData.resource = r
+        }
+
+        return MainMenuView()
+            .environmentObject(modelData)
+            .environment(\.locale, .init(identifier: "ja"))
     }
 
     static var preview_tour: some View {
@@ -297,7 +350,7 @@ struct ContentView_Previews: PreviewProvider {
             if let url = r.toursURL {
                 if let tours = try? Tours(at: url) {
                     modelData.tourManager.set(tour: tours.list[0])
-                    modelData.tourManager.nextDestination()
+                    _ = modelData.tourManager.nextDestination()
                 }
             }
         }
