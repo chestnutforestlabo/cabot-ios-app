@@ -28,69 +28,67 @@ struct DeviceStatusView: View {
     @State private var isConfirmingReboot = false
     @State private var isConfirmingPoweroff = false
     var body: some View {
-        return NavigationView {
-            VStack {
-                Form {
-                    Section(header:Text("Status")) {
-                        Text(LocalizedStringKey(modelData.deviceStatus.rawValue))
-                    }
+        return VStack {
+            Form {
+                Section(header:Text("Status")) {
+                    Text(LocalizedStringKey(modelData.deviceStatus.level.rawValue))
+                }
 
-                    Section(header:Text("Details")) {
-                        List {
-                            ForEach (modelData.deviceStatusDetail.keys, id: \.self) {key in
-                                VStack {
-                                    Text(key)
-                                        .frame(maxWidth: .infinity, alignment: .topLeading)
-                                    Text(modelData.deviceStatusDetail[key]!.text)
-                                        .frame(maxWidth: .infinity, alignment: .topLeading)
-                                }
+                Section(header:Text("Details")) {
+                    List {
+                        ForEach (modelData.deviceStatus.devices, id: \.self) {device in
+                            VStack {
+                                Text(device.name)
+                                    .frame(maxWidth: .infinity, alignment: .topLeading)
+                                Text(device.message)
+                                    .frame(maxWidth: .infinity, alignment: .topLeading)
                             }
                         }
                     }
+                }
 
-                    if (modelData.adminMode) {
-                        Section(header:Text("Actions")) {
-                            Button(action: {
-                                isConfirmingReboot = true
-                            }) {
-                                Text("Reboot")
-                                    .frame(width: nil, alignment: .topLeading)
-                            }
-                            .actionSheet(isPresented: $isConfirmingReboot) {
-                                return ActionSheet(title: Text("Reboot Computer"),
-                                                   message: Text("The app will be disconnected."),
-                                                   buttons: [
-                                                    .cancel(),
-                                                    .destructive(
-                                                        Text("Reboot"),
-                                                        action: {
-                                                            modelData.systemManageCommand(command: .reboot)
-                                                        }
-                                                    )
-                                                   ])
-                            }
-
-                            Button(action: {
-                                isConfirmingPoweroff = true
-                            }) {
-                                Text("Power off")
-                                    .frame(width: nil, alignment: .topLeading)
-                            }
-                            .actionSheet(isPresented: $isConfirmingPoweroff) {
-                                return ActionSheet(title: Text("Power off"),
-                                                   message: Text("The app will be disconnected."),
-                                                   buttons: [
-                                                    .cancel(),
-                                                    .destructive(
-                                                        Text("Power off"),
-                                                        action: {
-                                                            modelData.systemManageCommand(command: .poweroff)
-                                                        }
-                                                    )
-                                                   ])
-                            }
-
+                if (modelData.adminMode) {
+                    Section(header:Text("Actions")) {
+                        Button(action: {
+                            isConfirmingReboot = true
+                        }) {
+                            Text("Reboot")
+                                .frame(width: nil, alignment: .topLeading)
                         }
+                        .actionSheet(isPresented: $isConfirmingReboot) {
+                            return ActionSheet(title: Text("Reboot Computer"),
+                                               message: Text("The app will be disconnected."),
+                                               buttons: [
+                                                .cancel(),
+                                                .destructive(
+                                                    Text("Reboot"),
+                                                    action: {
+                                                        modelData.systemManageCommand(command: .reboot)
+                                                    }
+                                                )
+                                               ])
+                        }
+
+                        Button(action: {
+                            isConfirmingPoweroff = true
+                        }) {
+                            Text("Power off")
+                                .frame(width: nil, alignment: .topLeading)
+                        }
+                        .actionSheet(isPresented: $isConfirmingPoweroff) {
+                            return ActionSheet(title: Text("Power off"),
+                                               message: Text("The app will be disconnected."),
+                                               buttons: [
+                                                .cancel(),
+                                                .destructive(
+                                                    Text("Power off"),
+                                                    action: {
+                                                        modelData.systemManageCommand(command: .poweroff)
+                                                    }
+                                                )
+                                               ])
+                        }
+
                     }
                 }
             }
@@ -103,7 +101,7 @@ struct DeviceStatusView_Previews: PreviewProvider {
     static var previews: some View {
         let modelData = CaBotAppModel()
         modelData.suitcaseConnected = true
-        modelData.deviceStatus = .OK
+        modelData.deviceStatus.level = .OK
         return DeviceStatusView()
             .environmentObject(modelData)
     }

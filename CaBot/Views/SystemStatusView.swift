@@ -25,81 +25,62 @@ import SwiftUI
 
 struct SystemStatusView: View {
     @EnvironmentObject var modelData: CaBotAppModel
-    @State private var isConfirmingStart = false
     @State private var isConfirmingStop = false
 
     var body: some View {
-        var isServiceActive:Bool = false
-        if let service = modelData.systemStatusDetail["Service"] {
-            isServiceActive = service.status
-        }
+        let isServiceActive:Bool = (modelData.systemStatus.level == .Active)
 
-        return NavigationView {
-            VStack {
-                Form {
-                    Section(header:Text("Status")) {
-                        Text(LocalizedStringKey(modelData.systemStatus.rawValue))
-                    }
+        return VStack {
+            Form {
+                Section(header:Text(LocalizedStringKey(modelData.systemStatus.level.rawValue))) {
+                    List {
+                        ForEach (modelData.systemStatus.components.keys, id:\.self) { key in
+                            let component = modelData.systemStatus.components[key]!
+                            NavigationLink(destination: SystemStatusDetailView(key: key)
+                                            .environmentObject(modelData),
+                                           label: {
 
-                    Section(header:Text("Details")) {
-                        List {
-                            ForEach (modelData.systemStatusDetail.keys, id: \.self) {key in
-                                VStack {
-                                    Text(modelData.systemStatusDetail[key]!.text)
-                                        .frame(maxWidth: nil, alignment: .topLeading)
-                                }
-                            }
-                        }
-                    }
-
-                    if (modelData.adminMode) {
-                        Section(header:Text("Actions")) {
-                            Button(action: {
-                                isConfirmingStart = true
-                            }) {
-                                Text("Start")
-                                    .frame(width: nil, alignment: .topLeading)
-                            }
-                            .actionSheet(isPresented: $isConfirmingStart) {
-                                return ActionSheet(title: Text("Start System"),
-                                                   message: Text("Start CaBot ROS system"),
-                                                   buttons: [
-                                                    .cancel(),
-                                                    .destructive(
-                                                        Text("Start"),
-                                                        action: {
-                                                            modelData.systemManageCommand(command: .start)
-                                                        }
-                                                    )
-                                                   ])
-                            }
-                            .disabled(isServiceActive)
-
-                            Button(action: {
-                                isConfirmingStop = true
-                            }) {
-                                Text("Stop")
-                                    .frame(width: .infinity, alignment: .topLeading)
-                            }
-                            .actionSheet(isPresented: $isConfirmingStop) {
-                                return ActionSheet(title: Text("Stop System"),
-                                                   message: Text("Stop CaBot ROS system"),
-                                                   buttons: [
-                                                    .cancel(),
-                                                    .destructive(
-                                                        Text("Stop"),
-                                                        action: {
-                                                            modelData.systemManageCommand(command: .stop)
-                                                        }
-                                                    )
-                                                   ])
-                            }
-                            .disabled(!isServiceActive)
+                                Label(component.name, systemImage: component.level.icon)
+                                    .foregroundColor(component.level.color)
+                            })
                         }
                     }
                 }
+
+                if (modelData.adminMode) {
+                    Section(header:Text("Actions")) {
+                        Button(action: {
+                            modelData.systemManageCommand(command: .start)
+                        }) {
+                            Text("Start System")
+                                .frame(width: nil, alignment: .topLeading)
+                        }
+                        .disabled(isServiceActive)
+
+                        Button(action: {
+                            isConfirmingStop = true
+                        }) {
+                            Text("Stop System")
+                                .frame(width: nil, alignment: .topLeading)
+                        }
+                        .actionSheet(isPresented: $isConfirmingStop) {
+                            return ActionSheet(title: Text("Stop System"),
+                                               message: Text("Are you sure to stop the suitcase system?"),
+                                               buttons: [
+                                                .cancel(),
+                                                .destructive(
+                                                    Text("Stop"),
+                                                    action: {
+                                                        modelData.systemManageCommand(command: .stop)
+                                                    }
+                                                )
+                                               ])
+                        }
+                        .disabled(!isServiceActive)
+                    }
+                }
             }
-            .navigationTitle("System Status")
+            .navigationTitle(LocalizedStringKey("System Status"))
         }
     }
 }
@@ -108,8 +89,14 @@ struct SystemStatusView_Previews: PreviewProvider {
     static var previews: some View {
         let modelData = CaBotAppModel()
         modelData.suitcaseConnected = true
-        modelData.systemStatus = .NG
-        modelData.systemStatusDetail["Service"] = StatusEntry(name: "Service", status: true, message: "dummy")
+        let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
+            .appendingPathComponent("system.json")
+
+        let fm = FileManager.default
+        let data = fm.contents(atPath: path.path)!
+        let status = try! JSONDecoder().decode(SystemStatus.self, from: data)
+        modelData.systemStatus.update(with: status)
+
         return SystemStatusView()
             .environmentObject(modelData)
     }

@@ -261,13 +261,24 @@ struct StatusMenus: View {
                         .foregroundColor(Color.red)
                 }
                 NavigationLink(
+                    destination: BatteryStatusView().environmentObject(modelData),
+                    label: {
+                        HStack {
+                            Label(LocalizedStringKey("Battery Status"),
+                                  systemImage: modelData.batteryStatus.level.icon)
+                            Text(":")
+                            Text(modelData.batteryStatus.message)
+                        }
+                    }
+                )
+                NavigationLink(
                     destination: DeviceStatusView().environmentObject(modelData),
                     label: {
                         HStack {
                             Label(LocalizedStringKey("Device Status"),
-                                  systemImage: modelData.deviceStatus.icon)
+                                  systemImage: modelData.deviceStatus.level.icon)
                             Text(":")
-                            Text(LocalizedStringKey(modelData.deviceStatus.rawValue))
+                            Text(LocalizedStringKey(modelData.deviceStatus.level.rawValue))
                         }
                     }
                 )
@@ -276,9 +287,9 @@ struct StatusMenus: View {
                     label: {
                         HStack {
                             Label(LocalizedStringKey("System Status"),
-                                  systemImage: modelData.systemStatus.icon)
+                                  systemImage: modelData.systemStatus.level.icon)
                             Text(":")
-                            Text(LocalizedStringKey(modelData.systemStatus.rawValue))
+                            Text(LocalizedStringKey(modelData.systemStatus.level.rawValue))
                         }
                     }
                 )
@@ -326,8 +337,8 @@ struct ContentView_Previews: PreviewProvider {
     static var preview_connected: some View {
         let modelData = CaBotAppModel()
         modelData.suitcaseConnected = true
-        modelData.deviceStatus = .OK
-        modelData.systemStatus = .Unknown
+        modelData.deviceStatus.level = .OK
+        modelData.systemStatus.level = .Unknown
         modelData.versionMatched = true
         modelData.serverBLEVersion = "20220315"
 

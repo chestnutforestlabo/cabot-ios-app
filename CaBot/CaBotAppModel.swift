@@ -57,44 +57,6 @@ enum DisplayedScene {
     }
 }
 
-enum CaBotDeviceStatus:String {
-    case Unknown
-    case OK
-    case NG
-
-    var icon: String {
-        get {
-            switch (self) {
-            case .Unknown:
-                return "questionmark.circle"
-            case .OK:
-                return "checkmark.circle"
-            case .NG:
-                return "exclamationmark.triangle"
-            }
-        }
-    }
-}
-
-enum CaBotSystemStatus:String {
-    case Unknown
-    case OK
-    case Starting
-    case NG
-
-    var icon: String {
-        switch (self) {
-        case .OK:
-            return "checkmark.circle"
-        case .NG:
-            return "exclamationmark.triangle"
-        case .Unknown:
-            return "questionmark.circle"
-        case .Starting:
-            return "hourglass"
-        }
-    }
-}
 
 final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, TourManagerDelegate, CLLocationManagerDelegate {
 
@@ -258,10 +220,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         }
     }
 
-    @Published var deviceStatus: CaBotDeviceStatus = .Unknown
-    @Published var systemStatus: CaBotSystemStatus = .Unknown
-    @Published var deviceStatusDetail: OrderedDictionary<String, StatusEntry> = [:]
-    @Published var systemStatusDetail: OrderedDictionary<String, StatusEntry> = [:]
+    @Published var deviceStatus: DeviceStatus = DeviceStatus()
+    @Published var systemStatus: SystemStatusData = SystemStatusData()
+    @Published var batteryStatus: BatteryStatus = BatteryStatus()
 
     private let bleService: CaBotService
     private let tts: CaBotTTS
@@ -505,7 +466,17 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
     }
 
     func systemManageCommand(command: CaBotManageCommand) {
-        self.bleService.manage(command: command)
+        if self.bleService.manage(command: command) {
+            switch(command) {
+            case .poweroff, .reboot:
+                deviceStatus.level = .Unknown
+                systemStatus.level = .Unknown
+                break
+            case .start, .stop:
+                systemStatus.level = .Unknown
+                break
+            }
+        }
     }
 
     // MARK: TourManagerDelegate
@@ -661,42 +632,83 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         }
     }
 
-    func cabot(service: CaBotService, deviceStatus: [StatusEntry]) -> Void {
-        if deviceStatus.count == 0 {
-            self.deviceStatus = .Unknown
-            return
-        }
-        var allOK:Bool = true
-        for entry in deviceStatus {
-            allOK = allOK && entry.status
-            self.deviceStatusDetail[entry.name] = entry
-        }
-        if allOK {
-            self.deviceStatus = .OK
-        } else {
-            self.deviceStatus = .NG
-        }
+    func cabot(service: CaBotService, deviceStatus: DeviceStatus) -> Void {
+        self.deviceStatus = deviceStatus
     }
 
-    func cabot(service: CaBotService, systemStatus: [StatusEntry]) -> Void {
-        if systemStatus.count == 0 {
-            self.systemStatus = .Unknown
-            return
-        }
-        var allOK:Bool = true
-        for entry in systemStatus {
-            allOK = allOK && entry.status
-            self.systemStatusDetail[entry.name] = entry
-        }
-        if allOK {
-            self.systemStatus = .OK
-        } else {
-            self.systemStatus = .NG
-        }
+    func cabot(service: CaBotService, systemStatus: SystemStatus) -> Void {
+        self.systemStatus.update(with: systemStatus)
+    }
+
+    func cabot(service: CaBotService, batteryStatus: BatteryStatus) -> Void {
+        self.batteryStatus = batteryStatus
     }
 
     func debugCabotArrived() {
         self.cabot(service: self.bleService, notification: .arrived)
+    }
+}
+
+class DiagnosticStatusData: NSObject, ObservableObject {
+    @Published var name: String
+    @Published var level: DiagnosticLevel
+    @Published var message: String
+    @Published var values: OrderedDictionary<String,String>
+    init(with diagnostic: DiagnosticStatus) {
+        self.name = diagnostic.componentName
+        self.level = diagnostic.level
+        self.message = diagnostic.message
+        self.values = OrderedDictionary<String,String>()
+        super.init()
+        for value in diagnostic.values {
+            self.values[value.key] = value.value
+        }
+    }
+}
+
+class ComponentData: DiagnosticStatusData {
+    @Published var details: OrderedDictionary<String,DiagnosticStatusData>
+    override init(with diagnostic: DiagnosticStatus) {
+        self.details = OrderedDictionary<String,DiagnosticStatusData>()
+        super.init(with: diagnostic)
+    }
+    func update(detail: DiagnosticStatus) {
+        if let target = self.details[detail.componentName] {
+            for value in detail.values {
+                target.values[value.key] = value.value
+            }
+        } else {
+            self.details[detail.componentName] = DiagnosticStatusData(with: detail)
+        }
+    }
+}
+
+class SystemStatusData: NSObject, ObservableObject {
+    @Published var level: CaBotSystemLevel
+    @Published var components: OrderedDictionary<String,ComponentData>
+
+    static var cache:[String:ComponentData] = [:]
+
+    override init() {
+        level = .Unknown
+        components = OrderedDictionary<String,ComponentData>()
+    }
+    func update(with status: SystemStatus) {
+        self.level = status.level
+        self.components = OrderedDictionary<String,ComponentData>()
+        for diagnostic in status.diagnostics {
+            if diagnostic.rootName == nil {
+                let data = ComponentData(with: diagnostic)
+                components[diagnostic.componentName] = data
+            }
+        }
+        for diagnostic in status.diagnostics {
+            if let root = diagnostic.rootName {
+                if let data = components[root] {
+                    data.update(detail: diagnostic)
+                }
+            }
+        }
     }
 }
 

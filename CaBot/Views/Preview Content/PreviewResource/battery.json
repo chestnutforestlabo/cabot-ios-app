@@ -1,0 +1,1 @@
+{"name":"Battery Control","level":0,"message":"99%","hardware_id":"cabot2-ace-battery-control","values":{"Jetson power":"OFF","12V power":"OFF","5V power":"OFF","ODrive power":"OFF","Battery Capacity":"99%","Jetson current":"1234mA","Loop count":"156311","Shutdown Request":"0","Lowpower Shutdown Request":"0"}}
