@@ -32,16 +32,17 @@ struct SystemStatusView: View {
 
         return VStack {
             Form {
-                Section(header:Text(LocalizedStringKey(modelData.systemStatus.level.rawValue))) {
+                Section(header:Text("Details")) {
                     List {
                         ForEach (modelData.systemStatus.components.keys, id:\.self) { key in
                             let component = modelData.systemStatus.components[key]!
                             NavigationLink(destination: SystemStatusDetailView(key: key)
                                             .environmentObject(modelData),
                                            label: {
-
-                                Label(component.name, systemImage: component.level.icon)
-                                    .foregroundColor(component.level.color)
+                                HStack {
+                                    Label(component.name, systemImage: component.level.icon)
+                                        .labelStyle(StatusLabelStyle(color: component.level.color))
+                                }
                             })
                         }
                     }

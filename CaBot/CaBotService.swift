@@ -68,6 +68,7 @@ struct DeviceStatusEntry: Decodable, Hashable {
     var name: String
     var level: DeviceStatusLevel
     var message: String
+    var values: [DiagnosticStatusKeyValue]
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(name)
@@ -93,6 +94,16 @@ enum DeviceStatusLevel:String, Decodable {
             }
         }
     }
+    var color: Color? {
+        switch (self) {
+        case .OK:
+            return Color.blue
+        case .Error:
+            return Color.red
+        case .Unknown:
+            return Color.gray
+        }
+    }
 }
 
 struct SystemStatus: Decodable {
@@ -109,7 +120,7 @@ enum CaBotSystemLevel:String, Decodable {
     case Inactive
     case Active
     case Starting
-    case Errors
+    case Error
 
     var icon: String {
         switch (self) {
@@ -117,12 +128,23 @@ enum CaBotSystemLevel:String, Decodable {
             return "checkmark.circle"
         case .Inactive:
             return "sleep"
-        case .Errors:
+        case .Error:
             return "xmark.circle"
         case .Unknown:
             return "questionmark.circle"
         case .Starting:
             return "hourglass"
+        }
+    }
+
+    var color: Color? {
+        switch (self) {
+        case .Active, .Inactive, .Starting:
+            return Color.blue
+        case .Error:
+            return Color.red
+        case .Unknown:
+            return Color.gray
         }
     }
 }
@@ -184,22 +206,13 @@ struct BatteryStatus: Decodable {
         name = "Battery"
         hardware_id = ""
         message = "Unknown"
-        values = [:]
+        values = []
     }
     var level: DiagnosticLevel
     var name: String
     var hardware_id: String
     var message: String
-    var values: [String:String]
-    var details: OrderedDictionary<String, String> {
-        get {
-            var temp = OrderedDictionary<String, String>()
-            for key in values.keys.sorted() {
-                temp[key] = values[key]
-            }
-            return temp
-        }
-    }
+    var values: [DiagnosticStatusKeyValue]
 }
 
 enum DiagnosticLevel: Int, Decodable {
@@ -221,10 +234,10 @@ enum DiagnosticLevel: Int, Decodable {
         }
     }
 
-    var color: Color {
+    var color: Color? {
         switch (self) {
         case .OK:
-            return Color(UIColor.label)
+            return Color.blue
         case .Warn:
             return Color.orange
         case .Error:
@@ -236,7 +249,7 @@ enum DiagnosticLevel: Int, Decodable {
 }
 
 class CaBotService: NSObject, CBPeripheralManagerDelegate {
-    static let CABOT_BLE_VERSION = "20220314"
+    static let CABOT_BLE_VERSION = "20220320"
     static let UUID_FORMAT = "35CE%04X-5E89-4C0D-A3F6-8A6A507C1BF1"
     static let CABOT_SPEED_CONFIG = "cabot_speed"
     static let SPEECH_SPEED_CONFIG = "speech_speed"
@@ -279,44 +292,36 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
         self.peripheralManager = CBPeripheralManager(delegate: self, queue: nil,
                                                      options: [CBPeripheralManagerOptionShowPowerAlertKey: true,
                                                                CBPeripheralManagerOptionRestoreIdentifierKey: peripheralRestoreKey])
-        /*
-        self.chars.append(CaBotStoreChar(service: self, handles:[0x0001, 0x0002], configKey:CaBotService.CABOT_SPEED_CONFIG))
-        self.chars.append(CaBotStoreChar(service: self, handles:[0x0003, 0x0004], configKey:CaBotService.SPEECH_SPEED_CONFIG))
-         */
+
         self.chars.append(CaBotVersionChar(service: self, handle: 0x0000, version: CaBotService.CABOT_BLE_VERSION))
-        self.manageChar = CaBotNotifyChar(service: self, handle: 0x0005)
+        self.manageChar = CaBotNotifyChar(service: self, handle: 0x0001)
         self.chars.append(self.manageChar)
 
-        self.chars.append(CaBotDeviceStatusChar(service: self, handle: 0x0006))
-        self.chars.append(CaBotSystemStatusChar(service: self, handle: 0x0007))
-        self.chars.append(CabotBatteryStatusChar(service: self, handle: 0x0008))
+        self.chars.append(CaBotDeviceStatusChar(service: self, handle: 0x0002))
+        self.chars.append(CaBotSystemStatusChar(service: self, handle: 0x0003))
+        self.chars.append(CabotBatteryStatusChar(service: self, handle: 0x0004))
 
-        self.summonsChar = CaBotNotifyChar(service: self, handle:0x0009)
+        self.summonsChar = CaBotNotifyChar(service: self, handle:0x00010)
         self.chars.append(self.summonsChar)
 
-        self.destinationChar = CaBotNotifyChar(service: self, handle:0x0010)
+        self.destinationChar = CaBotNotifyChar(service: self, handle:0x0011)
         self.chars.append(self.destinationChar)
 
-        self.chars.append(CaBotFindPersonReadyChar(service: self, handle:0x0011))
-
-        self.findPersonChar = CaBotNotifyChar(service: self, handle:0x0012)
+        self.chars.append(CaBotFindPersonReadyChar(service: self, handle:0x0020))
+        self.findPersonChar = CaBotNotifyChar(service: self, handle:0x0021)
         self.chars.append(self.findPersonChar)
 
-        self.chars.append(CaBotQueryChar(service: self, handles:[0x0100, 0x0101]) { query in
-            return ""
-        })
-        self.speechChar = CaBotSpeechChar(service: self, handle:0x0200)
+        self.speechChar = CaBotSpeechChar(service: self, handle:0x0030)
         self.chars.append(self.speechChar)
 
-        self.naviChar = CaBotNaviChar(service: self, handle:0x0300)
+        self.naviChar = CaBotNaviChar(service: self, handle:0x0040)
         self.chars.append(self.naviChar)
 
-        self.chars.append(CaBotWebContentChar(service: self, handle:0x0400))
+        self.chars.append(CaBotWebContentChar(service: self, handle:0x0050))
 
-        self.chars.append(CaBotSoundEffectChar(service: self, handle:0x0500))
+        self.chars.append(CaBotSoundEffectChar(service: self, handle:0x0060))
 
         self.heartbeatChar = CaBotNotifyChar(service: self, handle:0x9999)
-        //self.heartbeatChar = CaBotHeartBeatChar(service: self, handle:0x9999)
         self.chars.append(self.heartbeatChar)
     }
 
@@ -467,7 +472,10 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
             return
         }
         
-        NSLog("service added: \(service)")
+        NSLog("service added")
+        for char in service.characteristics! {
+            NSLog("\(char.uuid)")
+        }
         self.serviceAdded = true
         self.startAdvertising();
     }
@@ -748,12 +756,14 @@ class CaBotBufferedWriteChar: CaBotChar {
 
     override func canHandle(writeRequest: CBATTRequest) -> Bool {
         if writeRequest.characteristic.uuid.isEqual(self.characteristic.uuid) {
-            guard let data = writeRequest.value else {
+            guard let temp = writeRequest.value else {
                 return false
             }
+            let data = Data(temp)
             guard data.count > 0 else {
                 return false
             }
+
 
             NSLog("canHandle uuid=\(self.characteristic.uuid) len=\(data.count) dataSize=\(dataSize) dataReceived=\(self.dataReceived) offset=\(writeRequest.offset)")
             if writeRequest.offset == 0 {
@@ -904,11 +914,6 @@ class CaBotDeviceStatusChar: CaBotBufferedWriteChar {
             DispatchQueue.main.async {
                 self.service.notifyDeviceStatus(status: status)
             }
-            guard let text = String(data: data, encoding: .utf8) else {
-                return
-            }
-            print(text)
-            NSLog("Device Status (%d) = \(status)", data.count)
         } catch {
             guard let text = String(data: data, encoding: .utf8) else {
                 return
@@ -926,11 +931,6 @@ class CaBotSystemStatusChar: CaBotBufferedWriteChar {
             DispatchQueue.main.async {
                 self.service.notifySystemStatus(status: status)
             }
-            guard let text = String(data: data, encoding: .utf8) else {
-                return
-            }
-            print(text)
-            NSLog("System Status (%d) = \(status)", data.count)
         } catch {
             guard let text = String(data: data, encoding: .utf8) else {
                 return
@@ -948,11 +948,6 @@ class CabotBatteryStatusChar: CaBotBufferedWriteChar {
             DispatchQueue.main.async {
                 self.service.notifyBatteryStatus(status: status)
             }
-            guard let text = String(data: data, encoding: .utf8) else {
-                return
-            }
-            print(text)
-            NSLog("System Status (%d) = \(status)", data.count)
         } catch {
             guard let text = String(data: data, encoding: .utf8) else {
                 return

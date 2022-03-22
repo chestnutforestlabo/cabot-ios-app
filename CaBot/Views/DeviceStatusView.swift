@@ -30,17 +30,13 @@ struct DeviceStatusView: View {
     var body: some View {
         return VStack {
             Form {
-                Section(header:Text("Status")) {
-                    Text(LocalizedStringKey(modelData.deviceStatus.level.rawValue))
-                }
-
                 Section(header:Text("Details")) {
                     List {
                         ForEach (modelData.deviceStatus.devices, id: \.self) {device in
-                            VStack {
-                                Text(device.name)
-                                    .frame(maxWidth: .infinity, alignment: .topLeading)
-                                Text(device.message)
+                            VStack(alignment: .leading) {
+                                Label(device.name, systemImage: device.level.icon)
+                                    .labelStyle(StatusLabelStyle(color: device.level.color))
+                                Label(device.message, systemImage: "text.bubble")
                                     .frame(maxWidth: .infinity, alignment: .topLeading)
                             }
                         }
@@ -101,7 +97,19 @@ struct DeviceStatusView_Previews: PreviewProvider {
     static var previews: some View {
         let modelData = CaBotAppModel()
         modelData.suitcaseConnected = true
-        modelData.deviceStatus.level = .OK
+        let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
+            .appendingPathComponent("device.json")
+
+        let fm = FileManager.default
+        let data = fm.contents(atPath: path.path)!
+        do {
+            let status = try JSONDecoder().decode(DeviceStatus.self, from: data)
+            modelData.deviceStatus = status
+        } catch {
+            modelData.deviceStatus.devices = []
+            modelData.deviceStatus.devices.append(DeviceStatusEntry(name: "Test", level: .Error, message: "Error", values:[]))
+        }
+
         return DeviceStatusView()
             .environmentObject(modelData)
     }

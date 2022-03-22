@@ -266,6 +266,7 @@ struct StatusMenus: View {
                         HStack {
                             Label(LocalizedStringKey("Battery Status"),
                                   systemImage: modelData.batteryStatus.level.icon)
+                                .labelStyle(StatusLabelStyle(color: modelData.batteryStatus.level.color))
                             Text(":")
                             Text(modelData.batteryStatus.message)
                         }
@@ -277,6 +278,7 @@ struct StatusMenus: View {
                         HStack {
                             Label(LocalizedStringKey("Device Status"),
                                   systemImage: modelData.deviceStatus.level.icon)
+                                .labelStyle(StatusLabelStyle(color: modelData.deviceStatus.level.color))
                             Text(":")
                             Text(LocalizedStringKey(modelData.deviceStatus.level.rawValue))
                         }
@@ -288,6 +290,7 @@ struct StatusMenus: View {
                         HStack {
                             Label(LocalizedStringKey("System Status"),
                                   systemImage: modelData.systemStatus.level.icon)
+                                .labelStyle(StatusLabelStyle(color: modelData.systemStatus.level.color))
                             Text(":")
                             Text(LocalizedStringKey(modelData.systemStatus.level.rawValue))
                         }

@@ -89,8 +89,10 @@ struct DiagnosticCell: View {
 
     private var header: some View {
         let diagnostic = modelData.systemStatus.components[key]!.details[key2]!
-        return HStack {
+        return VStack {
             Label(diagnostic.name, systemImage: diagnostic.level.icon)
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+            Label(diagnostic.message, systemImage: "text.bubble")
                 .frame(maxWidth: .infinity, alignment: .topLeading)
         }
         .padding(.vertical, 4)

@@ -29,25 +29,18 @@ struct BatteryStatusView: View {
     var body: some View {
         return VStack {
             Form {
-                Section(header:Text("Status")) {
-                    Text(LocalizedStringKey(modelData.batteryStatus.message))
-                }
-
                 Section(header:Text("Details")) {
                     List {
-                        ForEach (modelData.batteryStatus.details.keys, id: \.self) {key in
-                            if let detail = modelData.batteryStatus.details[key] {
-                                HStack {
-                                    Text(key)
-                                        .frame(maxWidth: nil, alignment: .topLeading)
-                                    Text(detail)
-                                        .frame(maxWidth: nil, alignment: .topLeading)
-                                }
+                        ForEach (modelData.batteryStatus.values, id: \.self) {value in
+                            HStack {
+                                Text(value.key)
+                                    .frame(maxWidth: 200, alignment: .topLeading)
+                                Text(value.value)
+                                    .frame(maxWidth: nil, alignment: .topLeading)
                             }
                         }
                     }
                 }
-
             }
             .navigationTitle("Battery Status")
         }
@@ -58,9 +51,15 @@ struct BatteryStatusView_Previews: PreviewProvider {
     static var previews: some View {
         let modelData = CaBotAppModel()
         modelData.suitcaseConnected = true
-        modelData.batteryStatus = BatteryStatus()
+        let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
+            .appendingPathComponent("battery.json")
 
-        return DeviceStatusView()
+        let fm = FileManager.default
+        let data = fm.contents(atPath: path.path)!
+        let status = try! JSONDecoder().decode(BatteryStatus.self, from: data)
+        modelData.batteryStatus = status
+
+        return BatteryStatusView()
             .environmentObject(modelData)
     }
 }

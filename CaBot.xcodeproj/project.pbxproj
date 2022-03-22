@@ -20,6 +20,7 @@
 		308FCE2A27E12844009FCC7B /* Gzip in Frameworks */ = {isa = PBXBuildFile; productRef = 308FCE2927E12844009FCC7B /* Gzip */; };
 		308FCE2C27E42B7B009FCC7B /* SystemStatusDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308FCE2B27E42B7B009FCC7B /* SystemStatusDetailView.swift */; };
 		308FCE2E27E62B30009FCC7B /* BatteryStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308FCE2D27E62B30009FCC7B /* BatteryStatusView.swift */; };
+		308FCE3027E81B7E009FCC7B /* StatusLabelStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308FCE2F27E81B7E009FCC7B /* StatusLabelStyle.swift */; };
 		3096BF1426A5C29F0066F256 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3096BF1326A5C29F0066F256 /* SettingView.swift */; };
 		3096BF1826A5D0990066F256 /* TTSHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3096BF1726A5D0990066F256 /* TTSHelper.swift */; };
 		3099132B265DE50A000C1BFE /* Resource in Resources */ = {isa = PBXBuildFile; fileRef = 3099132A265DE50A000C1BFE /* Resource */; };
@@ -82,6 +83,7 @@
 		308FCE1C27D8F4D3009FCC7B /* SystemStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemStatusView.swift; sourceTree = "<group>"; };
 		308FCE2B27E42B7B009FCC7B /* SystemStatusDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemStatusDetailView.swift; sourceTree = "<group>"; };
 		308FCE2D27E62B30009FCC7B /* BatteryStatusView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BatteryStatusView.swift; sourceTree = "<group>"; };
+		308FCE2F27E81B7E009FCC7B /* StatusLabelStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusLabelStyle.swift; sourceTree = "<group>"; };
 		3096BF1326A5C29F0066F256 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
 		3096BF1726A5D0990066F256 /* TTSHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTSHelper.swift; sourceTree = "<group>"; };
 		3099132A265DE50A000C1BFE /* Resource */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resource; sourceTree = "<group>"; };
@@ -183,6 +185,7 @@
 				308FCE2D27E62B30009FCC7B /* BatteryStatusView.swift */,
 				308FCE1C27D8F4D3009FCC7B /* SystemStatusView.swift */,
 				308FCE2B27E42B7B009FCC7B /* SystemStatusDetailView.swift */,
+				308FCE2F27E81B7E009FCC7B /* StatusLabelStyle.swift */,
 				30E50DDE26A0B21200729ABD /* ConversationView.swift */,
 				09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */,
 				30E50DE126A0BA5200729ABD /* DestinationsView.swift */,
@@ -452,6 +455,7 @@
 				30E50DCC269F672800729ABD /* TourManager.swift in Sources */,
 				308FCE2E27E62B30009FCC7B /* BatteryStatusView.swift in Sources */,
 				30E99DA4266B2216001ACAAA /* BeaconSampler.swift in Sources */,
+				308FCE3027E81B7E009FCC7B /* StatusLabelStyle.swift in Sources */,
 				30C3059E26B9036A00A1383A /* DestinationDetailView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
