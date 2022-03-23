@@ -27,11 +27,12 @@ struct StatusLabelStyle: LabelStyle {
     let color: Color?
 
     func makeBody(configuration: Configuration) -> some View {
-        HStack {
+        HStack (alignment: .top) {
             configuration.icon
                 .foregroundColor(color)
-                .padding(4)
+                .frame(width: 30, height: 20, alignment: .center)
             configuration.title
+                .frame(minWidth: 70, alignment: .topLeading)
         }
     }
 }

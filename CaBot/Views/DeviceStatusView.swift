@@ -32,12 +32,16 @@ struct DeviceStatusView: View {
             Form {
                 Section(header:Text("Details")) {
                     List {
+                        Label(modelData.deviceStatus.level.rawValue, systemImage: modelData.deviceStatus.level.icon)
+                            .labelStyle(StatusLabelStyle(color: modelData.deviceStatus.level.color))
                         ForEach (modelData.deviceStatus.devices, id: \.self) {device in
-                            VStack(alignment: .leading) {
-                                Label(device.name, systemImage: device.level.icon)
+                            VStack(alignment: .leading, spacing: 5) {
+                                Label(device.type, systemImage: device.level.icon)
                                     .labelStyle(StatusLabelStyle(color: device.level.color))
+                                Label(device.model, systemImage: "gearshape.2")
+                                    .labelStyle(StatusLabelStyle(color: .gray))
                                 Label(device.message, systemImage: "text.bubble")
-                                    .frame(maxWidth: .infinity, alignment: .topLeading)
+                                    .labelStyle(StatusLabelStyle(color: .gray))
                             }
                         }
                     }
@@ -45,6 +49,11 @@ struct DeviceStatusView: View {
 
                 if (modelData.adminMode) {
                     Section(header:Text("Actions")) {
+                        if !modelData.suitcaseConnected {
+                            Label(LocalizedStringKey("Suitcase Not Connected"),
+                                  systemImage: "antenna.radiowaves.left.and.right")
+                                .opacity(0.3)
+                        }
                         Button(action: {
                             isConfirmingReboot = true
                         }) {
@@ -64,6 +73,7 @@ struct DeviceStatusView: View {
                                                 )
                                                ])
                         }
+                        .disabled(!modelData.suitcaseConnected)
 
                         Button(action: {
                             isConfirmingPoweroff = true
@@ -84,6 +94,7 @@ struct DeviceStatusView: View {
                                                 )
                                                ])
                         }
+                        .disabled(!modelData.suitcaseConnected)
 
                     }
                 }
@@ -102,12 +113,16 @@ struct DeviceStatusView_Previews: PreviewProvider {
 
         let fm = FileManager.default
         let data = fm.contents(atPath: path.path)!
+        let text = String(data: data, encoding: .utf8)
+
         do {
             let status = try JSONDecoder().decode(DeviceStatus.self, from: data)
             modelData.deviceStatus = status
         } catch {
-            modelData.deviceStatus.devices = []
-            modelData.deviceStatus.devices.append(DeviceStatusEntry(name: "Test", level: .Error, message: "Error", values:[]))
+            modelData.deviceStatus.level = .Error
+            let entry = DeviceStatusEntry(type: "Error", model: "Error", level: .Error, message: error.localizedDescription, values: [])
+            let entry2 = DeviceStatusEntry(type: "Error", model: "Error", level: .Error, message: text!, values: [])
+            modelData.deviceStatus.devices = [entry, entry2]
         }
 
         return DeviceStatusView()

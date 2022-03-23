@@ -264,7 +264,7 @@ struct StatusMenus: View {
                     destination: BatteryStatusView().environmentObject(modelData),
                     label: {
                         HStack {
-                            Label(LocalizedStringKey("Battery Status"),
+                            Label(LocalizedStringKey("Battery"),
                                   systemImage: modelData.batteryStatus.level.icon)
                                 .labelStyle(StatusLabelStyle(color: modelData.batteryStatus.level.color))
                             Text(":")
@@ -276,7 +276,7 @@ struct StatusMenus: View {
                     destination: DeviceStatusView().environmentObject(modelData),
                     label: {
                         HStack {
-                            Label(LocalizedStringKey("Device Status"),
+                            Label(LocalizedStringKey("Device"),
                                   systemImage: modelData.deviceStatus.level.icon)
                                 .labelStyle(StatusLabelStyle(color: modelData.deviceStatus.level.color))
                             Text(":")
@@ -288,11 +288,13 @@ struct StatusMenus: View {
                     destination: SystemStatusView().environmentObject(modelData),
                     label: {
                         HStack {
-                            Label(LocalizedStringKey("System Status"),
-                                  systemImage: modelData.systemStatus.level.icon)
-                                .labelStyle(StatusLabelStyle(color: modelData.systemStatus.level.color))
+                            Label(LocalizedStringKey("System"),
+                                  systemImage: modelData.systemStatus.summary.icon)
+                                .labelStyle(StatusLabelStyle(color: modelData.systemStatus.summary.color))
                             Text(":")
-                            Text(LocalizedStringKey(modelData.systemStatus.level.rawValue))
+                            Text(LocalizedStringKey(modelData.systemStatus.levelText()))
+                            Text("-")
+                            Text(LocalizedStringKey(modelData.systemStatus.summary.text))
                         }
                     }
                 )
@@ -325,10 +327,7 @@ struct SettingMenus: View {
 struct ContentView_Previews: PreviewProvider {
     
     static var previews: some View {
-        Group {
-            preview_connected
-            preview_connected
-        }
+        preview_connected
         //preview_tour
         //preview_tour2
         //preview_tour3
@@ -341,7 +340,8 @@ struct ContentView_Previews: PreviewProvider {
         let modelData = CaBotAppModel()
         modelData.suitcaseConnected = true
         modelData.deviceStatus.level = .OK
-        modelData.systemStatus.level = .Unknown
+        modelData.systemStatus.level = .Inactive
+        modelData.systemStatus.summary = .Stale
         modelData.versionMatched = true
         modelData.serverBLEVersion = "20220315"
 
@@ -351,7 +351,7 @@ struct ContentView_Previews: PreviewProvider {
 
         return MainMenuView()
             .environmentObject(modelData)
-            .environment(\.locale, .init(identifier: "ja"))
+            .environment(\.locale, .init(identifier: "en"))
     }
 
     static var preview_tour: some View {

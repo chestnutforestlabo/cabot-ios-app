@@ -28,12 +28,17 @@ struct SystemStatusView: View {
     @State private var isConfirmingStop = false
 
     var body: some View {
-        let isServiceActive:Bool = (modelData.systemStatus.level == .Active)
-
         return VStack {
             Form {
                 Section(header:Text("Details")) {
                     List {
+                        HStack {
+                            Label(modelData.systemStatus.levelText(),
+                                  systemImage: modelData.systemStatus.summary.icon)
+                                .labelStyle(StatusLabelStyle(color: modelData.systemStatus.summary.color))
+                            Text(":")
+                            Text(modelData.systemStatus.summary.text)
+                        }
                         ForEach (modelData.systemStatus.components.keys, id:\.self) { key in
                             let component = modelData.systemStatus.components[key]!
                             NavigationLink(destination: SystemStatusDetailView(key: key)
@@ -48,15 +53,20 @@ struct SystemStatusView: View {
                     }
                 }
 
-                if (modelData.adminMode) {
+                if modelData.adminMode {
                     Section(header:Text("Actions")) {
+                        if !modelData.suitcaseConnected {
+                            Label(LocalizedStringKey("Suitcase Not Connected"),
+                                  systemImage: "antenna.radiowaves.left.and.right")
+                                .opacity(0.3)
+                        }
                         Button(action: {
                             modelData.systemManageCommand(command: .start)
                         }) {
                             Text("Start System")
                                 .frame(width: nil, alignment: .topLeading)
                         }
-                        .disabled(isServiceActive)
+                        .disabled(!modelData.systemStatus.canStart || !modelData.suitcaseConnected)
 
                         Button(action: {
                             isConfirmingStop = true
@@ -77,7 +87,7 @@ struct SystemStatusView: View {
                                                 )
                                                ])
                         }
-                        .disabled(!isServiceActive)
+                        .disabled(!modelData.systemStatus.canStop || !modelData.suitcaseConnected)
                     }
                 }
             }

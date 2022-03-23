@@ -30,6 +30,11 @@ struct BatteryStatusView: View {
         return VStack {
             Form {
                 Section(header:Text("Details")) {
+                    if !modelData.suitcaseConnected {
+                        Label(LocalizedStringKey("Suitcase Not Connected"),
+                              systemImage: "antenna.radiowaves.left.and.right")
+                            .opacity(0.3)
+                    }
                     List {
                         ForEach (modelData.batteryStatus.values, id: \.self) {value in
                             HStack {

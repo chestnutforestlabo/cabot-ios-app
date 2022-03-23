@@ -152,7 +152,15 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         }
     }
 
-    @Published var suitcaseConnected: Bool = false
+    @Published var suitcaseConnected: Bool = false {
+        didSet {
+            if !self.suitcaseConnected {
+                self.deviceStatus = DeviceStatus()
+                self.systemStatus.clear()
+                self.batteryStatus = BatteryStatus()
+            }
+        }
+    }
     @Published var backpackConnected: Bool = false
 
     @Published var teamID: String = "" {
@@ -472,10 +480,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                 deviceStatus.level = .Unknown
                 systemStatus.level = .Unknown
                 break
-            case .start, .stop:
-                systemStatus.level = .Unknown
+            case .start:
+                systemStatus.level = .Activating
+            case .stop:
+                systemStatus.level = .Deactivating
                 break
             }
+            systemStatus.components.removeAll()
+            objectWillChange.send()
         }
     }
 
@@ -685,21 +697,50 @@ class ComponentData: DiagnosticStatusData {
 
 class SystemStatusData: NSObject, ObservableObject {
     @Published var level: CaBotSystemLevel
+    @Published var summary: DiagnosticLevel
     @Published var components: OrderedDictionary<String,ComponentData>
 
     static var cache:[String:ComponentData] = [:]
 
     override init() {
         level = .Unknown
+        summary = .Stale
         components = OrderedDictionary<String,ComponentData>()
+    }
+    func levelText() -> String{
+        switch(self.level) {
+        case .Unknown, .Inactive, .Deactivating, .Error:
+            if self.summary != .Stale {
+                return "Debug"
+            }
+            return self.level.rawValue
+        case .Active, .Activating:
+            return self.level.rawValue
+        }
+    }
+    func clear() {
+        self.components.removeAll()
     }
     func update(with status: SystemStatus) {
         self.level = status.level
         self.components = OrderedDictionary<String,ComponentData>()
+        var allKeys = Set(self.components.keys)
+        var max_level: Int = -1
         for diagnostic in status.diagnostics {
             if diagnostic.rootName == nil {
                 let data = ComponentData(with: diagnostic)
                 components[diagnostic.componentName] = data
+                max_level = max(max_level, diagnostic.level.rawValue)
+                allKeys.remove(diagnostic.componentName)
+            }
+        }
+        for key in allKeys {
+            self.components.removeValue(forKey: key)
+        }
+        self.summary = .Stale
+        if max_level >= 0 {
+            if let summary = DiagnosticLevel(rawValue: max_level) {
+                self.summary = summary
             }
         }
         for diagnostic in status.diagnostics {
@@ -708,6 +749,28 @@ class SystemStatusData: NSObject, ObservableObject {
                     data.update(detail: diagnostic)
                 }
             }
+        }
+    }
+
+    var canStart:Bool {
+        get {
+            switch(self.level) {
+            case .Unknown, .Active, .Activating, .Deactivating, .Error:
+                return false
+            case .Inactive:
+                return true
+            }
+        }
+    }
+
+    var canStop:Bool {
+        get {
+            switch(self.level) {
+            case .Unknown, .Inactive, .Activating, .Deactivating, .Error:
+                return false
+            case .Active:
+                return true
+                }
         }
     }
 }

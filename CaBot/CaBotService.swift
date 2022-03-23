@@ -65,13 +65,15 @@ struct DeviceStatus: Decodable {
 }
 
 struct DeviceStatusEntry: Decodable, Hashable {
-    var name: String
+    var type: String
+    var model: String
     var level: DeviceStatusLevel
     var message: String
     var values: [DiagnosticStatusKeyValue]
 
     func hash(into hasher: inout Hasher) {
-        hasher.combine(name)
+        hasher.combine(type)
+        hasher.combine(model)
         hasher.combine(level)
         hasher.combine(message)
     }
@@ -119,7 +121,8 @@ enum CaBotSystemLevel:String, Decodable {
     case Unknown
     case Inactive
     case Active
-    case Starting
+    case Activating
+    case Deactivating
     case Error
 
     var icon: String {
@@ -132,15 +135,19 @@ enum CaBotSystemLevel:String, Decodable {
             return "xmark.circle"
         case .Unknown:
             return "questionmark.circle"
-        case .Starting:
+        case .Activating:
+            return "hourglass"
+        case .Deactivating:
             return "hourglass"
         }
     }
 
     var color: Color? {
         switch (self) {
-        case .Active, .Inactive, .Starting:
+        case .Active, .Inactive:
             return Color.blue
+        case .Activating, .Deactivating:
+            return Color.orange
         case .Error:
             return Color.red
         case .Unknown:
@@ -217,15 +224,28 @@ struct BatteryStatus: Decodable {
 
 enum DiagnosticLevel: Int, Decodable {
     case OK = 0
-    case Warn = 1
+    case Warning = 1
     case Error = 2
     case Stale = 3
+
+    var text: String {
+        switch (self) {
+        case .OK:
+            return "OK"
+        case .Warning:
+            return "Warning"
+        case .Error:
+            return "Error"
+        case .Stale:
+            return "Stale"
+        }
+    }
 
     var icon: String {
         switch (self) {
         case .OK:
             return "checkmark.circle"
-        case .Warn:
+        case .Warning:
             return "exclamationmark.triangle"
         case .Error:
             return "xmark.circle"
@@ -238,7 +258,7 @@ enum DiagnosticLevel: Int, Decodable {
         switch (self) {
         case .OK:
             return Color.blue
-        case .Warn:
+        case .Warning:
             return Color.orange
         case .Error:
             return Color.red
@@ -914,6 +934,10 @@ class CaBotDeviceStatusChar: CaBotBufferedWriteChar {
             DispatchQueue.main.async {
                 self.service.notifyDeviceStatus(status: status)
             }
+            guard let text = String(data: data, encoding: .utf8) else {
+                return
+            }
+            print(text)
         } catch {
             guard let text = String(data: data, encoding: .utf8) else {
                 return

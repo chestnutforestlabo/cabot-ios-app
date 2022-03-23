@@ -28,9 +28,8 @@ struct SystemStatusDetailView: View {
     let key: String
 
     var body: some View {
-        let status = modelData.systemStatus.components[key]!
-        ScrollView {
-            VStack(alignment: .leading, spacing: 8) {
+        if let status = modelData.systemStatus.components[key] {
+            Form {
                 header
                 ForEach (status.details.keys, id:\.self) {key2 in
                     let diagnostic = status.details[key2]!
@@ -39,16 +38,22 @@ struct SystemStatusDetailView: View {
                         .animation(.default)
                 }
             }
+        } else {
+            if !modelData.suitcaseConnected {
+                Label(LocalizedStringKey("Suitcase Not Connected"),
+                      systemImage: "antenna.radiowaves.left.and.right")
+                    .opacity(0.3)
+            }
         }
     }
     private var header: some View {
         let status = modelData.systemStatus.components[key]!
         return HStack {
             Label(status.name, systemImage: status.level.icon)
+                .labelStyle(StatusLabelStyle(color: status.level.color))
             Text(":")
             Text(status.message)
         }
-        .padding(.leading)
     }
 }
 
@@ -59,31 +64,27 @@ struct DiagnosticCell: View {
     @State private var isExpanded: Bool = true
 
     var body: some View {
-        content
-            .padding(.leading)
-            .frame(maxWidth: .infinity)
-    }
-
-    private var content: some View {
-        let diagnostic = modelData.systemStatus.components[key]!.details[key2]!
-        return VStack(alignment: .leading, spacing: 8) {
-            header
-            if isExpanded {
-                Group {
-                    ForEach(diagnostic.values.keys, id:\.self) { key in
-                        let value = diagnostic.values[key]!
-                        HStack (alignment: .top) {
-                            Text(key)
-                                .frame(width: 200, alignment: .topLeading)
-                            Text(":")
-                            Text(value)
+        if let component = modelData.systemStatus.components[key] {
+            if let diagnostic = component.details[key2] {
+                VStack(alignment: .leading, spacing: 8) {
+                    header
+                    if isExpanded {
+                        ForEach(diagnostic.values.keys, id:\.self) { key in
+                            let value = diagnostic.values[key]!
+                            HStack (alignment: .top) {
+                                Text(key)
+                                    .frame(minWidth: 220, alignment: .topLeading)
+                                    .scaledToFit()
+                                Text(":")
+                                Text(value)
+                            }
+                            .frame(alignment: .top)
+                            .font(.system(.footnote))
                         }
-                        .frame(alignment: .top)
                     }
                 }
-                .padding(.leading)
+                .frame(maxWidth: .infinity)
             }
-            Divider()
         }
     }
 
@@ -92,8 +93,10 @@ struct DiagnosticCell: View {
         return VStack {
             Label(diagnostic.name, systemImage: diagnostic.level.icon)
                 .frame(maxWidth: .infinity, alignment: .topLeading)
+                .labelStyle(StatusLabelStyle(color: diagnostic.level.color))
             Label(diagnostic.message, systemImage: "text.bubble")
                 .frame(maxWidth: .infinity, alignment: .topLeading)
+                .labelStyle(StatusLabelStyle(color: .gray))
         }
         .padding(.vertical, 4)
         .onTapGesture { isExpanded.toggle() }
@@ -113,7 +116,7 @@ struct SystemStatusDetailView_Previews: PreviewProvider {
         let status = try! JSONDecoder().decode(SystemStatus.self, from: data)
         modelData.systemStatus.update(with: status)
 
-        return SystemStatusDetailView(key: "Hard: Handle")
+        return SystemStatusDetailView(key: "Hard: Pressure")
             .environmentObject(modelData)
     }
 }
