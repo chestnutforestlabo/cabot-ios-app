@@ -710,7 +710,7 @@ class SystemStatusData: NSObject, ObservableObject {
     func levelText() -> String{
         switch(self.level) {
         case .Unknown, .Inactive, .Deactivating, .Error:
-            if self.summary != .Stale {
+            if !self.components.isEmpty {
                 return "Debug"
             }
             return self.level.rawValue
@@ -739,7 +739,7 @@ class SystemStatusData: NSObject, ObservableObject {
         }
         self.summary = .Stale
         if max_level >= 0 {
-            if let summary = DiagnosticLevel(rawValue: max_level) {
+            if let summary = DiagnosticLevel(rawValue: min(2, max_level)) {
                 self.summary = summary
             }
         }
