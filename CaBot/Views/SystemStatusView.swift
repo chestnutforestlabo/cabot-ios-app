@@ -48,7 +48,7 @@ struct SystemStatusView: View {
                                     Label(component.name, systemImage: component.level.icon)
                                         .labelStyle(StatusLabelStyle(color: component.level.color))
                                 }
-                            })
+                            }).isDetailLink(false)
                         }
                     }
                 }

@@ -271,7 +271,7 @@ struct StatusMenus: View {
                             Text(modelData.batteryStatus.message)
                         }
                     }
-                )
+                ).isDetailLink(false)
                 NavigationLink(
                     destination: DeviceStatusView().environmentObject(modelData),
                     label: {
@@ -283,7 +283,7 @@ struct StatusMenus: View {
                             Text(LocalizedStringKey(modelData.deviceStatus.level.rawValue))
                         }
                     }
-                )
+                ).isDetailLink(false)
                 NavigationLink(
                     destination: SystemStatusView().environmentObject(modelData),
                     label: {
@@ -297,7 +297,7 @@ struct StatusMenus: View {
                             Text(LocalizedStringKey(modelData.systemStatus.summary.text))
                         }
                     }
-                )
+                ).isDetailLink(false)
             }
         }
     }
