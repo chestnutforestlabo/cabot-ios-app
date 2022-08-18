@@ -45,7 +45,7 @@ typedef enum {
 @property SpeechPriority priority;
 @property NSTimeInterval validBy;
 @property double validRadius; // in meter
-@property (strong, nonatomic) void (^completionHandler)(void);
+@property (strong, nonatomic) void (^completionHandler)(int);
 @property NSTimeInterval issued;
 @property NSTimeInterval speakStart;
 @property NSTimeInterval speakFinish;
@@ -65,12 +65,12 @@ typedef enum {
 + (instancetype) sharedTTS;
 + (NSString *)removeDots:(NSString *)str;
 
-- (AVSpeechUtterance*) speak:(NSString*)text withOptions:(NSDictionary*)options completionHandler:(void(^)(void))handler;
+- (AVSpeechUtterance*) speak:(NSString*)text withOptions:(NSDictionary*)options completionHandler:(void(^)(int))handler;
 
-- (AVSpeechUtterance*) speak:(NSString*)text completionHandler:(void(^)(void))handler __attribute__ ((deprecated));
-- (AVSpeechUtterance*) speak:(NSString*)text force:(BOOL)flag completionHandler:(void(^)(void))handler __attribute__ ((deprecated));
-- (AVSpeechUtterance*) selfspeak:(NSString*)text completionHandler:(void(^)(void))handler __attribute__ ((deprecated));
-- (AVSpeechUtterance*) selfspeak:(NSString*)text force:(BOOL)flag completionHandler:(void(^)(void))handler __attribute__ ((deprecated));
+- (AVSpeechUtterance*) speak:(NSString*)text completionHandler:(void(^)(int))handler __attribute__ ((deprecated));
+- (AVSpeechUtterance*) speak:(NSString*)text force:(BOOL)flag completionHandler:(void(^)(int))handler __attribute__ ((deprecated));
+- (AVSpeechUtterance*) selfspeak:(NSString*)text completionHandler:(void(^)(int))handler __attribute__ ((deprecated));
+- (AVSpeechUtterance*) selfspeak:(NSString*)text force:(BOOL)flag completionHandler:(void(^)(int))handler __attribute__ ((deprecated));
 
 - (void) pause:(double)duration;
 - (void) reset;

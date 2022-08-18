@@ -44,7 +44,7 @@ class CaBotTTS : TTSProtocol{
         self._tts.reset()
     }
 
-    func speak(_ text: String?, forceSelfvoice: Bool, force: Bool, callback: @escaping () -> Void) {
+    func speak(_ text: String?, forceSelfvoice: Bool, force: Bool, callback: @escaping (Int32) -> Void) {
         let isForeground = UIApplication.shared.applicationState == .active
         let isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
         let selfspeak = forceSelfvoice || !isForeground || !isVoiceOverRunning
@@ -54,14 +54,20 @@ class CaBotTTS : TTSProtocol{
         } else {
             self._tts.speak(text == nil ? "" : text, withOptions: ["rate": rate, "selfspeak": selfspeak, "force": force], completionHandler: callback)
         }
-
     }
 
-    func speak(_ text: String?, force: Bool, callback: @escaping () -> Void) {
+    func speak(_ text: String?, force: Bool, callback: @escaping (Int32) -> Void) {
         self.speak(text, forceSelfvoice: false, force: force, callback: callback)
     }
 
-    func speak(_ text: String?, callback: @escaping () -> Void) {
+    // to conform to TTSProtocol for HLPDialog
+    func speak(_ text:String?, callback: @escaping ()->Void) {
+        self.speak(text) {
+            callback()
+        }
+    }
+
+    func speak(_ text: String?, callback: @escaping (Int32) -> Void) {
         self.speak(text, forceSelfvoice: false, force: false, callback: callback)
     }
 
@@ -125,7 +131,7 @@ class TTSHelper {
         let tts = CaBotTTS(voice: voice.AVvoice)
         tts.rate = rate
 
-        tts.speak(NSLocalizedString("Hello Suitcase!", comment: ""), forceSelfvoice:true, force:true) {
+        tts.speak(NSLocalizedString("Hello Suitcase!", comment: ""), forceSelfvoice:true, force:true) {_ in
 
         }
     }

@@ -177,7 +177,7 @@ static NavDeviceTTS *instance = nil;
     }
 }
 
-- (AVSpeechUtterance *)speak:(NSString *)text withOptions:(NSDictionary *)options completionHandler:(void (^)(void))handler
+- (AVSpeechUtterance *)speak:(NSString *)text withOptions:(NSDictionary *)options completionHandler:(void (^)(int))handler
 {
     BOOL force = [options[@"force"] boolValue];
     BOOL selfspeak = [options[@"selfspeak"] boolValue];
@@ -199,22 +199,22 @@ static NavDeviceTTS *instance = nil;
     return [self _speak:text force:force selfvoicing:selfspeak nohistory:nohistory quickAnswer:quickAnswer rate:speechRate voice:aVoice completionHandler:handler];
 }
 
-- (AVSpeechUtterance *)selfspeak:(NSString *)text completionHandler:(void (^)(void))handler
+- (AVSpeechUtterance *)selfspeak:(NSString *)text completionHandler:(void (^)(int))handler
 {
     return [self selfspeak:text force:NO completionHandler:handler];
 }
 
-- (AVSpeechUtterance *)selfspeak:(NSString *)text force:(BOOL)flag completionHandler:(void (^)(void))handler
+- (AVSpeechUtterance *)selfspeak:(NSString *)text force:(BOOL)flag completionHandler:(void (^)(int))handler
 {
     return [self _speak:text force:flag selfvoicing:YES nohistory:YES quickAnswer:NO rate:0.5 voice:nil completionHandler:handler];
 }
 
-- (AVSpeechUtterance*) speak: (NSString*) text completionHandler:(void (^)(void))handler
+- (AVSpeechUtterance*) speak: (NSString*) text completionHandler:(void (^)(int))handler
 {
     return [self speak:text force:NO completionHandler:handler];
 }
 
-- (AVSpeechUtterance*) speak:(NSString*)text force:(BOOL)flag completionHandler:(void (^)(void))handler
+- (AVSpeechUtterance*) speak:(NSString*)text force:(BOOL)flag completionHandler:(void (^)(int))handler
 {
     return [self _speak:text force:flag selfvoicing:NO nohistory:NO quickAnswer:NO rate:0.5 voice:nil completionHandler:handler];
 }
@@ -226,10 +226,10 @@ static NavDeviceTTS *instance = nil;
                   quickAnswer:(BOOL)quickAnswer
                          rate:(double)speechRate
                         voice:(AVSpeechSynthesisVoice*)voice_
-            completionHandler:(void (^)(void))handler
+            completionHandler:(void (^)(int))handler
 {
     if (text == nil) {
-        handler();
+        handler(0);
         return nil;
     }
     if (voice_ == nil) {
@@ -358,7 +358,7 @@ static NavDeviceTTS *instance = nil;
     [processing removeObjectForKey:utterance.speechString];
     
     if (se && se.completionHandler) {
-        se.completionHandler();
+        se.completionHandler(-1);
     }
 }
 
@@ -383,7 +383,7 @@ static NavDeviceTTS *instance = nil;
             [processing removeObjectForKey:utterance.speechString];
             
             if (se && se.completionHandler) {
-                se.completionHandler();
+                se.completionHandler((int)characterRange.location);
             }
         }
     }
@@ -402,7 +402,7 @@ static NavDeviceTTS *instance = nil;
         [processing removeObjectForKey:utterance.speechString];
         
         if (se.completionHandler) {
-            se.completionHandler();
+            se.completionHandler((int)utterance.speechString.length);
         }
     }
 }
@@ -422,7 +422,7 @@ static NavDeviceTTS *instance = nil;
         isProcessing = NO;
         expire = NAN;
         if (se.completionHandler) {
-            se.completionHandler();
+            se.completionHandler((int)speechString.length);
         }
     }    
 }

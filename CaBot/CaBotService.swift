@@ -291,6 +291,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     public var peripheralManager:CBPeripheralManager!
 
     private let uuid = CBUUID(string: String(format:UUID_FORMAT, 0x0000))
+    private var logChar:CaBotNotifyChar!
     private var summonsChar:CaBotNotifyChar!
     private var destinationChar:CaBotNotifyChar!
     private var findPersonChar:CaBotNotifyChar!
@@ -322,6 +323,8 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
         self.chars.append(CaBotDeviceStatusChar(service: self, handle: 0x0002))
         self.chars.append(CaBotSystemStatusChar(service: self, handle: 0x0003))
         self.chars.append(CabotBatteryStatusChar(service: self, handle: 0x0004))
+        self.logChar = CaBotNotifyChar(service: self, handle:0x0005)
+        self.chars.append(self.logChar)
 
         self.summonsChar = CaBotNotifyChar(service: self, handle:0x00010)
         self.chars.append(self.summonsChar)
@@ -373,6 +376,20 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
 
     // MARK: public functions
     
+    public func activityLog(category: String, text: String, memo: String) -> Bool{
+        let json: Dictionary<String, String> = [
+            "category": category,
+            "text": text,
+            "memo": memo
+        ]
+        do {
+            let data = try JSONSerialization.data(withJSONObject: json, options: [])
+            return logChar.notify(data: data)
+        } catch {
+        }
+        return false
+    }
+
     public func send(destination: String) -> Bool {
         NSLog("destination \(destination)")
         return (self.destinationChar.notify(value: destination))
@@ -587,15 +604,18 @@ class CaBotNotifyChar: CaBotChar {
         super.init(service: service)
     }
     
-    func notify(value:String, retry:Int = 10) -> Bool {
-        let data = Data(value.utf8)
-
+    func notify(data:Data, retry:Int = 10) -> Bool {
         if self.characteristic_read.subscribedCentrals?.count == 0 {
             return false
         }
 
         NSLog("notify to "+self.characteristic_read.uuid.uuidString)
         return self.service.peripheralManager.updateValue(data, for: self.characteristic_read, onSubscribedCentrals: nil)
+    }
+    
+    func notify(value:String, retry:Int = 10) -> Bool {
+        let data = Data(value.utf8)
+        return self.notify(data: data)
     }
 }
 
@@ -885,15 +905,23 @@ class CaBotSpeechChar: CaBotTextWriteChar {
             let tts = self.service.tts
 
             for line in text.split(separator: "\n") {
+                var force: Bool = false
                 if line == "__force_stop__" {
                     tts.speak("") {
                     }
+                    force = true
                 } else {
                     if !tts.isSpeaking {
-                        tts.speak(String(line)) {
+                        tts.speak(String(line)) { code in
+                            if code > 0 {
+                                _ = self.service.activityLog(category: "ble speech request completed", text: String(line), memo: "force=\(force),return_code=\(code)")
+                            } else {
+                                _ = self.service.activityLog(category: "ble speech request canceled", text: String(line), memo: "force=\(force),return_code=\(code)")
+                            }
                         }
                     } else {
                         NSLog("TTS is busy and skip speaking: \(line)")
+                        _ = self.service.activityLog(category: "ble speech request skipped", text: String(line), memo: "TTS is busy")
                     }
                 }
             }
