@@ -62,7 +62,7 @@ class CaBotTTS : TTSProtocol{
 
     // to conform to TTSProtocol for HLPDialog
     func speak(_ text:String?, callback: @escaping ()->Void) {
-        self.speak(text) {
+        self.speak(text) { _ in
             callback()
         }
     }

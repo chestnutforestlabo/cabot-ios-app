@@ -357,12 +357,18 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
         self.heartBeatTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { (timer) in
             DispatchQueue.main.async {
                 //NSLog("heartbeat")
-                self.checkAdvertisement();
+                if self.checkAdvertisement() == false {
+                    NSLog("disconnected from the server")
+                    timer.invalidate()
+                    self.contrialCount = 0
+                }
 
-                if (self.heartbeatChar.notify(value: "1")) {
+                if (self.heartbeatChar.notify(value: "1", retry: 0)) {
                     self.contrialCount = CaBotService.CONTRIAL_MAX
+                    NSLog("heartBeat success")
                 } else {
                     self.contrialCount = self.contrialCount - 1
+                    NSLog("heartBeat failure    ")
                 }
                 if(self.contrialCount > 0){
                     self.delegate?.caBot(service: self, centralConnected: true)
@@ -376,16 +382,21 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
 
     // MARK: public functions
     
-    public func activityLog(category: String, text: String, memo: String) -> Bool{
+    public func activityLog(category: String = "", text: String = "", memo: String = "") -> Bool{
         let json: Dictionary<String, String> = [
             "category": category,
             "text": text,
             "memo": memo
         ]
         do {
+            NSLog("activityLog \(category), \(text), \(memo)")
             let data = try JSONSerialization.data(withJSONObject: json, options: [])
-            return logChar.notify(data: data)
+            let result = logChar.notify(data: data)
+            if result == false {
+                NSLog("FAIL activityLog \(category), \(text), \(memo)")
+            }
         } catch {
+            NSLog("activityLog \(category), \(text), \(memo)")
         }
         return false
     }
@@ -475,11 +486,12 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
         peripheralManager.add(service)
     }
     private var checkCount:Int = 0
-    private func checkAdvertisement()
+    private func checkAdvertisement() -> Bool
     {
         if (self.heartbeatChar.characteristic_read.subscribedCentrals?.count ?? 0 > 0) {
             self.checkCount = 0
             self.stopAdvertising()
+            return true
         } else {
             self.checkCount += 1
             if self.checkCount > 15 {
@@ -492,6 +504,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
                 self.startAdvertising()
             }
         }
+        return false
     }
 
     // MARK: CBPeripheralManagerDelegate
@@ -595,7 +608,7 @@ class CaBotNotifyChar: CaBotChar {
         
         self.characteristic_read = CBMutableCharacteristic(
             type: service.generateUUID(handle: handle),
-            properties: [.notify],
+            properties: [.indicate],
             value: nil,
             permissions: [.readable])
         
@@ -610,12 +623,21 @@ class CaBotNotifyChar: CaBotChar {
         }
 
         NSLog("notify to "+self.characteristic_read.uuid.uuidString)
-        return self.service.peripheralManager.updateValue(data, for: self.characteristic_read, onSubscribedCentrals: nil)
+        if self.service.peripheralManager.updateValue(data, for: self.characteristic_read, onSubscribedCentrals: nil) == false {
+            if retry == 0 {
+                return false
+            }
+            NSLog("FAIL(\(retry)) notify to \(self.characteristic_read.uuid.uuidString)")
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.1) {
+                self.notify(data: data, retry: retry-1)
+            }
+        }
+        return true
     }
     
     func notify(value:String, retry:Int = 10) -> Bool {
         let data = Data(value.utf8)
-        return self.notify(data: data)
+        return self.notify(data: data, retry: retry)
     }
 }
 
@@ -912,6 +934,7 @@ class CaBotSpeechChar: CaBotTextWriteChar {
                     force = true
                 } else {
                     if !tts.isSpeaking {
+                        _ = self.service.activityLog(category: "ble speech request speaking", text: String(line), memo: "force=\(force)")
                         tts.speak(String(line)) { code in
                             if code > 0 {
                                 _ = self.service.activityLog(category: "ble speech request completed", text: String(line), memo: "force=\(force),return_code=\(code)")
