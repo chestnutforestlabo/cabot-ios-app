@@ -273,6 +273,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     static let UUID_FORMAT = "35CE%04X-5E89-4C0D-A3F6-8A6A507C1BF1"
     static let CABOT_SPEED_CONFIG = "cabot_speed"
     static let SPEECH_SPEED_CONFIG = "speech_speed"
+    static let CONTRIAL_MAX = 5
 
     func generateUUID(handle:Int) -> CBUUID {
         return CBUUID(string: String(format:CaBotService.UUID_FORMAT, handle))
@@ -301,6 +302,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     private var chars:[CaBotChar] = []
     private let peripheralRestoreKey:String = UUID().uuidString
     private var serviceAdded:Bool = false
+    private var contrialCount:Int = CONTRIAL_MAX
 
     func startIfAuthorized() {
         if (CBCentralManager.authorization == .allowedAlways) {
@@ -355,8 +357,13 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
                 self.checkAdvertisement();
 
                 if (self.heartbeatChar.notify(value: "1")) {
-                    self.delegate?.caBot(service: self, centralConnected: true)
+                    self.contrialCount = CaBotService.CONTRIAL_MAX
                 } else {
+                    self.contrialCount = self.contrialCount - 1
+                }
+                if(self.contrialCount > 0){
+                    self.delegate?.caBot(service: self, centralConnected: true)
+                }else{
                     self.delegate?.caBot(service: self, centralConnected: false)
                     self.delegate?.caBot(service: self, faceappConnected: false)
                 }
