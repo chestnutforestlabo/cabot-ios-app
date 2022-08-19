@@ -569,7 +569,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
             let text = centralConnected ? NSLocalizedString("Suitcase has been connected", comment: "") :
                 NSLocalizedString("Suitcase has been disconnected", comment: "")
 
-            self.tts.speak(text, force: true) {
+            _ = service.activityLog(category: "app speech speaking", text: text, memo: "force=true")
+            self.tts.speak(text, force: true) {_ in
+                _ = service.activityLog(category: "app speech completed", text: text, memo: "force=true")
             }
         }
     }
