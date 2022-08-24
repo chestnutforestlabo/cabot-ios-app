@@ -24,6 +24,11 @@ import Foundation
 import AVKit
 import HLPDialog
 
+
+protocol CaBotTTSDelegate {
+    func activityLog(category:String, text:String, memo:String)
+}
+
 class CaBotTTS : TTSProtocol{
 
     var voice: AVSpeechSynthesisVoice?
@@ -33,6 +38,7 @@ class CaBotTTS : TTSProtocol{
             self._tts.isSpeaking()
         }
     }
+    var delegate:CaBotTTSDelegate?
 
     init(voice: AVSpeechSynthesisVoice?) {
         self.voice = voice
@@ -49,10 +55,19 @@ class CaBotTTS : TTSProtocol{
         let isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
         let selfspeak = forceSelfvoice || !isForeground || !isVoiceOverRunning
 
+        self.delegate?.activityLog(category: "app apeech speaking", text: text ?? "", memo: "force=\(force)")
+
+        var options:Dictionary<String,Any> = ["rate": rate, "selfspeak": selfspeak, "force": force]
         if let voice = self.voice {
-            self._tts.speak(text == nil ? "" : text, withOptions: ["voice": voice, "rate": rate, "selfspeak": selfspeak, "force": force], completionHandler: callback)
-        } else {
-            self._tts.speak(text == nil ? "" : text, withOptions: ["rate": rate, "selfspeak": selfspeak, "force": force], completionHandler: callback)
+            options["voice"] = voice
+        }
+        self._tts.speak(text == nil ? "" : text, withOptions: options) { code in
+            if code > 0 {
+                self.delegate?.activityLog(category: "app apeech completed", text: text ?? "", memo: "force=\(force)")
+            } else {
+                self.delegate?.activityLog(category: "app apeech canceled", text: text ?? "", memo: "force=\(force)")
+            }
+            callback(code)
         }
     }
 

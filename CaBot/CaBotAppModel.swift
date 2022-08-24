@@ -58,7 +58,7 @@ enum DisplayedScene {
 }
 
 
-final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, TourManagerDelegate, CLLocationManagerDelegate {
+final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, TourManagerDelegate, CLLocationManagerDelegate, CaBotTTSDelegate {
 
     private let selectedResourceKey = "SelectedResourceKey"
     private let selectedVoiceKey = "SelectedVoiceKey"
@@ -261,6 +261,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
         self.notificationCenter = UNUserNotificationCenter.current()
         super.init()
 
+        self.tts.delegate = self
+
         if let selectedName = UserDefaults.standard.value(forKey: selectedResourceKey) as? String {
             self.resource = resourceManager.resource(by: selectedName)
         }
@@ -349,6 +351,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
                 self.notificationState = granted ? .Granted : .Denied
             }
         }
+    }
+
+    // MARK: CaBotTTSDelegate
+
+    func activityLog(category: String, text: String, memo: String) {
+        self.bleService.activityLog(category: category, text: text, memo: memo)
     }
 
     // MARK: LocationManagerDelegate
@@ -569,10 +577,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegate, Tou
             let text = centralConnected ? NSLocalizedString("Suitcase has been connected", comment: "") :
                 NSLocalizedString("Suitcase has been disconnected", comment: "")
 
-            _ = service.activityLog(category: "app speech speaking", text: text, memo: "force=true")
-            self.tts.speak(text, force: true) {_ in
-                _ = service.activityLog(category: "app speech completed", text: text, memo: "force=true")
-            }
+            self.tts.speak(text, force: true) {_ in }
         }
     }
 
