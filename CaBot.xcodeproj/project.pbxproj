@@ -13,6 +13,7 @@
 		3013614026A0BF590050CF9E /* PreviewResource in Resources */ = {isa = PBXBuildFile; fileRef = 3013613F26A0BF590050CF9E /* PreviewResource */; };
 		3013614326A0F8E10050CF9E /* TourDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3013614226A0F8E10050CF9E /* TourDetailView.swift */; };
 		3013614726A1E77B0050CF9E /* WebContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3013614626A1E77B0050CF9E /* WebContentView.swift */; };
+		306069B429A5E45D001FB5DB /* NavigationBackport in Frameworks */ = {isa = PBXBuildFile; productRef = 306069B329A5E45D001FB5DB /* NavigationBackport */; };
 		306C7F6C265D435100E5928E /* Yams in Frameworks */ = {isa = PBXBuildFile; productRef = 306C7F6B265D435100E5928E /* Yams */; };
 		308FCE1B27D8F4C8009FCC7B /* DeviceStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308FCE1A27D8F4C8009FCC7B /* DeviceStatusView.swift */; };
 		308FCE1D27D8F4D3009FCC7B /* SystemStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308FCE1C27D8F4D3009FCC7B /* SystemStatusView.swift */; };
@@ -130,6 +131,7 @@
 			files = (
 				308FCE2327D9014E009FCC7B /* Collections in Frameworks */,
 				306C7F6C265D435100E5928E /* Yams in Frameworks */,
+				306069B429A5E45D001FB5DB /* NavigationBackport in Frameworks */,
 				308FCE2A27E12844009FCC7B /* Gzip in Frameworks */,
 				3009AC3126AA3F4000370873 /* HLPDialog in Frameworks */,
 			);
@@ -301,6 +303,7 @@
 				3009AC3026AA3F4000370873 /* HLPDialog */,
 				308FCE2227D9014E009FCC7B /* Collections */,
 				308FCE2927E12844009FCC7B /* Gzip */,
+				306069B329A5E45D001FB5DB /* NavigationBackport */,
 			);
 			productName = CaBot;
 			productReference = 7E29F009228B548100CA7DD6 /* CaBot.app */;
@@ -381,6 +384,7 @@
 				3009AC2F26AA3F4000370873 /* XCRemoteSwiftPackageReference "HLPDialog" */,
 				308FCE2127D9014E009FCC7B /* XCRemoteSwiftPackageReference "swift-collections" */,
 				308FCE2827E12844009FCC7B /* XCRemoteSwiftPackageReference "GzipSwift" */,
+				306069B229A5E45D001FB5DB /* XCRemoteSwiftPackageReference "NavigationBackport" */,
 			);
 			productRefGroup = 7E29F00A228B548100CA7DD6 /* Products */;
 			projectDirPath = "";
@@ -833,6 +837,14 @@
 				kind = branch;
 			};
 		};
+		306069B229A5E45D001FB5DB /* XCRemoteSwiftPackageReference "NavigationBackport" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/johnpatrickmorgan/NavigationBackport.git";
+			requirement = {
+				kind = exactVersion;
+				version = 0.7.1;
+			};
+		};
 		306C7F6A265D435100E5928E /* XCRemoteSwiftPackageReference "Yams" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/jpsim/Yams";
@@ -864,6 +876,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3009AC2F26AA3F4000370873 /* XCRemoteSwiftPackageReference "HLPDialog" */;
 			productName = HLPDialog;
+		};
+		306069B329A5E45D001FB5DB /* NavigationBackport */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 306069B229A5E45D001FB5DB /* XCRemoteSwiftPackageReference "NavigationBackport" */;
+			productName = NavigationBackport;
 		};
 		306C7F6B265D435100E5928E /* Yams */ = {
 			isa = XCSwiftPackageProductDependency;

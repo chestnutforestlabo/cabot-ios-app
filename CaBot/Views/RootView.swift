@@ -22,12 +22,13 @@
 
 import SwiftUI
 import CoreData
+import NavigationBackport
 
 struct RootView: View {
     @EnvironmentObject var modelData: CaBotAppModel
 
     var body: some View {
-        return NavigationView {
+        return NBNavigationStack {
             VStack {
                 switch(modelData.displayedScene) {
                 case .Onboard:
