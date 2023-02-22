@@ -57,14 +57,14 @@ enum DisplayedScene {
     }
 }
 
-class wrapper_transportservice: CabotTransportProtocol{
+class wrapper_transportservice: CaBotTransportProtocol{
     
-    var services:[CabotTransportProtocol] = []
+    var services:[CaBotTransportProtocol] = []
     
-    func add_service(service:CabotTransportProtocol){
+    func add_service(service:CaBotTransportProtocol){
         self.services.append(service)
     }
-    func set_service(service:CabotTransportProtocol){
+    func set_service(service:CaBotTransportProtocol){
         self.services.removeAll()
         self.add_service(service:service)
     }
@@ -375,7 +375,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
 
     private var wrpService: wrapper_transportservice
     private var bleService: CaBotService
-    private var tcpService: CaBotService_tcp
+    private var tcpService: CaBotServiceTCP
     private let tts: CaBotTTS
     let preview: Bool
     let resourceManager: ResourceManager
@@ -397,7 +397,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
         self.preview = preview
         self.tts = CaBotTTS(voice: nil)
         self.bleService = CaBotService(with: self.tts)
-        self.tcpService = CaBotService_tcp(with: self.tts)
+        self.tcpService = CaBotServiceTCP(with: self.tts)
         self.wrpService = wrapper_transportservice()
         self.resourceManager = ResourceManager(preview: preview)
         self.tourManager = TourManager()
@@ -717,12 +717,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
 
     // MARK: CaBotServiceDelegate
 
-    func caBot(service: CabotTransportProtocol, versionMatched: Bool, with version: String) {
+    func caBot(service: CaBotTransportProtocol, versionMatched: Bool, with version: String) {
         self.versionMatched = versionMatched
         self.serverBLEVersion = version
     }
 
-    func caBot(service: CabotTransportProtocol, centralConnected: Bool) {
+    func caBot(service: CaBotTransportProtocol, centralConnected: Bool) {
         if self.suitcaseConnected != centralConnected {
             self.suitcaseConnected = centralConnected
 
@@ -733,13 +733,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
         }
     }
 
-    func caBot(service: CabotTransportProtocol, faceappConnected: Bool) {
+    func caBot(service: CaBotTransportProtocol, faceappConnected: Bool) {
         if self.backpackConnected != faceappConnected {
             self.backpackConnected = faceappConnected
         }
     }
 
-    func cabot(service: CabotTransportProtocol, bluetoothStateUpdated state: CBManagerState) {
+    func cabot(service: CaBotTransportProtocol, bluetoothStateUpdated state: CBManagerState) {
         if bluetoothState != state {
             bluetoothState = state
         }
@@ -749,12 +749,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
         #endif
     }
 
-    func cabot(service: CabotTransportProtocol, openRequest url: URL) {
+    func cabot(service: CaBotTransportProtocol, openRequest url: URL) {
         NSLog("open request: %@", url.absoluteString)
         self.open(content: url)
     }
 
-    func cabot(service: CabotTransportProtocol, soundRequest: String) {
+    func cabot(service: CaBotTransportProtocol, soundRequest: String) {
         switch(soundRequest) {
         case "SpeedUp":
             playAudio(file: speedUpSound)
@@ -767,7 +767,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
         }
     }
 
-    func cabot(service: CabotTransportProtocol, notification: NavigationNotification) {
+    func cabot(service: CaBotTransportProtocol, notification: NavigationNotification) {
         switch(notification){
         case .next:
             if tourManager.nextDestination() {
@@ -803,15 +803,15 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
         }
     }
 
-    func cabot(service: CabotTransportProtocol, deviceStatus: DeviceStatus) -> Void {
+    func cabot(service: CaBotTransportProtocol, deviceStatus: DeviceStatus) -> Void {
         self.deviceStatus = deviceStatus
     }
 
-    func cabot(service: CabotTransportProtocol, systemStatus: SystemStatus) -> Void {
+    func cabot(service: CaBotTransportProtocol, systemStatus: SystemStatus) -> Void {
         self.systemStatus.update(with: systemStatus)
     }
 
-    func cabot(service: CabotTransportProtocol, batteryStatus: BatteryStatus) -> Void {
+    func cabot(service: CaBotTransportProtocol, batteryStatus: BatteryStatus) -> Void {
         self.batteryStatus = batteryStatus
     }
 

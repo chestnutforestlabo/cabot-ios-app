@@ -24,7 +24,7 @@ import Foundation
 import SocketIO
 
 
-class CaBotService_tcp: NSObject, CabotTransportProtocol{
+class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
     fileprivate var tts:CaBotTTS
     fileprivate var socketURL:String!
     fileprivate var manager: SocketManager!
