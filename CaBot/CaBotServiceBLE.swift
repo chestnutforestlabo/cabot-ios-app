@@ -54,7 +54,7 @@ class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProt
 
     init(with tts:CaBotTTS) {
         self.tts = tts
-        self.actions = CaBotServiceActions()
+        self.actions = CaBotServiceActions.shared
     }
 
     public var teamID:String? = nil
@@ -73,6 +73,7 @@ class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProt
     private let peripheralRestoreKey:String = UUID().uuidString
     private var serviceAdded:Bool = false
     private var contrialCount:Int = CONTRIAL_MAX
+    private var connected:Bool = false
 
     func startIfAuthorized() {
         if (CBCentralManager.authorization == .allowedAlways) {
@@ -134,18 +135,17 @@ class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProt
                     NSLog("heartBeat failure    ")
                 }
                 if(self.contrialCount > 0){
-                    self.delegate?.caBot(service: self, centralConnected: true)
+                    self.connected = true
+                    self.delegate?.caBot(service: self, centralConnected: self.connected)
                 }else{
-                    self.delegate?.caBot(service: self, centralConnected: false)
+                    self.connected = false
+                    self.delegate?.caBot(service: self, centralConnected: self.connected)
                 }
             }
         }
     }
 
-    // MARK: CaBotTransportProtocol
-    public func connectionType() -> ConnectionType {
-        return .BLE
-    }
+    // MARK: CaBotServiceProtocol
 
     public func activityLog(category: String = "", text: String = "", memo: String = "") -> Bool{
         let json: Dictionary<String, String> = [
@@ -175,10 +175,19 @@ class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProt
         NSLog("summons \(destination)")
         return (self.summonsChar.notify(value: destination))
     }
-    
+
     public func manage(command: CaBotManageCommand) -> Bool {
         NSLog("manage \(command.rawValue)")
         return (self.manageChar.notify(value: command.rawValue))
+    }
+
+    public func isConnected() -> Bool {
+        return self.connected
+    }
+
+    // MARK: CaBotTransportProtocol
+    public func connectionType() -> ConnectionType {
+        return .BLE
     }
 
     public func startAdvertising() {

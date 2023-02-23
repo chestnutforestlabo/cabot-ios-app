@@ -57,6 +57,62 @@ enum DisplayedScene {
     }
 }
 
+class FallbackService: CaBotServiceProtocol {
+    private let services: [CaBotServiceProtocol]
+    private var selectedService: CaBotServiceProtocol?
+
+    init(services: [CaBotServiceProtocol]) {
+        self.services = services
+    }
+
+    func select(service: CaBotServiceProtocol) {
+        self.selectedService = service
+    }
+
+    private func getService() -> CaBotServiceProtocol? {
+        if let service = self.selectedService {
+            if service.isConnected() {
+                return service
+            }
+        }
+        for service in services {
+            if service.isConnected() {
+                return service
+            }
+        }
+        return nil
+    }
+
+    func isConnected() -> Bool {
+        for service in services {
+            if service.isConnected() {
+                return true
+            }
+        }
+        return false
+    }
+
+    func activityLog(category: String, text: String, memo: String) -> Bool {
+        guard let service = getService() else { return false }
+        return service.activityLog(category: category, text: text, memo: memo)
+    }
+
+    func send(destination: String) -> Bool {
+        guard let service = getService() else { return false }
+        return service.send(destination: destination)
+    }
+
+    func summon(destination: String) -> Bool {
+        guard let service = getService() else { return false }
+        return service.summon(destination: destination)
+    }
+
+    func manage(command: CaBotManageCommand) -> Bool {
+        guard let service = getService() else { return false }
+        return service.manage(command: command)
+    }
+}
+
 final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, TourManagerDelegate, CLLocationManagerDelegate, CaBotTTSDelegate {
     
     private let selectedResourceKey = "SelectedResourceKey"
@@ -182,9 +238,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             UserDefaults.standard.synchronize()
             switch(connectionType) {
             case .BLE:
-                selectedService = bleService
+                fallbackService.select(service: bleService)
             case .TCP:
-                selectedService = tcpService
+                fallbackService.select(service: tcpService)
             }
         }
     }
@@ -266,9 +322,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var systemStatus: SystemStatusData = SystemStatusData()
     @Published var batteryStatus: BatteryStatus = BatteryStatus()
 
-    private var selectedService: any CaBotTransportProtocol
     private var bleService: CaBotServiceBLE
     private var tcpService: CaBotServiceTCP
+    private var fallbackService: FallbackService
     private let tts: CaBotTTS
     private var lastUpdated: Int64 = 0
     let preview: Bool
@@ -290,8 +346,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     init(preview: Bool) {
         self.preview = preview
         self.tts = CaBotTTS(voice: nil)
-        self.bleService = CaBotServiceBLE(with: self.tts)
-        self.tcpService = CaBotServiceTCP(with: self.tts)
+        let bleService = CaBotServiceBLE(with: self.tts)
+        let tcpService = CaBotServiceTCP(with: self.tts)
+        self.bleService = bleService
+        self.tcpService = tcpService
+        self.fallbackService = FallbackService(services: [bleService, tcpService])
         self.resourceManager = ResourceManager(preview: preview)
         self.tourManager = TourManager()
         self.dialogViewHelper = DialogViewHelper()
@@ -305,9 +364,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
         switch(connectionType) {
         case .BLE:
-            selectedService = bleService
+            fallbackService.select(service: bleService)
         case .TCP:
-            selectedService = tcpService
+            fallbackService.select(service: tcpService)
         }
         self.connectionType = connectionType
         super.init()
@@ -414,7 +473,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     // MARK: CaBotTTSDelegate
 
     func activityLog(category: String, text: String, memo: String) {
-        _ = self.selectedService.activityLog(category: category, text: text, memo: memo)
+        _ = self.fallbackService.activityLog(category: category, text: text, memo: memo)
     }
 
     // MARK: LocationManagerDelegate
@@ -485,7 +544,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             print("Show modal waiting")
             NavUtil.showModalWaiting(withMessage: NSLocalizedString("processing...", comment: ""))
         }
-        if self.selectedService.summon(destination: destination) || self.noSuitcaseDebug {
+        if self.fallbackService.summon(destination: destination) || self.noSuitcaseDebug {
             self.speak(NSLocalizedString("Sending the command to the suitcase", comment: "")) {}
             DispatchQueue.main.async {
                 print("hide modal waiting")
@@ -540,7 +599,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func systemManageCommand(command: CaBotManageCommand) {
-        if self.selectedService.manage(command: command) {
+        if self.fallbackService.manage(command: command) {
             switch(command) {
             case .poweroff, .reboot:
                 deviceStatus.level = .Unknown
@@ -558,7 +617,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func debugCabotArrived() {
-        self.cabot(service: self.selectedService, notification: .arrived)
+        self.cabot(service: self.bleService, notification: .arrived)
     }
 
     // MARK: TourManagerDelegate
@@ -605,7 +664,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             print("Show modal waiting")
             NavUtil.showModalWaiting(withMessage: NSLocalizedString("processing...", comment: ""))
         }
-        if selectedService.send(destination: destination) || self.noSuitcaseDebug  {
+        if fallbackService.send(destination: destination) || self.noSuitcaseDebug  {
             DispatchQueue.main.async {
                 print("hide modal waiting")
                 NavUtil.hideModalWaiting()
@@ -669,13 +728,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func cabot(service: any CaBotTransportProtocol, openRequest url: URL) {
-        guard service.connectionType() == self.selectedService.connectionType() else { return }
         NSLog("open request: %@", url.absoluteString)
         self.open(content: url)
     }
 
     func cabot(service: any CaBotTransportProtocol, soundRequest: String) {
-        guard service.connectionType() == self.selectedService.connectionType() else { return }
         switch(soundRequest) {
         case "SpeedUp":
             playAudio(file: speedUpSound)
@@ -689,7 +746,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func cabot(service: any CaBotTransportProtocol, notification: NavigationNotification) {
-        guard service.connectionType() == self.selectedService.connectionType() else { return }
         switch(notification){
         case .next:
             if tourManager.nextDestination() {
@@ -726,17 +782,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func cabot(service: any CaBotTransportProtocol, deviceStatus: DeviceStatus) -> Void {
-        guard service.connectionType() == self.selectedService.connectionType() else { return }
         self.deviceStatus = deviceStatus
     }
 
     func cabot(service: any CaBotTransportProtocol, systemStatus: SystemStatus) -> Void {
-        guard service.connectionType() == self.selectedService.connectionType() else { return }
         self.systemStatus.update(with: systemStatus)
     }
 
     func cabot(service: any CaBotTransportProtocol, batteryStatus: BatteryStatus) -> Void {
-        guard service.connectionType() == self.selectedService.connectionType() else { return }
         self.batteryStatus = batteryStatus
     }
 }

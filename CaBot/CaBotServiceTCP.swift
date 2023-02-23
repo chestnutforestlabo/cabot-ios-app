@@ -31,7 +31,8 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
     fileprivate var socket: SocketIOClient?
     fileprivate let version:String = CaBotServiceBLE.CABOT_BLE_VERSION
 
-    private let actions = CaBotServiceActions()
+    private let actions = CaBotServiceActions.shared
+    private var connected: Bool = true
 
     var delegate:CaBotServiceDelegate?
 
@@ -52,11 +53,7 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
         socket.emit(event, items)
     }
 
-    // MARK: CaBotTransportProtocol
-
-    func connectionType() -> ConnectionType {
-        return .TCP
-    }
+    // MARK: CaBotServiceProtocol
 
     func activityLog(category: String, text: String, memo: String) -> Bool {
         let json: Dictionary<String, String> = [
@@ -93,7 +90,17 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
         self.emit("manage_cabot", command.rawValue)//TODO emitwithack??
         return true
     }
+
+    public func isConnected() -> Bool {
+        return self.connected
+    }
     
+    // MARK: CaBotTransportProtocol
+
+    func connectionType() -> ConnectionType {
+        return .TCP
+    }
+
     func startAdvertising() {
         //assuming nothing to do
     }
@@ -140,6 +147,7 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
             guard let socket = weakself.socket else { return }
             guard let delegate = weakself.delegate else { return }
             DispatchQueue.main.async {
+                weakself.connected = true
                 delegate.caBot(service: weakself, centralConnected: true)
             }
             socket.emit("req_version", true)
@@ -154,6 +162,7 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
             guard let weakself = self else { return }
             guard let delegate = weakself.delegate else { return }
             DispatchQueue.main.async {
+                weakself.connected = false
                 delegate.caBot(service: weakself, centralConnected: false)
             }
         }

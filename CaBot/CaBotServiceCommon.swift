@@ -30,12 +30,16 @@ enum ConnectionType:String, CaseIterable{
     case TCP = "tcp"
 }
 
-protocol CaBotTransportProtocol {
-    func connectionType() -> ConnectionType
+protocol CaBotServiceProtocol {
     func activityLog(category: String, text: String, memo: String) -> Bool
     func send(destination: String) -> Bool
     func summon(destination: String) -> Bool
     func manage(command: CaBotManageCommand) -> Bool
+    func isConnected() -> Bool
+}
+
+protocol CaBotTransportProtocol: CaBotServiceProtocol {
+    func connectionType() -> ConnectionType
     func startAdvertising()
     func stopAdvertising()
 }
@@ -305,6 +309,10 @@ struct NavigationEventRequest: Decodable {
 }
 
 class CaBotServiceActions {
+    static let shared = CaBotServiceActions()
+    private init() {
+    }
+
     private var lastSpeakRequestID: Int64 = 0
     private var lastNavigationEventRequestID: Int64 = 0
 
