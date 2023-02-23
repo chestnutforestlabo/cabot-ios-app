@@ -26,13 +26,19 @@ import SocketIO
 
 class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
     fileprivate var tts:CaBotTTS
-    fileprivate var socketURL:String!
-    fileprivate var manager: SocketManager!
-    fileprivate var socket: SocketIOClient!
-    fileprivate let version:String = CaBotService.CABOT_BLE_VERSION + "_t"
-    
-    var delegate:CaBotServiceDelegate!
-    
+    fileprivate var socketURL:String?
+    fileprivate var manager: SocketManager?
+    fileprivate var socket: SocketIOClient?
+    fileprivate let version:String = CaBotServiceBLE.CABOT_BLE_VERSION
+
+    private let actions = CaBotServiceActions()
+
+    var delegate:CaBotServiceDelegate?
+
+    static func == (lhs: CaBotServiceTCP, rhs: CaBotServiceTCP) -> Bool {
+        return lhs === rhs
+    }
+
     init(with tts:CaBotTTS) {
         self.tts = tts
     }
@@ -40,10 +46,18 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
         self.socketURL = "ws://" + addr + "/cabot"
     }
     func emit(_ event: String, _ items: SocketData..., completion: (() -> ())? = nil)  {
-        if let skt = self.socket, skt.status == .connected{
-            self.socket.emit(event, items)
-        }
+        guard let socket = self.socket else { return }
+        guard socket.status == .connected else { return }
+
+        socket.emit(event, items)
     }
+
+    // MARK: CaBotTransportProtocol
+
+    func connectionType() -> ConnectionType {
+        return .TCP
+    }
+
     func activityLog(category: String, text: String, memo: String) -> Bool {
         let json: Dictionary<String, String> = [
             "category": category,
@@ -74,13 +88,6 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
         return true
     }
     
-    func find(person: String) -> Bool {
-        //TODO no subscriber in the server?
-        NSLog("person \(person)")
-        self.emit("person", "\(person);100000")
-        return true
-    }
-    
     func manage(command: CaBotManageCommand) -> Bool {
         NSLog("manage \(command.rawValue)")
         self.emit("manage_cabot", command.rawValue)//TODO emitwithack??
@@ -106,7 +113,7 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
     func notifyBatteryStatus(status: BatteryStatus) {
         //assuming nothing to do
     }
-    
+
     func stop(){
         if let skt = self.socket{
             skt.disconnect()
@@ -121,142 +128,112 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
         self.socket = nil
     }
     func start() {
+        guard let socketURL = self.socketURL else { return }
+        guard let url = URL(string: socketURL) else { return }
 
-        if let socketUrl = self.socketURL as? String{
-            manager = SocketManager(socketURL: URL(string: socketUrl)!, config: [.log(true), .compress, .reconnects(true), .reconnectWait(1), .reconnectAttempts(-1)])
-            socket = manager.defaultSocket
-            socket.on(clientEvent: .connect) {[weak self] data, ack in
-                DispatchQueue.main.async {
-                    self?.delegate.caBot(service: self!, centralConnected: true)
-                }
-                self?.socket.emit("req_version", true)
+        let manager = SocketManager(socketURL: url, config: [.log(true), .compress, .reconnects(true), .reconnectWait(1), .reconnectAttempts(-1)])
+        self.manager = manager
+        let socket = manager.defaultSocket
+        self.socket = socket
+        socket.on(clientEvent: .connect) {[weak self] data, ack in
+            guard let weakself = self else { return }
+            guard let socket = weakself.socket else { return }
+            guard let delegate = weakself.delegate else { return }
+            DispatchQueue.main.async {
+                delegate.caBot(service: weakself, centralConnected: true)
             }
-            socket.on(clientEvent: .error){[weak self] data, ack in
-                if let text = data[0] as? String{
-                    /*self?.tts.speak(text){
-                    }*/
-                }
-            }
-            socket.on(clientEvent: .disconnect){[weak self] data, ack in
-                DispatchQueue.main.async {
-                    self?.delegate.caBot(service: self!, centralConnected: false)
-                }
-            }
-
-            socket.on("device_status"){[weak self] dt, ack in
-                if let text = dt[0] as? String, let data = String(text).data(using:.utf8){
-                    do {
-                        let status = try JSONDecoder().decode(DeviceStatus.self, from: data)
-                        DispatchQueue.main.async {
-                            self?.delegate.cabot(service: self!, deviceStatus: status)
-                        }
-                        guard let text = String(data: data, encoding: .utf8) else {
-                            return
-                        }
-                        print(text)
-                    } catch {
-                        /*guard let text = String(data: data[0] as? Data, encoding: .utf8) else {
-                            return
-                        }
-                        print(text)*/
-                        NSLog(error.localizedDescription)
-                    }
-                }
-                
-
-            }
-            socket.on("cabot_version"){[weak self] data, ack in
-                if let text = data[0] as? String{
-                    self?.delegate.caBot(service: self!, versionMatched: self!.version == text, with: text)
-                }
-            }
-            socket.on("system_status"){[weak self] dt, ack in
-                if let text = dt[0] as? String, let data = String(text).data(using:.utf8){
-                    do {
-                        let status = try JSONDecoder().decode(SystemStatus.self, from: data)
-                        DispatchQueue.main.async {
-                            self?.delegate.cabot(service: self!, systemStatus: status)
-                        }
-                    } catch {
-                        print(text)
-                        NSLog(error.localizedDescription)
-                    }
-                }
-                
-            }
-            socket.on("battery_status"){[weak self] dt, ack in
-                if let text = dt[0] as? String, let data = String(text).data(using:.utf8){
-                    do {
-                        let status = try JSONDecoder().decode(BatteryStatus.self, from: data)
-                        DispatchQueue.main.async {
-                            self?.delegate.cabot(service: self!, batteryStatus: status)
-                        }
-                    } catch {
-                        print(text)
-                        NSLog(error.localizedDescription)
-                    }
-                }
-            }
-            socket.on("speak"){[weak self] data, ack in
-                if let text = data[0] as? String{
-                    DispatchQueue.main.async {
-                        if let tts = self?.tts{
-                            for line in text.split(separator: "\n") {
-                                var force: Bool = false
-                                if line == "__force_stop__" {
-                                    tts.speak("") {
-                                    }
-                                    force = true
-                                } else {
-                                    if !tts.isSpeaking {
-                                        _ = self?.activityLog(category: "ble speech request speaking", text: String(line), memo: "force=\(force)")
-                                        tts.speak(String(line)) { code in
-                                            if code > 0 {
-                                                _ = self?.activityLog(category: "ble speech request completed", text: String(line), memo: "force=\(force),return_code=\(code)")
-                                            } else {
-                                                _ = self?.activityLog(category: "ble speech request canceled", text: String(line), memo: "force=\(force),return_code=\(code)")
-                                            }
-                                        }
-                                    } else {
-                                        NSLog("TTS is busy and skip speaking: \(line)")
-                                        _ = self?.activityLog(category: "ble speech request skipped", text: String(line), memo: "TTS is busy")
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            socket.on("navigate"){[weak self] data, ack in
-                if let text = data[0] as? String{
-                    DispatchQueue.main.async {
-                        if let note = NavigationNotification(rawValue: text) {
-                            self?.delegate.cabot(service: self!, notification: note)
-                        } else {
-                            NSLog("Unknown navigation notification type %@", text)
-                        }
-                    }
-                }
-            }
-            socket.on("content"){[weak self] data, ack in
-                if let text = data[0] as? String{
-                    DispatchQueue.main.async {
-                        guard let url = URL(string: text) else {
-                            return
-                        }
-                        self?.delegate.cabot(service: self!, openRequest: url)
-                    }
-                }
-            }
-            socket.on("sound"){[weak self] data, ack in
-                if let text = data[0] as? String{
-                    DispatchQueue.main.async {
-                        self?.delegate.cabot(service: self!, soundRequest: text)
-                    }
-                }
-            }
-            socket.connect()
+            socket.emit("req_version", true)
         }
+        socket.on(clientEvent: .error){[weak self] data, ack in
+            if let text = data[0] as? String{
+                /*self?.tts.speak(text){
+                }*/
+            }
+        }
+        socket.on(clientEvent: .disconnect){[weak self] data, ack in
+            guard let weakself = self else { return }
+            guard let delegate = weakself.delegate else { return }
+            DispatchQueue.main.async {
+                delegate.caBot(service: weakself, centralConnected: false)
+            }
+        }
+        socket.on("cabot_version"){[weak self] data, ack in
+            guard let text = data[0] as? String else { return }
+            guard let weakself = self else { return }
+            guard let delegate = weakself.delegate else { return }
+            delegate.caBot(service: weakself, versionMatched: text == weakself.version, with: text)
+        }
+        socket.on("device_status"){[weak self] dt, ack in
+            guard let text = dt[0] as? String else { return }
+            guard let data = String(text).data(using:.utf8) else { return }
+            guard let weakself = self else { return }
+            guard let delegate = weakself.delegate else { return }
+            do {
+                let status = try JSONDecoder().decode(DeviceStatus.self, from: data)
+                DispatchQueue.main.async {
+                    delegate.cabot(service: weakself, deviceStatus: status)
+                }
+            } catch {
+                print(text)
+                NSLog(error.localizedDescription)
+            }
+        }
+        socket.on("system_status"){[weak self] dt, ack in
+            guard let text = dt[0] as? String else { return }
+            guard let data = String(text).data(using:.utf8) else { return }
+            guard let weakself = self else { return }
+            guard let delegate = weakself.delegate else { return }
+            do {
+                let status = try JSONDecoder().decode(SystemStatus.self, from: data)
+                DispatchQueue.main.async {
+                    delegate.cabot(service: weakself, systemStatus: status)
+                }
+            } catch {
+                print(text)
+                NSLog(error.localizedDescription)
+            }
+        }
+        socket.on("battery_status"){[weak self] dt, ack in
+            guard let text = dt[0] as? String else { return }
+            guard let data = String(text).data(using:.utf8) else { return }
+            guard let weakself = self else { return }
+            guard let delegate = weakself.delegate else { return }
+            do {
+                let status = try JSONDecoder().decode(BatteryStatus.self, from: data)
+                DispatchQueue.main.async {
+                    delegate.cabot(service: weakself, batteryStatus: status)
+                }
+            } catch {
+                print(text)
+                NSLog(error.localizedDescription)
+            }
+        }
+        socket.on("speak"){[weak self] dt, ack in
+            guard let text = dt[0] as? String else { return }
+            guard let data = String(text).data(using:.utf8) else { return }
+            guard let weakself = self else { return }
+            guard let delegate = weakself.delegate else { return }
+            do {
+                let request = try JSONDecoder().decode(SpeakRequest.self, from: data)
+                weakself.actions.handle(service: weakself, delegate: delegate, tts: weakself.tts, request: request)
+            } catch {
+                print(text)
+                NSLog(error.localizedDescription)
+            }
+        }
+        socket.on("navigate"){[weak self] dt, ack in
+            guard let text = dt[0] as? String else { return }
+            guard let data = String(text).data(using:.utf8) else { return }
+            guard let weakself = self else { return }
+            guard let delegate = weakself.delegate else { return }
+            do {
+                let request = try JSONDecoder().decode(NavigationEventRequest.self, from: data)
+                weakself.actions.handle(service: weakself, delegate: delegate, request: request)
+            } catch {
+                print(text)
+                NSLog(error.localizedDescription)
+            }
+        }
+        socket.connect()
     }
-    
 }

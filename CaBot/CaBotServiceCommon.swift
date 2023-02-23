@@ -23,30 +23,32 @@
 
 import Foundation
 import SwiftUI
+import CoreBluetooth
 
-protocol CaBotTransportProtocol{
+enum ConnectionType:String, CaseIterable{
+    case BLE = "ble"
+    case TCP = "tcp"
+}
+
+protocol CaBotTransportProtocol {
+    func connectionType() -> ConnectionType
     func activityLog(category: String, text: String, memo: String) -> Bool
     func send(destination: String) -> Bool
     func summon(destination: String) -> Bool
-    func find(person: String) -> Bool
     func manage(command: CaBotManageCommand) -> Bool
     func startAdvertising()
     func stopAdvertising()
-    func notifyDeviceStatus(status: DeviceStatus)
-    func notifySystemStatus(status: SystemStatus)
-    func notifyBatteryStatus(status: BatteryStatus)
 }
 
 protocol CaBotServiceDelegate {
-    func caBot(service:CaBotTransportProtocol, versionMatched:Bool, with:String)
-    func caBot(service:CaBotTransportProtocol, faceappConnected:Bool)
-    func cabot(service:CaBotTransportProtocol, openRequest:URL)
-    func cabot(service:CaBotTransportProtocol, soundRequest:String)
-    func cabot(service:CaBotTransportProtocol, notification:NavigationNotification)
-    func cabot(service:CaBotTransportProtocol, deviceStatus:DeviceStatus)
-    func cabot(service:CaBotTransportProtocol, systemStatus:SystemStatus)
-    func cabot(service:CaBotTransportProtocol, batteryStatus:BatteryStatus)
-    func caBot(service:CaBotTransportProtocol, centralConnected:Bool)
+    func caBot(service:any CaBotTransportProtocol, centralConnected:Bool)
+    func caBot(service:any CaBotTransportProtocol, versionMatched:Bool, with:String)
+    func cabot(service:any CaBotTransportProtocol, openRequest:URL)
+    func cabot(service:any CaBotTransportProtocol, soundRequest:String)
+    func cabot(service:any CaBotTransportProtocol, notification:NavigationNotification)
+    func cabot(service:any CaBotTransportProtocol, deviceStatus:DeviceStatus)
+    func cabot(service:any CaBotTransportProtocol, systemStatus:SystemStatus)
+    func cabot(service:any CaBotTransportProtocol, batteryStatus:BatteryStatus)
 }
 
 enum NavigationNotification:String {
@@ -270,6 +272,93 @@ enum DiagnosticLevel: Int, Decodable {
             return Color.red
         case .Stale:
             return Color.gray
+        }
+    }
+}
+
+struct SpeakRequest: Decodable {
+    var request_id: Int64
+    var text: String = ""
+    var rate: Int8 = 0
+    var pitch: Int8 = 0
+    var volume: Int8 = 0
+    var lang: String = ""
+    var voice: String = ""
+    var force: Bool = false
+    var priority: Int32 = 0
+    var timeout: Float32 = 0
+    var channels: Int8 = 0
+}
+
+enum NavigationEventType:String, Decodable {
+    case next
+    case arrived
+    case content
+    case sound
+    case unknown
+}
+
+struct NavigationEventRequest: Decodable {
+    var request_id: Int64
+    var type: NavigationEventType = .unknown
+    var param: String = ""
+}
+
+class CaBotServiceActions {
+    private var lastSpeakRequestID: Int64 = 0
+    private var lastNavigationEventRequestID: Int64 = 0
+
+    func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, tts: CaBotTTS, request: SpeakRequest) {
+        // noop for same request ID from different transport
+        guard lastSpeakRequestID < request.request_id else { return }
+        lastSpeakRequestID = request.request_id
+
+        DispatchQueue.main.async {
+            if request.force {
+                tts.stop()
+            }
+            let line = request.text
+            let force = request.force
+            if !tts.isSpeaking {
+                _ = service.activityLog(category: "ble speech request speaking", text: String(line), memo: "force=\(force)")
+                tts.speak(String(line)) { code in
+                    if code > 0 {
+                        _ = service.activityLog(category: "ble speech request completed", text: String(line), memo: "force=\(force),return_code=\(code)")
+                    } else {
+                        _ = service.activityLog(category: "ble speech request canceled", text: String(line), memo: "force=\(force),return_code=\(code)")
+                    }
+                }
+            } else {
+                NSLog("TTS is busy and skip speaking: \(line)")
+                _ = service.activityLog(category: "ble speech request skipped", text: String(line), memo: "TTS is busy")
+            }
+
+        }
+    }
+
+    func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, request: NavigationEventRequest) {
+        // noop for same request ID from different transport
+        guard lastNavigationEventRequestID < request.request_id else { return }
+        lastNavigationEventRequestID = request.request_id
+
+        DispatchQueue.main.async {
+            switch(request.type) {
+            case .next, .arrived:
+                if let note = NavigationNotification(rawValue: request.type.rawValue) {
+                    delegate.cabot(service: service, notification: note)
+                } else {
+                    NSLog("Unknown navigation notification type %@", request.type.rawValue)
+                }
+            case .content:
+                guard let url = URL(string: request.param) else {
+                    return
+                }
+                delegate.cabot(service: service, openRequest: url)
+            case .sound:
+                delegate.cabot(service: service, soundRequest: request.param)
+            case .unknown:
+                break
+            }
         }
     }
 }

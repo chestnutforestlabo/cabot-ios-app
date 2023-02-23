@@ -80,9 +80,10 @@
 "Navigation"="Navigation";
 "Connection"="Connection";
 
-"Suitcase Connected"="Suitcase Connected";
-"Suitcase and Backpack Connected"="Suitcase and Backpack Connected";
-"Suitcase Not Connected"="Suitcase Not Connected";
+"BLE Connected"="BLE Connected";
+"BLE Not Connected"="BLE Not Connected";
+"TCP Connected"="TCP Connected";
+"TCP Not Connected"="TCP Not Connected";
 
 "processing..."="processing...";
 "Navigating to %@"="Navigating to %@";

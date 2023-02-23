@@ -29,37 +29,41 @@ import Gzip
 import UIKit
 import SwiftUI
 
-protocol CaBotServiceDelegateBlueTooth : CaBotServiceDelegate{
-    func cabot(service:CaBotTransportProtocol, bluetoothStateUpdated: CBManagerState)
+protocol CaBotServiceDelegateBLE : CaBotServiceDelegate{
+    func cabot(service:any CaBotTransportProtocol, bluetoothStateUpdated: CBManagerState)
 }
 
-class CaBotService: NSObject, CBPeripheralManagerDelegate, CaBotTransportProtocol {
-    static let CABOT_BLE_VERSION = "20220320"
+class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProtocol {
+    static let CABOT_BLE_VERSION = "20230222"
     static let UUID_FORMAT = "35CE%04X-5E89-4C0D-A3F6-8A6A507C1BF1"
     static let CABOT_SPEED_CONFIG = "cabot_speed"
     static let SPEECH_SPEED_CONFIG = "speech_speed"
     static let CONTRIAL_MAX = 5
 
     func generateUUID(handle:Int) -> CBUUID {
-        return CBUUID(string: String(format:CaBotService.UUID_FORMAT, handle))
+        return CBUUID(string: String(format:CaBotServiceBLE.UUID_FORMAT, handle))
     }
 
-    fileprivate var tts:CaBotTTS
-    var delegate:CaBotServiceDelegateBlueTooth?
-    
+    fileprivate let tts:CaBotTTS
+    fileprivate let actions: CaBotServiceActions
+    var delegate:CaBotServiceDelegateBLE?
+
+    static func == (lhs: CaBotServiceBLE, rhs: CaBotServiceBLE) -> Bool {
+        return lhs === rhs
+    }
+
     init(with tts:CaBotTTS) {
         self.tts = tts
+        self.actions = CaBotServiceActions()
     }
 
     public var teamID:String? = nil
-    public var faceappReady:Bool = false
     public var peripheralManager:CBPeripheralManager?
 
     private let uuid = CBUUID(string: String(format:UUID_FORMAT, 0x0000))
     private var logChar:CaBotNotifyChar!
     private var summonsChar:CaBotNotifyChar!
     private var destinationChar:CaBotNotifyChar!
-    private var findPersonChar:CaBotNotifyChar!
     private var naviChar:CaBotNaviChar!
     private var heartbeatChar:CaBotNotifyChar!
     private var speechChar:CaBotSpeechChar!
@@ -67,41 +71,28 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate, CaBotTransportProtoco
     private var characteristics:[CBCharacteristic] = []
     private var chars:[CaBotChar] = []
     private let peripheralRestoreKey:String = UUID().uuidString
-    enum add_state:Int{
-        case none = 0
-        case adding = 1
-        case added = 2
-    }
-    private var serviceAdded:add_state = .none
+    private var serviceAdded:Bool = false
     private var contrialCount:Int = CONTRIAL_MAX
 
-    func requestAuthorized() -> Bool{
-        return CBCentralManager.authorization == .allowedAlways
-    }
-    func prepareIfAuthorized(){
-        if (self.requestAuthorized()) {
-            self.prepare()
-        }
-    }
     func startIfAuthorized() {
-        if (self.requestAuthorized()) {
+        if (CBCentralManager.authorization == .allowedAlways) {
             self.start();
         }
     }
 
-    func prepare() {
+    func start() {
         if self.peripheralManager != nil {return}
         let peripheralManager = CBPeripheralManager(delegate: self, queue: nil,
                                                      options: [CBPeripheralManagerOptionShowPowerAlertKey: true,
                                                                CBPeripheralManagerOptionRestoreIdentifierKey: peripheralRestoreKey])
 
-        self.chars.append(CaBotVersionChar(service: self, handle: 0x0000, version: CaBotService.CABOT_BLE_VERSION))
+        self.chars.append(CaBotVersionChar(service: self, handle: 0x0000, version: CaBotServiceBLE.CABOT_BLE_VERSION))
         self.manageChar = CaBotNotifyChar(service: self, handle: 0x0001)
         self.chars.append(self.manageChar)
 
         self.chars.append(CaBotDeviceStatusChar(service: self, handle: 0x0002))
         self.chars.append(CaBotSystemStatusChar(service: self, handle: 0x0003))
-        self.chars.append(CabotBatteryStatusChar(service: self, handle: 0x0004))
+        self.chars.append(CaBotBatteryStatusChar(service: self, handle: 0x0004))
         self.logChar = CaBotNotifyChar(service: self, handle:0x0005)
         self.chars.append(self.logChar)
 
@@ -111,31 +102,15 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate, CaBotTransportProtoco
         self.destinationChar = CaBotNotifyChar(service: self, handle:0x0011)
         self.chars.append(self.destinationChar)
 
-        self.chars.append(CaBotFindPersonReadyChar(service: self, handle:0x0020))
-        self.findPersonChar = CaBotNotifyChar(service: self, handle:0x0021)
-        self.chars.append(self.findPersonChar)
-
         self.speechChar = CaBotSpeechChar(service: self, handle:0x0030)
         self.chars.append(self.speechChar)
 
         self.naviChar = CaBotNaviChar(service: self, handle:0x0040)
         self.chars.append(self.naviChar)
 
-        self.chars.append(CaBotWebContentChar(service: self, handle:0x0050))
-
-        self.chars.append(CaBotSoundEffectChar(service: self, handle:0x0060))
-
         self.heartbeatChar = CaBotNotifyChar(service: self, handle:0x9999)
         self.chars.append(self.heartbeatChar)
         self.peripheralManager = peripheralManager
-    }
-    func start(){
-        self.prepare()
-        self.addService()
-    }
-    func stop(){
-        self.stopAdvertising()
-        self.removeService()
     }
 
     var heartBeatTimer:Timer? = nil
@@ -152,7 +127,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate, CaBotTransportProtoco
                 }
 
                 if (self.heartbeatChar.notify(value: "1", retry: 0)) {
-                    self.contrialCount = CaBotService.CONTRIAL_MAX
+                    self.contrialCount = CaBotServiceBLE.CONTRIAL_MAX
                     NSLog("heartBeat success")
                 } else {
                     self.contrialCount = self.contrialCount - 1
@@ -162,14 +137,16 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate, CaBotTransportProtoco
                     self.delegate?.caBot(service: self, centralConnected: true)
                 }else{
                     self.delegate?.caBot(service: self, centralConnected: false)
-                    self.delegate?.caBot(service: self, faceappConnected: false)
                 }
             }
         }
     }
 
-    // MARK: public functions
-    
+    // MARK: CaBotTransportProtocol
+    public func connectionType() -> ConnectionType {
+        return .BLE
+    }
+
     public func activityLog(category: String = "", text: String = "", memo: String = "") -> Bool{
         let json: Dictionary<String, String> = [
             "category": category,
@@ -199,11 +176,6 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate, CaBotTransportProtoco
         return (self.summonsChar.notify(value: destination))
     }
     
-    public func find(person: String) -> Bool {
-        NSLog("person \(person)")
-        return (self.findPersonChar.notify(value: "\(person);100000"))
-    }
-
     public func manage(command: CaBotManageCommand) -> Bool {
         NSLog("manage \(command.rawValue)")
         return (self.manageChar.notify(value: command.rawValue))
@@ -234,59 +206,22 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate, CaBotTransportProtoco
         }
     }
 
-    public func notifyDeviceStatus(status: DeviceStatus) {
-        guard let delegate = self.delegate else {
-            return
-        }
-        delegate.cabot(service: self, deviceStatus: status)
-    }
-
-    public func notifySystemStatus(status: SystemStatus) {
-        guard let delegate = self.delegate else {
-            return
-        }
-        delegate.cabot(service: self, systemStatus: status)
-    }
-
-    public func notifyBatteryStatus(status: BatteryStatus) {
-        guard let delegate = self.delegate else {
-            return
-        }
-        delegate.cabot(service: self, batteryStatus: status)
-    }
-
     // MARK: private functions
 
     internal func add(characteristic:CBCharacteristic) {
         self.characteristics.append(characteristic)
     }
-    private let add_service_lock = NSLock()
     private func addService()
     {
-        defer{self.add_service_lock.unlock()}
-        self.add_service_lock.lock()
-        guard let peripheralManager = self.peripheralManager else {return}
-        if self.serviceAdded == .added {
+        if serviceAdded {
             startAdvertising()
             return
         }
-        if self.cbpm_state != .poweredOn{
-            self.need_add_service = true
-        }else{
-            if self.serviceAdded != .adding{
-                let service:CBMutableService = CBMutableService(type: self.uuid, primary: true)
-                service.characteristics = self.characteristics
-                
-                NSLog("adding a service")
-                peripheralManager.add(service)
-                self.serviceAdded = .adding
-            }
-        }
-    }
-    private func removeService(){
-        guard let peripheralManager = self.peripheralManager else {return}
-        peripheralManager.removeAllServices()
-        self.serviceAdded = .none
+        let service:CBMutableService = CBMutableService(type: self.uuid, primary: true)
+        service.characteristics = self.characteristics
+
+        NSLog("adding a service")
+        peripheralManager?.add(service)
     }
     private var checkCount:Int = 0
     private func checkAdvertisement() -> Bool
@@ -311,15 +246,12 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate, CaBotTransportProtoco
     }
 
     // MARK: CBPeripheralManagerDelegate
-    private var need_add_service:Bool = false
-    private var cbpm_state:CBManagerState = .unknown
 
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager)
     {
         NSLog("state: \(peripheral.state.rawValue)")
 
-        self.cbpm_state = peripheral.state
-        if self.need_add_service, peripheral.state == .poweredOn {
+        if peripheral.state == .poweredOn {
             DispatchQueue.main.asyncAfter(deadline: .now()+1) {
                 self.addService();
             }
@@ -339,7 +271,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate, CaBotTransportProtoco
         for char in service.characteristics! {
             NSLog("\(char.uuid)")
         }
-        self.serviceAdded = .added
+        self.serviceAdded = true
         self.startAdvertising();
     }
     
@@ -389,20 +321,19 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate, CaBotTransportProtoco
             NSLog("restored")
         }
     }
-
 }
 
 class CaBotChar: NSObject {
-    let service:CaBotService
-    
-    init(service: CaBotService) {
+    let service:CaBotServiceBLE
+
+    init(service: CaBotServiceBLE) {
         self.service = service
     }
-    
+
     func canHandle(readRequest: CBATTRequest) -> Bool {
         return false
     }
-    
+
     func canHandle(writeRequest: CBATTRequest) -> Bool {
         return false
     }
@@ -411,8 +342,7 @@ class CaBotChar: NSObject {
 class CaBotNotifyChar: CaBotChar {
     let characteristic_read: CBMutableCharacteristic
     
-    init(service:CaBotService, handle:Int) {
-        
+    init(service:CaBotServiceBLE, handle:Int) {
         self.characteristic_read = CBMutableCharacteristic(
             type: service.generateUUID(handle: handle),
             properties: [.indicate],
@@ -437,7 +367,7 @@ class CaBotNotifyChar: CaBotChar {
             }
             NSLog("FAIL(\(retry)) notify to \(self.characteristic_read.uuid.uuidString)")
             DispatchQueue.main.asyncAfter(deadline: .now()+0.1) {
-                self.notify(data: data, retry: retry-1)
+                _ = self.notify(data: data, retry: retry-1)
             }
         }
         return true
@@ -449,168 +379,6 @@ class CaBotNotifyChar: CaBotChar {
     }
 }
 
-class CaBotStoreChar: CaBotChar {
-    let configKey:String
-    let characteristic_read: CBMutableCharacteristic
-    let characteristic_write: CBMutableCharacteristic
-    
-    init(service:CaBotService, handles:[Int], configKey:String){
-        
-        self.characteristic_read = CBMutableCharacteristic(
-            type: service.generateUUID(handle: handles[0]),
-            properties: [.notify],
-            value: nil,
-            permissions: [])
-        
-        self.characteristic_write = CBMutableCharacteristic(
-            type: service.generateUUID(handle: handles[1]),
-            properties: [.write],
-            value: nil,
-            permissions: [.writeable])
-        
-        service.add(characteristic: self.characteristic_read)
-        service.add(characteristic: self.characteristic_write)
-        
-        self.configKey = configKey
-        super.init(service: service)
-        
-        UserDefaults.standard.addObserver(self, forKeyPath: configKey, options: NSKeyValueObservingOptions.new, context: nil)
-    }
-    
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        guard let peripheralManager = self.service.peripheralManager else {return}
-        if let data = self.valueData {
-            peripheralManager.updateValue(data, for: self.characteristic_read, onSubscribedCentrals: nil)
-        }
-    }
-    
-    var value: Any? {
-        get {
-            return UserDefaults.standard.value(forKey: configKey)
-        }
-        set {
-            UserDefaults.standard.set(newValue, forKey: configKey)
-        }
-    }
-    
-    var valueData: Data? {
-        get {
-            if let value = self.value{
-                return Data("\(value)".utf8)
-            }
-            return nil
-        }
-        set {
-            if let value = newValue {
-                if let str = String(data: value, encoding: .utf8) {
-                    if let f = Float(str) {
-                        self.value = f
-                    }
-                    else {
-                        self.value = str
-                    }
-                }
-            }
-        }
-    }
-    
-    override func canHandle(readRequest: CBATTRequest) -> Bool {
-        guard let peripheralManager = self.service.peripheralManager else {return false}
-        if readRequest.characteristic.uuid.isEqual(self.characteristic_read.uuid) {
-            readRequest.value = self.valueData
-            peripheralManager.respond(
-                to: readRequest,
-               withResult: .success)
-            return true
-        }
-        return false
-    }
-    
-    override func canHandle(writeRequest: CBATTRequest) -> Bool {
-        if writeRequest.characteristic.uuid.isEqual(self.characteristic_write.uuid) {
-            self.valueData = writeRequest.value
-            return true
-        }
-        return false
-    }
-}
-
-class CaBotQueryChar: CaBotChar {
-    let characteristic_read: CBMutableCharacteristic
-    let characteristic_write: CBMutableCharacteristic
-    let operation: (String)->(String)
-    
-    init(service:CaBotService, handles:[Int], operation: @escaping (_ query:String)->(String)){
-        
-        self.characteristic_read = CBMutableCharacteristic(
-            type: service.generateUUID(handle: handles[0]),
-            properties: [.notify],
-            value: nil,
-            permissions: [])
-        
-        self.characteristic_write = CBMutableCharacteristic(
-            type: service.generateUUID(handle: handles[1]),
-            properties: [.write],
-            value: nil,
-            permissions: [.writeable])
-        
-        self.operation = operation
-        
-        service.add(characteristic: self.characteristic_read)
-        service.add(characteristic: self.characteristic_write)
-        
-        super.init(service: service)
-    }
-    
-    private func timeElapsedInSecondsWhenRunningCode(operation: ()->()) -> Double {
-        let startTime = CFAbsoluteTimeGetCurrent()
-        operation()
-        let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-        return Double(timeElapsed)
-    }
-    
-    private func request(_ request:CBATTRequest) {
-        guard let val = request.value else {
-            return
-        }
-        guard let query = String(data: val, encoding: .utf8) else {
-            return
-        }
-        self.request(query, mtu: request.central.maximumUpdateValueLength)
-    }
-    
-    public func request(_ query:String, mtu:Int) {
-        let queue = DispatchQueue(label: "Wiring-queue")
-        queue.async {
-            guard let peripheralManager = self.service.peripheralManager else {return}
-            var ret = self.operation(query)
-            let dataLength = ret.count
-        
-            let duration = self.timeElapsedInSecondsWhenRunningCode {
-                while ret.count > 0 {
-                    let temp = ret.prefix(mtu)
-                    if peripheralManager.updateValue(Data(temp.utf8), for: self.characteristic_read, onSubscribedCentrals: nil) {
-                        ret = String(ret.suffix(max(0, ret.count-mtu)))
-                    }
-                    usleep(1000)
-                }
-            }
-            NSLog(String(format:"%.2f kbytes in %.2f secs = %.2f kbps", Double(dataLength) / 1024.0, duration, Double(dataLength)/duration*8/1024))
-        }
-    }
-    
-    override func canHandle(writeRequest: CBATTRequest) -> Bool {
-        if writeRequest.characteristic.uuid.isEqual(self.characteristic_write.uuid) {
-            self.request(writeRequest)
-            //self.service.peripheralManager.respond(
-            //    to: writeRequest,
-            //    withResult: .success)
-            return true
-        }
-        return false
-    }
-}
-
 class CaBotBufferedWriteChar: CaBotChar {
     let uuid:CBUUID
     let characteristic: CBMutableCharacteristic
@@ -619,7 +387,7 @@ class CaBotBufferedWriteChar: CaBotChar {
     var packetOffset: Int = 0
     var dataReceived: Int = 0
 
-    init(service: CaBotService, handle: Int) {
+    init(service: CaBotServiceBLE, handle: Int) {
         self.uuid = service.generateUUID(handle: handle)
         self.characteristic = CBMutableCharacteristic(
             type: self.uuid,
@@ -704,149 +472,78 @@ class CaBotTextWriteChar: CaBotBufferedWriteChar {
     }
 }
 
+class CaBotJSONChar<T:Decodable>: CaBotBufferedWriteChar {
+    override func handleData(_ data: Data) {
+        do {
+            let json = try JSONDecoder().decode(T.self, from: data)
+            self.handle(json: json)
+        } catch {
+            guard let text = String(data: data, encoding: .utf8) else {
+                return
+            }
+            print(text)
+            NSLog(error.localizedDescription)
+        }
+    }
+
+    func handle(json: T) {
+        preconditionFailure("handle \(T.self) needs to be implemented")
+    }
+}
+
+// MARK: Concrete CaBot Chars
+
 class CaBotVersionChar: CaBotTextWriteChar {
     let version:String
-    init(service:CaBotService, handle:Int, version:String) {
+    init(service:CaBotServiceBLE, handle:Int, version:String) {
         self.version = version
         super.init(service: service, handle: handle)
     }
-
     override func handleText(_ text: String) {
-        self.service.delegate?.caBot(service:self.service, versionMatched:text == version, with:text)
-    }
-}
-
-class CaBotFindPersonReadyChar: CaBotTextWriteChar {
-
-    override func handleText(_ text: String) {
+        guard let delegate = self.service.delegate else { return }
         DispatchQueue.main.async {
-            // Backpack is ready
-            let ready:Bool = (text == "True") ? true : false
-
-            self.service.faceappReady = ready
-            self.service.delegate?.caBot(service: self.service, faceappConnected: ready)
-
-            NSLog("Back pack ready:", text, ready)
+            delegate.caBot(service:self.service, versionMatched:self.version == text, with: text)
         }
     }
-
 }
 
-class CaBotSpeechChar: CaBotTextWriteChar {
-    override func handleText(_ text: String) {
+class CaBotSpeechChar: CaBotJSONChar<SpeakRequest> {
+    override func handle(json: SpeakRequest) {
+        guard let delegate = self.service.delegate else { return }
+        self.service.actions.handle(service: self.service, delegate: delegate, tts: self.service.tts, request: json)
+    }
+}
+
+class CaBotNaviChar: CaBotJSONChar<NavigationEventRequest> {
+    override func handle(json: NavigationEventRequest) {
+        guard let delegate = self.service.delegate else { return }
+        self.service.actions.handle(service: self.service, delegate: delegate, request: json)
+    }
+}
+
+class CaBotDeviceStatusChar: CaBotJSONChar<DeviceStatus> {
+    override func handle(json: DeviceStatus) {
+        guard let delegate = self.service.delegate else { return }
         DispatchQueue.main.async {
-            let tts = self.service.tts
-
-            for line in text.split(separator: "\n") {
-                var force: Bool = false
-                if line == "__force_stop__" {
-                    tts.speak("") {
-                    }
-                    force = true
-                } else {
-                    if !tts.isSpeaking {
-                        _ = self.service.activityLog(category: "ble speech request speaking", text: String(line), memo: "force=\(force)")
-                        tts.speak(String(line)) { code in
-                            if code > 0 {
-                                _ = self.service.activityLog(category: "ble speech request completed", text: String(line), memo: "force=\(force),return_code=\(code)")
-                            } else {
-                                _ = self.service.activityLog(category: "ble speech request canceled", text: String(line), memo: "force=\(force),return_code=\(code)")
-                            }
-                        }
-                    } else {
-                        NSLog("TTS is busy and skip speaking: \(line)")
-                        _ = self.service.activityLog(category: "ble speech request skipped", text: String(line), memo: "TTS is busy")
-                    }
-                }
-            }
+            delegate.cabot(service: self.service, deviceStatus: json)
         }
     }
 }
 
-class CaBotNaviChar: CaBotTextWriteChar {
-    override func handleText(_ text: String) {
+class CaBotSystemStatusChar: CaBotJSONChar<SystemStatus> {
+    override func handle(json: SystemStatus) {
+        guard let delegate = self.service.delegate else { return }
         DispatchQueue.main.async {
-            if let note = NavigationNotification(rawValue: text) {
-                self.service.delegate?.cabot(service: self.service, notification: note)
-            } else {
-                NSLog("Unknown navigation notification type %@", text)
-            }
+            delegate.cabot(service: self.service, systemStatus: json)
         }
     }
 }
 
-
-class CaBotWebContentChar: CaBotTextWriteChar {
-    override func handleText(_ text: String) {
+class CaBotBatteryStatusChar: CaBotJSONChar<BatteryStatus> {
+    override func handle(json: BatteryStatus) {
+        guard let delegate = self.service.delegate else { return }
         DispatchQueue.main.async {
-            guard let url = URL(string: text) else {
-                return
-            }
-            self.service.delegate?.cabot(service: self.service, openRequest: url)
-        }
-    }
-}
-
-
-class CaBotSoundEffectChar: CaBotTextWriteChar {
-    override func handleText(_ text: String) {
-        DispatchQueue.main.async {
-            self.service.delegate?.cabot(service: self.service, soundRequest: text)
-        }
-    }
-}
-
-class CaBotDeviceStatusChar: CaBotBufferedWriteChar {
-    override func handleData(_ data: Data) {
-        do {
-            let status = try JSONDecoder().decode(DeviceStatus.self, from: data)
-            DispatchQueue.main.async {
-                self.service.notifyDeviceStatus(status: status)
-            }
-            guard let text = String(data: data, encoding: .utf8) else {
-                return
-            }
-            print(text)
-        } catch {
-            guard let text = String(data: data, encoding: .utf8) else {
-                return
-            }
-            print(text)
-            NSLog(error.localizedDescription)
-        }
-    }
-}
-
-class CaBotSystemStatusChar: CaBotBufferedWriteChar {
-    override func handleData(_ data: Data) {
-        do {
-            let status = try JSONDecoder().decode(SystemStatus.self, from: data)
-            DispatchQueue.main.async {
-                self.service.notifySystemStatus(status: status)
-            }
-        } catch {
-            guard let text = String(data: data, encoding: .utf8) else {
-                return
-            }
-            print(text)
-            NSLog(error.localizedDescription)
-        }
-    }
-}
-
-class CabotBatteryStatusChar: CaBotBufferedWriteChar {
-    override func handleData(_ data: Data) {
-        do {
-            let status = try JSONDecoder().decode(BatteryStatus.self, from: data)
-            DispatchQueue.main.async {
-                self.service.notifyBatteryStatus(status: status)
-            }
-        } catch {
-            guard let text = String(data: data, encoding: .utf8) else {
-                return
-            }
-            print(text)
-            NSLog(error.localizedDescription)
+            delegate.cabot(service: self.service, batteryStatus: json)
         }
     }
 }

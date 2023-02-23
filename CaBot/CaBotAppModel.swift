@@ -57,96 +57,7 @@ enum DisplayedScene {
     }
 }
 
-class wrapper_transportservice: CaBotTransportProtocol{
-    
-    var services:[CaBotTransportProtocol] = []
-    
-    func add_service(service:CaBotTransportProtocol){
-        self.services.append(service)
-    }
-    func set_service(service:CaBotTransportProtocol){
-        self.services.removeAll()
-        self.add_service(service:service)
-    }
-    
-    func activityLog(category: String, text: String, memo: String) -> Bool {
-        for service in self.services{
-            if(!service.activityLog(category: category, text: text, memo: memo)){
-                return false
-            }
-        }
-        return true
-    }
-    
-    func send(destination: String) -> Bool {
-        for service in self.services{
-            if(!service.send(destination:destination)){
-                return false
-            }
-        }
-        return true
-    }
-    
-    func summon(destination: String) -> Bool {
-        for service in self.services{
-            if(!service.summon(destination:destination)){
-                return false
-            }
-        }
-        return true
-    }
-    
-    func find(person: String) -> Bool {
-        for service in self.services{
-            if(!service.find(person:person)){
-                return false
-            }
-        }
-        return true
-    }
-    
-    func manage(command: CaBotManageCommand) -> Bool {
-        for service in self.services{
-            if(!service.manage(command:command)){
-                return false
-            }
-        }
-        return true
-    }
-    
-    func startAdvertising() {
-        for service in self.services{
-            service.startAdvertising()
-        }
-    }
-    
-    func stopAdvertising() {
-        for service in self.services{
-            service.stopAdvertising()
-        }
-    }
-    
-    func notifyDeviceStatus(status: DeviceStatus) {
-        for service in self.services{
-            service.notifyDeviceStatus(status:status)
-        }
-    }
-    
-    func notifySystemStatus(status: SystemStatus) {
-        for service in self.services{
-            service.notifySystemStatus(status:status)
-        }
-    }
-    
-    func notifyBatteryStatus(status: BatteryStatus) {
-        for service in self.services{
-            service.notifyBatteryStatus(status:status)
-        }
-    }
-}
-
-
-final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueTooth, TourManagerDelegate, CLLocationManagerDelegate, CaBotTTSDelegate {
+final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, TourManagerDelegate, CLLocationManagerDelegate, CaBotTTSDelegate {
     
     private let selectedResourceKey = "SelectedResourceKey"
     private let selectedVoiceKey = "SelectedVoiceKey"
@@ -164,8 +75,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
     private let browserCloseDelayKey = "browserCloseDelayKey"
     
 
-    @Published var versionMatched: Bool = false
+    @Published var versionMatchedBLE: Bool = false
     @Published var serverBLEVersion: String? = nil
+    @Published var versionMatchedTCP: Bool = false
+    @Published var serverTCPVersion: String? = nil
 
     @Published var locationState: GrantState = .Init {
         didSet {
@@ -243,6 +156,16 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
         }
     }
 
+    @Published var suitcaseConnectedBLE: Bool = false {
+        didSet {
+            self.suitcaseConnected = self.suitcaseConnectedBLE || self.suitcaseConnectedTCP
+        }
+    }
+    @Published var suitcaseConnectedTCP: Bool = false {
+        didSet {
+            self.suitcaseConnected = self.suitcaseConnectedBLE || self.suitcaseConnectedTCP
+        }
+    }
     @Published var suitcaseConnected: Bool = false {
         didSet {
             if !self.suitcaseConnected {
@@ -252,43 +175,16 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
             }
         }
     }
-    @Published var backpackConnected: Bool = false
 
-    private func stop_ble(){
-        self.bleService.stop()
-    }
-    private func start_ble(){
-        if !self.teamID.isEmpty{
-            self.bleService.teamID = self.teamID
-            self.bleService.start()
-            self.wrpService.set_service(service: self.bleService)
-        }
-    }
-    private func stop_tcp(){
-        self.tcpService.stop()
-    }
-    private func start_tcp(){
-        if !self.socketAddr.isEmpty{
-            self.tcpService.set_addr(addr: socketAddr)
-            self.tcpService.start()
-            self.wrpService.set_service(service: self.tcpService)
-        }
-    }
-    enum conntype:String, CaseIterable{
-        case ble = "ble"
-        case tcp = "tcp"
-    }
-    @Published var connectionType:conntype = .ble{
+    @Published var connectionType:ConnectionType = .BLE{
         didSet{
             UserDefaults.standard.setValue(connectionType.rawValue, forKey: connectionTypeKey)
             UserDefaults.standard.synchronize()
-            stop_ble()
-            stop_tcp()
-            switch self.connectionType{
-            case .ble:
-                self.start_ble()
-            case .tcp:
-                self.start_tcp()
+            switch(connectionType) {
+            case .BLE:
+                selectedService = bleService
+            case .TCP:
+                selectedService = tcpService
             }
         }
     }
@@ -296,21 +192,18 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
         didSet {
             UserDefaults.standard.setValue(teamID, forKey: teamIDKey)
             UserDefaults.standard.synchronize()
-            if self.connectionType == .ble{
-                self.stop_ble()
-                self.start_ble()
-            }
+            bleService.stopAdvertising()
+            bleService.teamID = self.teamID
+            bleService.startAdvertising()
         }
     }
-    
     @Published var socketAddr: String = "172.20.10.7:5000" {
         didSet {
             UserDefaults.standard.setValue(socketAddr, forKey: socketAddrKey)
             UserDefaults.standard.synchronize()
-            if self.connectionType == .tcp{
-                self.stop_tcp()
-                self.start_tcp()
-            }
+            tcpService.stop()
+            tcpService.set_addr(addr: socketAddr)
+            tcpService.start()
         }
     }
     @Published var menuDebug: Bool = false {
@@ -373,10 +266,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
     @Published var systemStatus: SystemStatusData = SystemStatusData()
     @Published var batteryStatus: BatteryStatus = BatteryStatus()
 
-    private var wrpService: wrapper_transportservice
-    private var bleService: CaBotService
+    private var selectedService: any CaBotTransportProtocol
+    private var bleService: CaBotServiceBLE
     private var tcpService: CaBotServiceTCP
     private let tts: CaBotTTS
+    private var lastUpdated: Int64 = 0
     let preview: Bool
     let resourceManager: ResourceManager
     let tourManager: TourManager
@@ -396,25 +290,32 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
     init(preview: Bool) {
         self.preview = preview
         self.tts = CaBotTTS(voice: nil)
-        self.bleService = CaBotService(with: self.tts)
+        self.bleService = CaBotServiceBLE(with: self.tts)
         self.tcpService = CaBotServiceTCP(with: self.tts)
-        self.wrpService = wrapper_transportservice()
         self.resourceManager = ResourceManager(preview: preview)
         self.tourManager = TourManager()
         self.dialogViewHelper = DialogViewHelper()
         self.locationManager =  CLLocationManager()
         self.notificationCenter = UNUserNotificationCenter.current()
+
+        // initialize connection type
+        var connectionType: ConnectionType = .BLE
+        if let conntypestr = UserDefaults.standard.value(forKey: connectionTypeKey) as? String, let storedType = ConnectionType(rawValue: conntypestr){
+            connectionType = storedType
+        }
+        switch(connectionType) {
+        case .BLE:
+            selectedService = bleService
+        case .TCP:
+            selectedService = tcpService
+        }
+        self.connectionType = connectionType
         super.init()
 
         self.tts.delegate = self
-        self.bleService.delegate = self
-        self.tcpService.delegate = self
-        
+
         if let selectedName = UserDefaults.standard.value(forKey: selectedResourceKey) as? String {
             self.resource = resourceManager.resource(by: selectedName)
-        }
-        if let conntypestr = UserDefaults.standard.value(forKey: connectionTypeKey) as? String, let connectionType = conntype(rawValue: conntypestr){
-            self.connectionType = connectionType
         }
         if let groupID = UserDefaults.standard.value(forKey: teamIDKey) as? String {
             self.teamID = groupID
@@ -438,8 +339,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
         // services
         self.locationManager.delegate = self
         self.locationManagerDidChangeAuthorization(self.locationManager)
-        
-        self.bleService.prepareIfAuthorized()//startIfAuthorized()
+
+        self.bleService.delegate = self
+        self.bleService.startIfAuthorized()
+
+        self.tcpService.set_addr(addr: self.socketAddr)
+        self.tcpService.delegate = self
+        self.tcpService.start()
 
         self.notificationCenter.getNotificationSettings { settings in
             if settings.alertSetting == .enabled &&
@@ -490,8 +396,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
 
     func requestBluetoothAuthorization() {
         self.authRequestedByUser = true
-        self.bleService.prepare()//start()
-        //self.bleService.startAdvertising()
+        self.bleService.start()
+        self.bleService.startAdvertising()
     }
 
     func requestNotificationAuthorization() {
@@ -508,7 +414,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
     // MARK: CaBotTTSDelegate
 
     func activityLog(category: String, text: String, memo: String) {
-        self.wrpService.activityLog(category: category, text: text, memo: memo)
+        _ = self.selectedService.activityLog(category: category, text: text, memo: memo)
     }
 
     // MARK: LocationManagerDelegate
@@ -579,7 +485,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
             print("Show modal waiting")
             NavUtil.showModalWaiting(withMessage: NSLocalizedString("processing...", comment: ""))
         }
-        if self.wrpService.summon(destination: destination) || self.noSuitcaseDebug {
+        if self.selectedService.summon(destination: destination) || self.noSuitcaseDebug {
             self.speak(NSLocalizedString("Sending the command to the suitcase", comment: "")) {}
             DispatchQueue.main.async {
                 print("hide modal waiting")
@@ -634,7 +540,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
     }
 
     func systemManageCommand(command: CaBotManageCommand) {
-        if self.wrpService.manage(command: command) {
+        if self.selectedService.manage(command: command) {
             switch(command) {
             case .poweroff, .reboot:
                 deviceStatus.level = .Unknown
@@ -649,6 +555,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
             systemStatus.components.removeAll()
             objectWillChange.send()
         }
+    }
+
+    func debugCabotArrived() {
+        self.cabot(service: self.selectedService, notification: .arrived)
     }
 
     // MARK: TourManagerDelegate
@@ -695,7 +605,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
             print("Show modal waiting")
             NavUtil.showModalWaiting(withMessage: NSLocalizedString("processing...", comment: ""))
         }
-        if wrpService.send(destination: destination) || self.noSuitcaseDebug  {
+        if selectedService.send(destination: destination) || self.noSuitcaseDebug  {
             DispatchQueue.main.async {
                 print("hide modal waiting")
                 NavUtil.hideModalWaiting()
@@ -715,31 +625,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
         }
     }
 
-    // MARK: CaBotServiceDelegate
+    // MARK: CaBotServiceDelegateBLE
 
-    func caBot(service: CaBotTransportProtocol, versionMatched: Bool, with version: String) {
-        self.versionMatched = versionMatched
-        self.serverBLEVersion = version
-    }
-
-    func caBot(service: CaBotTransportProtocol, centralConnected: Bool) {
-        if self.suitcaseConnected != centralConnected {
-            self.suitcaseConnected = centralConnected
-
-            let text = centralConnected ? NSLocalizedString("Suitcase has been connected", comment: "") :
-                NSLocalizedString("Suitcase has been disconnected", comment: "")
-
-            self.tts.speak(text, force: true) {_ in }
-        }
-    }
-
-    func caBot(service: CaBotTransportProtocol, faceappConnected: Bool) {
-        if self.backpackConnected != faceappConnected {
-            self.backpackConnected = faceappConnected
-        }
-    }
-
-    func cabot(service: CaBotTransportProtocol, bluetoothStateUpdated state: CBManagerState) {
+    func cabot(service: any CaBotTransportProtocol, bluetoothStateUpdated state: CBManagerState) {
+        guard service.connectionType() == self.selectedService.connectionType() else { return }
         if bluetoothState != state {
             bluetoothState = state
         }
@@ -749,12 +638,45 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
         #endif
     }
 
-    func cabot(service: CaBotTransportProtocol, openRequest url: URL) {
+    // MARK: CaBotServiceDelegate
+
+    func caBot(service: any CaBotTransportProtocol, centralConnected: Bool) {
+        let saveSuitcaseConnected = self.suitcaseConnected
+
+        switch(service.connectionType()) {
+        case .BLE:
+            self.suitcaseConnectedBLE = centralConnected
+        case .TCP:
+            self.suitcaseConnectedTCP = centralConnected
+        }
+
+        if self.suitcaseConnected != saveSuitcaseConnected {
+            let text = centralConnected ? NSLocalizedString("Suitcase has been connected", comment: "") :
+                NSLocalizedString("Suitcase has been disconnected", comment: "")
+
+            self.tts.speak(text, force: true) {_ in }
+        }
+    }
+
+    func caBot(service: any CaBotTransportProtocol, versionMatched: Bool, with version: String) {
+        switch(service.connectionType()) {
+        case .BLE:
+            self.versionMatchedBLE = versionMatched
+            self.serverBLEVersion = version
+        case .TCP:
+            self.versionMatchedTCP = versionMatched
+            self.serverTCPVersion = version
+        }
+    }
+
+    func cabot(service: any CaBotTransportProtocol, openRequest url: URL) {
+        guard service.connectionType() == self.selectedService.connectionType() else { return }
         NSLog("open request: %@", url.absoluteString)
         self.open(content: url)
     }
 
-    func cabot(service: CaBotTransportProtocol, soundRequest: String) {
+    func cabot(service: any CaBotTransportProtocol, soundRequest: String) {
+        guard service.connectionType() == self.selectedService.connectionType() else { return }
         switch(soundRequest) {
         case "SpeedUp":
             playAudio(file: speedUpSound)
@@ -767,7 +689,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
         }
     }
 
-    func cabot(service: CaBotTransportProtocol, notification: NavigationNotification) {
+    func cabot(service: any CaBotTransportProtocol, notification: NavigationNotification) {
+        guard service.connectionType() == self.selectedService.connectionType() else { return }
         switch(notification){
         case .next:
             if tourManager.nextDestination() {
@@ -803,20 +726,19 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBlueT
         }
     }
 
-    func cabot(service: CaBotTransportProtocol, deviceStatus: DeviceStatus) -> Void {
+    func cabot(service: any CaBotTransportProtocol, deviceStatus: DeviceStatus) -> Void {
+        guard service.connectionType() == self.selectedService.connectionType() else { return }
         self.deviceStatus = deviceStatus
     }
 
-    func cabot(service: CaBotTransportProtocol, systemStatus: SystemStatus) -> Void {
+    func cabot(service: any CaBotTransportProtocol, systemStatus: SystemStatus) -> Void {
+        guard service.connectionType() == self.selectedService.connectionType() else { return }
         self.systemStatus.update(with: systemStatus)
     }
 
-    func cabot(service: CaBotTransportProtocol, batteryStatus: BatteryStatus) -> Void {
+    func cabot(service: any CaBotTransportProtocol, batteryStatus: BatteryStatus) -> Void {
+        guard service.connectionType() == self.selectedService.connectionType() else { return }
         self.batteryStatus = batteryStatus
-    }
-
-    func debugCabotArrived() {
-        self.cabot(service: self.wrpService, notification: .arrived)
     }
 }
 

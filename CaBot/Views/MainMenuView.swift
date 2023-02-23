@@ -237,26 +237,34 @@ struct StatusMenus: View {
     var body: some View {
         Section(header:Text("Status")) {
             HStack {
-                if modelData.suitcaseConnected {
-                    if modelData.backpackConnected {
-                        Label(LocalizedStringKey("Suitcase and Backpack Connected"),
-                              systemImage: "antenna.radiowaves.left.and.right")
-                    } else {
-                        Label(LocalizedStringKey("Suitcase Connected"),
-                              systemImage: "antenna.radiowaves.left.and.right")
-                    }
+                if modelData.suitcaseConnectedBLE {
+                    Label(LocalizedStringKey("BLE Connected"),
+                          systemImage: "antenna.radiowaves.left.and.right")
                     if let version = modelData.serverBLEVersion {
                         Text("(\(version))")
                     }
                 } else {
-                    Label(LocalizedStringKey("Suitcase Not Connected"),
+                    Label(LocalizedStringKey("BLE Not Connected"),
+                          systemImage: "antenna.radiowaves.left.and.right")
+                    .opacity(0.1)
+                }
+            }
+            HStack {
+                if modelData.suitcaseConnectedTCP {
+                    Label(LocalizedStringKey("TCP Connected"),
+                          systemImage: "antenna.radiowaves.left.and.right")
+                    if let version = modelData.serverTCPVersion {
+                        Text("(\(version))")
+                    }
+                } else {
+                    Label(LocalizedStringKey("TCP Not Connected"),
                           systemImage: "antenna.radiowaves.left.and.right")
                         .opacity(0.1)
                 }
             }
             if modelData.suitcaseConnected {
-                if modelData.versionMatched == false {
-                    Label(LocalizedStringKey("Protocol mismatch \(CaBotService.CABOT_BLE_VERSION)"),
+                if modelData.versionMatchedBLE == false {
+                    Label(LocalizedStringKey("Protocol mismatch \(CaBotServiceBLE.CABOT_BLE_VERSION)"),
                           systemImage: "exclamationmark.triangle")
                         .foregroundColor(Color.red)
                 }
@@ -319,7 +327,7 @@ struct SettingMenus: View {
                 }
             }
 
-            Text("Version: \(versionNo) (\(buildNo)) - \(CaBotService.CABOT_BLE_VERSION)")
+            Text("Version: \(versionNo) (\(buildNo)) - \(CaBotServiceBLE.CABOT_BLE_VERSION)")
         }
     }
 }
@@ -338,12 +346,14 @@ struct ContentView_Previews: PreviewProvider {
 
     static var preview_connected: some View {
         let modelData = CaBotAppModel()
-        modelData.suitcaseConnected = true
+        modelData.suitcaseConnectedBLE = true
+        modelData.suitcaseConnectedTCP = true
         modelData.deviceStatus.level = .OK
         modelData.systemStatus.level = .Inactive
         modelData.systemStatus.summary = .Stale
-        modelData.versionMatched = true
-        modelData.serverBLEVersion = "20220315"
+        modelData.versionMatchedBLE = true
+        modelData.serverBLEVersion = CaBotServiceBLE.CABOT_BLE_VERSION
+        modelData.serverTCPVersion = CaBotServiceBLE.CABOT_BLE_VERSION + "_t"
 
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
