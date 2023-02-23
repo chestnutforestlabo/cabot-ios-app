@@ -263,7 +263,8 @@ struct StatusMenus: View {
                 }
             }
             if modelData.suitcaseConnected {
-                if modelData.versionMatchedBLE == false {
+                if (modelData.suitcaseConnectedBLE && modelData.versionMatchedBLE == false) ||
+                (modelData.suitcaseConnectedTCP && modelData.versionMatchedTCP == false) {
                     Label(LocalizedStringKey("Protocol mismatch \(CaBotServiceBLE.CABOT_BLE_VERSION)"),
                           systemImage: "exclamationmark.triangle")
                         .foregroundColor(Color.red)
@@ -352,8 +353,9 @@ struct ContentView_Previews: PreviewProvider {
         modelData.systemStatus.level = .Inactive
         modelData.systemStatus.summary = .Stale
         modelData.versionMatchedBLE = true
+        modelData.versionMatchedTCP = true
         modelData.serverBLEVersion = CaBotServiceBLE.CABOT_BLE_VERSION
-        modelData.serverTCPVersion = CaBotServiceBLE.CABOT_BLE_VERSION + "_t"
+        modelData.serverTCPVersion = CaBotServiceBLE.CABOT_BLE_VERSION
 
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
