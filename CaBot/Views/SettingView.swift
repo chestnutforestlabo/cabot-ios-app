@@ -119,10 +119,22 @@ struct SettingView: View {
                 }
             }
             Section(header: Text("Connection")) {
-
-                HStack {
-                    Text("Team ID")
-                    TextField("Team ID", text: $modelData.teamID)
+                Picker("", selection: $modelData.connectionType){
+                    ForEach(CaBotAppModel.conntype.allCases, id: \.self){ (type) in
+                        Text(type.rawValue).tag(type)
+                    }
+                }.pickerStyle(SegmentedPickerStyle())
+                if modelData.connectionType == CaBotAppModel.conntype.ble{
+                    HStack {
+                        Text("Team ID(ble)")
+                        TextField("Team ID", text: $modelData.teamID)
+                    }
+                }else{
+                    HStack {
+                        Text("Socket Address")
+                        TextField("Socket Address", text:
+                                    $modelData.socketAddr)
+                    }
                 }
             }
             Section(header: Text("VoiceOver adjustment")) {

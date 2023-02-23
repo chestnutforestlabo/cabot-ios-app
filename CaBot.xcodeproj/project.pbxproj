@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0967677F29371BA0005CFA58 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = 0967677E29371BA0005CFA58 /* SocketIO */; };
+		09676781293727CE005CFA58 /* CaBotService_tcp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09676780293727CE005CFA58 /* CaBotService_tcp.swift */; };
 		09725B0A24FE4AC300012D42 /* DialogViewControllerCabot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */; };
 		097845C02531E65B004DE1F6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 097845C22531E65B004DE1F6 /* InfoPlist.strings */; };
 		3009AC3126AA3F4000370873 /* HLPDialog in Frameworks */ = {isa = PBXBuildFile; productRef = 3009AC3026AA3F4000370873 /* HLPDialog */; };
@@ -69,6 +71,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		09676780293727CE005CFA58 /* CaBotService_tcp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaBotService_tcp.swift; sourceTree = "<group>"; };
 		09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogViewControllerCabot.swift; sourceTree = "<group>"; };
 		097845C12531E65B004DE1F6 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		097845C32531E685004DE1F6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -133,6 +136,7 @@
 				306C7F6C265D435100E5928E /* Yams in Frameworks */,
 				306069B429A5E45D001FB5DB /* NavigationBackport in Frameworks */,
 				308FCE2A27E12844009FCC7B /* Gzip in Frameworks */,
+				0967677F29371BA0005CFA58 /* SocketIO in Frameworks */,
 				3009AC3126AA3F4000370873 /* HLPDialog in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -238,6 +242,7 @@
 				30E99DA3266B2216001ACAAA /* BeaconSampler.swift */,
 				30E50DCB269F672800729ABD /* TourManager.swift */,
 				3096BF1726A5D0990066F256 /* TTSHelper.swift */,
+				09676780293727CE005CFA58 /* CaBotService_tcp.swift */,
 			);
 			path = CaBot;
 			sourceTree = "<group>";
@@ -303,6 +308,7 @@
 				3009AC3026AA3F4000370873 /* HLPDialog */,
 				308FCE2227D9014E009FCC7B /* Collections */,
 				308FCE2927E12844009FCC7B /* Gzip */,
+				0967677E29371BA0005CFA58 /* SocketIO */,
 				306069B329A5E45D001FB5DB /* NavigationBackport */,
 			);
 			productName = CaBot;
@@ -384,6 +390,7 @@
 				3009AC2F26AA3F4000370873 /* XCRemoteSwiftPackageReference "HLPDialog" */,
 				308FCE2127D9014E009FCC7B /* XCRemoteSwiftPackageReference "swift-collections" */,
 				308FCE2827E12844009FCC7B /* XCRemoteSwiftPackageReference "GzipSwift" */,
+				0967677D29371B9F005CFA58 /* XCRemoteSwiftPackageReference "socket" */,
 				306069B229A5E45D001FB5DB /* XCRemoteSwiftPackageReference "NavigationBackport" */,
 			);
 			productRefGroup = 7E29F00A228B548100CA7DD6 /* Products */;
@@ -460,6 +467,7 @@
 				308FCE2E27E62B30009FCC7B /* BatteryStatusView.swift in Sources */,
 				30E99DA4266B2216001ACAAA /* BeaconSampler.swift in Sources */,
 				308FCE3027E81B7E009FCC7B /* StatusLabelStyle.swift in Sources */,
+				09676781293727CE005CFA58 /* CaBotService_tcp.swift in Sources */,
 				30C3059E26B9036A00A1383A /* DestinationDetailView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -829,6 +837,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		0967677D29371B9F005CFA58 /* XCRemoteSwiftPackageReference "socket" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/socketio/socket.io-client-swift";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		3009AC2F26AA3F4000370873 /* XCRemoteSwiftPackageReference "HLPDialog" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/hulop/HLPDialog";
@@ -872,6 +888,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		0967677E29371BA0005CFA58 /* SocketIO */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0967677D29371B9F005CFA58 /* XCRemoteSwiftPackageReference "socket" */;
+			productName = SocketIO;
+		};
 		3009AC3026AA3F4000370873 /* HLPDialog */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 3009AC2F26AA3F4000370873 /* XCRemoteSwiftPackageReference "HLPDialog" */;

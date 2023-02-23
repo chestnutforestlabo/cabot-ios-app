@@ -42,17 +42,21 @@ enum CaBotManageCommand:String {
 }
 
 protocol CaBotServiceDelegate {
-    func caBot(service:CaBotService, versionMatched:Bool, with:String)
-    func caBot(service:CaBotService, centralConnected:Bool)
-    func caBot(service:CaBotService, faceappConnected:Bool)
-    func cabot(service:CaBotService, bluetoothStateUpdated: CBManagerState)
-    func cabot(service:CaBotService, openRequest:URL)
-    func cabot(service:CaBotService, soundRequest:String)
-    func cabot(service:CaBotService, notification:NavigationNotification)
-    func cabot(service:CaBotService, deviceStatus:DeviceStatus)
-    func cabot(service:CaBotService, systemStatus:SystemStatus)
-    func cabot(service:CaBotService, batteryStatus:BatteryStatus)
+    func caBot(service:CabotTransportProtocol, versionMatched:Bool, with:String)
 
+    func caBot(service:CabotTransportProtocol, faceappConnected:Bool)
+
+    func cabot(service:CabotTransportProtocol, openRequest:URL)
+    func cabot(service:CabotTransportProtocol, soundRequest:String)
+    func cabot(service:CabotTransportProtocol, notification:NavigationNotification)
+    func cabot(service:CabotTransportProtocol, deviceStatus:DeviceStatus)
+    func cabot(service:CabotTransportProtocol, systemStatus:SystemStatus)
+    func cabot(service:CabotTransportProtocol, batteryStatus:BatteryStatus)
+    func caBot(service:CabotTransportProtocol, centralConnected:Bool)
+}
+
+protocol CaBotServiceDelegateBlueTooth : CaBotServiceDelegate{
+    func cabot(service:CabotTransportProtocol, bluetoothStateUpdated: CBManagerState)
 }
 
 struct DeviceStatus: Decodable {
@@ -267,8 +271,24 @@ enum DiagnosticLevel: Int, Decodable {
         }
     }
 }
+protocol CabotTransportProtocol{
 
-class CaBotService: NSObject, CBPeripheralManagerDelegate {
+    func activityLog(category: String, text: String, memo: String) -> Bool
+    func send(destination: String) -> Bool
+    func summon(destination: String) -> Bool
+    func find(person: String) -> Bool
+    func manage(command: CaBotManageCommand) -> Bool
+    func startAdvertising()
+    func stopAdvertising()
+    func notifyDeviceStatus(status: DeviceStatus)
+    func notifySystemStatus(status: SystemStatus)
+    func notifyBatteryStatus(status: BatteryStatus)
+}
+
+
+class CaBotService: NSObject, CBPeripheralManagerDelegate, CabotTransportProtocol {
+    
+    
     static let CABOT_BLE_VERSION = "20220320"
     static let UUID_FORMAT = "35CE%04X-5E89-4C0D-A3F6-8A6A507C1BF1"
     static let CABOT_SPEED_CONFIG = "cabot_speed"
@@ -280,15 +300,16 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     }
 
     fileprivate var tts:CaBotTTS
-
+    var delegate:CaBotServiceDelegateBlueTooth?
+    
     init(with tts:CaBotTTS) {
         self.tts = tts
     }
 
-    public var delegate:CaBotServiceDelegate?
+
     public var teamID:String? = nil
     public var faceappReady:Bool = false
-    public var peripheralManager:CBPeripheralManager!
+    public var peripheralManager:CBPeripheralManager?
 
     private let uuid = CBUUID(string: String(format:UUID_FORMAT, 0x0000))
     private var logChar:CaBotNotifyChar!
@@ -302,17 +323,31 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     private var characteristics:[CBCharacteristic] = []
     private var chars:[CaBotChar] = []
     private let peripheralRestoreKey:String = UUID().uuidString
-    private var serviceAdded:Bool = false
+    enum add_state:Int{
+        case none = 0
+        case adding = 1
+        case added = 2
+    }
+    private var serviceAdded:add_state = .none
     private var contrialCount:Int = CONTRIAL_MAX
 
+    func requestAuthorized() -> Bool{
+        return CBCentralManager.authorization == .allowedAlways
+    }
+    func prepareIfAuthorized(){
+        if (self.requestAuthorized()) {
+            self.prepare()
+        }
+    }
     func startIfAuthorized() {
-        if (CBCentralManager.authorization == .allowedAlways) {
+        if (self.requestAuthorized()) {
             self.start();
         }
     }
 
-    func start() {
-        self.peripheralManager = CBPeripheralManager(delegate: self, queue: nil,
+    func prepare() {
+        if self.peripheralManager != nil {return}
+        let peripheralManager = CBPeripheralManager(delegate: self, queue: nil,
                                                      options: [CBPeripheralManagerOptionShowPowerAlertKey: true,
                                                                CBPeripheralManagerOptionRestoreIdentifierKey: peripheralRestoreKey])
 
@@ -348,6 +383,15 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
 
         self.heartbeatChar = CaBotNotifyChar(service: self, handle:0x9999)
         self.chars.append(self.heartbeatChar)
+        self.peripheralManager = peripheralManager
+    }
+    func start(){
+        self.prepare()
+        self.addService()
+    }
+    func stop(){
+        self.stopAdvertising()
+        self.removeService()
     }
 
     var heartBeatTimer:Timer? = nil
@@ -422,7 +466,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     }
 
     public func startAdvertising() {
-        if self.peripheralManager == nil {
+        guard let peripheralManager = self.peripheralManager else {
             return
         }
         let localName = "CaBot" + (self.teamID != nil ? "-" + self.teamID! : "")
@@ -430,18 +474,18 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
             CBAdvertisementDataLocalNameKey: localName,
             CBAdvertisementDataServiceUUIDsKey: [CBUUID(string: self.uuid.uuidString)]
         ]
-        if (!self.peripheralManager.isAdvertising) {
+        if (!peripheralManager.isAdvertising) {
             peripheralManager.startAdvertising(advertisementData)
             NSLog("Start advertising \(localName)")
         }
     }
 
     public func stopAdvertising() {
-        if self.peripheralManager == nil {
+        guard let peripheralManager = self.peripheralManager else {
             return
         }
-        if (self.peripheralManager.isAdvertising) {
-            self.peripheralManager.stopAdvertising();
+        if (peripheralManager.isAdvertising) {
+            peripheralManager.stopAdvertising();
             NSLog("Stop advertising")
         }
     }
@@ -472,18 +516,33 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     internal func add(characteristic:CBCharacteristic) {
         self.characteristics.append(characteristic)
     }
-    
+    private let add_service_lock = NSLock()
     private func addService()
     {
-        if serviceAdded {
+        defer{self.add_service_lock.unlock()}
+        self.add_service_lock.lock()
+        guard let peripheralManager = self.peripheralManager else {return}
+        if self.serviceAdded == .added {
             startAdvertising()
             return
         }
-        let service:CBMutableService = CBMutableService(type: self.uuid, primary: true)
-        service.characteristics = self.characteristics
-        
-        NSLog("adding a service")
-        peripheralManager.add(service)
+        if self.cbpm_state != .poweredOn{
+            self.need_add_service = true
+        }else{
+            if self.serviceAdded != .adding{
+                let service:CBMutableService = CBMutableService(type: self.uuid, primary: true)
+                service.characteristics = self.characteristics
+                
+                NSLog("adding a service")
+                peripheralManager.add(service)
+                self.serviceAdded = .adding
+            }
+        }
+    }
+    private func removeService(){
+        guard let peripheralManager = self.peripheralManager else {return}
+        peripheralManager.removeAllServices()
+        self.serviceAdded = .none
     }
     private var checkCount:Int = 0
     private func checkAdvertisement() -> Bool
@@ -508,12 +567,15 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     }
 
     // MARK: CBPeripheralManagerDelegate
+    private var need_add_service:Bool = false
+    private var cbpm_state:CBManagerState = .unknown
 
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager)
     {
         NSLog("state: \(peripheral.state.rawValue)")
 
-        if peripheral.state == .poweredOn {
+        self.cbpm_state = peripheral.state
+        if self.need_add_service, peripheral.state == .poweredOn {
             DispatchQueue.main.asyncAfter(deadline: .now()+1) {
                 self.addService();
             }
@@ -533,7 +595,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
         for char in service.characteristics! {
             NSLog("\(char.uuid)")
         }
-        self.serviceAdded = true
+        self.serviceAdded = .added
         self.startAdvertising();
     }
     
@@ -557,6 +619,7 @@ class CaBotService: NSObject, CBPeripheralManagerDelegate {
     
     func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveWrite requests: [CBATTRequest]) {
         NSLog("didReceiveWrite \(requests)")
+        guard let peripheralManager = self.peripheralManager else {return}
         for request in requests
         {
             for char in self.chars {
@@ -618,12 +681,13 @@ class CaBotNotifyChar: CaBotChar {
     }
     
     func notify(data:Data, retry:Int = 10) -> Bool {
+        guard let peripheralManager = self.service.peripheralManager else {return false}
         if self.characteristic_read.subscribedCentrals?.count == 0 {
             return false
         }
 
         NSLog("notify to "+self.characteristic_read.uuid.uuidString)
-        if self.service.peripheralManager.updateValue(data, for: self.characteristic_read, onSubscribedCentrals: nil) == false {
+        if peripheralManager.updateValue(data, for: self.characteristic_read, onSubscribedCentrals: nil) == false {
             if retry == 0 {
                 return false
             }
@@ -670,8 +734,9 @@ class CaBotStoreChar: CaBotChar {
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        guard let peripheralManager = self.service.peripheralManager else {return}
         if let data = self.valueData {
-            self.service.peripheralManager.updateValue(data, for: self.characteristic_read, onSubscribedCentrals: nil)
+            peripheralManager.updateValue(data, for: self.characteristic_read, onSubscribedCentrals: nil)
         }
     }
     
@@ -706,9 +771,10 @@ class CaBotStoreChar: CaBotChar {
     }
     
     override func canHandle(readRequest: CBATTRequest) -> Bool {
+        guard let peripheralManager = self.service.peripheralManager else {return false}
         if readRequest.characteristic.uuid.isEqual(self.characteristic_read.uuid) {
             readRequest.value = self.valueData
-            self.service.peripheralManager.respond(
+            peripheralManager.respond(
                 to: readRequest,
                withResult: .success)
             return true
@@ -772,13 +838,14 @@ class CaBotQueryChar: CaBotChar {
     public func request(_ query:String, mtu:Int) {
         let queue = DispatchQueue(label: "Wiring-queue")
         queue.async {
+            guard let peripheralManager = self.service.peripheralManager else {return}
             var ret = self.operation(query)
             let dataLength = ret.count
         
             let duration = self.timeElapsedInSecondsWhenRunningCode {
                 while ret.count > 0 {
                     let temp = ret.prefix(mtu)
-                    if self.service.peripheralManager.updateValue(Data(temp.utf8), for: self.characteristic_read, onSubscribedCentrals: nil) {
+                    if peripheralManager.updateValue(Data(temp.utf8), for: self.characteristic_read, onSubscribedCentrals: nil) {
                         ret = String(ret.suffix(max(0, ret.count-mtu)))
                     }
                     usleep(1000)
