@@ -148,14 +148,16 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
             guard let delegate = weakself.delegate else { return }
             DispatchQueue.main.async {
                 weakself.connected = true
-                delegate.caBot(service: weakself, centralConnected: true)
+                delegate.caBot(service: weakself, centralConnected: weakself.connected)
             }
             socket.emit("req_version", true)
         }
         socket.on(clientEvent: .error){[weak self] data, ack in
-            if let text = data[0] as? String{
-                /*self?.tts.speak(text){
-                }*/
+            guard let weakself = self else { return }
+            guard let delegate = weakself.delegate else { return }
+            DispatchQueue.main.async {
+                weakself.connected = false
+                delegate.caBot(service: weakself, centralConnected: weakself.connected)
             }
         }
         socket.on(clientEvent: .disconnect){[weak self] data, ack in
@@ -163,7 +165,7 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
             guard let delegate = weakself.delegate else { return }
             DispatchQueue.main.async {
                 weakself.connected = false
-                delegate.caBot(service: weakself, centralConnected: false)
+                delegate.caBot(service: weakself, centralConnected: weakself.connected)
             }
         }
         socket.on("cabot_version"){[weak self] data, ack in

@@ -129,10 +129,10 @@ class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProt
 
                 if (self.heartbeatChar.notify(value: "1", retry: 0)) {
                     self.contrialCount = CaBotServiceBLE.CONTRIAL_MAX
-                    NSLog("heartBeat success")
+                    NSLog("BLE heartBeat success")
                 } else {
                     self.contrialCount = self.contrialCount - 1
-                    NSLog("heartBeat failure    ")
+                    NSLog("BLE heartBeat failure")
                 }
                 if(self.contrialCount > 0){
                     self.connected = true
