@@ -628,7 +628,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     // MARK: CaBotServiceDelegateBLE
 
     func cabot(service: any CaBotTransportProtocol, bluetoothStateUpdated state: CBManagerState) {
-        guard service.connectionType() == self.selectedService.connectionType() else { return }
         if bluetoothState != state {
             bluetoothState = state
         }
