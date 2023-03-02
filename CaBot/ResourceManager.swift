@@ -36,18 +36,21 @@ enum SourceType: String, Decodable {
 
 extension CodingUserInfoKey {
     static let base = CodingUserInfoKey(rawValue: "base")!
+    static let i18n = CodingUserInfoKey(rawValue: "i18n")!
 }
 
 struct Source: Decodable {
     let base: URL?
     let type: SourceType
     let src: String
+    let i18n: I18N
 
     var url: URL? {
         get {
             switch(type) {
             case .local:
-                return base?.appendingPathComponent(src)
+                let langSrc = String(format: src, i18n.langCode)
+                return base?.appendingPathComponent(langSrc)
             case .remote:
                 return URL(string:src)
             }
@@ -70,6 +73,7 @@ struct Source: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        i18n = decoder.userInfo[.i18n] as! I18N
         type = try container.decode(SourceType.self, forKey: .type)
         src = try container.decode(String.self, forKey: .src)
         base = decoder.userInfo[.base] as? URL
@@ -91,9 +95,43 @@ struct CustomMenu: Decodable, Hashable {
     let function: String
 }
 
+class I18N {
+    var lang: String
+    var tableName: String?
+    var bundle: Foundation.Bundle?
+
+    var langCode: String {
+        get {
+            Locale(identifier: self.lang).languageCode ?? "en"
+        }
+    }
+
+    init() {
+        self.lang = Locale.preferredLanguages[0]
+    }
+
+    func set(tableName: String?, bundle: Foundation.Bundle?, lang: String?) {
+        self.tableName = tableName
+        self.bundle = bundle
+        if let lang = lang {
+            self.lang = lang
+        }
+    }
+
+    func localizedString(key: String) -> String {
+        guard let tableName = self.tableName else { return key }
+        guard let bundle = self.bundle else { return key }
+
+        let text = CustomLocalizedString(key, lang: self.langCode, tableName: tableName, bundle: bundle)
+        // NSLog("key=\(key), tableName=\(tableName), text=\(text), bundle=\(bundle.bundleURL)")
+        return text
+    }
+}
+
 struct Metadata: Decodable{
+    let identifier: String
     let name: String
-    let language: String
+    let i18n: I18N
     let conversation: Source?
     let destinations: Source?
     let tours: Source?
@@ -106,10 +144,43 @@ struct Metadata: Decodable{
             let json = try JSONSerialization.data(withJSONObject: yaml)
             let decoder = JSONDecoder()
             decoder.userInfo[.base] = url.deletingLastPathComponent()
+            decoder.userInfo[.i18n] = I18N()
             return try decoder.decode(Metadata.self, from: json)
         } catch is YamlError {
             throw MetadataError.yamlParseError
         }
+    }
+
+    enum CodingKeys: CodingKey {
+        case name
+        case language
+        case i18n
+        case conversation
+        case destinations
+        case tours
+        case custom_menus
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        // needs to have I18N instance
+        let i18nTableName = try? container.decodeIfPresent(String.self, forKey: .i18n)
+        var bundle: Foundation.Bundle?
+        if let url = decoder.userInfo[.base] as? URL {
+            bundle = Foundation.Bundle(url: url)
+        }
+        let i18n = decoder.userInfo[.i18n] as! I18N
+        self.i18n = i18n
+        let language = try? container.decodeIfPresent(String.self, forKey: .language)
+        i18n.set(tableName: i18nTableName, bundle: bundle, lang: language)
+
+        self.identifier = try container.decode(String.self, forKey: .name)
+        self.name = i18n.localizedString(key: self.identifier)
+        self.conversation = try? container.decodeIfPresent(Source.self, forKey: .conversation)
+        self.destinations = try? container.decodeIfPresent(Source.self, forKey: .destinations)
+        self.tours = try? container.decodeIfPresent(Source.self, forKey: .tours)
+        self.custom_menus = try? container.decodeIfPresent([CustomMenu].self, forKey: .custom_menus)
     }
 }
 
@@ -133,6 +204,12 @@ class Resource: Hashable {
 
     private let metadata: Metadata
 
+    var identifier:String {
+        get {
+            metadata.identifier
+        }
+    }
+
     var name:String {
         get {
             metadata.name
@@ -147,37 +224,36 @@ class Resource: Hashable {
 
     var lang: String {
         get {
-            metadata.language
+            metadata.i18n.lang
         }
     }
 
     var locale: Locale {
-
         return Locale.init(identifier: self.lang)
     }
 
-    var conversationURL: URL? {
+    var conversationSource: Source? {
         get {
             if let c = metadata.conversation {
-                return c.url
+                return c
             }
             return nil
         }
     }
 
-    var destinationsURL: URL? {
+    var destinationsSource: Source? {
         get {
             if let d = metadata.destinations {
-                return d.url
+                return d
             }
             return nil
         }
     }
 
-    var toursURL: URL? {
+    var toursSource: Source? {
         get {
             if let t = metadata.tours {
-                return t.url
+                return t
             }
             return nil
         }
@@ -229,18 +305,57 @@ struct Destination: Decodable, Hashable {
     let message:Source?
     let content:Source?
     let waitingDestination:SimpleDestination?
+
+    enum CodingKeys: String, CodingKey {
+        case title
+        case value
+        case pron
+        case file
+        case message
+        case content
+        case waitingDestination
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let i18n = decoder.userInfo[.i18n] as! I18N
+        let title = try container.decode(String.self, forKey: .title)
+        self.title = i18n.localizedString(key: title)
+        value = try? container.decode(String.self, forKey: .value)
+        if let pron = try? container.decode(String.self, forKey: .pron) {
+            self.pron = i18n.localizedString(key: pron)
+        } else {
+            self.pron = nil
+        }
+        file = try? container.decode(Source.self, forKey: .file)
+        message = try? container.decode(Source.self, forKey: .message)
+        content = try? container.decode(Source.self, forKey: .content)
+        waitingDestination = try? container.decode(SimpleDestination.self, forKey: .waitingDestination)
+    }
+
+    init(title: String, value: String?, pron: String?, file: Source?, message: Source?, content: Source?, waitingDestination: SimpleDestination?) {
+        self.title = title
+        self.value = value
+        self.pron = pron
+        self.file = file
+        self.message = message
+        self.content = content
+        self.waitingDestination = waitingDestination
+    }
 }
 
 class Destinations {
     let list: [Destination]
 
-    init(at url: URL) throws {
+    init(at src: Source) throws {
         do {
+            guard let url = src.url else { throw MetadataError.contentLoadError }
             let str = try String(contentsOf: url)
             guard let yaml = try Yams.load(yaml: str) else { throw MetadataError.yamlParseError }
             let json = try JSONSerialization.data(withJSONObject: yaml)
             let decoder = JSONDecoder()
             decoder.userInfo[.base] = url.deletingLastPathComponent()
+            decoder.userInfo[.i18n] = src.i18n
             list = try decoder.decode([Destination].self, from: json)
         } catch is YamlError {
             throw MetadataError.yamlParseError
@@ -275,13 +390,15 @@ struct Tour: Decodable, Hashable, TourProtocol {
 class Tours {
     let list: [Tour]
 
-    init(at url: URL) throws {
+    init(at src: Source) throws {
         do {
+            guard let url = src.url else { throw MetadataError.contentLoadError }
             let str = try String(contentsOf: url)
             guard let yaml = try Yams.load(yaml: str) else { throw MetadataError.yamlParseError }
             let json = try JSONSerialization.data(withJSONObject: yaml)
             let decoder = JSONDecoder()
             decoder.userInfo[.base] = url.deletingLastPathComponent()
+            decoder.userInfo[.i18n] = src.i18n
             list = try decoder.decode([Tour].self, from: json)
         } catch is YamlError {
             throw MetadataError.yamlParseError
@@ -326,9 +443,11 @@ class ResourceManager {
         }
     }
 
-    public func resource(by name: String) -> Resource? {
+    public func resource(by identifier: String) -> Resource? {
+        NSLog("identifier=\(identifier)")
         for resource in resources {
-            if resource.name == name {
+            NSLog("resource.identifier = \(resource.identifier)")
+            if resource.identifier == identifier {
                 return resource
             }
         }

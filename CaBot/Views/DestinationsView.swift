@@ -27,20 +27,27 @@ struct DestinationsView: View {
     @State private var isConfirming = false
     @State private var targetDestination: Destination?
 
-    var url: URL
+    var src: Source
     var destination: Destination?
 
     var body: some View {
         let tourManager = modelData.tourManager
-        let destinations = try! Destinations(at: url)
+        let destinations = try! Destinations(at: src)
+        var header: Text?
+        if let title = destination?.title {
+            header = Text(title)
+        } else {
+            header = Text("SELECT_DESTINATION")
+        }
 
-        Form {
-            Section(header: Text(destination?.title ?? NSLocalizedString("SELECT_DESTINATION", comment: ""))) {
+        return Form {
+            Section(
+                header: header) {
                 ForEach(destinations.list, id: \.self) { destination in
 
-                    if let url = destination.file?.url {
+                    if let src = destination.file {
                         NavigationLink(
-                            destination: DestinationsView(url: url, destination: destination)
+                            destination: DestinationsView(src: src, destination: destination)
                                 .environmentObject(modelData),
                             label: {
                                 Text(destination.title)
@@ -72,8 +79,7 @@ struct DestinationsView: View {
                             }
                             // deprecated
                             .actionSheet(isPresented: $isConfirming) {
-                                let message = String(format: NSLocalizedString("ADD_A_DESTINATION_MESSAGE", comment: ""),
-                                                     arguments: [modelData.tourManager.destinationCount])
+                                let message = LocalizedStringKey("ADD_A_DESTINATION_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
                                 return ActionSheet(title: Text("ADD_A_DESTINATION"),
                                             message: Text(message),
                                             buttons: [
@@ -150,7 +156,7 @@ struct DestinationsView_Previews: PreviewProvider {
 
         let resource = modelData.resourceManager.resource(by: "place0")!
 
-        return DestinationsView(url: resource.destinationsURL!)
+        return DestinationsView(src: resource.destinationsSource!)
             .environmentObject(modelData)
     }
 
@@ -159,9 +165,9 @@ struct DestinationsView_Previews: PreviewProvider {
 
         let resource = modelData.resourceManager.resource(by: "place0")!
 
-        let destinations = try! Destinations(at: resource.destinationsURL!)
+        let destinations = try! Destinations(at: resource.destinationsSource!)
 
-        return DestinationsView(url: destinations.list[0].file!.url!)
+        return DestinationsView(src: destinations.list[0].file!)
             .environmentObject(modelData)
     }
 }

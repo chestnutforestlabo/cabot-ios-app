@@ -59,7 +59,7 @@ struct SettingView: View {
     var body: some View {
         return Form {
             Section(header: Text("Speech Voice")) {
-                Picker(NSLocalizedString("Voice", comment:""), selection: $modelData.voice) {
+                Picker(LocalizedStringKey("Voice"), selection: $modelData.voice) {
                     ForEach(TTSHelper.getVoices(by: locale), id: \.self) { voice in
                         Text(voice.AVvoice.name).tag(voice as Voice?)
                     }
@@ -146,8 +146,8 @@ struct SettingView: View {
                                in: 1...2,
                                step: 0.1)
                             .accessibility(label: Text("Delay after closing browser"))
-                            .accessibility(value: Text(String(format:NSLocalizedString("%.1f seconds", comment:""), arguments:[modelData.browserCloseDelay])))
-                        Text(String(format:NSLocalizedString("%.1f sec", comment:""), arguments:[modelData.browserCloseDelay]))
+                            .accessibility(value: Text(LocalizedStringKey("\(modelData.browserCloseDelay, specifier: "%.1f") seconds")))
+                        Text(LocalizedStringKey("\(modelData.browserCloseDelay, specifier: "%.1f") sec"))
                             .accessibility(hidden: true)
                     }
                 }

@@ -51,7 +51,7 @@
 
 "PAUSE_NAVIGATION"="ナビゲーションを一時停止";
 "CANCEL_NAVIGATION"="ナビゲーションを中止";
-"CANCEL_NAVIGATION_MESSAGE"="%d個の目的地が設定されています。全てキャンセルしてよろしいですか？";
+"CANCEL_NAVIGATION_MESSAGE %d"="%d個の目的地が設定されています。全てキャンセルしてよろしいですか？";
 "CANCEL_ALL"="全ての目的地を中止";
 "START"="ナビゲーションを開始";
 
@@ -59,12 +59,12 @@
 "SETTINGS_LABEL"="設定";
 "SET_TOUR"="ツアーを設定する";
 "ADD_A_DESTINATION"="目的地を追加する";
-"ADD_A_DESTINATION_MESSAGE"="既に%d個の目的地が設定されています。どのようにしますか？";
+"ADD_A_DESTINATION_MESSAGE %d"="既に%d個の目的地が設定されています。どのようにしますか？";
 "CLEAR_ALL_THEN_ADD"="全部消してから追加する";
 "ADD_TO_FIRST"="最初に追加する";
 "ADD_TO_LAST"="最後に追加する";
 "ADD_TOUR"="これらの行先を追加する";
-"ADD_TOUR_MESSAGE"="既に%d個の目的地が設定されていますが、上書きしてよろしいですか？";
+"ADD_TOUR_MESSAGE %d"="既に%d個の目的地が設定されていますが、上書きしてよろしいですか？";
 "OVERWRITE_TOUR"="上書きする";
 "SELECT_RESOURCE"="リソースの選択";
 "Hello Suitcase!"="こんにちは、スーツケース";
@@ -93,7 +93,7 @@
 "You have arrived at %@"="%@に到着しました。";
 "Open Content for %@"="%@の説明ページを開く";
 "Let the suitcase wait"="スーツケースを待たせる";
-"Let the suitcase wait message"="%@にスーツケースを待たせるコマンドを送ろうとしています。よろしいですか？";
+"Let the suitcase wait message %@"="%@にスーツケースを待たせるコマンドを送ろうとしています。よろしいですか？";
 "Yes"="はい";
 "No"="いいえ";
 "Let the suitcase wait at %@"="%@にスーツケースを待たせる";

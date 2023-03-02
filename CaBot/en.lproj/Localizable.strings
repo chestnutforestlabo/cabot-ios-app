@@ -51,7 +51,7 @@
 
 "PAUSE_NAVIGATION"="Pause Navigation";
 "CANCEL_NAVIGATION"="Cancel Navigation";
-"CANCEL_NAVIGATION_MESSAGE"="You have %d destination(s). Are you sure to cancel all?";
+"CANCEL_NAVIGATION_MESSAGE %d"="You have %d destination(s). Are you sure to cancel all?";
 "CANCEL_ALL"="Cancel all destination";
 "START"="Start Navigation";
 
@@ -59,12 +59,12 @@
 "SETTINGS_LABEL"="Settings";
 "SET_TOUR"="Set Tour";
 "ADD_A_DESTINATION"="Add a destination";
-"ADD_A_DESTINATION_MESSAGE"="You already have %d destination(s). What do you want to do?";
+"ADD_A_DESTINATION_MESSAGE %d"="You already have %d destination(s). What do you want to do?";
 "CLEAR_ALL_THEN_ADD"="Clear All then Add";
 "ADD_TO_FIRST"="Add to first";
 "ADD_TO_LAST"="Add to last";
 "ADD_TOUR"="Add These Points";
-"ADD_TOUR_MESSAGE"="You already have %d destination(s), do you want overwrite?";
+"ADD_TOUR_MESSAGE %d"="You already have %d destination(s), do you want overwrite?";
 "OVERWRITE_TOUR"="Overwrite";
 "SELECT_RESOURCE"="Select Resource";
 
@@ -91,7 +91,7 @@
 "You have arrived at %@"="You have arrived at %@. ";
 "Open Content for %@"="Open Content for %@";
 "Let the suitcase wait"="Let the suitcase wait";
-"Let the suitcase wait message"="You are going to send a command to let the suitcase wait at %@. Are you okay with it?";
+"Let the suitcase wait message %@"="You are going to send a command to let the suitcase wait at %@. Are you okay with it?";
 "Yes"="Yes";
 "No"="No";
 "Let the suitcase wait at %@"="Let the suitcase wait at %@";

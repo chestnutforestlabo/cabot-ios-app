@@ -42,13 +42,13 @@ struct OnboardGrantAccess: View {
             }) {
                 switch(modelData.locationState) {
                 case .Init:
-                    Label(NSLocalizedString("Enable Location Update", comment: ""), systemImage:"circle")
+                    Label(LocalizedStringKey("Enable Location Update"), systemImage:"circle")
                 case .Granted:
-                    Label(NSLocalizedString("Location Update Enabled", comment: ""), systemImage:"checkmark.circle")
+                    Label(LocalizedStringKey("Location Update Enabled"), systemImage:"checkmark.circle")
                 case .Denied:
-                    Label(NSLocalizedString("Location Update Denied", comment: ""), systemImage:"multiply.circle")
+                    Label(LocalizedStringKey("Location Update Denied"), systemImage:"multiply.circle")
                 case .Off:
-                    Label(NSLocalizedString("ERROR", comment: ""), systemImage:"multiply.circle")
+                    Label(LocalizedStringKey("ERROR"), systemImage:"multiply.circle")
                 }
             }
             .padding()
@@ -61,15 +61,15 @@ struct OnboardGrantAccess: View {
             }) {
                 switch(modelData.bluetoothState) {
                 case .unknown:
-                    Label(NSLocalizedString("Enable Bluetooth", comment: ""), systemImage: "circle")
+                    Label(LocalizedStringKey("Enable Bluetooth"), systemImage: "circle")
                 case .unauthorized:
-                    Label(NSLocalizedString("Bluetooth Denied", comment: ""), systemImage: "multiply.circle")
+                    Label(LocalizedStringKey("Bluetooth Denied"), systemImage: "multiply.circle")
                 case .poweredOn:
-                    Label(NSLocalizedString("Bluetooth Enabled", comment: ""), systemImage: "checkmark.circle")
+                    Label(LocalizedStringKey("Bluetooth Enabled"), systemImage: "checkmark.circle")
                 case .poweredOff:
-                    Label(NSLocalizedString("Bluetooth is Off", comment: ""), systemImage: "circle")
+                    Label(LocalizedStringKey("Bluetooth is Off"), systemImage: "circle")
                 case .unsupported:
-                    Label(NSLocalizedString("Running on Simulator?", comment: ""),
+                    Label(LocalizedStringKey("Running on Simulator?"),
                           systemImage: "multiply.circle")
                 default:
                     Text("bluetoothState error")
@@ -85,13 +85,13 @@ struct OnboardGrantAccess: View {
             }) {
                 switch(modelData.notificationState) {
                 case .Init:
-                    Label(NSLocalizedString("Enable Notification", comment: ""), systemImage:"circle")
+                    Label(LocalizedStringKey("Enable Notification"), systemImage:"circle")
                 case .Granted:
-                    Label(NSLocalizedString("Notification Enabled", comment: ""), systemImage:"checkmark.circle")
+                    Label(LocalizedStringKey("Notification Enabled"), systemImage:"checkmark.circle")
                 case .Denied:
-                    Label(NSLocalizedString("Notification Denied", comment: ""), systemImage:"multiply.circle")
+                    Label(LocalizedStringKey("Notification Denied"), systemImage:"multiply.circle")
                 case .Off:
-                    Label(NSLocalizedString("ERROR", comment: ""), systemImage:"multiply.circle")
+                    Label(LocalizedStringKey("ERROR"), systemImage:"multiply.circle")
                 }
             }
             .padding()

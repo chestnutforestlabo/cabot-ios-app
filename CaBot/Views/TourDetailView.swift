@@ -54,8 +54,7 @@ struct TourDetailView: View {
                         }
                     }
                     .actionSheet(isPresented: $isConfirming) {
-                        let message = String(format: NSLocalizedString("ADD_TOUR_MESSAGE", comment: ""),
-                                             arguments: [modelData.tourManager.destinationCount])
+                        let message = LocalizedStringKey("ADD_TOUR_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
                         return ActionSheet(title: Text("ADD_TOUR"),
                                            message: Text(message),
                                            buttons: [
@@ -85,8 +84,7 @@ struct TourDetailView: View {
                         }
                     }
                     .actionSheet(isPresented: $isConfirming) {
-                        let message = String(format: NSLocalizedString("CANCEL_NAVIGATION_MESSAGE", comment: ""),
-                                             arguments: [modelData.tourManager.destinationCount])
+                        let message = LocalizedStringKey("CANCEL_NAVIGATION_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
                         return ActionSheet(title: Text("CANCEL_NAVIGATION"),
                                            message: Text(message),
                                            buttons: [
@@ -121,7 +119,7 @@ struct TourDetailView_Previews: PreviewProvider {
         let modelData = CaBotAppModel()
 
         let resource = modelData.resourceManager.resource(by: "place0")!
-        let tours = try! Tours(at: resource.toursURL!)
+        let tours = try! Tours(at: resource.toursSource!)
 
         return TourDetailView(tour: tours.list[0],
                               showStartButton: true,

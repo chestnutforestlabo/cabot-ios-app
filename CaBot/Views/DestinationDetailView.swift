@@ -54,8 +54,7 @@ struct DestinationDetailView: View {
                     }
                 }
                 .actionSheet(isPresented: $isConfirming) {
-                    let message = String(format: NSLocalizedString("ADD_A_DESTINATION_MESSAGE", comment: ""),
-                                         arguments: [modelData.tourManager.destinationCount])
+                    let message = LocalizedStringKey("ADD_A_DESTINATION_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
                     return ActionSheet(title: Text("ADD_A_DESTINATION"),
                                 message: Text(message),
                                 buttons: [
@@ -105,7 +104,7 @@ struct DestinationDetailView_Previews: PreviewProvider {
         let modelData = CaBotAppModel()
 
         let resource = modelData.resourceManager.resource(by: "place0")!
-        let destinations = try! Destinations(at: resource.destinationsURL!)
+        let destinations = try! Destinations(at: resource.destinationsSource!)
         let destination = destinations.list[0]
 
         DestinationDetailView(destination: destination)

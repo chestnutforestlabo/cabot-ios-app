@@ -183,28 +183,6 @@ static NSMutableDictionary<NSString*, UIView*>* messageViewMap;
     });
 }
 
-+(void)openURL:(NSURL*) url onViewController:(UIViewController*)controller
-{
-    if (url == nil) {
-        return;
-    }
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Open_with_Safari",@"")
-                                                                   message:NSLocalizedString(@"Open_with_Safari_Message", @"")
-                                                            preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedStringFromTable(@"Cancel", @"BlindView", @"")
-                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-                                              }]];
-    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedStringFromTable(@"OK", @"BlindView", @"")
-                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-                                                  [[UIApplication sharedApplication] openURL:url
-                                                                                     options:@{}
-                                                                           completionHandler:^(BOOL success) {
-                                                                           }];
-                                              }]];
-    
-    [controller presentViewController:alert animated:YES completion:nil];
-}
-
 +(NSString*)deviceModel
 {
     struct utsname sysinfo;

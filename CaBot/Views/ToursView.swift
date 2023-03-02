@@ -25,10 +25,10 @@ import SwiftUI
 struct ToursView: View {
     @EnvironmentObject var modelData: CaBotAppModel
     
-    var url:URL
+    var src:Source
 
     var body: some View {
-        let tours = try! Tours(at: url)
+        let tours = try! Tours(at: src)
 
         Form {
             Section(header: Text("SELECT_TOUR")) {
@@ -49,7 +49,7 @@ struct ToursView_Previews: PreviewProvider {
         let modelData = CaBotAppModel()
 
         let resource = modelData.resourceManager.resource(by: "place0")!
-        return ToursView(url: resource.toursURL!)
+        return ToursView(src: resource.toursSource!)
             .environmentObject(modelData)
     }
 }

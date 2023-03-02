@@ -114,6 +114,8 @@ class FallbackService: CaBotServiceProtocol {
 }
 
 final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, TourManagerDelegate, CLLocationManagerDelegate, CaBotTTSDelegate {
+
+    private let DEFAULT_LANG = "en"
     
     private let selectedResourceKey = "SelectedResourceKey"
     private let selectedVoiceKey = "SelectedVoiceKey"
@@ -179,6 +181,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             if let resource = resource {
 
                 let key = "\(selectedVoiceKey)_\(resource.locale.identifier)"
+                print(key)
                 if let id = UserDefaults.standard.value(forKey: key) as? String {
                     self.voice = TTSHelper.getVoice(by: id)
                 } else {
@@ -186,8 +189,15 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 }
             }
 
-            UserDefaults.standard.setValue(resource?.name, forKey: selectedResourceKey)
+            NSLog("resource.identifier = \(resource?.identifier)")
+            UserDefaults.standard.setValue(resource?.identifier, forKey: selectedResourceKey)
             UserDefaults.standard.synchronize()
+        }
+    }
+
+    var resourceLang: String {
+        get {
+            resource?.lang ?? DEFAULT_LANG
         }
     }
 
@@ -373,8 +383,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
         self.tts.delegate = self
 
-        if let selectedName = UserDefaults.standard.value(forKey: selectedResourceKey) as? String {
-            self.resource = resourceManager.resource(by: selectedName)
+        if let selectedIdentifier = UserDefaults.standard.value(forKey: selectedResourceKey) as? String {
+            self.resource = resourceManager.resource(by: selectedIdentifier)
         }
         if let groupID = UserDefaults.standard.value(forKey: teamIDKey) as? String {
             self.teamID = groupID
@@ -542,10 +552,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     func summon(destination: String) -> Bool {
         DispatchQueue.main.async {
             print("Show modal waiting")
-            NavUtil.showModalWaiting(withMessage: NSLocalizedString("processing...", comment: ""))
+            NavUtil.showModalWaiting(withMessage: CustomLocalizedString("processing...", lang: self.resourceLang))
         }
         if self.fallbackService.summon(destination: destination) || self.noSuitcaseDebug {
-            self.speak(NSLocalizedString("Sending the command to the suitcase", comment: "")) {}
+            self.speak(CustomLocalizedString("Sending the command to the suitcase", lang: self.resourceLang)) {}
             DispatchQueue.main.async {
                 print("hide modal waiting")
                 NavUtil.hideModalWaiting()
@@ -557,7 +567,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 NavUtil.hideModalWaiting()
             }
             DispatchQueue.main.async {
-                let message = NSLocalizedString("Suitcase may not be connected", comment: "")
+                let message = CustomLocalizedString("Suitcase may not be connected", lang: self.resourceLang)
 
                 self.speak(message) {}
             }
@@ -593,7 +603,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         let delay = wait ? self.browserCloseDelay : 0
 
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            self.speak(NSLocalizedString("You can proceed by pressing the right button of the suitcase handle", comment: "")) {
+            self.speak(CustomLocalizedString("You can proceed by pressing the right button of the suitcase handle", lang: self.resourceLang)) {
             }
         }
     }
@@ -646,7 +656,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     // wait 1.0 ~ 2.0 seconds if browser was open.
                     // hopefully closing browser and reading the content by voice over will be ended by then
                     DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                        let announce = String(format:NSLocalizedString("Going to %@", comment: ""), arguments: [dest.pron ?? dest.title])
+                        let announce = String(format:CustomLocalizedString("Going to %@", lang: self.resourceLang), arguments: [dest.pron ?? dest.title])
                             + (dest.message?.content ?? "")
 
                         self.speak(announce){
@@ -662,7 +672,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private func send(destination: String) -> Bool {
         DispatchQueue.main.async {
             print("Show modal waiting")
-            NavUtil.showModalWaiting(withMessage: NSLocalizedString("processing...", comment: ""))
+            NavUtil.showModalWaiting(withMessage: CustomLocalizedString("processing...", lang: self.resourceLang))
         }
         if fallbackService.send(destination: destination) || self.noSuitcaseDebug  {
             DispatchQueue.main.async {
@@ -676,7 +686,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 NavUtil.hideModalWaiting()
             }
             DispatchQueue.main.async {
-                let message = NSLocalizedString("Suitcase may not be connected", comment: "")
+                let message = CustomLocalizedString("Suitcase may not be connected", lang: self.resourceLang)
 
                 self.speak(message) {}
             }
@@ -709,8 +719,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
 
         if self.suitcaseConnected != saveSuitcaseConnected {
-            let text = centralConnected ? NSLocalizedString("Suitcase has been connected", comment: "") :
-                NSLocalizedString("Suitcase has been disconnected", comment: "")
+            let text = centralConnected ? CustomLocalizedString("Suitcase has been connected", lang: self.resourceLang) :
+                CustomLocalizedString("Suitcase has been disconnected", lang: self.resourceLang)
 
             self.tts.speak(text, force: true) {_ in }
         }
@@ -751,7 +761,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             if tourManager.nextDestination() {
                 self.playAudio(file: self.startSound)
             }else {
-                self.speak(NSLocalizedString("No destination is selected", comment: "")) {
+                self.speak(CustomLocalizedString("No destination is selected", lang: self.resourceLang)) {
                 }
             }
             break
@@ -760,12 +770,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 self.playAudio(file: self.arrivedSound)
                 tourManager.arrivedCurrent()
 
-                var announce = String(format:NSLocalizedString("You have arrived at %@", comment: ""), arguments: [cd.pron ?? cd.title])
+                var announce = String(format:CustomLocalizedString("You have arrived at %@", lang: self.resourceLang), arguments: [cd.pron ?? cd.title])
                 if let _ = cd.content?.url {
-                    announce += String(format:NSLocalizedString("You can check detail of %@ on the phone", comment: ""), arguments: [cd.pron ?? cd.title])
+                    announce += String(format:CustomLocalizedString("You can check detail of %@ on the phone", lang: self.resourceLang), arguments: [cd.pron ?? cd.title])
                 }
                 if tourManager.hasDestination {
-                    announce += NSLocalizedString("You can proceed by pressing the right button of the suitcase handle", comment: "")
+                    announce += CustomLocalizedString("You can proceed by pressing the right button of the suitcase handle", lang: self.resourceLang)
                 }
 
                 self.speak(announce) {

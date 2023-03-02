@@ -98,8 +98,11 @@ struct ActionMenus: View {
                     Button(action: {
                         modelData.open(content: contentURL)
                     }) {
-                        Label(String(format:NSLocalizedString("Open Content for %@", comment: ""), arguments: [ad.title]),
-                              systemImage: "newspaper")
+                        Label(title: {
+                            Text("Open Content for \(ad.title)")
+                        }, icon: {
+                            Image(systemName: "newspaper")
+                        })
                     }
                 }
                 if modelData.tourManager.currentDestination == nil,
@@ -108,8 +111,11 @@ struct ActionMenus: View {
                     Button(action: {
                         modelData.isConfirmingSummons = true
                     }) {
-                        Label(String(format:NSLocalizedString("Let the suitcase wait at %@", comment: ""), arguments: [title]),
-                              systemImage: "arrow.triangle.turn.up.right.diamond")
+                        Label(title: {
+                            Text("Let the suitcase wait at \(title)")
+                        }, icon: {
+                            Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                        })
                     }
                     .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
                 }
@@ -132,8 +138,7 @@ struct DestinationMenus: View {
                     HStack {
                         Label(cd.title,
                               systemImage: "arrow.triangle.turn.up.right.diamond")
-                            .accessibilityLabel(String(format: NSLocalizedString("Navigating to %@", comment: ""),
-                                                       arguments: [cd.title]))
+                            .accessibilityLabel(Text("Navigating to \(cd.title)"))
                         if modelData.menuDebug {
                             Spacer()
                             Button(action: {
@@ -183,9 +188,9 @@ struct MainMenus: View {
     var body: some View {
         if let cm = modelData.resource {
             Section(header: Text("Navigation")) {
-                if let url = cm.conversationURL{
+                if let src = cm.conversationSource{
                     NavigationLink(
-                        destination: ConversationView(url: url)
+                        destination: ConversationView(src: src)
                             .onDisappear(){
                                 modelData.resetAudioSession()
                             }
@@ -194,17 +199,17 @@ struct MainMenus: View {
                             Text("START_CONVERSATION")
                         })
                 }
-                if let url = cm.destinationsURL {
+                if let src = cm.destinationsSource {
                     NavigationLink(
-                        destination: DestinationsView(url: url)
+                        destination: DestinationsView(src: src)
                             .environmentObject(modelData),
                         label: {
                             Text("SELECT_DESTINATION")
                         })
                 }
-                if let url = cm.toursURL {
+                if let src = cm.toursSource {
                     NavigationLink(
-                        destination: ToursView(url: url)
+                        destination: ToursView(src: src)
                             .environmentObject(modelData),
                         label: {
                             Text("SELECT_TOUR")
@@ -230,6 +235,7 @@ struct MainMenus: View {
         }
     }
 }
+
 
 struct StatusMenus: View {
     @EnvironmentObject var modelData: CaBotAppModel
@@ -321,10 +327,9 @@ struct SettingMenus: View {
 
         Section(header:Text("System")) {
             NavigationLink (destination: SettingView()
-                                .environmentObject(modelData)
-                                .environment(\.locale, modelData.resource?.locale ?? .init(identifier: "base"))) {
+                                .environmentObject(modelData)) {
                 HStack {
-                    Label(NSLocalizedString("Settings", comment: ""), systemImage: "gearshape")
+                    Label(LocalizedStringKey("Settings"), systemImage: "gearshape")
                 }
             }
 
@@ -373,7 +378,7 @@ struct ContentView_Previews: PreviewProvider {
 
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
-            if let url = r.toursURL {
+            if let url = r.toursSource {
                 if let tours = try? Tours(at: url) {
                     modelData.tourManager.set(tour: tours.list[0])
                     _ = modelData.tourManager.nextDestination()
@@ -390,7 +395,7 @@ struct ContentView_Previews: PreviewProvider {
 
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
-            if let url = r.toursURL {
+            if let url = r.toursSource {
                 if let tours = try? Tours(at: url) {
                     modelData.tourManager.set(tour: tours.list[0])
                 }
@@ -406,7 +411,7 @@ struct ContentView_Previews: PreviewProvider {
 
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
-            if let url = r.toursURL {
+            if let url = r.toursSource {
                 if let tours = try? Tours(at: url) {
                     modelData.tourManager.set(tour: tours.list[1])
                 }
@@ -422,7 +427,7 @@ struct ContentView_Previews: PreviewProvider {
 
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
-            if let url = r.toursURL {
+            if let url = r.toursSource {
                 if let tours = try? Tours(at: url) {
                     modelData.tourManager.set(tour: tours.list[1])
                 }
