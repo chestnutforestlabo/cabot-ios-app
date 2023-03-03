@@ -1,24 +1,15 @@
 -
-  title: Tour 0
+  title: Tour With Reference
   id: tour_0
   destinations:
     -
-      title: point A
-      value: Node_ID_FOR_A
+      ref: destinations_all.yaml/destination1_node_value
     -
-      title: point B
-      value: Node_ID_FOR_B
+      ref: destinations_all.yaml/destination2_node_value_without_title
     -
-      title: point C
-      value: Node_ID_FOR_C
-    -
-      title: point D
-      value: Node_ID_FOR_D
-    -
-      title: point E
-      value: Node_ID_FOR_E
+      ref: destinations_all.yaml/destination3_node_value_nested_ref
 -
-  title: Tour 1
+  title: Tour Without Reference
   id: tour_1
   destinations:
     -

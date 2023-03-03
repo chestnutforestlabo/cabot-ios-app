@@ -125,12 +125,30 @@ struct TourDetailView: View {
 
 struct TourDetailView_Previews: PreviewProvider {
     static var previews: some View {
+        preview2
+        preview1
+    }
+
+    static var preview2: some View {
         let modelData = CaBotAppModel()
 
         let resource = modelData.resourceManager.resource(by: "place0")!
         let tours = try! Tours(at: resource.toursSource!)
 
         return TourDetailView(tour: tours.list[0],
+                              showStartButton: true,
+                              showCancelButton: true
+                              )
+            .environmentObject(modelData)
+    }
+
+    static var preview1: some View {
+        let modelData = CaBotAppModel()
+
+        let resource = modelData.resourceManager.resource(by: "place0")!
+        let tours = try! Tours(at: resource.toursSource!)
+
+        return TourDetailView(tour: tours.list[1],
                               showStartButton: true,
                               showCancelButton: true
                               )
