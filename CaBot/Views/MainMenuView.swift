@@ -326,7 +326,7 @@ struct SettingMenus: View {
         let buildNo = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
 
         Section(header:Text("System")) {
-            NavigationLink (destination: SettingView()
+            NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
                                 .environmentObject(modelData)) {
                 HStack {
                     Label(LocalizedStringKey("Settings"), systemImage: "gearshape")

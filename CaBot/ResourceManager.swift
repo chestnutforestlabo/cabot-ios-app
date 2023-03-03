@@ -186,6 +186,7 @@ struct Metadata: Decodable{
 
 class Resource: Hashable {
     let base: URL
+    var langOverride: String?
 
     init(at url: URL) throws {
         base = url
@@ -224,7 +225,10 @@ class Resource: Hashable {
 
     var lang: String {
         get {
-            metadata.i18n.lang
+            self.langOverride ?? metadata.i18n.lang
+        }
+        set {
+            self.langOverride = newValue
         }
     }
 
@@ -265,6 +269,26 @@ class Resource: Hashable {
                 return cm
             }
             return []
+        }
+    }
+
+    var languages: [String] {
+        get {
+            var languages:[String] = []
+            if let directoryContents = try? FileManager.default.contentsOfDirectory(
+                at: base,
+                includingPropertiesForKeys: [.isDirectoryKey]
+            ) {
+                for directory in directoryContents {
+                    if directory.pathExtension == "lproj" {
+                        languages.append(directory.deletingPathExtension().lastPathComponent)
+                    }
+                }
+            }
+            if languages.contains(where: {lang in lang == metadata.i18n.lang }) == false {
+                languages.append(metadata.i18n.lang)
+            }
+            return languages
         }
     }
 }

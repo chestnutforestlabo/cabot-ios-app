@@ -28,6 +28,8 @@ struct SettingView: View {
     @EnvironmentObject var modelData: CaBotAppModel
 
     @State var timer:Timer?
+    @State var langOverride:String
+    @State var isResourceChanging:Bool = false
 
     let startSounds:[String] = [
         "/System/Library/Audio/UISounds/nano/3rdParty_Success_Haptic.caf",
@@ -65,9 +67,13 @@ struct SettingView: View {
                     }
                 }.onChange(of: modelData.voice, perform: { value in
                     if let voice = modelData.voice {
-                        TTSHelper.playSample(of: voice)
+                        if !isResourceChanging {
+                            TTSHelper.playSample(of: voice)
+                        }
                     }
-                })
+                }).onTapGesture {
+                    isResourceChanging = false
+                }
                 .pickerStyle(DefaultPickerStyle())
 
                 HStack {
@@ -163,6 +169,18 @@ struct SettingView: View {
                     Text("SELECT_RESOURCE")
                 }
 
+                if let resource = modelData.resource {
+                    Picker("Language", selection: $langOverride) {
+                        ForEach(resource.languages, id: \.self) { language in
+                            Text(language).tag(language)
+                        }
+                    }.onChange(of: langOverride) { lang in
+                        modelData.resource?.lang = lang
+                        self.isResourceChanging = true
+                        modelData.resource = modelData.resource
+                    }
+                }
+
                 Toggle("Menu Debug", isOn: $modelData.menuDebug)
                 Toggle("No Suitcase Debug", isOn: $modelData.noSuitcaseDebug)
             }
@@ -179,7 +197,7 @@ struct SettingView_Previews: PreviewProvider {
         modelData.resource = resource
         modelData.teamID = "test"
 
-        return SettingView()
+        return SettingView(langOverride: "en-US")
             .environmentObject(modelData)
             .environment(\.locale, Locale.init(identifier: "en-US"))
     }
