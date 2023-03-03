@@ -33,6 +33,7 @@ struct TourDetailView: View {
 
     var body: some View {
         let tourManager = modelData.tourManager
+        let hasError = tour.destinations.first(where: {d in d.error != nil}) != nil
 
         Form {
             Section(header: Text("Actions")) {
@@ -53,6 +54,7 @@ struct TourDetailView: View {
                             Image(systemName: "arrow.triangle.turn.up.right.diamond")
                         }
                     }
+                    .disabled(hasError)
                     .actionSheet(isPresented: $isConfirming) {
                         let message = LocalizedStringKey("ADD_TOUR_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
                         return ActionSheet(title: Text("ADD_TOUR"),
@@ -107,7 +109,14 @@ struct TourDetailView: View {
                 }
 
                 ForEach(tour.destinations, id: \.self) { dest in
-                    Label(dest.title, systemImage: "mappin.and.ellipse")
+                    if let error = dest.error {
+                        HStack{
+                            Text(dest.title)
+                            Text(error).font(.system(size: 11))
+                        }.foregroundColor(Color.red)
+                    } else {
+                        Label(dest.title, systemImage: "mappin.and.ellipse")
+                    }
                 }
             }
         }

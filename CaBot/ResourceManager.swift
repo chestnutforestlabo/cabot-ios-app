@@ -37,9 +37,18 @@ enum SourceType: String, Decodable {
 extension CodingUserInfoKey {
     static let base = CodingUserInfoKey(rawValue: "base")!
     static let i18n = CodingUserInfoKey(rawValue: "i18n")!
+    static let nest = CodingUserInfoKey(rawValue: "nest")!
 }
 
-struct Source: Decodable {
+struct Source: Decodable, Hashable {
+    static func == (lhs: Source, rhs: Source) -> Bool {
+        return lhs.base == rhs.base && lhs.type == rhs.type && lhs.src == rhs.src
+    }
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(base)
+        hasher.combine(type)
+        hasher.combine(src)
+    }
     let base: URL?
     let type: SourceType
     let src: String
@@ -77,6 +86,13 @@ struct Source: Decodable {
         type = try container.decode(SourceType.self, forKey: .type)
         src = try container.decode(String.self, forKey: .src)
         base = decoder.userInfo[.base] as? URL
+    }
+
+    init(base: URL?, type:SourceType, src:String, i18n:I18N) {
+        self.base = base
+        self.type = type
+        self.src = src
+        self.i18n = i18n
     }
 }
 
@@ -122,7 +138,7 @@ class I18N {
         guard let tableName = self.tableName else { return key }
         guard let bundle = self.bundle else { return key }
 
-        let text = CustomLocalizedString(key, lang: self.langCode, tableName: tableName, bundle: bundle)
+        let text = CustomLocalizedString(key, lang: self.langCode, tableName: tableName, bundle: bundle, returnKeyIfNotFound: false)
         // NSLog("key=\(key), tableName=\(tableName), text=\(text), bundle=\(bundle.bundleURL)")
         return text
     }
@@ -293,12 +309,63 @@ class Resource: Hashable {
     }
 }
 
-struct SimpleDestination: Decodable {
+
+/// Destination for the robot waiting position
+///
+/// ```
+/// - title: <String> Display text for the destination
+///    - the text can be localizable
+/// - value: <String> Navigation node ID
+/// - pron: <String> Reading text for the destination if required other wise title is used for reading
+///    - the text can be localizable
+/// ```
+struct WaitingDestination: Decodable {
     let title:String
     let value:String?
     let pron:String?
+
+    enum CodingKeys: String, CodingKey {
+        case title
+        case value
+        case pron
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let i18n = decoder.userInfo[.i18n] as! I18N
+
+        let title = try container.decode(String.self, forKey: .title)
+        self.title = i18n.localizedString(key: title)
+        value = try? container.decode(String.self, forKey: .value)
+        if let pron = try? container.decode(String.self, forKey: .pron) {
+            let i18n_pron = i18n.localizedString(key: pron)
+            if i18n_pron.count == 0 {  // assume there is no localized pron
+                self.pron = title
+            } else {
+                self.pron = i18n_pron
+            }
+        } else {
+            self.pron = nil
+        }
+    }
 }
 
+
+/// Destination for the navigation
+///
+/// ```
+/// - ref: <String> if ref is specified with the format (<local file>/<value>), it will copy properties from the destination that has <value> in the <local file>
+///   - if other properties are specified too, it will override
+/// - title: <String> Display text for the destination
+///   - the text can be localizable
+/// - value: <String> Navigation node ID
+/// - pron: <String> Reading text for the destination if required other wise title is used for reading
+///    - the text can be localizable
+/// - file: <Source> file including a list of destinations
+/// - message: <Source> file including a message text
+/// - content: <Source> file including a web content to show in the browser
+/// - waitingDestination: <WaitingDestination>
+/// ```
 struct Destination: Decodable, Hashable {
     static func == (lhs: Destination, rhs: Destination) -> Bool {
         if let lhsfile = lhs.file,
@@ -328,10 +395,12 @@ struct Destination: Decodable, Hashable {
     let file:Source?
     let message:Source?
     let content:Source?
-    let waitingDestination:SimpleDestination?
+    let waitingDestination:WaitingDestination?
+    let error:String?
 
     enum CodingKeys: String, CodingKey {
         case title
+        case ref
         case value
         case pron
         case file
@@ -342,22 +411,104 @@ struct Destination: Decodable, Hashable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let base = decoder.userInfo[.base] as! URL
         let i18n = decoder.userInfo[.i18n] as! I18N
-        let title = try container.decode(String.self, forKey: .title)
-        self.title = i18n.localizedString(key: title)
+        let nest = decoder.userInfo[.nest] as! Int
+
+        // if 'ref' is specified, try to find a destination
+        if let ref = try? container.decode(String.self, forKey: .ref), nest < 3 {
+            if let index = ref.firstIndex(of: "/") {
+                let file = String(ref[..<index])
+                let value = String(ref[ref.index(index, offsetBy: 1)...])
+                let src = Source(base: base, type: .local, src: file, i18n: i18n)
+                if let destinations = try? Destinations(at: src) {
+                    if let refDest = destinations.destination(by: value) {
+                        // override if other properties exist
+                        if let title = try? container.decode(String.self, forKey: .title) {
+                            self.title = i18n.localizedString(key: title)
+                        } else {
+                            self.title = refDest.title
+                        }
+                        if let value = try? container.decode(String.self, forKey: .value) {
+                            self.value = value
+                        } else {
+                            self.value = refDest.value
+                        }
+                        if let pron = try? container.decode(String.self, forKey: .pron) {
+                            self.pron = pron
+                        } else {
+                            self.pron = refDest.pron
+                        }
+                        if let file = try? container.decode(Source.self, forKey: .file) {
+                            self.file = file
+                        } else {
+                            self.file = refDest.file
+                        }
+                        if let message = try? container.decode(Source.self, forKey: .message) {
+                            self.message = message
+                        } else {
+                            self.message = refDest.message
+                        }
+                        if let content = try? container.decode(Source.self, forKey: .content) {
+                            self.content = content
+                        } else {
+                            self.content = refDest.content
+                        }
+                        if let waitingDestination = try? container.decode(WaitingDestination.self, forKey: .waitingDestination) {
+                            self.waitingDestination = waitingDestination
+                        } else {
+                            self.waitingDestination = refDest.waitingDestination
+                        }
+                        if let error = refDest.error {
+                            self.error = CustomLocalizedString("Reference \(file)/\(value) got error.\n\(error)", lang: i18n.lang)
+                        } else {
+                            self.error = nil
+                        }
+                        return
+                    } else {
+                        self.error = CustomLocalizedString("Cannot find \(file)/\(value)", lang: i18n.lang)
+                    }
+                } else {
+                    self.error = CustomLocalizedString("Cannot find \(file)", lang: i18n.lang)
+                }
+            } else {
+                self.error = CustomLocalizedString("Reference error (syntax='file/value')", lang: i18n.lang)
+            }
+            self.title = CustomLocalizedString("ERROR", lang: i18n.lang)
+            self.value = nil
+            self.pron = nil
+            self.file = nil
+            self.message = nil
+            self.content = nil
+            self.waitingDestination = nil
+            return  // error
+        }
+
+        if nest == 3 {
+            self.error = CustomLocalizedString("Nested reference", lang: i18n.lang)
+            self.title = CustomLocalizedString("ERROR", lang: i18n.lang)
+        } else {
+            if let title = try? container.decode(String.self, forKey: .title) {
+                self.title = i18n.localizedString(key: title)
+                self.error = nil
+            } else {
+                self.title = CustomLocalizedString("ERROR", lang: i18n.lang)
+                self.error = CustomLocalizedString("No title specified", lang: i18n.lang)
+            }
+        }
         value = try? container.decode(String.self, forKey: .value)
         if let pron = try? container.decode(String.self, forKey: .pron) {
             self.pron = i18n.localizedString(key: pron)
         } else {
             self.pron = nil
         }
-        file = try? container.decode(Source.self, forKey: .file)
-        message = try? container.decode(Source.self, forKey: .message)
-        content = try? container.decode(Source.self, forKey: .content)
-        waitingDestination = try? container.decode(SimpleDestination.self, forKey: .waitingDestination)
+        self.file = try? container.decode(Source.self, forKey: .file)
+        self.message = try? container.decode(Source.self, forKey: .message)
+        self.content = try? container.decode(Source.self, forKey: .content)
+        self.waitingDestination = try? container.decode(WaitingDestination.self, forKey: .waitingDestination)
     }
 
-    init(title: String, value: String?, pron: String?, file: Source?, message: Source?, content: Source?, waitingDestination: SimpleDestination?) {
+    init(title: String, value: String?, pron: String?, file: Source?, message: Source?, content: Source?, waitingDestination: WaitingDestination?) {
         self.title = title
         self.value = value
         self.pron = pron
@@ -365,13 +516,33 @@ struct Destination: Decodable, Hashable {
         self.message = message
         self.content = content
         self.waitingDestination = waitingDestination
+        self.error = nil
     }
 }
 
 class Destinations {
+    static var nest: Int = 0
+    static var srcList: Dictionary<Source, [Destination]> = Dictionary()
+    static var srcDict: Dictionary<Source, Dictionary<String, Destination>> = Dictionary()
     let list: [Destination]
+    let dict: Dictionary<String, Destination>
+
+    func destination(by value: String) -> Destination? {
+        if let dest = dict[value] {
+            return dest
+        }
+        return nil
+    }
 
     init(at src: Source) throws {
+        if let list = Destinations.srcList[src] {
+            if let dict = Destinations.srcDict[src] {
+                self.list = list
+                self.dict = dict
+                print("\(src) nest=\(Destinations.nest) cached")
+                return
+            }
+        }
         do {
             guard let url = src.url else { throw MetadataError.contentLoadError }
             let str = try String(contentsOf: url)
@@ -380,7 +551,23 @@ class Destinations {
             let decoder = JSONDecoder()
             decoder.userInfo[.base] = url.deletingLastPathComponent()
             decoder.userInfo[.i18n] = src.i18n
-            list = try decoder.decode([Destination].self, from: json)
+
+            Destinations.nest += 1
+            decoder.userInfo[.nest] = Destinations.nest
+            print("\(url) nest=\(Destinations.nest) going to decode")
+            let list = try decoder.decode([Destination].self, from: json)
+            Destinations.nest -= 1
+
+            var dict = Dictionary<String, Destination>()
+            for d in list {
+                if let value = d.value {
+                    dict[value] = d
+                }
+            }
+            Destinations.srcList[src] = list
+            Destinations.srcDict[src] = dict
+            self.list = list
+            self.dict = dict
         } catch is YamlError {
             throw MetadataError.yamlParseError
         }
@@ -423,7 +610,12 @@ class Tours {
             let decoder = JSONDecoder()
             decoder.userInfo[.base] = url.deletingLastPathComponent()
             decoder.userInfo[.i18n] = src.i18n
+
+            Destinations.nest += 1
+            decoder.userInfo[.nest] = Destinations.nest
+            print("\(url) nest=\(Destinations.nest) going to decode")
             list = try decoder.decode([Tour].self, from: json)
+            Destinations.nest -= 1
         } catch is YamlError {
             throw MetadataError.yamlParseError
         }

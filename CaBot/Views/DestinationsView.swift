@@ -44,8 +44,12 @@ struct DestinationsView: View {
             Section(
                 header: header) {
                 ForEach(destinations.list, id: \.self) { destination in
-
-                    if let src = destination.file {
+                    if let error = destination.error {
+                        HStack{
+                            Text(destination.title)
+                            Text(error).font(.system(size: 11))
+                        }.foregroundColor(Color.red)
+                    } else if let src = destination.file {
                         NavigationLink(
                             destination: DestinationsView(src: src, destination: destination)
                                 .environmentObject(modelData),
