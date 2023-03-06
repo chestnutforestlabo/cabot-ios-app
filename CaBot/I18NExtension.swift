@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021  Carnegie Mellon University
+ * Copyright (c) 2023  Carnegie Mellon University
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,36 +20,22 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-import SwiftUI
+import Foundation
 
-struct ToursView: View {
-    @EnvironmentObject var modelData: CaBotAppModel
-    
-    var src:Source
-
-    var body: some View {
-        let tours = try! Tour.load(at: src)
-
-        Form {
-            Section(header: Text("SELECT_TOUR")) {
-                ForEach(tours, id: \.self) { tour in
-                    NavigationLink(
-                        destination: TourDetailView(tour: tour, showStartButton: true),
-                        label: {
-                            Text(tour.title)
-                        })
-                }
-            }
-        }.listStyle(PlainListStyle())
+func CustomLocalizedString(_ key:String, lang:String, tableName:String = "Localizable", bundle:Bundle = Bundle.main) -> String {
+    if let path = bundle.path(forResource: lang, ofType: "lproj") {
+        let bundle = Bundle(path: path)
+        if let string = bundle?.localizedString(forKey: key, value: nil, table: tableName) {
+            return string
+        }
     }
-}
 
-struct ToursView_Previews: PreviewProvider {
-    static var previews: some View {
-        let modelData = CaBotAppModel()
-
-        let resource = modelData.resourceManager.resource(by: "place0")!
-        return ToursView(src: resource.toursSource!)
-            .environmentObject(modelData)
+    let langCode = String(lang.prefix(2))
+    if let path = bundle.path(forResource: langCode, ofType: "lproj") {
+        let bundle = Bundle(path: path)
+        if let string = bundle?.localizedString(forKey: key, value: nil, table: tableName) {
+            return string
+        }
     }
+    return key
 }

@@ -1,0 +1,17 @@
+-
+  ref: destinations_all.yaml/destination1_node_value
+-
+  ref: destinations_all.yaml/destination2_node_value_without_title
+-
+  ref: destinations_all.yaml/destination3_node_value_nested_ref
+-
+  value: no_title_destination
+-
+  title: test destination with a subtour
+  value: test_destination_with_a_subtour
+  subtour: tours.yaml/sub_tour_1
+-
+  ref: destinations_all.yaml/destination4_node_with_a_subtour
+-
+  ref: destinations_all.yaml/destination7_node_with_a_subtour_recursive
+

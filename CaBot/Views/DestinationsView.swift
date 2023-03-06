@@ -32,7 +32,7 @@ struct DestinationsView: View {
 
     var body: some View {
         let tourManager = modelData.tourManager
-        let destinations = try! Destinations(at: src)
+        let destinations = try! Destination.load(at: src)
         var header: Text?
         if let title = destination?.title {
             header = Text(title)
@@ -43,7 +43,7 @@ struct DestinationsView: View {
         return Form {
             Section(
                 header: header) {
-                ForEach(destinations.list, id: \.self) { destination in
+                ForEach(destinations, id: \.self) { destination in
                     if let error = destination.error {
                         HStack{
                             Text(destination.title)
@@ -169,9 +169,9 @@ struct DestinationsView_Previews: PreviewProvider {
 
         let resource = modelData.resourceManager.resource(by: "place0")!
 
-        let destinations = try! Destinations(at: resource.destinationsSource!)
+        let destinations = try! Destination.load(at: resource.destinationsSource!)
 
-        return DestinationsView(src: destinations.list[0].file!)
+        return DestinationsView(src: destinations[0].file!)
             .environmentObject(modelData)
     }
 }

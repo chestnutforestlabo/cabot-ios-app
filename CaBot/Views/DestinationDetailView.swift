@@ -104,8 +104,8 @@ struct DestinationDetailView_Previews: PreviewProvider {
         let modelData = CaBotAppModel()
 
         let resource = modelData.resourceManager.resource(by: "place0")!
-        let destinations = try! Destinations(at: resource.destinationsSource!)
-        let destination = destinations.list[0]
+        let destinations = try! Destination.load(at: resource.destinationsSource!)
+        let destination = destinations[0]
 
         DestinationDetailView(destination: destination)
     }

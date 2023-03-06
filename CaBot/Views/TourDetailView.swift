@@ -133,9 +133,9 @@ struct TourDetailView_Previews: PreviewProvider {
         let modelData = CaBotAppModel()
 
         let resource = modelData.resourceManager.resource(by: "place0")!
-        let tours = try! Tours(at: resource.toursSource!)
+        let tours = try! Tour.load(at: resource.toursSource!)
 
-        return TourDetailView(tour: tours.list[0],
+        return TourDetailView(tour: tours[0],
                               showStartButton: true,
                               showCancelButton: true
                               )
@@ -146,9 +146,9 @@ struct TourDetailView_Previews: PreviewProvider {
         let modelData = CaBotAppModel()
 
         let resource = modelData.resourceManager.resource(by: "place0")!
-        let tours = try! Tours(at: resource.toursSource!)
+        let tours = try! Tour.load(at: resource.toursSource!)
 
-        return TourDetailView(tour: tours.list[1],
+        return TourDetailView(tour: tours[1],
                               showStartButton: true,
                               showCancelButton: true
                               )

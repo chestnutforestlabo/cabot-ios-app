@@ -379,8 +379,8 @@ struct ContentView_Previews: PreviewProvider {
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
             if let url = r.toursSource {
-                if let tours = try? Tours(at: url) {
-                    modelData.tourManager.set(tour: tours.list[0])
+                if let tours = try? Tour.load(at: url) {
+                    modelData.tourManager.set(tour: tours[0])
                     _ = modelData.tourManager.nextDestination()
                 }
             }
@@ -396,8 +396,8 @@ struct ContentView_Previews: PreviewProvider {
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
             if let url = r.toursSource {
-                if let tours = try? Tours(at: url) {
-                    modelData.tourManager.set(tour: tours.list[0])
+                if let tours = try? Tour.load(at: url) {
+                    modelData.tourManager.set(tour: tours[0])
                 }
             }
         }
@@ -412,8 +412,8 @@ struct ContentView_Previews: PreviewProvider {
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
             if let url = r.toursSource {
-                if let tours = try? Tours(at: url) {
-                    modelData.tourManager.set(tour: tours.list[1])
+                if let tours = try? Tour.load(at: url) {
+                    modelData.tourManager.set(tour: tours[1])
                 }
             }
         }
@@ -428,8 +428,8 @@ struct ContentView_Previews: PreviewProvider {
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
             if let url = r.toursSource {
-                if let tours = try? Tours(at: url) {
-                    modelData.tourManager.set(tour: tours.list[1])
+                if let tours = try? Tour.load(at: url) {
+                    modelData.tourManager.set(tour: tours[1])
                 }
             }
         }

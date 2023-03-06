@@ -51,6 +51,13 @@
 		7E29F06D228B55C000CA7DD6 /* NavDeviceTTS.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F062228B55C000CA7DD6 /* NavDeviceTTS.m */; };
 		7E29F072228B55FC00CA7DD6 /* CaBotServiceBLE.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F070228B55FC00CA7DD6 /* CaBotServiceBLE.swift */; };
 		7E557F002581C79B00B1B9CA /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7E557EFE2581C79B00B1B9CA /* Localizable.strings */; };
+		7EDE7C8629B428BB00A65829 /* data in Resources */ = {isa = PBXBuildFile; fileRef = 7EDE7C8529B428BB00A65829 /* data */; };
+		7EDE7C8E29B5715800A65829 /* ResourceChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EDE7C8D29B5715800A65829 /* ResourceChecker.swift */; };
+		7EDE7C9629B5737C00A65829 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 7EDE7C9529B5737C00A65829 /* ArgumentParser */; };
+		7EDE7C9729B5802200A65829 /* ResourceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99D9126681097001ACAAA /* ResourceManager.swift */; };
+		7EDE7C9929B5803700A65829 /* Yams in Frameworks */ = {isa = PBXBuildFile; productRef = 7EDE7C9829B5803700A65829 /* Yams */; };
+		7EDE7C9C29B580C200A65829 /* I18NExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EDE7C9B29B580C200A65829 /* I18NExtension.swift */; };
+		7EDE7C9D29B580F700A65829 /* I18NExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EDE7C9B29B580C200A65829 /* I18NExtension.swift */; };
 		7EF5F1EA228DB07100788987 /* NavUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EF5F1E8228DB07100788987 /* NavUtil.m */; };
 /* End PBXBuildFile section */
 
@@ -70,6 +77,18 @@
 			remoteInfo = CaBot;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		7EDE7C8929B5715800A65829 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		09676780293727CE005CFA58 /* CaBotServiceTCP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaBotServiceTCP.swift; sourceTree = "<group>"; };
@@ -125,6 +144,10 @@
 		7E29F070228B55FC00CA7DD6 /* CaBotServiceBLE.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaBotServiceBLE.swift; sourceTree = "<group>"; };
 		7E557EFF2581C79B00B1B9CA /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		7E557F042581C80E00B1B9CA /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
+		7EDE7C8529B428BB00A65829 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = data; sourceTree = "<group>"; };
+		7EDE7C8B29B5715800A65829 /* CaBotTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CaBotTool; sourceTree = BUILT_PRODUCTS_DIR; };
+		7EDE7C8D29B5715800A65829 /* ResourceChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceChecker.swift; sourceTree = "<group>"; };
+		7EDE7C9B29B580C200A65829 /* I18NExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = I18NExtension.swift; sourceTree = "<group>"; };
 		7EF5F1E8228DB07100788987 /* NavUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NavUtil.m; sourceTree = "<group>"; };
 		7EF5F1E9228DB07100788987 /* NavUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NavUtil.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -154,6 +177,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7EDE7C8829B5715800A65829 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7EDE7C9929B5803700A65829 /* Yams in Frameworks */,
+				7EDE7C9629B5737C00A65829 /* ArgumentParser in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -214,6 +246,7 @@
 				7E29F00B228B548100CA7DD6 /* CaBot */,
 				7E29F020228B548200CA7DD6 /* CaBotTests */,
 				7E29F02B228B548200CA7DD6 /* CaBotUITests */,
+				7EDE7C8C29B5715800A65829 /* CaBotTool */,
 				7E29F00A228B548100CA7DD6 /* Products */,
 				7E29F073228B5B5A00CA7DD6 /* Frameworks */,
 			);
@@ -225,6 +258,7 @@
 				7E29F009228B548100CA7DD6 /* CaBot.app */,
 				7E29F01D228B548200CA7DD6 /* CaBotTests.xctest */,
 				7E29F028228B548200CA7DD6 /* CaBotUITests.xctest */,
+				7EDE7C8B29B5715800A65829 /* CaBotTool */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -237,6 +271,7 @@
 				30E50DCF269F76F000729ABD /* CaBotAppModel.swift */,
 				30E50DD2269F77BE00729ABD /* Views */,
 				30E99D95266A993E001ACAAA /* Extension.swift */,
+				7EDE7C9B29B580C200A65829 /* I18NExtension.swift */,
 				306069B529A686D9001FB5DB /* CaBotServiceCommon.swift */,
 				7E29F070228B55FC00CA7DD6 /* CaBotServiceBLE.swift */,
 				09676780293727CE005CFA58 /* CaBotServiceTCP.swift */,
@@ -253,6 +288,7 @@
 		7E29F020228B548200CA7DD6 /* CaBotTests */ = {
 			isa = PBXGroup;
 			children = (
+				7EDE7C8529B428BB00A65829 /* data */,
 				7E29F021228B548200CA7DD6 /* CaBotTests.swift */,
 				7E29F023228B548200CA7DD6 /* Info.plist */,
 			);
@@ -288,6 +324,14 @@
 				306A57DA265C4435006B510D /* Speech.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		7EDE7C8C29B5715800A65829 /* CaBotTool */ = {
+			isa = PBXGroup;
+			children = (
+				7EDE7C8D29B5715800A65829 /* ResourceChecker.swift */,
+			);
+			path = CaBotTool;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -354,13 +398,34 @@
 			productReference = 7E29F028228B548200CA7DD6 /* CaBotUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		7EDE7C8A29B5715800A65829 /* CaBotTool */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7EDE7C8F29B5715800A65829 /* Build configuration list for PBXNativeTarget "CaBotTool" */;
+			buildPhases = (
+				7EDE7C8729B5715800A65829 /* Sources */,
+				7EDE7C8829B5715800A65829 /* Frameworks */,
+				7EDE7C8929B5715800A65829 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CaBotTool;
+			packageProductDependencies = (
+				7EDE7C9529B5737C00A65829 /* ArgumentParser */,
+				7EDE7C9829B5803700A65829 /* Yams */,
+			);
+			productName = CaBotTool;
+			productReference = 7EDE7C8B29B5715800A65829 /* CaBotTool */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		7E29F001228B548100CA7DD6 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1020;
+				LastSwiftUpdateCheck = 1420;
 				LastUpgradeCheck = 1250;
 				ORGANIZATIONNAME = "Carnegie Mellon University";
 				TargetAttributes = {
@@ -374,6 +439,9 @@
 					7E29F027228B548200CA7DD6 = {
 						CreatedOnToolsVersion = 10.2.1;
 						TestTargetID = 7E29F008228B548100CA7DD6;
+					};
+					7EDE7C8A29B5715800A65829 = {
+						CreatedOnToolsVersion = 14.2;
 					};
 				};
 			};
@@ -395,6 +463,7 @@
 				308FCE2827E12844009FCC7B /* XCRemoteSwiftPackageReference "GzipSwift" */,
 				0967677D29371B9F005CFA58 /* XCRemoteSwiftPackageReference "socket" */,
 				306069B229A5E45D001FB5DB /* XCRemoteSwiftPackageReference "NavigationBackport" */,
+				7EDE7C9229B5733D00A65829 /* XCRemoteSwiftPackageReference "swift-argument-parser" */,
 			);
 			productRefGroup = 7E29F00A228B548100CA7DD6 /* Products */;
 			projectDirPath = "";
@@ -403,6 +472,7 @@
 				7E29F008228B548100CA7DD6 /* CaBot */,
 				7E29F01C228B548200CA7DD6 /* CaBotTests */,
 				7E29F027228B548200CA7DD6 /* CaBotUITests */,
+				7EDE7C8A29B5715800A65829 /* CaBotTool */,
 			);
 		};
 /* End PBXProject section */
@@ -424,6 +494,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7EDE7C8629B428BB00A65829 /* data in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -460,6 +531,7 @@
 				30E50DDF26A0B21200729ABD /* ConversationView.swift in Sources */,
 				3096BF1426A5C29F0066F256 /* SettingView.swift in Sources */,
 				30E50DD8269F784A00729ABD /* MainMenuView.swift in Sources */,
+				7EDE7C9C29B580C200A65829 /* I18NExtension.swift in Sources */,
 				3096BF1826A5D0990066F256 /* TTSHelper.swift in Sources */,
 				308FCE1D27D8F4D3009FCC7B /* SystemStatusView.swift in Sources */,
 				30E50DDB269F7E3800729ABD /* CaBot.xcdatamodeld in Sources */,
@@ -489,6 +561,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				7E29F02D228B548200CA7DD6 /* CaBotUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7EDE7C8729B5715800A65829 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7EDE7C9D29B580F700A65829 /* I18NExtension.swift in Sources */,
+				7EDE7C9729B5802200A65829 /* ResourceManager.swift in Sources */,
+				7EDE7C8E29B5715800A65829 /* ResourceChecker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -725,6 +807,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = B98QB5W4Z4;
 				INFOPLIST_FILE = CaBotTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -746,6 +829,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = B98QB5W4Z4;
 				INFOPLIST_FILE = CaBotTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -799,6 +883,36 @@
 			};
 			name = Release;
 		};
+		7EDE7C9029B5715800A65829 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = B98QB5W4Z4;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = CMU.CaBotRemote.CaBotTool;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		7EDE7C9129B5715800A65829 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = B98QB5W4Z4;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = CMU.CaBotRemote.CaBotTool;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -834,6 +948,15 @@
 			buildConfigurations = (
 				7E29F038228B548200CA7DD6 /* Debug */,
 				7E29F039228B548200CA7DD6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7EDE7C8F29B5715800A65829 /* Build configuration list for PBXNativeTarget "CaBotTool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7EDE7C9029B5715800A65829 /* Debug */,
+				7EDE7C9129B5715800A65829 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -889,6 +1012,14 @@
 				version = 5.1.1;
 			};
 		};
+		7EDE7C9229B5733D00A65829 /* XCRemoteSwiftPackageReference "swift-argument-parser" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-argument-parser.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -921,6 +1052,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 308FCE2827E12844009FCC7B /* XCRemoteSwiftPackageReference "GzipSwift" */;
 			productName = Gzip;
+		};
+		7EDE7C9529B5737C00A65829 /* ArgumentParser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7EDE7C9229B5733D00A65829 /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
+			productName = ArgumentParser;
+		};
+		7EDE7C9829B5803700A65829 /* Yams */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 306C7F6A265D435100E5928E /* XCRemoteSwiftPackageReference "Yams" */;
+			productName = Yams;
 		};
 /* End XCSwiftPackageProductDependency section */
 

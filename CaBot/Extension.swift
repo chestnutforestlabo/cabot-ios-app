@@ -59,25 +59,3 @@ struct NavigationUtil {
   }
 }
 
-
-func CustomLocalizedString(_ key:String, lang:String, tableName:String = "Localizable", bundle:Bundle = Bundle.main, returnKeyIfNotFound:Bool = true) -> String {
-    if let path = bundle.path(forResource: lang, ofType: "lproj") {
-        let bundle = Bundle(path: path)
-        if let string = bundle?.localizedString(forKey: key, value: nil, table: tableName) {
-            return string
-        }
-    }
-
-    let langCode = String(lang.prefix(2))
-    if let path = bundle.path(forResource: langCode, ofType: "lproj") {
-        let bundle = Bundle(path: path)
-        if let string = bundle?.localizedString(forKey: key, value: nil, table: tableName) {
-            return string
-        }
-    }
-    if returnKeyIfNotFound {
-        return "<<\(key)>>"
-    } else {
-        return ""
-    }
-}

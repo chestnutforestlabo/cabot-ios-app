@@ -25,18 +25,43 @@ import XCTest
 @testable import CaBot
 
 class CaBotTests: XCTestCase {
-
+    static func getSource(_ name: String, withExtension: String) -> Source {
+        let url = Bundle(for: Self.self).url(forResource: name, withExtension: withExtension, subdirectory: "data")!
+        return Source(base: url.deletingLastPathComponent(), type: .local, src: url.lastPathComponent, i18n: I18N())
+    }
+    
     override func setUp() {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
     }
 
     override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    func testParseDestinationYaml() {
+        if let destinations = try? Destination.load(at: Self.getSource("destinations", withExtension: "yaml")) {
+            assert(destinations[0].error == nil)
+            
+            print("-------------------")
+            assert(destinations[1].error != nil)
+            print(destinations[1].error!)
+            print("-------------------")
+            assert(destinations[2].error != nil)
+            print(destinations[2].error!)
+            print("-------------------")
+            assert(destinations[3].error != nil)
+            print(destinations[3].error!)
+            print("-------------------")
+            assert(destinations[4].error == nil)
+            assert(destinations[4].subtour != nil)
+            print(destinations[4].subtour!)
+            print("-------------------")
+            assert(destinations[5].error == nil)
+            assert(destinations[5].subtour != nil)
+            print(destinations[5].subtour!)
+            print("-------------------")
+            assert(destinations[6].error != nil)
+            print(destinations[6].error!)
+            print("-------------------")
+        }
     }
 
     func testPerformanceExample() {
