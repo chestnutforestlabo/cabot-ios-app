@@ -52,8 +52,10 @@ class I18N {
             Locale(identifier: self.lang).languageCode ?? "en"
         }
     }
+    
+    static let shared:I18N = I18N()
 
-    init() {
+    private init() {
         self.lang = Locale.preferredLanguages[0]
     }
 
@@ -187,7 +189,7 @@ struct Metadata: Decodable{
             let str = try String(contentsOf: url)
             var userInfo:[CodingUserInfoKey : Any] = [:]
             userInfo[.src] = url
-            userInfo[.i18n] = I18N()
+            userInfo[.i18n] = I18N.shared
             let yamlDecoder = YAMLDecoder()
             return try yamlDecoder.decode(Metadata.self, from: str, userInfo: userInfo)
         } catch let error as YamlError {
@@ -433,10 +435,30 @@ class Destination: Decodable, Hashable {
             hasher.combine(value)
         }
     }
-
-    let title:String
+    
+    let i18n:I18N
+    let _title:[String: String]
+    var title:String {
+        get {
+            if let title = _title[i18n.lang] {
+                return title
+            }
+            if let title = _title["Base"] {
+                return title
+            }
+            return CustomLocalizedString("NO TITLE", lang: i18n.lang)
+        }
+    }
     let value:String?
-    let pron:String?
+    let _pron:[String: String]?
+    var pron:String? {
+        get {
+            if let pron = _pron?[i18n.lang] {
+                return pron
+            }
+            return self.title
+        }
+    }
     let file:Source?
     let message:Source?
     let content:Source?
@@ -464,7 +486,7 @@ class Destination: Decodable, Hashable {
             userInfo[.src] = url
             userInfo[.i18n] = src.i18n
             userInfo[.refCount] = refCount
-
+            
             let node = try Yams.load(yaml: str)
             guard let yaml = node as? Array<Any> else { throw MetadataError.contentLoadError }
             let yamlDecoder = YAMLDecoder()
@@ -494,6 +516,7 @@ class Destination: Decodable, Hashable {
         let error = ParseError()
         var refDest: Destination?
         
+        self.i18n = i18n
 
         // if 'ref' is specified, try to find a destination
     outer: if let refstr = try? container.decode(String.self, forKey: .ref) {
@@ -520,20 +543,47 @@ class Destination: Decodable, Hashable {
             }
         }
 
-        if let title = try? container.decode(String.self, forKey: .title) {
-            self.title = i18n.localizedString(key: title)
-        } else if let title = refDest?.title {
-            self.title = title
+        var _title:[String:String] = [:]
+        var _pron:[String:String] = [:]
+        for key in container.allKeys.filter({ key in
+            key.stringValue.hasPrefix("title")
+        }) {
+            let items = key.stringValue.split(separator: "-")
+            if items.count == 1 { // title
+                _title["Base"] = try container.decode(String.self, forKey: key)
+            }
+            else if items.count == 2 {
+                _title[String(items[1])] = try container.decode(String.self, forKey: key)
+            }
+            else if items.count == 3 && items[2] == "pron" {
+                _pron[String(items[1])] = try container.decode(String.self, forKey: key)
+            }
+        }
+        if _title.count > 0 {
+            self._title = _title
+        } else if let _title = refDest?._title{
+            self._title = _title
         } else {
-            self.title = CustomLocalizedString("NO TITLE", lang: i18n.lang)
+            self._title = _title
+        }
+        if _pron.count > 0 {
+            self._pron = _pron
+        } else if let _pron = refDest?._pron {
+            self._pron = _pron
+        } else {
+            self._pron = nil
+        }
+        
+        if self._title.count == 0 {
             error.add(error: CustomLocalizedString("No title specified", lang: i18n.lang))
         }
-        value = try? container.decode(String.self, forKey: .value)
-        if let pron = try? container.decode(String.self, forKey: .pron) {
-            self.pron = i18n.localizedString(key: pron)
+        
+        if let value = try? container.decode(String.self, forKey: .value) {
+            self.value = value
         } else {
-            self.pron = refDest?.pron
+            self.value = refDest?.value
         }
+        
         // ToDo: should not refer that has file prop (need to separate)
         self.file = try? container.decode(Source.self, forKey: .file)
         if let message = try? container.decode(Source.self, forKey: .message) {
@@ -595,9 +645,14 @@ class Destination: Decodable, Hashable {
     }
     
     init(title: String, value: String?, pron: String?, file: Source?, message: Source?, content: Source?, waitingDestination: WaitingDestination?, subtour: Tour?) {
-        self.title = title
+        self.i18n = I18N.shared
+        var _title:[String:String] = [:]
+        _title[i18n.lang] = title
+        self._title = _title
         self.value = value
-        self.pron = pron
+        var _pron:[String:String] = [:]
+        _pron[i18n.lang] = pron
+        self._pron = _pron
         self.file = file
         self.message = message
         self.content = content
