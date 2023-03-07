@@ -33,24 +33,77 @@ $ open CaBot.xcworkspace
 ### Model data structure
 ```
 Main Bundle
- | _ Resource
-     | _ [Model_DIR]
-         | _ _metadata.yaml
-	 | _ ...
+ | - Resource
+     | - Resource_DIR
+         | - _metadata.yaml
+	 | - ...
+	 | - <language-code>.lproj  # for i18n
 ```
 
 ### Metadata format
 ```
-name: <String>
-language: <Locale>
-conversation:
-  type: "local" / "remote"
-  src: <relative path> / <URL>
-destinations:
-  type: "local" / "remote"
-  src: <relative path> / <URL>
+name: String                         # this should be unique among Resource_DIRs
+language: LanguageCode?              # optional, if specified, use the language instead of the system setting
+conversation: Source<Conversation>?  # optional, conversation source
+destinations: Source<Destinations>?  # optional, destinations source
+tours: Source<Tours>?                # optional, tours source
 location:
-  ibeacon-uuid: <UUID String> # for beacon scanning
-  latlng: <Lat,Lng> # to determine location automatically
-  radius: <number> # in meters
+  ibeacon-uuid: [String]             # for beacon scanning
+  lat: Float                         # to determine location automatically
+  lng: Float                         #
+  radius: Int                        # in meters
 ```
+
+### Source format
+```
+type: String (local / remote)
+src: String (relative path / URL)
+```
+
+### Conversation format
+- JavaScript to handle conversation
+- it needs to implement `function getResponse(request)`
+```
+custom global objects
+Bundle.loadYaml       : returns a list of destination from a specified yaml file
+Console.log           : print log
+Bluetooth.scanBeacons : scan beacons
+Device.type           : device type like iPhone13,3
+Device.id             : device vendor uuid
+HTTPS.postJSON        : post JSON to a host (not implemented yet)
+View.showModalWaitingWithMessage : show modal wait and a message
+View.hideModalWaiting            : hide the modal wait
+View.alert                       : show an alert with title and message
+```
+
+### Destinations format
+[DestinationRef | Destination | DestinationEx | DestinationSource]
+
+#### DestinationRef
+ref: String
+
+#### Destination format
+title: String
+value: String?
+pron: String?
+
+#### DestinationEx format
+title: String
+value: String?
+pron: String?
+message: Source?
+content: Source?
+waitingDestination: Destination?
+
+#### DestinationSource format
+title: String
+pron: String?
+file:  Source?
+
+### Tours format
+[Tour]
+
+#### Tour format
+id: String
+title: String
+destinations: Destinations
