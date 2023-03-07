@@ -1,8 +1,2 @@
 -
   ref: destinations_all.yaml/destination1_node_value
--
-  ref: destinations_all.yaml/destination2_node_value_without_title
--
-  ref: destinations_all.yaml/destination3_node_value_nested_ref
--
-  value: no_title_destination

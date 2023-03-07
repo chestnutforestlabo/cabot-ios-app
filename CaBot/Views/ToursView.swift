@@ -36,7 +36,7 @@ struct ToursView: View {
                     NavigationLink(
                         destination: TourDetailView(tour: tour, showStartButton: true),
                         label: {
-                            Text(tour.title)
+                            Text(tour.title.text)
                         })
                 }
             }

@@ -28,7 +28,7 @@ protocol TourManagerDelegate {
 }
 
 class TourManager: TourProtocol {
-    var title: String = "No Name"
+    var title: I18NText = I18NText(text: [:], pron: [:])
     var pron: String? = "No Name"
     let id: String = "TourManager"
     var destinations: [Destination] {
@@ -85,7 +85,6 @@ class TourManager: TourProtocol {
         _currentDestination = nil
         _arrivedDestination = nil
         self.title = tour.title
-        self.pron = tour.pron
         for d in tour.destinations {
             _destinations.append(d)
         }

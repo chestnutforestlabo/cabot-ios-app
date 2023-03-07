@@ -66,7 +66,7 @@ struct RootView: View {
                 let destination = ad!.waitingDestination!.value!
                 let title = ad!.waitingDestination!.title
                 return Alert(title: Text("Let the suitcase wait"),
-                             message: Text(LocalizedStringKey("Let the suitcase wait message \(title)")),
+                             message: Text(LocalizedStringKey("Let the suitcase wait message \(title.text)")),
                              primaryButton: .default(Text("No")) {
                                 // noop
                              },

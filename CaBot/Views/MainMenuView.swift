@@ -99,7 +99,7 @@ struct ActionMenus: View {
                         modelData.open(content: contentURL)
                     }) {
                         Label(title: {
-                            Text("Open Content for \(ad.title)")
+                            Text("Open Content for \(ad.title.text)")
                         }, icon: {
                             Image(systemName: "newspaper")
                         })
@@ -112,7 +112,7 @@ struct ActionMenus: View {
                         modelData.isConfirmingSummons = true
                     }) {
                         Label(title: {
-                            Text("Let the suitcase wait at \(title)")
+                            Text("Let the suitcase wait at \(title.text)")
                         }, icon: {
                             Image(systemName: "arrow.triangle.turn.up.right.diamond")
                         })
@@ -136,9 +136,9 @@ struct DestinationMenus: View {
 
                 if let cd = modelData.tourManager.currentDestination {
                     HStack {
-                        Label(cd.title,
+                        Label(cd.title.text,
                               systemImage: "arrow.triangle.turn.up.right.diamond")
-                            .accessibilityLabel(Text("Navigating to \(cd.title)"))
+                        .accessibilityLabel(Text("Navigating to \(cd.title.text)"))
                         if modelData.menuDebug {
                             Spacer()
                             Button(action: {
@@ -163,7 +163,7 @@ struct DestinationMenus: View {
                     }
                 }
                 ForEach(modelData.tourManager.first(n: maxDestinationNumber-1), id: \.self) {dest in
-                    Label(dest.title, systemImage: "mappin.and.ellipse")
+                    Label(dest.title.text, systemImage: "mappin.and.ellipse")
                 }
                 if modelData.tourManager.destinations.count > 0 {
                     NavigationLink(

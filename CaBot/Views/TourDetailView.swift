@@ -103,19 +103,19 @@ struct TourDetailView: View {
                     }
                 }
             }
-            Section(header: Text(tour.title)) {
+            Section(header: Text(tour.title.text)) {
                 if let cd = tour.currentDestination {
-                    Label(cd.title, systemImage: "arrow.triangle.turn.up.right.diamond")
+                    Label(cd.title.text, systemImage: "arrow.triangle.turn.up.right.diamond")
                 }
 
                 ForEach(tour.destinations, id: \.self) { dest in
                     if let error = dest.error {
                         HStack{
-                            Text(dest.title)
+                            Text(dest.title.text)
                             Text(error).font(.system(size: 11))
                         }.foregroundColor(Color.red)
                     } else {
-                        Label(dest.title, systemImage: "mappin.and.ellipse")
+                        Label(dest.title.text, systemImage: "mappin.and.ellipse")
                     }
                 }
             }

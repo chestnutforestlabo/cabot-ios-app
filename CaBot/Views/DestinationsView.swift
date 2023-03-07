@@ -35,7 +35,7 @@ struct DestinationsView: View {
         let destinations = try! Destination.load(at: src)
         var header: Text?
         if let title = destination?.title {
-            header = Text(title)
+            header = Text(title.text)
         } else {
             header = Text("SELECT_DESTINATION")
         }
@@ -46,7 +46,7 @@ struct DestinationsView: View {
                 ForEach(destinations, id: \.self) { destination in
                     if let error = destination.error {
                         HStack{
-                            Text(destination.title)
+                            Text(destination.title.text)
                             Text(error).font(.system(size: 11))
                         }.foregroundColor(Color.red)
                     } else if let src = destination.file {
@@ -54,8 +54,8 @@ struct DestinationsView: View {
                             destination: DestinationsView(src: src, destination: destination)
                                 .environmentObject(modelData),
                             label: {
-                                Text(destination.title)
-                                    .accessibilityLabel(destination.pron ?? destination.title)
+                                Text(destination.title.text)
+                                    .accessibilityLabel(destination.title.pron)
                             })
                     } else {
                         if let _ = destination.message {
@@ -63,8 +63,8 @@ struct DestinationsView: View {
                                 destination: DestinationDetailView(destination: destination)
                                     .environmentObject(modelData),
                                 label: {
-                                    Text(destination.title)
-                                        .accessibilityLabel(destination.pron ?? destination.title)
+                                    Text(destination.title.text)
+                                        .accessibilityLabel(destination.title.pron)
                                 })
                         } else {
                             Button(action: {
@@ -78,8 +78,8 @@ struct DestinationsView: View {
                                     NavigationUtil.popToRootView()
                                 }
                             }){
-                                Text(destination.title)
-                                    .accessibilityLabel(destination.pron ?? destination.title)
+                                Text(destination.title.text)
+                                    .accessibilityLabel(destination.title.pron)
                             }
                             // deprecated
                             .actionSheet(isPresented: $isConfirming) {

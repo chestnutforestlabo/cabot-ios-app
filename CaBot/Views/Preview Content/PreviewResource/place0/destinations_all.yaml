@@ -1,23 +1,15 @@
 -
-  pron : destination1
-  title: destination1
+  title: Destination 1
+  title-ja: 行き先 1
+  title-ja-pron : いきさき、いち
   value : destination1_node_value
 -
-  pron : destination2
-#  title : destination2
-  value : destination2_node_value_without_title
+  title: Destination 2
+  title-ja: 行き先 2
+  title-ja-pron : いきさき、に
+  value : destination2_node_value
 -
-  ref: destinations_all.yaml/destination3_node_value_nested_ref
-  value : destination3_node_value_nested_ref
--
-  pron : destination4
-  title : destination4
-  value : destination4_node_value
--
-  pron : destination5
-  title : destination5
-  value : destination5_node_value
--
-  pron : destination6
-  title : destination6
-  value : destination6_node_value
+  title: Destination 3
+  title-ja: 行き先 3
+  title-ja-pron : いきさき、さん
+  value : destination3_node_value

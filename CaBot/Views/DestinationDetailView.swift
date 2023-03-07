@@ -32,7 +32,7 @@ struct DestinationDetailView: View {
     var body: some View {
         let tourManager = modelData.tourManager
         Form {
-            Section(header: Text(destination.title)) {
+            Section(header: Text(destination.title.text)) {
                 if let content =  destination.message?.content {
                     Text(content)
                 }

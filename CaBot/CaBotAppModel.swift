@@ -656,7 +656,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     // wait 1.0 ~ 2.0 seconds if browser was open.
                     // hopefully closing browser and reading the content by voice over will be ended by then
                     DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                        let announce = String(format:CustomLocalizedString("Going to %@", lang: self.resourceLang), arguments: [dest.pron ?? dest.title])
+                        let announce = String(format:CustomLocalizedString("Going to %@", lang: self.resourceLang), arguments: [dest.title.pron])
                             + (dest.message?.content ?? "")
 
                         self.speak(announce){
@@ -770,9 +770,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 self.playAudio(file: self.arrivedSound)
                 tourManager.arrivedCurrent()
 
-                var announce = String(format:CustomLocalizedString("You have arrived at %@", lang: self.resourceLang), arguments: [cd.pron ?? cd.title])
+                var announce = String(format:CustomLocalizedString("You have arrived at %@", lang: self.resourceLang), arguments: [cd.title.pron])
                 if let _ = cd.content?.url {
-                    announce += String(format:CustomLocalizedString("You can check detail of %@ on the phone", lang: self.resourceLang), arguments: [cd.pron ?? cd.title])
+                    announce += String(format:CustomLocalizedString("You can check detail of %@ on the phone", lang: self.resourceLang), arguments: [cd.title.pron])
                 }
                 if tourManager.hasDestination {
                     announce += CustomLocalizedString("You can proceed by pressing the right button of the suitcase handle", lang: self.resourceLang)

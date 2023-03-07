@@ -1,4 +1,2 @@
 -
-  pron : reading content
-  title : title
-  value : <NODE_ID>
+  ref: destinations_all.yaml/destination3_node_value
