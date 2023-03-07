@@ -27,7 +27,7 @@ import XCTest
 class CaBotTests: XCTestCase {
     static func getSource(_ name: String, withExtension: String) -> Source {
         let url = Bundle(for: Self.self).url(forResource: name, withExtension: withExtension, subdirectory: "data")!
-        return Source(base: url.deletingLastPathComponent(), type: .local, src: url.lastPathComponent, i18n: I18N())
+        return Source(base: url.deletingLastPathComponent(), type: .local, src: url.lastPathComponent, i18n: I18N.shared)
     }
     
     override func setUp() {
