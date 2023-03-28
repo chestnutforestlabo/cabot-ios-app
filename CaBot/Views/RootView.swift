@@ -92,7 +92,6 @@ struct RootView_Previews: PreviewProvider {
         let modelData = CaBotAppModel()
         modelData.displayedScene = .ResourceSelect
         modelData.suitcaseConnected = false
-        modelData.backpackConnected = false
         modelData.resource = modelData.resourceManager.resource(by: "place0")
 
         return RootView()
@@ -114,7 +113,6 @@ struct RootView_Previews: PreviewProvider {
         let modelData = CaBotAppModel()
         modelData.displayedScene = .ResourceSelect
         modelData.suitcaseConnected = false
-        modelData.backpackConnected = false
         modelData.resource = nil
 
         return RootView()
@@ -124,7 +122,6 @@ struct RootView_Previews: PreviewProvider {
     static var previewOnboard: some View {
         let modelData = CaBotAppModel()
         modelData.suitcaseConnected = false
-        modelData.backpackConnected = false
 
         return RootView()
             .environmentObject(modelData)

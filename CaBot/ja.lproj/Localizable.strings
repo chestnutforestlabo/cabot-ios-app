@@ -81,9 +81,11 @@
 "Navigation"="ナビゲーション";
 "Connection"="接続";
 
-"Suitcase Connected"="スーツケース接続あり";
-"Suitcase and Backpack Connected"="スーツケース、バックパック接続あり";
-"Suitcase Not Connected"="スーツケース接続なし";
+
+"BLE Connected"="BLE 接続あり";
+"BLE Not Connected"="BLE 接続なし";
+"TCP Connected"="TCP 接続あり";
+"TCP Not Connected"="TCP 接続なし";
 
 "processing..."="処理中...";
 "Navigating to %@"="%@に移動ちゅう";

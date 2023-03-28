@@ -120,11 +120,11 @@ struct SettingView: View {
             }
             Section(header: Text("Connection")) {
                 Picker("", selection: $modelData.connectionType){
-                    ForEach(CaBotAppModel.conntype.allCases, id: \.self){ (type) in
+                    ForEach(ConnectionType.allCases, id: \.self){ (type) in
                         Text(type.rawValue).tag(type)
                     }
                 }.pickerStyle(SegmentedPickerStyle())
-                if modelData.connectionType == CaBotAppModel.conntype.ble{
+                if modelData.connectionType == ConnectionType.BLE{
                     HStack {
                         Text("Team ID(ble)")
                         TextField("Team ID", text: $modelData.teamID)
