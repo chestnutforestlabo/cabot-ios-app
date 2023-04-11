@@ -1,0 +1,4 @@
+name: CMU Demo
+destinations:
+  type: local
+  src: destinations.yaml
