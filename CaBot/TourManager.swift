@@ -29,7 +29,6 @@ protocol TourManagerDelegate {
 
 class TourManager: TourProtocol {
     var title: I18NText = I18NText(text: [:], pron: [:])
-    var pron: String? = "No Name"
     let id: String = "TourManager"
     var destinations: [Destination] {
         get {

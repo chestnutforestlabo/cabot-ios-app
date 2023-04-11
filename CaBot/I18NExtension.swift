@@ -21,12 +21,21 @@
  *******************************************************************************/
 
 import Foundation
+import NaturalLanguage
+import WebKit
 
-func CustomLocalizedString(_ key:String, lang:String, tableName:String = "Localizable", bundle:Bundle = Bundle.main) -> String {
+func CustomLocalizedString(_ key:String, lang:String, _ args:String...) -> String {
+    let tableName:String = "Localizable"
+    let bundle:Bundle = Bundle.main
+    
     if let path = bundle.path(forResource: lang, ofType: "lproj") {
         let bundle = Bundle(path: path)
         if let string = bundle?.localizedString(forKey: key, value: nil, table: tableName) {
-            return string
+            if args.count == 1 {
+                return String(format: string, args[0])
+            } else {
+                return String(format: string)
+            }
         }
     }
 
@@ -34,8 +43,48 @@ func CustomLocalizedString(_ key:String, lang:String, tableName:String = "Locali
     if let path = bundle.path(forResource: langCode, ofType: "lproj") {
         let bundle = Bundle(path: path)
         if let string = bundle?.localizedString(forKey: key, value: nil, table: tableName) {
-            return string
+            if args.count == 1 {
+                return String(format: string, args[0])
+            } else {
+                return String(format: string)
+            }
         }
     }
     return key
+}
+
+class LanguageDetector {
+    let string: String?
+    var target: String? = nil
+    var wait: Bool = true
+
+    init(string: String?) {
+        self.string = string
+    }
+
+    func detect() -> String? {
+        let recognizer = NLLanguageRecognizer()
+        
+        if let plainText = string {
+            self.target = plainText
+            if plainText.contains("html") {
+                self.wait = true
+                NSAttributedString.loadFromHTML(string: plainText) { html, attr, error in
+                    self.target = html?.string
+                    self.wait = false
+                }
+                DispatchQueue.global().sync {
+                    while self.wait {
+                        RunLoop.current.run(mode: .default, before: .distantFuture)
+                    }
+                }
+            }
+            if let target = self.target {
+                recognizer.processString(target)
+                guard let languageCode = recognizer.dominantLanguage?.rawValue else { return nil }
+                return languageCode
+            }
+        }
+        return nil
+    }
 }

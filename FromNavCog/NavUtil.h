@@ -42,7 +42,6 @@
 +(void)hideWaitingForView:(UIView*)view;
 +(UIMessageView*)showMessageView:(UIView*)view;
 +(void)hideMessageView:(UIView*)view;
-+(void)openURL:(NSURL*)url onViewController:(UIViewController*)controller;
 +(NSString*)deviceModel;
 +(void)switchAccessibilityMethods;
 @end

@@ -128,3 +128,6 @@
 "Delay after closing browser"="ブラウザを閉じた後の待ち時間";
 "%.1f seconds"="%.1f秒";
 "%.1f sec"="%.1f秒";
+
+"Robot Waiting Spot (%@)"="ロボット待機場所 (%@)";
+"Robot Waiting Spot (%@)-pron"="ロボット待機場所 (%@)";

@@ -44,8 +44,6 @@ extension CodingUserInfoKey {
 
 class I18N {
     var lang: String
-    var tableName: String?
-    var bundle: Foundation.Bundle?
 
     var langCode: String {
         get {
@@ -59,18 +57,54 @@ class I18N {
         self.lang = Locale.preferredLanguages[0]
     }
 
-    func set(tableName: String?, bundle: Foundation.Bundle?, lang: String?) {
-        self.tableName = tableName ?? "Localizable"
-        self.bundle = bundle
+    func set(lang: String?) {
         if let lang = lang {
             self.lang = lang
         }
     }
 }
 
-class I18NText {
+class KeyedI18NText: Equatable {
+    let key: String
+    let base: I18NText?
+    
+    static func == (lhs: KeyedI18NText, rhs: KeyedI18NText) -> Bool {
+        return lhs.key == rhs.key && lhs.base == rhs.base
+    }
+    
+    init(key: String, base: I18NText?) {
+        self.key = key
+        self.base = base
+    }
+    
+    var text: String {
+        get {
+            if let base = self.base {
+                return CustomLocalizedString(key, lang: I18N.shared.lang, base.text)
+            } else {
+                return CustomLocalizedString(key, lang: I18N.shared.lang)
+            }
+        }
+    }
+
+    var pron: String {
+        get {
+            if let base = self.base {
+                return CustomLocalizedString("\(key)-pron", lang: I18N.shared.lang, base.pron)
+            } else {
+                return CustomLocalizedString("\(key)-pron", lang: I18N.shared.lang)
+            }
+        }
+    }
+}
+
+class I18NText: Equatable {
     private var _text: [String: String] = [:]
     private var _pron: [String: String] = [:]
+    
+    static func == (lhs: I18NText, rhs: I18NText) -> Bool {
+        return lhs._text == rhs._text && lhs._pron == rhs._pron
+    }
 
     init(text: [String: String], pron: [String: String]) {
         self._text = text
@@ -85,7 +119,7 @@ class I18NText {
             if let text = self._text["Base"] {
                 return text
             }
-            return CustomLocalizedString("NO Text", lang: I18N.shared.lang)
+            return "" // CustomLocalizedString("❗️NO Text", lang: I18N.shared.lang)
         }
     }
 
@@ -97,9 +131,38 @@ class I18NText {
             return self.text
         }
     }
+    
+    var languages: [String] {
+        get {
+            return self._text.keys.sorted()
+        }
+    }
+    
+    var isEmpty: Bool {
+        get {
+            return _text.count == 0 || _pron.count == 0
+        }
+    }
+    
+    var warn: String? {
+        get {
+            let warn = BufferedInfo()
+            if self.text.count == 0 {
+                warn.add(info: "No text found for launguage \(I18N.shared.lang)")
+            }
+            return warn.summary()
+        }
+    }
 
-    enum CodingKeys: CodingKey {
-        case dummy
+    private struct CodingKeys: CodingKey {
+        var stringValue: String
+        init?(stringValue: String) {
+            self.stringValue = stringValue
+        }
+        var intValue: Int?
+        init?(intValue: Int) {
+            return nil
+        }
     }
     static func decode(decoder: Decoder, baseKey: String) -> I18NText {
         var main: [String: String] = [:]
@@ -155,7 +218,7 @@ func yamlPath(_ path: [CodingKey]) -> String{
     return ret
 }
 
-struct Source: Decodable, Hashable {
+struct Source: Decodable, Hashable, CustomStringConvertible {
     static func == (lhs: Source, rhs: Source) -> Bool {
         return lhs.base == rhs.base && lhs.type == rhs.type && lhs.src == rhs.src
     }
@@ -164,9 +227,47 @@ struct Source: Decodable, Hashable {
         hasher.combine(type)
         hasher.combine(src)
     }
+    var description: String {
+        var exists = "not exists"
+        if let content = self.content {
+            exists = "content length=\(content.count)"
+        }
+        return "\(self.src) - (\(exists))"
+    }
+    
+    var warn: String? {
+        get {
+            let warn = BufferedInfo()
+            if let content = self.content {
+                if let lang = LanguageDetector(string: content).detect() {
+                    if lang != i18n.lang {
+                        warn.add(info: "Different language detected: \(lang) - expected \(i18n.lang)")
+                    }
+                }
+            }
+            return warn.summary()
+        }
+    }
+    
+    var error: String? {
+        get {
+            let error = BufferedInfo()
+            if let content = self.content {
+            } else {
+                error.add(info: "Content not found")
+            }
+            return error.summary()
+        }
+    }
+    
     let base: URL?
     let type: SourceType
-    let src: String
+    let _src: String
+    var src: String {
+        get {
+            return String(format:_src, i18n.lang)
+        }
+    }
     let i18n: I18N
 
     var url: URL? {
@@ -199,14 +300,14 @@ struct Source: Decodable, Hashable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         i18n = decoder.userInfo[.i18n] as! I18N
         type = try container.decode(SourceType.self, forKey: .type)
-        src = try container.decode(String.self, forKey: .src)
+        _src = try container.decode(String.self, forKey: .src)
         base = (decoder.userInfo[.src] as? URL)?.deletingLastPathComponent()
     }
 
     init(base: URL?, type:SourceType, src:String, i18n:I18N) {
         self.base = base
         self.type = type
-        self.src = src
+        self._src = src
         self.i18n = i18n
     }
 }
@@ -262,18 +363,13 @@ struct Metadata: Decodable{
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         // needs to have I18N instance
-        let i18nTableName = try? container.decodeIfPresent(String.self, forKey: .i18n)
-        var bundle: Foundation.Bundle?
-        if let url = decoder.userInfo[.src] as? URL {
-            bundle = Foundation.Bundle(url: url.deletingLastPathComponent())
-        }
         let i18n = decoder.userInfo[.i18n] as! I18N
         self.i18n = i18n
         let language = try? container.decodeIfPresent(String.self, forKey: .language)
-        i18n.set(tableName: i18nTableName, bundle: bundle, lang: language)
+        i18n.set(lang: language)
 
-        self.identifier = try container.decode(String.self, forKey: .name)
         self.name = I18NText.decode(decoder: decoder, baseKey: CodingKeys.name.stringValue)
+        self.identifier = self.name.text
         self.conversation = try? container.decodeIfPresent(Source.self, forKey: .conversation)
         self.destinations = try? container.decodeIfPresent(Source.self, forKey: .destinations)
         self.tours = try? container.decodeIfPresent(Source.self, forKey: .tours)
@@ -400,20 +496,31 @@ class Resource: Hashable {
 /// - pron: <String> Reading text for the destination if required other wise title is used for reading
 ///    - the text can be localizable
 /// ```
-struct WaitingDestination: Decodable {
-    let title:I18NText
-    let value:String?
+struct WaitingDestination: Decodable, Equatable {
+    static func == (lhs: WaitingDestination, rhs: WaitingDestination) -> Bool {
+        return lhs.title == rhs.title && lhs.value == rhs.value
+    }
+    
+    var parentTitle:I18NText?
+    let value:String
+    var title:KeyedI18NText {
+        get {
+            return KeyedI18NText(key: "Robot Waiting Spot (%@)", base: parentTitle)
+        }
+    }
 
     enum CodingKeys: String, CodingKey {
-        case title
         case value
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-
-        self.title = I18NText.decode(decoder: decoder, baseKey: CodingKeys.title.stringValue)
-        value = try? container.decode(String.self, forKey: .value)
+        if let value = try? container.decode(String.self, forKey: .value) {
+            self.value = value
+        } else {
+            self.value = ""
+            //warning.add(info: CustomLocalizedString("file specified by Source(type, src) is deprecated, use just 'src' string instead", lang: i18n.lang))
+        }
     }
 }
 
@@ -483,6 +590,8 @@ class Destination: Decodable, Hashable {
     let subtour:Tour?
     let error:String?
     let warning:String?
+    let ref:Reference?
+    let refDest:Destination?
 
     enum CodingKeys: String, CodingKey {
         case title
@@ -540,10 +649,12 @@ class Destination: Decodable, Hashable {
         // if 'ref' is specified, try to find a destination
     outer: if let refstr = try? container.decode(String.self, forKey: .ref) {
             guard refCount < 10 else {
+                self.ref = nil
                 error.add(info: CustomLocalizedString("Too deep nested reference \(refCount) [ref]=\(refstr)", lang: i18n.lang))
                 break outer
             }
             if let ref = Reference.from(ref: refstr) {
+                self.ref = ref
                 let refSrc = Source(base: base, type: .local, src: ref.file, i18n: i18n)
                 if let tempDest = try? Destination.load(at: refSrc, refCount: refCount+1, reference: ref) {
                     if tempDest.count == 1 {
@@ -558,17 +669,28 @@ class Destination: Decodable, Hashable {
                     error.add(info: CustomLocalizedString("Parse Error \(ref.file)/\(ref.value)", lang: i18n.lang))
                 }
             } else {
+                self.ref = nil
                 error.add(info: CustomLocalizedString("Reference error (syntax='file/value')", lang: i18n.lang))
             }
+        } else {
+            self.ref = nil
         }
+        
+        self.refDest = refDest
 
         let title = I18NText.decode(decoder: decoder, baseKey: CodingKeys.title.stringValue)
-
-        if let title = refDest?.title{
+        
+        if !title.isEmpty {
             self.title = title
         } else {
-            self.title = title
+            if let title = refDest?.title{
+                self.title = title
+            } else {
+                self.title = title
+            }
         }
+        
+        
 
         if let value = try? container.decode(String.self, forKey: .value) {
             self.value = value
@@ -594,37 +716,47 @@ class Destination: Decodable, Hashable {
             self.content = refDest?.content
         }
         
-    outer: if let subtour = try? container.decode(String.self, forKey: .subtour) {
+        var tempSubtour: Tour? = nil
+    outer: do {
+            let subtour = try container.decode(String.self, forKey: .subtour)
             guard refCount < 5 else {
                 error.add(info: CustomLocalizedString("Nested reference [ref]=\(subtour)", lang: i18n.lang))
-                self.subtour = nil
+                tempSubtour = nil
                 break outer
             }
             if let ref = Reference.from(ref: subtour) {
                 let src = Source(base: base, type: .local, src: ref.file, i18n: i18n)
                 if let tempTour = try? Tour.load(at: src, refCount: refCount+1, reference: ref) {
                     if tempTour.count == 1 {
-                        self.subtour = tempTour[0]
+                        tempSubtour = tempTour[0]
                         error.add(info: tempTour[0].error)
                     } else if tempTour.count > 1 {
-                        self.subtour = nil
+                        tempSubtour = nil
                         error.add(info: CustomLocalizedString("Found multiple \(ref.file)/\(ref.value)", lang: i18n.lang))
                     } else {
-                        self.subtour = nil
+                        tempSubtour = nil
                         error.add(info: CustomLocalizedString("Cannot find \(ref.file)/\(ref.value)", lang: i18n.lang))
                     }
                 } else {
-                    self.subtour = nil
+                    tempSubtour = nil
                     error.add(info: CustomLocalizedString("Parse Error \(ref.file)/\(ref.value)", lang: i18n.lang))
                 }
             } else {
-                self.subtour = nil
+                tempSubtour = nil
                 error.add(info:CustomLocalizedString("Reference error (syntax='file/value')", lang: i18n.lang))
             }
-        } else {
-            self.subtour = refDest?.subtour
+        } catch DecodingError.typeMismatch {
+            error.add(info: CustomLocalizedString("subtour should be speficied in ref format (file/id)", lang: i18n.lang))
+            tempSubtour = nil
+        } catch {
+            if tempSubtour == nil, let temp = refDest?.subtour {
+                tempSubtour = temp
+            }
         }
-        if let waitingDestination = try? container.decode(WaitingDestination.self, forKey: .waitingDestination) {
+        self.subtour = tempSubtour
+        
+        if var waitingDestination = try? container.decode(WaitingDestination.self, forKey: .waitingDestination) {
+            waitingDestination.parentTitle = self.title
             self.waitingDestination = waitingDestination
         } else {
             self.waitingDestination = refDest?.waitingDestination
@@ -653,6 +785,8 @@ class Destination: Decodable, Hashable {
         self.subtour = subtour
         self.error = nil
         self.warning = nil
+        self.ref = nil
+        self.refDest = nil
     }
 }
 

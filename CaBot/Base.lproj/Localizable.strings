@@ -126,3 +126,6 @@
 "Delay after closing browser"="Delay after closing browser";
 "%.1f seconds"="%.1f seconds";
 "%.1f sec"="%.1f sec";
+
+"Robot Waiting Spot (%@)"="Robot Waiting Spot (%@)";
+"Robot Waiting Spot (%@)-pron"="Robot Waiting Spot (%@)";
