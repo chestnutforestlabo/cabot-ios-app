@@ -43,7 +43,7 @@ extension CodingUserInfoKey {
 }
 
 class I18N {
-    var lang: String
+    private var lang: String
 
     var langCode: String {
         get {
@@ -80,9 +80,9 @@ class KeyedI18NText: Equatable {
     var text: String {
         get {
             if let base = self.base {
-                return CustomLocalizedString(key, lang: I18N.shared.lang, base.text)
+                return CustomLocalizedString(key, lang: I18N.shared.langCode, base.text)
             } else {
-                return CustomLocalizedString(key, lang: I18N.shared.lang)
+                return CustomLocalizedString(key, lang: I18N.shared.langCode)
             }
         }
     }
@@ -90,9 +90,9 @@ class KeyedI18NText: Equatable {
     var pron: String {
         get {
             if let base = self.base {
-                return CustomLocalizedString("\(key)-pron", lang: I18N.shared.lang, base.pron)
+                return CustomLocalizedString("\(key)-pron", lang: I18N.shared.langCode, base.pron)
             } else {
-                return CustomLocalizedString("\(key)-pron", lang: I18N.shared.lang)
+                return CustomLocalizedString("\(key)-pron", lang: I18N.shared.langCode)
             }
         }
     }
@@ -113,7 +113,7 @@ class I18NText: Equatable {
 
     var text: String {
         get {
-            if let text = self._text[I18N.shared.lang] {
+            if let text = self._text[I18N.shared.langCode] {
                 return text
             }
             if let text = self._text["Base"] {
@@ -125,7 +125,7 @@ class I18NText: Equatable {
 
     var pron: String {
         get {
-            if let text = self._pron[I18N.shared.lang] {
+            if let text = self._pron[I18N.shared.langCode] {
                 return text
             }
             return self.text
@@ -148,7 +148,7 @@ class I18NText: Equatable {
         get {
             let warn = BufferedInfo()
             if self.text.count == 0 {
-                warn.add(info: "No text found for launguage \(I18N.shared.lang)")
+                warn.add(info: "No text found for launguage \(I18N.shared.langCode)")
             }
             return warn.summary()
         }
@@ -240,8 +240,8 @@ struct Source: Decodable, Hashable, CustomStringConvertible {
             let warn = BufferedInfo()
             if let content = self.content {
                 if let lang = LanguageDetector(string: content).detect() {
-                    if lang != i18n.lang {
-                        warn.add(info: "Different language detected: \(lang) - expected \(i18n.lang)")
+                    if lang != i18n.langCode {
+                        warn.add(info: "Different language detected: \(lang) - expected \(i18n.langCode)")
                     }
                 }
             }
@@ -265,7 +265,7 @@ struct Source: Decodable, Hashable, CustomStringConvertible {
     let _src: String
     var src: String {
         get {
-            return String(format:_src, i18n.lang)
+            return String(format:_src, i18n.langCode)
         }
     }
     let i18n: I18N
@@ -365,8 +365,9 @@ struct Metadata: Decodable{
         // needs to have I18N instance
         let i18n = decoder.userInfo[.i18n] as! I18N
         self.i18n = i18n
-        let language = try? container.decodeIfPresent(String.self, forKey: .language)
-        i18n.set(lang: language)
+        if let language = try? container.decodeIfPresent(String.self, forKey: .language) {
+            i18n.set(lang: language)
+        }
 
         self.name = I18NText.decode(decoder: decoder, baseKey: CodingKeys.name.stringValue)
         self.identifier = self.name.text
@@ -418,7 +419,7 @@ class Resource: Hashable {
 
     var lang: String {
         get {
-            self.langOverride ?? metadata.i18n.lang
+            self.langOverride ?? metadata.i18n.langCode
         }
         set {
             self.langOverride = newValue
@@ -478,8 +479,8 @@ class Resource: Hashable {
                     }
                 }
             }
-            if languages.contains(where: {lang in lang == metadata.i18n.lang }) == false {
-                languages.append(metadata.i18n.lang)
+            if languages.contains(where: {lang in lang == metadata.i18n.langCode }) == false {
+                languages.append(metadata.i18n.langCode)
             }
             return languages
         }
@@ -519,7 +520,7 @@ struct WaitingDestination: Decodable, Equatable {
             self.value = value
         } else {
             self.value = ""
-            //warning.add(info: CustomLocalizedString("file specified by Source(type, src) is deprecated, use just 'src' string instead", lang: i18n.lang))
+            //warning.add(info: CustomLocalizedString("file specified by Source(type, src) is deprecated, use just 'src' string instead", lang: i18n.langCode))
         }
     }
 }
@@ -650,7 +651,7 @@ class Destination: Decodable, Hashable {
     outer: if let refstr = try? container.decode(String.self, forKey: .ref) {
             guard refCount < 10 else {
                 self.ref = nil
-                error.add(info: CustomLocalizedString("Too deep nested reference \(refCount) [ref]=\(refstr)", lang: i18n.lang))
+                error.add(info: CustomLocalizedString("Too deep nested reference \(refCount) [ref]=\(refstr)", lang: i18n.langCode))
                 break outer
             }
             if let ref = Reference.from(ref: refstr) {
@@ -660,17 +661,17 @@ class Destination: Decodable, Hashable {
                     if tempDest.count == 1 {
                         refDest = tempDest[0]
                     } else if tempDest.count > 1 {
-                        error.add(info: CustomLocalizedString("Found multiple \(ref.file)/\(ref.value)", lang: i18n.lang))
+                        error.add(info: CustomLocalizedString("Found multiple \(ref.file)/\(ref.value)", lang: i18n.langCode))
 
                     } else {
-                        error.add(info: CustomLocalizedString("Cannot find \(ref.file)/\(ref.value)", lang: i18n.lang))
+                        error.add(info: CustomLocalizedString("Cannot find \(ref.file)/\(ref.value)", lang: i18n.langCode))
                     }
                 } else {
-                    error.add(info: CustomLocalizedString("Parse Error \(ref.file)/\(ref.value)", lang: i18n.lang))
+                    error.add(info: CustomLocalizedString("Parse Error \(ref.file)/\(ref.value)", lang: i18n.langCode))
                 }
             } else {
                 self.ref = nil
-                error.add(info: CustomLocalizedString("Reference error (syntax='file/value')", lang: i18n.lang))
+                error.add(info: CustomLocalizedString("Reference error (syntax='file/value')", lang: i18n.langCode))
             }
         } else {
             self.ref = nil
@@ -703,7 +704,7 @@ class Destination: Decodable, Hashable {
             self.file = Source(base: base, type: .local, src: file, i18n: i18n)
         } else {
             self.file = try? container.decode(Source.self, forKey: .file)
-            warning.add(info: CustomLocalizedString("file specified by Source(type, src) is deprecated, use just 'src' string instead", lang: i18n.lang))
+            warning.add(info: CustomLocalizedString("file specified by Source(type, src) is deprecated, use just 'src' string instead", lang: i18n.langCode))
         }
         if let message = try? container.decode(Source.self, forKey: .message) {
             self.message = message
@@ -720,7 +721,7 @@ class Destination: Decodable, Hashable {
     outer: do {
             let subtour = try container.decode(String.self, forKey: .subtour)
             guard refCount < 5 else {
-                error.add(info: CustomLocalizedString("Nested reference [ref]=\(subtour)", lang: i18n.lang))
+                error.add(info: CustomLocalizedString("Nested reference [ref]=\(subtour)", lang: i18n.langCode))
                 tempSubtour = nil
                 break outer
             }
@@ -732,21 +733,21 @@ class Destination: Decodable, Hashable {
                         error.add(info: tempTour[0].error)
                     } else if tempTour.count > 1 {
                         tempSubtour = nil
-                        error.add(info: CustomLocalizedString("Found multiple \(ref.file)/\(ref.value)", lang: i18n.lang))
+                        error.add(info: CustomLocalizedString("Found multiple \(ref.file)/\(ref.value)", lang: i18n.langCode))
                     } else {
                         tempSubtour = nil
-                        error.add(info: CustomLocalizedString("Cannot find \(ref.file)/\(ref.value)", lang: i18n.lang))
+                        error.add(info: CustomLocalizedString("Cannot find \(ref.file)/\(ref.value)", lang: i18n.langCode))
                     }
                 } else {
                     tempSubtour = nil
-                    error.add(info: CustomLocalizedString("Parse Error \(ref.file)/\(ref.value)", lang: i18n.lang))
+                    error.add(info: CustomLocalizedString("Parse Error \(ref.file)/\(ref.value)", lang: i18n.langCode))
                 }
             } else {
                 tempSubtour = nil
-                error.add(info:CustomLocalizedString("Reference error (syntax='file/value')", lang: i18n.lang))
+                error.add(info:CustomLocalizedString("Reference error (syntax='file/value')", lang: i18n.langCode))
             }
         } catch DecodingError.typeMismatch {
-            error.add(info: CustomLocalizedString("subtour should be speficied in ref format (file/id)", lang: i18n.lang))
+            error.add(info: CustomLocalizedString("subtour should be speficied in ref format (file/id)", lang: i18n.langCode))
             tempSubtour = nil
         } catch {
             if tempSubtour == nil, let temp = refDest?.subtour {
@@ -763,12 +764,12 @@ class Destination: Decodable, Hashable {
         }
         
         if error.summary() != nil {
-            error.add(info: CustomLocalizedString("Error at \(src.lastPathComponent)\(yamlPath(decoder.codingPath))", lang: i18n.lang))
+            error.add(info: CustomLocalizedString("Error at \(src.lastPathComponent)\(yamlPath(decoder.codingPath))", lang: i18n.langCode))
         }
         
         if error.summary() == nil, let refError = refDest?.error {
             error.add(info: refError)
-            error.add(info: CustomLocalizedString("Error at \(src.lastPathComponent)\(yamlPath(decoder.codingPath))", lang: i18n.lang))
+            error.add(info: CustomLocalizedString("Error at \(src.lastPathComponent)\(yamlPath(decoder.codingPath))", lang: i18n.langCode))
         }
         self.error = error.summary()
         self.warning = warning.summary()
@@ -859,7 +860,7 @@ class Tour: Decodable, Hashable, TourProtocol {
             self.id = id
         } else {
             self.id = "ERROR"
-            error.add(info: CustomLocalizedString("No ID specified", lang: i18n.lang))
+            error.add(info: CustomLocalizedString("No ID specified", lang: i18n.langCode))
         }
 
         if let destinations = try? container.decode([Destination].self, forKey: .destinations) {
@@ -869,7 +870,7 @@ class Tour: Decodable, Hashable, TourProtocol {
             }
         } else {
             self.destinations = []
-            error.add(info: CustomLocalizedString("No destinations specified", lang: i18n.lang))
+            error.add(info: CustomLocalizedString("No destinations specified", lang: i18n.langCode))
         }
         self.error = error.summary()
     }

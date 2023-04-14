@@ -63,7 +63,7 @@ struct RootView: View {
             })
             .alert(isPresented: $modelData.isConfirmingSummons) {
                 let ad = modelData.tourManager.arrivedDestination
-                let destination = ad!.waitingDestination!.value!
+                let destination = ad!.waitingDestination!.value
                 let title = ad!.waitingDestination!.title
                 return Alert(title: Text("Let the suitcase wait"),
                              message: Text(LocalizedStringKey("Let the suitcase wait message \(title.text)")),

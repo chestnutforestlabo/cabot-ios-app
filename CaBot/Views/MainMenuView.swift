@@ -119,6 +119,51 @@ struct ActionMenus: View {
                     }
                     .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
                 }
+                /*
+                if let count = ad.arrive?.count {
+                    if let text = ad.arrive?[count-1].content {
+                        Button(action: {
+                            modelData.service.tts.speak(text){}
+                        }) {
+                            Label{
+                                Text("もう一度音声を流す")
+                            } icon: {
+                                Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                            }
+                        }
+                    }
+                }
+                 */
+
+                if let subtour = ad.subtour {
+                    Button(action: {
+                        modelData.cabot(service: modelData.service, notification: .subtour)
+                    }) {
+                        Label{
+                            Text("Begin Subtour")
+                        } icon: {
+                            Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                        }
+                    }
+                }
+                if modelData.tourManager.hasSubDestination {
+                    Button(action: {
+                        modelData.tourManager.clearSubTour()
+                    }) {
+                        Text("End Subtour")
+                    }
+                }
+            }
+
+            if let _ = modelData.tourManager.hasDestination {
+                if modelData.tourManager.hasDestination {
+                    Button(action: {
+                        modelData.cabot(service: modelData.service, notification: .skip)
+                    }) {
+                        Text("スキップ")
+                    }
+                    .disabled(!modelData.suitcaseConnected)
+                }
             }
         }
     }
