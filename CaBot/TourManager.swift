@@ -60,16 +60,27 @@ class TourManager: TourProtocol {
             _subtours.count > 0
         }
     }
+    var setting: NavigationSettingProtocol {
+        get {
+            if let setting = _tempNavigationSetting {
+                return setting
+            }
+            return _defaultNavigationSetting
+        }
+    }
 
     private var _destinations: [Destination]
     private var _currentDestination: Destination?
     private var _arrivedDestination: Destination?
     private var _subtours: [Tour]
+    private var _defaultNavigationSetting: NavigationSettingProtocol
+    private var _tempNavigationSetting: NavigationSettingProtocol?
     var delegate:TourManagerDelegate?
 
-    init() {
+    init(setting: NavigationSettingProtocol) {
         _destinations = []
         _subtours = []
+        _defaultNavigationSetting = setting
     }
 
     func first(n: Int) -> [Destination] {
@@ -90,6 +101,7 @@ class TourManager: TourProtocol {
         _destinations.removeAll()
         _currentDestination = nil
         _arrivedDestination = nil
+        _tempNavigationSetting = tour.setting
         self.title = tour.title
         for d in tour.destinations {
             _destinations.append(d)

@@ -113,6 +113,104 @@ class FallbackService: CaBotServiceProtocol {
     }
 }
 
+protocol NavigationSettingProtocol {
+    var enableSubtourOnHandle: Bool { get }
+    var showContentWhenArrive: Bool { get }
+}
+
+final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
+    private let startSoundKey = "startSoundKey"
+    private let arrivedSoundKey = "arrivedSoundKey"
+    private let speedUpSoundKey = "speedUpSoundKey"
+    private let speedDownSoundKey = "speedDownSoundKey"
+    private let browserCloseDelayKey = "browserCloseDelayKey"
+    private let enableSubtourOnHandleKey = "enableSubtourOnHandleKey"
+    private let showContentWhenArriveKey = "showContentWhenArriveKey"
+    
+    init() {
+        if let startSound = UserDefaults.standard.value(forKey: startSoundKey) as? String {
+            self.startSound = startSound
+        }
+        if let arrivedSound = UserDefaults.standard.value(forKey: arrivedSoundKey) as? String {
+            self.arrivedSound = arrivedSound
+        }
+        if let speedUpSound = UserDefaults.standard.value(forKey: speedUpSoundKey) as? String {
+            self.speedUpSound = speedUpSound
+        }
+        if let speedDownSound = UserDefaults.standard.value(forKey: speedDownSoundKey) as? String {
+            self.speedDownSound = speedDownSound
+        }
+        if let browserCloseDelay = UserDefaults.standard.value(forKey: browserCloseDelayKey) as? Double {
+            self.browserCloseDelay = browserCloseDelay
+        }
+        if let enableSubtourOnHandle = UserDefaults.standard.value(forKey: enableSubtourOnHandleKey) as? Bool {
+            self.enableSubtourOnHandle = enableSubtourOnHandle
+        }
+        if let showContentWhenArrive = UserDefaults.standard.value(forKey: showContentWhenArriveKey) as? Bool {
+            self.showContentWhenArrive = showContentWhenArrive
+        }
+    }
+        
+    @Published var startSound: String = "/System/Library/Audio/UISounds/nano/3rdParty_Success_Haptic.caf" {
+        didSet {
+            UserDefaults.standard.setValue(startSound, forKey: startSoundKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
+    @Published var arrivedSound: String = "/System/Library/Audio/UISounds/nano/HummingbirdNotification_Haptic.caf" {
+        didSet {
+            UserDefaults.standard.setValue(arrivedSound, forKey: arrivedSoundKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
+    @Published var speedUpSound: String = "/System/Library/Audio/UISounds/nano/WalkieTalkieActiveStart_Haptic.caf" {
+        didSet {
+            UserDefaults.standard.setValue(speedUpSound, forKey: speedUpSoundKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
+    @Published var speedDownSound: String = "/System/Library/Audio/UISounds/nano/ET_RemoteTap_Receive_Haptic.caf" {
+        didSet {
+            UserDefaults.standard.setValue(speedDownSound, forKey: speedDownSoundKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
+    
+    @Published var browserCloseDelay: Double = 1.2 {
+        didSet {
+            UserDefaults.standard.setValue(browserCloseDelay, forKey: browserCloseDelayKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
+    
+    @Published var enableSubtourOnHandle: Bool = false{
+        didSet {
+            UserDefaults.standard.setValue(enableSubtourOnHandle, forKey: enableSubtourOnHandleKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
+    
+    @Published var showContentWhenArrive: Bool = true {
+        didSet {
+            UserDefaults.standard.setValue(showContentWhenArrive, forKey: showContentWhenArriveKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
+    
+    var audioPlayer: AVAudioPlayer = AVAudioPlayer()
+    func playAudio(file: String) {
+        DispatchQueue.main.async {
+            let fileURL: URL = URL(fileURLWithPath: file)
+            do {
+                self.audioPlayer = try AVAudioPlayer(contentsOf: fileURL)
+                self.audioPlayer.play()
+            } catch {
+                print("\(error)")
+            }
+        }
+    }
+}
+
 final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, TourManagerDelegate, CLLocationManagerDelegate, CaBotTTSDelegate {
 
     private let DEFAULT_LANG = "en"
@@ -126,12 +224,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private let menuDebugKey = "menu_debug"
     private let noSuitcaseDebugKey = "noSuitcaseDebugKey"
     private let adminModeKey = "adminModeKey"
-    private let startSoundKey = "startSoundKey"
-    private let arrivedSoundKey = "arrivedSoundKey"
-    private let speedUpSoundKey = "speedUpSoundKey"
-    private let speedDownSoundKey = "speedDownSoundKey"
-    private let browserCloseDelayKey = "browserCloseDelayKey"
     
+    let detailSettingModel = DetailSettingModel()
 
     @Published var versionMatchedBLE: Bool = false
     @Published var serverBLEVersion: String? = nil
@@ -291,42 +385,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             UserDefaults.standard.synchronize()
         }
     }
-    @Published var browserCloseDelay: Double = 1.2 {
-        didSet {
-            UserDefaults.standard.setValue(browserCloseDelay, forKey: browserCloseDelayKey)
-            UserDefaults.standard.synchronize()
-        }
-    }
 
     @Published var isContentPresenting: Bool = false
     @Published var isConfirmingSummons: Bool = false
     @Published var contentURL: URL? = nil
     @Published var tourUpdated: Bool = false
 
-    @Published var startSound: String = "/System/Library/Audio/UISounds/nano/3rdParty_Success_Haptic.caf" {
-        didSet {
-            UserDefaults.standard.setValue(startSound, forKey: startSoundKey)
-            UserDefaults.standard.synchronize()
-        }
-    }
-    @Published var arrivedSound: String = "/System/Library/Audio/UISounds/nano/HummingbirdNotification_Haptic.caf" {
-        didSet {
-            UserDefaults.standard.setValue(arrivedSound, forKey: arrivedSoundKey)
-            UserDefaults.standard.synchronize()
-        }
-    }
-    @Published var speedUpSound: String = "/System/Library/Audio/UISounds/nano/WalkieTalkieActiveStart_Haptic.caf" {
-        didSet {
-            UserDefaults.standard.setValue(speedUpSound, forKey: speedUpSoundKey)
-            UserDefaults.standard.synchronize()
-        }
-    }
-    @Published var speedDownSound: String = "/System/Library/Audio/UISounds/nano/ET_RemoteTap_Receive_Haptic.caf" {
-        didSet {
-            UserDefaults.standard.setValue(speedDownSound, forKey: speedDownSoundKey)
-            UserDefaults.standard.synchronize()
-        }
-    }
 
     @Published var deviceStatus: DeviceStatus = DeviceStatus()
     @Published var systemStatus: SystemStatusData = SystemStatusData()
@@ -347,7 +411,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     let locationUpdateTimeLimit: CFAbsoluteTime = 60*15
     var locationUpdateStartTime: CFAbsoluteTime = 0
     var audioAvailableEstimate: Bool = false
-    var audioPlayer: AVAudioPlayer = AVAudioPlayer()
 
     convenience override init() {
         self.init(preview: true)
@@ -362,7 +425,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.tcpService = tcpService
         self.fallbackService = FallbackService(services: [bleService, tcpService])
         self.resourceManager = ResourceManager(preview: preview)
-        self.tourManager = TourManager()
+        self.tourManager = TourManager(setting: self.detailSettingModel)
         self.dialogViewHelper = DialogViewHelper()
         self.locationManager =  CLLocationManager()
         self.notificationCenter = UNUserNotificationCenter.current()
@@ -397,12 +460,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
         if let speechRate = UserDefaults.standard.value(forKey: speechRateKey) as? Double {
             self.speechRate = speechRate
-        }
-        if let arrivedSound = UserDefaults.standard.value(forKey: arrivedSoundKey) as? String {
-            self.arrivedSound = arrivedSound
-        }
-        if let browserCloseDelay = UserDefaults.standard.value(forKey: browserCloseDelayKey) as? Double {
-            self.browserCloseDelay = browserCloseDelay
         }
 
         // services
@@ -578,7 +635,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     func addSubTour(tour: Tour) -> Void {
         tourManager.addSubTour(tour: tour)
         if tourManager.nextDestination() {
-            self.playAudio(file: self.startSound)
+            self.playAudio(file: self.detailSettingModel.startSound)
         }
     }
 
@@ -595,19 +652,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func playAudio(file: String) {
-        DispatchQueue.main.async {
-            let fileURL: URL = URL(fileURLWithPath: file)
-            do {
-                self.audioPlayer = try AVAudioPlayer(contentsOf: fileURL)
-                self.audioPlayer.play()
-            } catch {
-                print("\(error)")
-            }
-        }
+        detailSettingModel.playAudio(file: file)
     }
 
     func needToStartAnnounce(wait: Bool) {
-        let delay = wait ? self.browserCloseDelay : 0
+        let delay = wait ? self.detailSettingModel.browserCloseDelay : 0
 
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             self.speak(CustomLocalizedString("You can proceed by pressing the right button of the suitcase handle", lang: self.resourceLang)) {
@@ -657,7 +706,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
                     if self.isContentPresenting {
                         self.isContentPresenting = false
-                        delay = self.browserCloseDelay
+                        delay = self.detailSettingModel.browserCloseDelay
                     }
                     // wait at least 1.0 seconds if tts was speaking
                     // wait 1.0 ~ 2.0 seconds if browser was open.
@@ -752,10 +801,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     func cabot(service: any CaBotTransportProtocol, soundRequest: String) {
         switch(soundRequest) {
         case "SpeedUp":
-            playAudio(file: speedUpSound)
+            playAudio(file: detailSettingModel.speedUpSound)
             break
         case "SpeedDown":
-            playAudio(file: speedDownSound)
+            playAudio(file: detailSettingModel.speedDownSound)
             break
         default:
             NSLog("\"\(soundRequest)\" is unknown sound")
@@ -770,12 +819,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 tourManager.addSubTour(tour: subtour)
             }
             if tourManager.nextDestination() {
-                self.playAudio(file: self.startSound)
+                self.playAudio(file: self.detailSettingModel.startSound)
             }
             break
         case .next:
             if tourManager.nextDestination() {
-                self.playAudio(file: self.startSound)
+                self.playAudio(file: self.detailSettingModel.startSound)
             }else {
                 self.speak(CustomLocalizedString("No destination is selected", lang: self.resourceLang)) {
                 }
@@ -783,7 +832,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             break
         case .arrived:
             if let cd = tourManager.currentDestination {
-                self.playAudio(file: self.arrivedSound)
+                self.playAudio(file: self.detailSettingModel.arrivedSound)
                 tourManager.arrivedCurrent()
 
                 var announce = CustomLocalizedString("You have arrived at %@", lang: self.resourceLang, cd.title.pron)

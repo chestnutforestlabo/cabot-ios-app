@@ -800,6 +800,10 @@ protocol TourProtocol {
     var currentDestination: Destination? { get }
 }
 
+struct NavigationSetting: Decodable, NavigationSettingProtocol {
+    let enableSubtourOnHandle: Bool
+    let showContentWhenArrive: Bool
+}
 
 class Tour: Decodable, Hashable, TourProtocol {
     static func == (lhs: Tour, rhs: Tour) -> Bool {
@@ -815,12 +819,14 @@ class Tour: Decodable, Hashable, TourProtocol {
     let destinations: [Destination]
     var currentDestination: Destination? = nil
     let error: String?
+    let setting: NavigationSetting?
     
     enum CodingKeys: String, CodingKey {
         case title
         case pron
         case id
         case destinations
+        case navigationSetting
     }
     
     static func load(at src: Source, refCount: Int = 0, reference: Reference? = nil) throws -> [Tour] {
@@ -876,6 +882,7 @@ class Tour: Decodable, Hashable, TourProtocol {
             error.add(info: CustomLocalizedString("No destinations specified", lang: i18n.langCode))
         }
         self.error = error.summary()
+        self.setting = try? container.decode(NavigationSetting.self, forKey: .navigationSetting)
         
         for dest in self.destinations {
             dest.parent = self

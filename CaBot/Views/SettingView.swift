@@ -31,33 +31,6 @@ struct SettingView: View {
     @State var langOverride:String
     @State var isResourceChanging:Bool = false
 
-    let startSounds:[String] = [
-        "/System/Library/Audio/UISounds/nano/3rdParty_Success_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/3rdParty_Start_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/Alert_SpartanConnecting_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/Warsaw_Haptic.caf",
-    ]
-    let arrivedSounds:[String] = [
-        "/System/Library/Audio/UISounds/nano/HummingbirdNotification_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/Alarm_Nightstand_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/WorkoutStartAutodetect.caf",
-        "/System/Library/Audio/UISounds/nano/Alert_MapsDirectionsInApp_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/WorkoutSaved_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/MultiwayInvitation.caf",
-        "/System/Library/Audio/UISounds/nano/SiriStopSuccess_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/NavigationGenericManeuver_Haptic.caf",
-    ]
-    let speedUpSounds:[String] = [
-        "/System/Library/Audio/UISounds/nano/WalkieTalkieActiveStart_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/3rdParty_DirectionUp_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/WalkieTalkieReceiveStart_Haptic.caf",
-    ]
-    let speedDownSounds:[String] = [
-        "/System/Library/Audio/UISounds/nano/ET_RemoteTap_Receive_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/3rdParty_DirectionDown_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/WalkieTalkieReceiveEnd_Haptic.caf",
-    ]
-    
     var body: some View {
         return Form {
             Section(header: Text("Speech Voice")) {
@@ -94,72 +67,36 @@ struct SettingView: View {
                         .accessibility(hidden: true)
                 }
             }
-            Section(header: Text("Audio Effect")) {
-                Picker("Start", selection: $modelData.startSound) {
-                    ForEach(startSounds, id: \.self) { sound in
-                        Text(NSString(string: sound).lastPathComponent).tag(sound)
-                    }
-                }.onChange(of: modelData.startSound) { value in
-                    modelData.playAudio(file: value)
-                }
-                Picker("Arrived", selection: $modelData.arrivedSound) {
-                    ForEach(arrivedSounds, id: \.self) { sound in
-                        Text(NSString(string: sound).lastPathComponent).tag(sound)
-                    }
-                }.onChange(of: modelData.arrivedSound) { value in
-                    modelData.playAudio(file: value)
-                }
-                Picker("SpeedUp", selection: $modelData.speedUpSound) {
-                    ForEach(speedUpSounds, id: \.self) { sound in
-                        Text(NSString(string: sound).lastPathComponent).tag(sound)
-                    }
-                }.onChange(of: modelData.speedUpSound) { value in
-                    modelData.playAudio(file: value)
-                }
-                Picker("SpeedDown", selection: $modelData.speedDownSound) {
-                    ForEach(speedDownSounds, id: \.self) { sound in
-                        Text(NSString(string: sound).lastPathComponent).tag(sound)
-                    }
-                }.onChange(of: modelData.speedDownSound) { value in
-                    modelData.playAudio(file: value)
-                }
-            }
             Section(header: Text("Connection")) {
-                Picker("", selection: $modelData.connectionType){
-                    ForEach(ConnectionType.allCases, id: \.self){ (type) in
-                        Text(type.rawValue).tag(type)
-                    }
-                }.pickerStyle(SegmentedPickerStyle())
-                if modelData.connectionType == ConnectionType.BLE{
-                    HStack {
-                        Text("Team ID(ble)")
-                        TextField("Team ID", text: $modelData.teamID)
-                    }
-                }else{
-                    HStack {
-                        Text("Socket Address")
-                        TextField("Socket Address", text:
-                                    $modelData.socketAddr)
-                    }
-                }
-            }
-            Section(header: Text("VoiceOver adjustment")) {
                 VStack {
-                    Text("Delay after closing browser")
-                        .accessibility(hidden: true)
-                    HStack {
-                        Slider(value: $modelData.browserCloseDelay,
-                               in: 1...2,
-                               step: 0.1)
-                            .accessibility(label: Text("Delay after closing browser"))
-                            .accessibility(value: Text(LocalizedStringKey("\(modelData.browserCloseDelay, specifier: "%.1f") seconds")))
-                        Text(LocalizedStringKey("\(modelData.browserCloseDelay, specifier: "%.1f") sec"))
-                            .accessibility(hidden: true)
+                    HStack{
+                        Text("Priority Connection")
+                        Spacer()
                     }
+                    Picker("", selection: $modelData.connectionType){
+                        ForEach(ConnectionType.allCases, id: \.self){ (type) in
+                            Text(type.rawValue).tag(type)
+                        }
+                    }.pickerStyle(SegmentedPickerStyle())
+                }
+                HStack {
+                    Text("Team ID (ble)")
+                        .frame(width: 120, alignment: .leading)
+                    TextField("Team ID", text: $modelData.teamID)
+                }
+                HStack {
+                    Text("Socket Address")
+                        .frame(width: 120, alignment: .leading)
+                    TextField("Socket Address", text:
+                                $modelData.socketAddr)
                 }
             }
-
-            Section(header: Text("Others")) {
+            
+            NavigationLink(destination: DetailSettingView().environmentObject(modelData.detailSettingModel), label: {
+                Text("Detail Setting")
+            })
+            
+            Section(header: Text("Debug")) {
                 Button(action: {
                     UserDefaults.standard.setValue(false, forKey: ResourceSelectView.resourceSelectedKey)
                     UserDefaults.standard.synchronize()

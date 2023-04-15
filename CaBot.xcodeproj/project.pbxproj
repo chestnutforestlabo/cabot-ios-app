@@ -51,6 +51,7 @@
 		7E29F06D228B55C000CA7DD6 /* NavDeviceTTS.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F062228B55C000CA7DD6 /* NavDeviceTTS.m */; };
 		7E29F072228B55FC00CA7DD6 /* CaBotServiceBLE.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F070228B55FC00CA7DD6 /* CaBotServiceBLE.swift */; };
 		7E557F002581C79B00B1B9CA /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7E557EFE2581C79B00B1B9CA /* Localizable.strings */; };
+		7E9690C329EAF25C0062DEBD /* DetailSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E9690C229EAF25C0062DEBD /* DetailSettingView.swift */; };
 		7EDE7C8629B428BB00A65829 /* data in Resources */ = {isa = PBXBuildFile; fileRef = 7EDE7C8529B428BB00A65829 /* data */; };
 		7EDE7C8E29B5715800A65829 /* ResourceChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EDE7C8D29B5715800A65829 /* ResourceChecker.swift */; };
 		7EDE7C9629B5737C00A65829 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 7EDE7C9529B5737C00A65829 /* ArgumentParser */; };
@@ -148,6 +149,7 @@
 		7E29F070228B55FC00CA7DD6 /* CaBotServiceBLE.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaBotServiceBLE.swift; sourceTree = "<group>"; };
 		7E557EFF2581C79B00B1B9CA /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		7E557F042581C80E00B1B9CA /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
+		7E9690C229EAF25C0062DEBD /* DetailSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailSettingView.swift; sourceTree = "<group>"; };
 		7EDE7C8529B428BB00A65829 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = data; sourceTree = "<group>"; };
 		7EDE7C8B29B5715800A65829 /* CaBotTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CaBotTool; sourceTree = BUILT_PRODUCTS_DIR; };
 		7EDE7C8D29B5715800A65829 /* ResourceChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceChecker.swift; sourceTree = "<group>"; };
@@ -238,6 +240,7 @@
 				3013614226A0F8E10050CF9E /* TourDetailView.swift */,
 				3013614626A1E77B0050CF9E /* WebContentView.swift */,
 				3096BF1326A5C29F0066F256 /* SettingView.swift */,
+				7E9690C229EAF25C0062DEBD /* DetailSettingView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -519,6 +522,7 @@
 				09725B0A24FE4AC300012D42 /* DialogViewControllerCabot.swift in Sources */,
 				30E50DD0269F76F000729ABD /* CaBotAppModel.swift in Sources */,
 				30E50DD7269F784A00729ABD /* OnboardGrantAccess.swift in Sources */,
+				7E9690C329EAF25C0062DEBD /* DetailSettingView.swift in Sources */,
 				30E50DE226A0BA5200729ABD /* DestinationsView.swift in Sources */,
 				3099132D26603B10000C1BFE /* LocalConversation.swift in Sources */,
 				30E50DE826A0BBE900729ABD /* ToursView.swift in Sources */,
