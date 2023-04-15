@@ -574,6 +574,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             return false
         }
     }
+    
+    func addSubTour(tour: Tour) -> Void {
+        tourManager.addSubTour(tour: tour)
+        if tourManager.nextDestination() {
+            self.playAudio(file: self.startSound)
+        }
+    }
 
     func speak(_ text:String, callback: @escaping () -> Void) {
         if (preview) {
@@ -656,7 +663,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     // wait 1.0 ~ 2.0 seconds if browser was open.
                     // hopefully closing browser and reading the content by voice over will be ended by then
                     DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                        let announce = String(format:CustomLocalizedString("Going to %@", lang: self.resourceLang), arguments: [dest.title.pron])
+                        let announce = CustomLocalizedString("Going to %@", lang: self.resourceLang, dest.title.pron)
                             + (dest.message?.content ?? "")
 
                         self.speak(announce){
@@ -757,6 +764,15 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func cabot(service: any CaBotTransportProtocol, notification: NavigationNotification) {
         switch(notification){
+        case .subtour:
+            if let ad = tourManager.arrivedDestination,
+               let subtour = ad.subtour {
+                tourManager.addSubTour(tour: subtour)
+            }
+            if tourManager.nextDestination() {
+                self.playAudio(file: self.startSound)
+            }
+            break
         case .next:
             if tourManager.nextDestination() {
                 self.playAudio(file: self.startSound)
@@ -770,9 +786,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 self.playAudio(file: self.arrivedSound)
                 tourManager.arrivedCurrent()
 
-                var announce = String(format:CustomLocalizedString("You have arrived at %@", lang: self.resourceLang), arguments: [cd.title.pron])
+                var announce = CustomLocalizedString("You have arrived at %@", lang: self.resourceLang, cd.title.pron)
                 if let _ = cd.content?.url {
-                    announce += String(format:CustomLocalizedString("You can check detail of %@ on the phone", lang: self.resourceLang), arguments: [cd.title.pron])
+                    announce += CustomLocalizedString("You can check detail of %@ on the phone", lang: self.resourceLang, cd.title.pron)
                 }
                 if tourManager.hasDestination {
                     announce += CustomLocalizedString("You can proceed by pressing the right button of the suitcase handle", lang: self.resourceLang)

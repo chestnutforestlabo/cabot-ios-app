@@ -58,6 +58,7 @@ protocol CaBotServiceDelegate {
 enum NavigationNotification:String {
     case next
     case arrived
+    case subtour
 }
 
 enum CaBotManageCommand:String {

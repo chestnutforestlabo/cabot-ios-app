@@ -593,6 +593,7 @@ class Destination: Decodable, Hashable {
     let warning:String?
     let ref:Reference?
     let refDest:Destination?
+    var parent: Tour? = nil
 
     enum CodingKeys: String, CodingKey {
         case title
@@ -791,12 +792,14 @@ class Destination: Decodable, Hashable {
     }
 }
 
+
 protocol TourProtocol {
     var title: I18NText { get }
     var id: String { get }
     var destinations: [Destination] { get }
     var currentDestination: Destination? { get }
 }
+
 
 class Tour: Decodable, Hashable, TourProtocol {
     static func == (lhs: Tour, rhs: Tour) -> Bool {
@@ -873,6 +876,10 @@ class Tour: Decodable, Hashable, TourProtocol {
             error.add(info: CustomLocalizedString("No destinations specified", lang: i18n.langCode))
         }
         self.error = error.summary()
+        
+        for dest in self.destinations {
+            dest.parent = self
+        }
     }
 }
 
