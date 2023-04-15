@@ -158,7 +158,7 @@ struct DestinationsView_Previews: PreviewProvider {
     static var preview1: some View {
         let modelData = CaBotAppModel()
 
-        let resource = modelData.resourceManager.resource(by: "place0")!
+        let resource = modelData.resourceManager.resource(by: "Test data")!
 
         return DestinationsView(src: resource.destinationsSource!)
             .environmentObject(modelData)
@@ -167,7 +167,7 @@ struct DestinationsView_Previews: PreviewProvider {
     static var preview2: some View {
         let modelData = CaBotAppModel()
 
-        let resource = modelData.resourceManager.resource(by: "place0")!
+        let resource = modelData.resourceManager.resource(by: "Test data")!
 
         let destinations = try! Destination.load(at: resource.destinationsSource!)
 

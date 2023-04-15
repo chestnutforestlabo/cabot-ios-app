@@ -63,12 +63,12 @@ struct WebContentView: UIViewRepresentable {
 struct WebView_Previews : PreviewProvider {
     static var previews: some View {
         let modelData = CaBotAppModel()
-
+        
         let contentURL = URL(string: "content://place0/test.html")!
         let url = modelData.resourceManager.resolveContentURL(url: contentURL)!
-
         return WebContentView(url: url,
-                       handlers: ["Test": TestHandler()])
+                              handlers: ["Test": TestHandler()])
+            .environmentObject(modelData)
     }
 }
 

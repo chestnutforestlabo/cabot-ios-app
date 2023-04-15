@@ -57,7 +57,7 @@ struct SettingView: View {
         "/System/Library/Audio/UISounds/nano/3rdParty_DirectionDown_Haptic.caf",
         "/System/Library/Audio/UISounds/nano/WalkieTalkieReceiveEnd_Haptic.caf",
     ]
-
+    
     var body: some View {
         return Form {
             Section(header: Text("Speech Voice")) {
@@ -192,11 +192,8 @@ struct SettingView_Previews: PreviewProvider {
     static var previews: some View {
         let modelData = CaBotAppModel()
 
-        let resource = modelData.resourceManager.resource(by: "place0")!
-
-        modelData.resource = resource
         modelData.teamID = "test"
-
+        
         return SettingView(langOverride: "en-US")
             .environmentObject(modelData)
             .environment(\.locale, Locale.init(identifier: "en-US"))

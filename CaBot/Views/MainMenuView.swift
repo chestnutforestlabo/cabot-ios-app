@@ -68,7 +68,7 @@ struct MainMenuView: View {
 
 struct ActionMenus: View {
     @EnvironmentObject var modelData: CaBotAppModel
-
+    
     var body: some View {
         Section(header: Text("Actions")) {
             if modelData.tourManager.hasDestination && modelData.menuDebug {
@@ -90,82 +90,94 @@ struct ActionMenus: View {
                         }
                     }
                     .disabled(!modelData.suitcaseConnected)
-               }
-            }
-
-            if let ad = modelData.tourManager.arrivedDestination {
-                if let contentURL = ad.content?.url {
-                    Button(action: {
-                        modelData.open(content: contentURL)
-                    }) {
-                        Label(title: {
-                            Text("Open Content for \(ad.title.text)")
-                        }, icon: {
-                            Image(systemName: "newspaper")
-                        })
-                    }
-                }
-                if modelData.tourManager.currentDestination == nil,
-                   let _ = ad.waitingDestination?.value,
-                   let title = ad.waitingDestination?.title {
-                    Button(action: {
-                        modelData.isConfirmingSummons = true
-                    }) {
-                        Label(title: {
-                            Text("Let the suitcase wait at \(title.text)")
-                        }, icon: {
-                            Image(systemName: "arrow.triangle.turn.up.right.diamond")
-                        })
-                    }
-                    .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
-                }
-                /*
-                if let count = ad.arrive?.count {
-                    if let text = ad.arrive?[count-1].content {
-                        Button(action: {
-                            modelData.service.tts.speak(text){}
-                        }) {
-                            Label{
-                                Text("もう一度音声を流す")
-                            } icon: {
-                                Image(systemName: "arrow.triangle.turn.up.right.diamond")
-                            }
-                        }
-                    }
-                }
-                 */
-
-                if let subtour = ad.subtour {
-                    Button(action: {
-                        modelData.cabot(service: modelData.service, notification: .subtour)
-                    }) {
-                        Label{
-                            Text("Begin Subtour")
-                        } icon: {
-                            Image(systemName: "arrow.triangle.turn.up.right.diamond")
-                        }
-                    }
-                }
-                if modelData.tourManager.hasSubDestination {
-                    Button(action: {
-                        modelData.tourManager.clearSubTour()
-                    }) {
-                        Text("End Subtour")
-                    }
                 }
             }
+            
+            ArrivedActionMenus()
+                .environmentObject(modelData)
+        }
+    }
+}
 
-            if let _ = modelData.tourManager.hasDestination {
-                if modelData.tourManager.hasDestination {
-                    Button(action: {
-                        modelData.cabot(service: modelData.service, notification: .skip)
-                    }) {
-                        Text("スキップ")
+
+struct ArrivedActionMenus: View {
+    @EnvironmentObject var modelData: CaBotAppModel
+    
+    var body: some View {
+        if let ad = modelData.tourManager.arrivedDestination {
+            if let contentURL = ad.content?.url {
+                Button(action: {
+                    modelData.open(content: contentURL)
+                }) {
+                    Label(title: {
+                        Text("Open Content for \(ad.title.text)")
+                    }, icon: {
+                        Image(systemName: "newspaper")
+                    })
+                }
+            }
+            if modelData.tourManager.currentDestination == nil,
+               let _ = ad.waitingDestination?.value,
+               let title = ad.waitingDestination?.title {
+                Button(action: {
+                    modelData.isConfirmingSummons = true
+                }) {
+                    Label(title: {
+                        Text("Let the suitcase wait at \(title.text)")
+                    }, icon: {
+                        Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                    })
+                }
+                .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
+            }
+            /*
+             if let count = ad.arrive?.count {
+             if let text = ad.arrive?[count-1].content {
+             Button(action: {
+             modelData.service.tts.speak(text){}
+             }) {
+             Label{
+             Text("もう一度音声を流す")
+             } icon: {
+             Image(systemName: "arrow.triangle.turn.up.right.diamond")
+             }
+             }
+             }
+             }*/
+            
+            if let subtour = ad.subtour {
+                Button(action: {
+                    modelData.addSubTour(tour: subtour)
+                }) {
+                    Label{
+                        Text("Begin Subtour")
+                    } icon: {
+                        Image(systemName: "arrow.triangle.turn.up.right.diamond")
                     }
-                    .disabled(!modelData.suitcaseConnected)
+                }
+            }
+            
+            if modelData.tourManager.isSubtour {
+                Button(action: {
+                    modelData.tourManager.clearSubTour()
+                }) {
+                    Text("End Subtour")
                 }
             }
         }
+        
+        /*
+         if let _ = modelData.tourManager.hasDestination {
+         if modelData.tourManager.hasDestination {
+         Button(action: {
+         modelData.cabot(service: modelData.service, notification: .skip)
+         }) {
+         Text("スキップ")
+         }
+         .disabled(!modelData.suitcaseConnected)
+         }
+         }
+         */
     }
 }
 
@@ -212,9 +224,7 @@ struct DestinationMenus: View {
                 }
                 if modelData.tourManager.destinations.count > 0 {
                     NavigationLink(
-                        destination: TourDetailView(tour: modelData.tourManager,
-                                                    showStartButton: false,
-                                                    showCancelButton: true),
+                        destination: DynamicTourDetailView(tour: modelData.tourManager),
                         label: {
                             HStack {
                                 Spacer()
@@ -407,7 +417,7 @@ struct ContentView_Previews: PreviewProvider {
         modelData.serverBLEVersion = CaBotServiceBLE.CABOT_BLE_VERSION
         modelData.serverTCPVersion = CaBotServiceBLE.CABOT_BLE_VERSION
 
-        if let r = modelData.resourceManager.resource(by: "place0") {
+        if let r = modelData.resourceManager.resource(by: "Test data") {
             modelData.resource = r
         }
 

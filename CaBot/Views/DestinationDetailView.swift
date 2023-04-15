@@ -103,10 +103,12 @@ struct DestinationDetailView_Previews: PreviewProvider {
     static var previews: some View {
         let modelData = CaBotAppModel()
 
-        let resource = modelData.resourceManager.resource(by: "place0")!
+        let resource = modelData.resourceManager.resource(by: "Test data")!
         let destinations = try! Destination.load(at: resource.destinationsSource!)
         let destination = destinations[0]
+        let destinations2 = try! Destination.load(at: destination.file!)
 
-        DestinationDetailView(destination: destination)
+        DestinationDetailView(destination: destinations2[0])
+            .environmentObject(modelData)
     }
 }

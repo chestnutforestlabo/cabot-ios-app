@@ -34,7 +34,7 @@ struct ToursView: View {
             Section(header: Text("SELECT_TOUR")) {
                 ForEach(tours, id: \.self) { tour in
                     NavigationLink(
-                        destination: TourDetailView(tour: tour, showStartButton: true),
+                        destination: StaticTourDetailView(tour: tour),
                         label: {
                             Text(tour.title.text)
                         })
@@ -48,8 +48,10 @@ struct ToursView_Previews: PreviewProvider {
     static var previews: some View {
         let modelData = CaBotAppModel()
 
-        let resource = modelData.resourceManager.resource(by: "place0")!
-        return ToursView(src: resource.toursSource!)
+        let resource = modelData.resourceManager.resource(by: "Test data")!
+        let tours = resource.toursSource!
+
+        return ToursView(src: tours)
             .environmentObject(modelData)
     }
 }
