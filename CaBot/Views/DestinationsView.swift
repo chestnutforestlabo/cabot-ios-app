@@ -58,7 +58,7 @@ struct DestinationsView: View {
                                     .accessibilityLabel(destination.title.pron)
                             })
                     } else {
-                        if let _ = destination.message {
+                        if let _ = destination.startMessage {
                             NavigationLink(
                                 destination: DestinationDetailView(destination: destination)
                                     .environmentObject(modelData),

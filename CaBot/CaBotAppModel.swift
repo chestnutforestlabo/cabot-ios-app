@@ -113,11 +113,6 @@ class FallbackService: CaBotServiceProtocol {
     }
 }
 
-protocol NavigationSettingProtocol {
-    var enableSubtourOnHandle: Bool { get }
-    var showContentWhenArrive: Bool { get }
-}
-
 final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
     private let startSoundKey = "startSoundKey"
     private let arrivedSoundKey = "arrivedSoundKey"
@@ -634,7 +629,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     
     func addSubTour(tour: Tour) -> Void {
         tourManager.addSubTour(tour: tour)
-        if tourManager.nextDestination() {
+        if tourManager.proceedToNextDestination() {
             self.playAudio(file: self.detailSettingModel.startSound)
         }
     }
@@ -713,7 +708,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     // hopefully closing browser and reading the content by voice over will be ended by then
                     DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                         let announce = CustomLocalizedString("Going to %@", lang: self.resourceLang, dest.title.pron)
-                            + (dest.message?.content ?? "")
+                            + (dest.startMessage?.content ?? "")
 
                         self.speak(announce){
                         }
@@ -814,16 +809,18 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     func cabot(service: any CaBotTransportProtocol, notification: NavigationNotification) {
         switch(notification){
         case .subtour:
-            if let ad = tourManager.arrivedDestination,
-               let subtour = ad.subtour {
-                tourManager.addSubTour(tour: subtour)
-            }
-            if tourManager.nextDestination() {
-                self.playAudio(file: self.detailSettingModel.startSound)
+            if tourManager.setting.enableSubtourOnHandle {
+                if let ad = tourManager.arrivedDestination,
+                   let subtour = ad.subtour {
+                    tourManager.addSubTour(tour: subtour)
+                }
+                if tourManager.proceedToNextDestination() {
+                    self.playAudio(file: self.detailSettingModel.startSound)
+                }
             }
             break
         case .next:
-            if tourManager.nextDestination() {
+            if tourManager.proceedToNextDestination() {
                 self.playAudio(file: self.detailSettingModel.startSound)
             }else {
                 self.speak(CustomLocalizedString("No destination is selected", lang: self.resourceLang)) {
@@ -835,18 +832,33 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 self.playAudio(file: self.detailSettingModel.arrivedSound)
                 tourManager.arrivedCurrent()
 
-                var announce = CustomLocalizedString("You have arrived at %@", lang: self.resourceLang, cd.title.pron)
-                if let _ = cd.content?.url {
-                    announce += CustomLocalizedString("You can check detail of %@ on the phone", lang: self.resourceLang, cd.title.pron)
-                }
-                if tourManager.hasDestination {
-                    announce += CustomLocalizedString("You can proceed by pressing the right button of the suitcase handle", lang: self.resourceLang)
+                var announce = CustomLocalizedString("You have arrived at %@. ", lang: self.resourceLang, cd.title.pron)
+                if let count = cd.arriveMessages?.count {
+                    for i in 0 ..< count{
+                        announce += cd.arriveMessages?[i].content ?? ""
+                    }
+                } else{
+                    if let _ = cd.content?.content,
+                       tourManager.setting.showContentWhenArrive {
+                        announce += CustomLocalizedString("You can check detail of %@ on the phone. ", lang: self.resourceLang, cd.title.pron)
+                    }
+                    if let next = tourManager.nextDestination {
+                        announce += CustomLocalizedString("You can proceed to %@ by pressing the right button of the suitcase handle. ", lang: self.resourceLang, next.title.pron)
+                        if let subtour = cd.subtour,
+                           tourManager.setting.enableSubtourOnHandle {
+                            announce += CustomLocalizedString("Or by pressing the center button to proceed a subtour %@.", lang: self.resourceLang, subtour.introduction.pron)
+                        }
+                    } else if let subtour = cd.subtour,
+                       tourManager.setting.enableSubtourOnHandle {
+                        announce += CustomLocalizedString("Press the center button to proceed a subtour %@.", lang: self.resourceLang, subtour.introduction.pron)
+                    }
                 }
 
                 self.speak(announce) {
                     // if user pressed the next button while reading announce, skip open content
                     if self.tourManager.currentDestination == nil {
-                        if let contentURL = cd.content?.url {
+                        if let contentURL = cd.content?.url,
+                           self.tourManager.setting.showContentWhenArrive {
                             self.open(content: contentURL)
                         }
                     }

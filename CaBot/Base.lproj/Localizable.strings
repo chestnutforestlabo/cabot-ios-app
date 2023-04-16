@@ -88,7 +88,7 @@
 "processing..."="processing...";
 "Navigating to %@"="Navigating to %@";
 "Going to %@"="Going to %@. ";
-"You have arrived at %@"="You have arrived at %@. ";
+"You have arrived at %@. "="You have arrived at %@. ";
 "Open Content for %@"="Open Content for %@";
 "Let the suitcase wait"="Let the suitcase wait";
 "Let the suitcase wait message %@"="You are going to send a command to let the suitcase wait at %@. Are you okay with it?";
@@ -114,8 +114,10 @@
 "Complete Destination"="Complete Destination";
 "Complete Destination Message"="Are you sure to complete the current destination?";
 
-"You can check detail of %@ on the phone"="You can check detail of %@ on the phone. ";
-"You can proceed by pressing the right button of the suitcase handle"="You can proceed by pressing the right button of the suitcase handle. ";
+"You can check detail of %@ on the phone. "="You can check detail of %@ on the phone. ";
+"You can proceed to %@ by pressing the right button of the suitcase handle. "="You can proceed to %@ by pressing the right button of the suitcase handle. ";
+"Or by pressing the center button to proceed a subtour %@."="Or by pressing the center button to proceed a subtour %@.";
+"Press the center button to proceed a subtour %@."="Press the center button to proceed a subtour %@.";
 
 "No destination is selected"="No destination is selected";
 

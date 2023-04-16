@@ -554,7 +554,7 @@ struct Reference: CustomStringConvertible {
 /// - pron: <String> Reading text for the destination if required other wise title is used for reading
 ///    - the text can be localizable
 /// - file: <Source> file including a list of destinations
-/// - message: <Source> file including a message text
+/// - startMessage: <Source> file including a message text
 /// - content: <Source> file including a web content to show in the browser
 /// - waitingDestination: <WaitingDestination>
 /// ```
@@ -585,7 +585,8 @@ class Destination: Decodable, Hashable {
     let title: I18NText
     let value:String?
     let file:Source?
-    let message:Source?
+    let startMessage:Source?
+    let arriveMessages: [Source]?
     let content:Source?
     let waitingDestination:WaitingDestination?
     let subtour:Tour?
@@ -601,7 +602,8 @@ class Destination: Decodable, Hashable {
         case value
         case pron
         case file
-        case message
+        case startMessage
+        case arriveMessages
         case content
         case waitingDestination
         case subtour
@@ -707,10 +709,15 @@ class Destination: Decodable, Hashable {
             self.file = try? container.decode(Source.self, forKey: .file)
             warning.add(info: CustomLocalizedString("file specified by Source(type, src) is deprecated, use just 'src' string instead", lang: i18n.langCode))
         }
-        if let message = try? container.decode(Source.self, forKey: .message) {
-            self.message = message
+        if let message = try? container.decode(Source.self, forKey: .startMessage) {
+            self.startMessage = message
         } else {
-            self.message = refDest?.message
+            self.startMessage = refDest?.startMessage
+        }
+        if let arriveMessages = try? container.decode([Source].self, forKey: .arriveMessages) {
+            self.arriveMessages = arriveMessages
+        } else {
+            self.arriveMessages = refDest?.arriveMessages
         }
         if let content = try? container.decode(Source.self, forKey: .content) {
             self.content = content
@@ -781,7 +788,8 @@ class Destination: Decodable, Hashable {
         self.title = I18NText(text: [:], pron: [:])
         self.value = value
         self.file = file
-        self.message = message
+        self.startMessage = message
+        self.arriveMessages = nil
         self.content = content
         self.waitingDestination = waitingDestination
         self.subtour = subtour
@@ -800,6 +808,11 @@ protocol TourProtocol {
     var currentDestination: Destination? { get }
 }
 
+protocol NavigationSettingProtocol {
+    var enableSubtourOnHandle: Bool { get }
+    var showContentWhenArrive: Bool { get }
+}
+
 struct NavigationSetting: Decodable, NavigationSettingProtocol {
     let enableSubtourOnHandle: Bool
     let showContentWhenArrive: Bool
@@ -816,6 +829,7 @@ class Tour: Decodable, Hashable, TourProtocol {
 
     let title: I18NText
     let id: String
+    let introduction: I18NText
     let destinations: [Destination]
     var currentDestination: Destination? = nil
     let error: String?
@@ -823,8 +837,8 @@ class Tour: Decodable, Hashable, TourProtocol {
     
     enum CodingKeys: String, CodingKey {
         case title
-        case pron
         case id
+        case introduction
         case destinations
         case navigationSetting
     }
@@ -871,6 +885,8 @@ class Tour: Decodable, Hashable, TourProtocol {
             self.id = "ERROR"
             error.add(info: CustomLocalizedString("No ID specified", lang: i18n.langCode))
         }
+        
+        self.introduction = I18NText.decode(decoder: decoder, baseKey: CodingKeys.introduction.stringValue)
 
         if let destinations = try? container.decode([Destination].self, forKey: .destinations) {
             self.destinations = destinations

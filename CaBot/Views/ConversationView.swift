@@ -47,7 +47,7 @@ struct ConversationView: UIViewControllerRepresentable {
                 let title = note.userInfo?["title"] as? String ?? "From Conversation"
                 let pron = note.userInfo?["pron"] as? String
                 owner.modelData.tourManager.addToLast(destination: Destination(title: title, value: toID, pron: pron, file: nil, message: nil, content: nil, waitingDestination: nil, subtour: nil))
-                owner.modelData.tourManager.nextDestination()
+                owner.modelData.tourManager.proceedToNextDestination()
             }
             DispatchQueue.main.async {
                 self.owner.presentationMode.wrappedValue.dismiss()

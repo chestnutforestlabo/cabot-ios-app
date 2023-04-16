@@ -50,6 +50,11 @@ class TourManager: TourProtocol {
             return _destinations.count > 0 || _currentDestination != nil
         }
     }
+    var nextDestination: Destination? {
+        get {
+            return _destinations.first
+        }
+    }
     var destinationCount: Int {
         get {
             _destinations.count + (currentDestination == nil ? 0 : 1)
@@ -161,7 +166,7 @@ class TourManager: TourProtocol {
         delegate?.tour(manager: self, destinationChanged: nil)
     }
 
-    func nextDestination() -> Bool {
+    func proceedToNextDestination() -> Bool {
         if _destinations.count == 0  {
             self._currentDestination = nil
             delegate?.tourUpdated(manager: self)

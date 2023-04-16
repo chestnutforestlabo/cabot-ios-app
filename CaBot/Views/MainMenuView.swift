@@ -81,7 +81,7 @@ struct ActionMenus: View {
                     .disabled(!modelData.suitcaseConnected)
                 } else if modelData.tourManager.destinations.count > 0 {
                     Button(action: {
-                        _ = modelData.tourManager.nextDestination()
+                        _ = modelData.tourManager.proceedToNextDestination()
                     }) {
                         Label{
                             Text("START")
@@ -436,7 +436,7 @@ struct ContentView_Previews: PreviewProvider {
             if let url = r.toursSource {
                 if let tours = try? Tour.load(at: url) {
                     modelData.tourManager.set(tour: tours[0])
-                    _ = modelData.tourManager.nextDestination()
+                    _ = modelData.tourManager.proceedToNextDestination()
                 }
             }
         }

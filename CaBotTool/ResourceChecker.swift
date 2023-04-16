@@ -164,11 +164,22 @@ struct ResourceChecker: ParsableCommand {
                 if let file = destination.file {
                     emitError("file: \(file) reference should not have file prop", indent: indent)
                 }
-                if let message = destination.message {
-                    if message != refDest.message {
-                        emitInfo("message: \(message) # overwritten", indent: indent, warn: message.warn, error: message.error)
+                if let message = destination.startMessage {
+                    if message != refDest.startMessage {
+                        emitInfo("startMessage: \(message) # overwritten", indent: indent, warn: message.warn, error: message.error)
                     } else {
-                        emitInfo("message: \(message)", indent: indent, warn: message.warn, error: message.error)
+                        emitInfo("startMessage: \(message)", indent: indent, warn: message.warn, error: message.error)
+                    }
+                }
+                if let messages = destination.arriveMessages {
+                    if messages != refDest.arriveMessages {
+                        for message in messages {
+                            emitInfo("arriveMessage: \(message) # overwritten", indent: indent, warn: message.warn, error: message.error)
+                        }
+                    } else {
+                        for message in messages {
+                            emitInfo("arriveMessage: \(message)", indent: indent, warn: message.warn, error: message.error)
+                        }
                     }
                 }
                 if let content = destination.content {
@@ -218,8 +229,13 @@ struct ResourceChecker: ParsableCommand {
                 emitInfo("file: \(file.src)", indent: indent)
                 analyse(destinations: file, languages: languages, indent: indent+"    ")
             }
-            if let message = destination.message {
-                emitInfo("message: \(message)", indent: indent, warn: message.warn, error: message.error)
+            if let message = destination.startMessage {
+                emitInfo("startMessage: \(message)", indent: indent, warn: message.warn, error: message.error)
+            }
+            if let messages = destination.arriveMessages {
+                for message in messages {
+                    emitInfo("arriveMessage: \(message)", indent: indent, warn: message.warn, error: message.error)
+                }
             }
             if let content = destination.content {
                 emitInfo("content: \(content)", indent: indent, warn: content.warn, error: content.error)

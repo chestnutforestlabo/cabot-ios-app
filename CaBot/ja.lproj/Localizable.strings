@@ -90,7 +90,7 @@
 "processing..."="処理中...";
 "Navigating to %@"="%@に移動ちゅう";
 "Going to %@"="%@に移動します。";
-"You have arrived at %@"="%@に到着しました。";
+"You have arrived at %@. "="%@に到着しました。";
 "Open Content for %@"="%@の説明ページを開く";
 "Let the suitcase wait"="スーツケースを待たせる";
 "Let the suitcase wait message %@"="%@にスーツケースを待たせるコマンドを送ろうとしています。よろしいですか？";
@@ -116,8 +116,10 @@
 "Complete Destination"="目的地に到着";
 "Complete Destination Message"="目的地に到着したことにしてよろしいですか？";
 
-"You can check detail of %@ on the phone"="%@の詳細についてスマホを使って読むことができます。";
-"You can proceed by pressing the right button of the suitcase handle"="スーツケースハンドルの右ボタンを押すと進みます。";
+"You can check detail of %@ on the phone. "="%@の詳細についてスマホを使って読むことができます。";
+"You can proceed to %@ by pressing the right button of the suitcase handle. "="スーツケースハンドルの右ボタンを押すと%@へ進みます。";
+"Or by pressing the center button to proceed a subtour %@."="もしくは、真ん中ボタンを押してサブツアーに進みます。%@。";
+"Press the center button to proceed a subtour %@."="真ん中ボタンを押すとサブツアーに進みます。%@.";
 
 "No destination is selected"="目的地が設定されていません";
 
