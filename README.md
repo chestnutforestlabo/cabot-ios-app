@@ -75,6 +75,7 @@ src: String (relative path / URL)
 ### Conversation format
 - JavaScript to handle conversation
 - it needs to implement `function getResponse(request)`
+
 ```
 custom global objects
 Bundle.loadYaml       : returns a list of destination from a specified yaml file
