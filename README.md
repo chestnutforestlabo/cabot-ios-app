@@ -15,12 +15,16 @@
 
 type|ID|IN/OUT|data|description
 ---|---|---|---|---
-summons|0x09|OUT|text|set the destination of the robot (summon mode), specify a node id
-destination|0x10|OUT|text|set the destination of the robot (normal mode), specify a node id or `__cancel__` for cancel
-speech|0x200|IN|text|speak input text
-navi|0x300|IN|text|navigation status, next or arrived
-content|0x400|IN|text|open text as URL in browser
-sound|0x500|IN|text|play specified sound, speedUp or speedDown
+version|0x00|IN|text|protocol version
+manage|0x01|OUT|text|send command to control system (reboot, restart, etc)
+device status|0x02|IN|text|device status JSON
+system status|0x03|IN|text|system status JSON
+battery status|0x04|IN|text|battery status JSON
+log|0x05|OUT|text|send log text
+summons|0x010|OUT|text|set the destination of the robot (summon mode), specify a node id
+destination|0x11|OUT|text|set the destination of the robot (normal mode), specify a node id or `__cancel__` for cancel
+speech|0x30|IN|text|speak input text
+navi|0x40|IN|text|navigation status, next or arrived, sound, content, subtour
 heart_beat|0x9999|OUT|text|send heart beat every second
 
 ## How to build
@@ -37,12 +41,11 @@ Main Bundle
      | - Resource_DIR
          | - _metadata.yaml
 	 | - ...
-	 | - <language-code>.lproj  # for i18n
 ```
 
 ### Metadata format
-```
-name: String                         # this should be unique among Resource_DIRs
+```yaml
+name: I18NText                       # this should be unique among Resource_DIRs
 language: LanguageCode?              # optional, if specified, use the language instead of the system setting
 conversation: Source<Conversation>?  # optional, conversation source
 destinations: Source<Destinations>?  # optional, destinations source
@@ -54,8 +57,17 @@ location:
   radius: Int                        # in meters
 ```
 
-### Source format
+### I18NText format
+`<key>` can be any property string such as `name` and `title`.
+
 ```
+<key>: text           # text for the system language
+<key>-ja: text        # text for the language specified by the 2-characters lang code (ja in this case)
+<key>-ja-pron: text   # reading text for the language specified by the 2-characters lang code (ja in this case)
+```
+
+### Source format
+```yaml
 type: String (local / remote)
 src: String (relative path / URL)
 ```
@@ -77,33 +89,42 @@ View.alert                       : show an alert with title and message
 ```
 
 ### Destinations format
-[DestinationRef | Destination | DestinationEx | DestinationSource]
-
-#### DestinationRef
-ref: String
+```
+[Destination | DestinationRef | DestinationSource]
+```
 
 #### Destination format
-title: String
-value: String?
-pron: String?
-
-#### DestinationEx format
-title: String
-value: String?
-pron: String?
-message: Source?
+```yaml
+title: I18NText
+value: String
+startMessage: Source?
+arriveMessages: [Source]?
 content: Source?
-waitingDestination: Destination?
+waitingDestination: DestinationRef
+subtour: <file name>/<id of a tour>
+```
+
+#### DestinationRef
+```yaml
+ref: <file name>/<value of a destination>
+if other keys of the Destination format are specified, it will override the reference destination
+```
 
 #### DestinationSource format
-title: String
-pron: String?
+```
+title: I18NText
 file:  Source?
+```
 
 ### Tours format
+```
 [Tour]
+```
 
 #### Tour format
+```
 id: String
-title: String
+title: I18NText
+introduction: I18NText          # brief description of the tour
 destinations: Destinations
+```
