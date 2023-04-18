@@ -643,6 +643,15 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
     }
 
+    func skipDestination() -> Void {
+        let skip = tourManager.skipDestination()
+        self.tts.stop()
+        self.tts.speak("ー"){}
+        var announce = CustomLocalizedString("Skip Message %@", lang: self.resourceLang, skip.title.pron)
+        self.tts.speak(announce){
+        }
+    }
+
     func speak(_ text:String, callback: @escaping () -> Void) {
         if (preview) {
             print("previewing speak - \(text)")
@@ -873,6 +882,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     }
                 }
             }
+            break
+        case .skip:
+            self.skipDestination()
             break
         }
     }

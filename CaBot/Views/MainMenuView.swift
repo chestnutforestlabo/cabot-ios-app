@@ -138,7 +138,7 @@ struct ArrivedActionMenus: View {
                         Label{
                             Text("Repeat the message")
                         } icon: {
-                            Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                            Image(systemName: "arrow.counterclockwise")
                         }
                     }
                 }
@@ -158,23 +158,30 @@ struct ArrivedActionMenus: View {
                 Button(action: {
                     modelData.tourManager.clearSubTour()
                 }) {
-                    Text("End Subtour")
+                    Label{
+                        Text("End Subtour")
+                    } icon: {
+                        Image(systemName: "xmark.circle")
+                    }
                 }
             }
         }
-        
-        /*
-         if let _ = modelData.tourManager.hasDestination {
-         if modelData.tourManager.hasDestination {
-         Button(action: {
-         modelData.cabot(service: modelData.service, notification: .skip)
-         }) {
-         Text("スキップ")
-         }
-         .disabled(!modelData.suitcaseConnected)
-         }
-         }
-         */
+
+        if modelData.tourManager.currentDestination == nil &&
+            modelData.tourManager.hasDestination {
+            if let next = modelData.tourManager.nextDestination {
+                Button(action: {
+                    modelData.skipDestination()
+                }) {
+                    Label{
+                        Text("Skip Label \(next.title.text)")
+                    } icon: {
+                        Image(systemName: "arrow.right.to.line")
+                    }
+                }
+                .disabled(!modelData.suitcaseConnected)
+            }
+        }
     }
 }
 

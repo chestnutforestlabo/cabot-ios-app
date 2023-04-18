@@ -38,6 +38,9 @@
 "processing..."="処理中...";
 "Suitcase may not be connected"="スーツケースが接続されていません";
 
+/// func skipDestination
+"Skip Message %@"="%@をスキップします。";
+
 /// func needToStartAnnounce
 "You can proceed by pressing the right button of the suitcase handle"="スーツケースハンドルの右ボタンを押すと進みます。";
 
@@ -90,6 +93,7 @@
 "Repeat the message"="もう一度音声を流す";
 "Begin Subtour %@"="サブツアーを開始。%@";
 "End Subtour"="サブツアーを終了";
+"Skip Label %@"="%@をスキップ";
 
 "Destinations"="目的地";
 "Navigating to %@"="%@に移動ちゅう";  // accessibility label

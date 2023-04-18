@@ -38,6 +38,9 @@
 "processing..."="processing...";
 "Suitcase may not be connected"="Suitcase may not be connected";
 
+/// func skipDestination
+"Skip Message %@"="Skip %@";
+
 /// func needToStartAnnounce
 "You can proceed by pressing the right button of the suitcase handle"="You can proceed by pressing the right button of the suitcase handle";
 
@@ -90,6 +93,7 @@
 "Repeat the message"="Repeat the message";
 "Begin Subtour %@"="Begin Subtour %@";
 "End Subtour"="End Subtour";
+"Skip Label %@"="Skip %@";
 
 "Destinations"="Destinations";
 "Navigating to %@"="Navigating to %@";  // accessibility label

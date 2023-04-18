@@ -180,6 +180,16 @@ class TourManager: TourProtocol {
         return true
     }
 
+    func skipDestination() -> Destination {
+        let skip: Destination = _currentDestination ?? pop()
+        if (_currentDestination != nil) {
+            clearCurrent()
+        } else {
+            delegate?.tourUpdated(manager: self)
+        }
+        return skip
+    }
+
     func pop() -> Destination {
         let dest = _destinations.removeFirst()
         
