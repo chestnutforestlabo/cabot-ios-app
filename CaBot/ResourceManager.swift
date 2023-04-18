@@ -331,6 +331,7 @@ struct Metadata: Decodable{
     let identifier: String
     let name: I18NText
     let i18n: I18N
+    let langCode: String
     let conversation: Source?
     let destinations: Source?
     let tours: Source?
@@ -368,6 +369,7 @@ struct Metadata: Decodable{
         if let language = try? container.decodeIfPresent(String.self, forKey: .language) {
             i18n.set(lang: language)
         }
+        self.langCode = i18n.langCode
 
         self.name = I18NText.decode(decoder: decoder, baseKey: CodingKeys.name.stringValue)
         self.identifier = self.name.text
@@ -419,10 +421,11 @@ class Resource: Hashable {
 
     var lang: String {
         get {
-            self.langOverride ?? metadata.i18n.langCode
+            self.langOverride ?? metadata.langCode
         }
         set {
             self.langOverride = newValue
+            I18N.shared.set(lang: newValue)  // TODO unify language model
         }
     }
 
@@ -469,18 +472,14 @@ class Resource: Hashable {
     var languages: [String] {
         get {
             var languages:[String] = []
-            if let directoryContents = try? FileManager.default.contentsOfDirectory(
-                at: base,
-                includingPropertiesForKeys: [.isDirectoryKey]
-            ) {
-                for directory in directoryContents {
-                    if directory.pathExtension == "lproj" {
-                        languages.append(directory.deletingPathExtension().lastPathComponent)
-                    }
+            for lang in metadata.name.languages {
+                if lang != "Base" {
+                    languages.append(lang)
                 }
             }
-            if languages.contains(where: {lang in lang == metadata.i18n.langCode }) == false {
-                languages.append(metadata.i18n.langCode)
+
+            if languages.contains(where: {lang in lang == metadata.langCode}) == false {
+                languages.append(metadata.langCode)
             }
             return languages
         }
@@ -813,9 +812,31 @@ protocol NavigationSettingProtocol {
     var showContentWhenArrive: Bool { get }
 }
 
-struct NavigationSetting: Decodable, NavigationSettingProtocol {
+class NavigationSetting: Decodable, NavigationSettingProtocol {
     let enableSubtourOnHandle: Bool
     let showContentWhenArrive: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case enableSubtourOnHandle
+        case showContentWhenArrive
+    }
+
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let i18n = decoder.userInfo[.i18n] as! I18N
+        let error = BufferedInfo()
+
+        if let flag = try? container.decode(Bool.self, forKey: .enableSubtourOnHandle) {
+            self.enableSubtourOnHandle = flag
+        } else {
+            self.enableSubtourOnHandle = false
+        }
+        if let flag = try? container.decode(Bool.self, forKey: .showContentWhenArrive) {
+            self.showContentWhenArrive = flag
+        } else {
+            self.showContentWhenArrive = false
+        }
+    }
 }
 
 class Tour: Decodable, Hashable, TourProtocol {

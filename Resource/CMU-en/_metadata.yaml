@@ -1,4 +1,4 @@
-name: CMU Demo
+name: CMU Demo (en only)
 language: en-US
 destinations:
   type: local

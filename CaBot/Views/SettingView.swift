@@ -70,7 +70,7 @@ struct SettingView: View {
             Section(header: Text("Connection")) {
                 VStack {
                     HStack{
-                        Text("Priority Connection")
+                        Text("PRIORITY_CONNECTION")
                         Spacer()
                     }
                     Picker("", selection: $modelData.connectionType){
@@ -80,23 +80,21 @@ struct SettingView: View {
                     }.pickerStyle(SegmentedPickerStyle())
                 }
                 HStack {
-                    Text("Team ID (ble)")
-                        .frame(width: 120, alignment: .leading)
-                    TextField("Team ID", text: $modelData.teamID)
+                    Text("ROBOT_NAME_LABEL")
+                    TextField("ROBOT_NAME", text: $modelData.teamID)
                 }
                 HStack {
-                    Text("Socket Address")
-                        .frame(width: 120, alignment: .leading)
-                    TextField("Socket Address", text:
+                    Text("SOCKET_ADDRESS_LABEL")
+                    TextField("SOCKET_ADDRESS", text:
                                 $modelData.socketAddr)
                 }
             }
             
             NavigationLink(destination: DetailSettingView().environmentObject(modelData.detailSettingModel), label: {
-                Text("Detail Setting")
+                Text("DETAIL_SETTING")
             })
             
-            Section(header: Text("Debug")) {
+            Section(header: Text("DEBUG")) {
                 Button(action: {
                     UserDefaults.standard.setValue(false, forKey: ResourceSelectView.resourceSelectedKey)
                     UserDefaults.standard.synchronize()
@@ -107,7 +105,7 @@ struct SettingView: View {
                 }
 
                 if let resource = modelData.resource {
-                    Picker("Language", selection: $langOverride) {
+                    Picker("LANGUAGE", selection: $langOverride) {
                         ForEach(resource.languages, id: \.self) { language in
                             Text(language).tag(language)
                         }
@@ -118,8 +116,8 @@ struct SettingView: View {
                     }
                 }
 
-                Toggle("Menu Debug", isOn: $modelData.menuDebug)
-                Toggle("No Suitcase Debug", isOn: $modelData.noSuitcaseDebug)
+                Toggle("MENU_DEBUG", isOn: $modelData.menuDebug)
+                Toggle("NO_SUITCASE_DEBUG", isOn: $modelData.noSuitcaseDebug)
             }
         }
     }

@@ -1,0 +1,5 @@
+name-en: CMU Demo (en, jp)
+name-ja: CMU デモ (英日)
+destinations:
+  type: local
+  src: destinations.yaml

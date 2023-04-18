@@ -29,7 +29,7 @@ struct MainMenuView: View {
     var body: some View {
         Form {
             if modelData.noSuitcaseDebug {
-                Label("No Suitcase Debug mode (better to restart app to connect to a suitcase)", systemImage: "exclamationmark.triangle")
+                Label("No Suitcase Debug mode", systemImage: "exclamationmark.triangle")
                     .foregroundColor(.red)
             }
             if hasAnyAction() {
@@ -130,33 +130,30 @@ struct ArrivedActionMenus: View {
                 }
                 .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
             }
-            /*
-             if let count = ad.arrive?.count {
-             if let text = ad.arrive?[count-1].content {
-             Button(action: {
-             modelData.service.tts.speak(text){}
-             }) {
-             Label{
-             Text("もう一度音声を流す")
-             } icon: {
-             Image(systemName: "arrow.triangle.turn.up.right.diamond")
-             }
-             }
-             }
-             }*/
-            
+            if let count = ad.arriveMessages?.count {
+                if let text = ad.arriveMessages?[count-1].content {
+                    Button(action: {
+                        modelData.speak(text) {}
+                    }) {
+                        Label{
+                            Text("Repeat the message")
+                        } icon: {
+                            Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                        }
+                    }
+                }
+            }
             if let subtour = ad.subtour {
                 Button(action: {
                     modelData.addSubTour(tour: subtour)
                 }) {
                     Label{
-                        Text("Begin Subtour")
+                        Text("Begin Subtour \(subtour.introduction.text)")
                     } icon: {
                         Image(systemName: "arrow.triangle.turn.up.right.diamond")
                     }
                 }
             }
-            
             if modelData.tourManager.isSubtour {
                 Button(action: {
                     modelData.tourManager.clearSubTour()

@@ -20,85 +20,49 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-
-"Main Menu"="メインメニュー";
-"Okay"="OK";
-"ERROR"="エラー";
-"Select"="選択してください";
-"Settings"="設定";
-"Select Resource"="リソースの選択";
-"Actions"="アクション";
-"Status"="ステータス";
-"System"="システム";
-
-"Battery Status"="バッテリ状態";
-"Device Status"="デバイス状態";
-"System Status"="システム状態";
-"OK"="正常";
-"NG"="異常";
-"Unknown"="不明";
-"Starting"="起動中";
-
-"Suitcase may not be connected"="スーツケースが接続されていません";
-"Suitcase has been connected"="スーツケースが接続されました";
-"Suitcase has been disconnected"="スーツケースの接続が解除されました";
-"Protocol mismatch %@"="通信規格の不一致 %@";
-
-"START_CONVERSATION"="対話を開始";
-"SELECT_DESTINATION"="行き先を選択";
-"SELECT_TOUR"="ツアーを選択";
-"See detail"="詳細を見る";
-
-"PAUSE_NAVIGATION"="ナビゲーションを一時停止";
-"CANCEL_NAVIGATION"="ナビゲーションを中止";
-"CANCEL_NAVIGATION_MESSAGE %d"="%d個の目的地が設定されています。全てキャンセルしてよろしいですか？";
-"CANCEL_ALL"="全ての目的地を中止";
-"START"="ナビゲーションを開始";
-
-"Destinations"="目的地";
-"SETTINGS_LABEL"="設定";
-"SET_TOUR"="ツアーを設定する";
-"ADD_A_DESTINATION"="目的地を追加する";
-"ADD_A_DESTINATION_MESSAGE %d"="既に%d個の目的地が設定されています。どのようにしますか？";
-"CLEAR_ALL_THEN_ADD"="全部消してから追加する";
-"ADD_TO_FIRST"="最初に追加する";
-"ADD_TO_LAST"="最後に追加する";
-"ADD_TOUR"="これらの行先を追加する";
-"ADD_TOUR_MESSAGE %d"="既に%d個の目的地が設定されていますが、上書きしてよろしいですか？";
-"OVERWRITE_TOUR"="上書きする";
-"SELECT_RESOURCE"="リソースの選択";
-"Hello Suitcase!"="こんにちは、スーツケース";
-
-"Speech Voice"="読み上げ音声";
-"Voice"="音声";
-"Speech Speed"="速度";
-"Audio Effect"="効果音";
-"Start"="開始";
-"Arrived"="到着";
-"SpeedUp"="速度上";
-"SpeedDown"="速度下";
-"Others"="その他";
-"Navigation"="ナビゲーション";
-"Connection"="接続";
-
-
-"BLE Connected"="BLE 接続あり";
-"BLE Not Connected"="BLE 接続なし";
-"TCP Connected"="TCP 接続あり";
-"TCP Not Connected"="TCP 接続なし";
-
-"processing..."="処理中...";
-"Navigating to %@"="%@に移動ちゅう";
-"Going to %@"="%@に移動します。";
-"You have arrived at %@. "="%@に到着しました。";
-"Open Content for %@"="%@の説明ページを開く";
-"Let the suitcase wait"="スーツケースを待たせる";
-"Let the suitcase wait message %@"="%@にスーツケースを待たせるコマンドを送ろうとしています。よろしいですか？";
+// General
 "Yes"="はい";
 "No"="いいえ";
-"Let the suitcase wait at %@"="%@にスーツケースを待たせる";
+"Okay"="OK";
+"ERROR"="エラー";
+
+
+// CaBotAppModel
+"SELECT_RESOURCE"="リソースの選択";
+"MAIN_MENU"="メインメニュー";
+
+/// func summon
 "Sending the command to the suitcase"="スーツケースに指示を送っています。ハンドルから手を離してください。";
 
+/// func summon, func send
+"processing..."="処理中...";
+"Suitcase may not be connected"="スーツケースが接続されていません";
+
+/// func needToStartAnnounce
+"You can proceed by pressing the right button of the suitcase handle"="スーツケースハンドルの右ボタンを押すと進みます。";
+
+/// func tour
+"Going to %@"="%@に移動します。";
+
+/// func caBot service centralConnected
+"Suitcase has been connected"="スーツケースが接続されました";
+"Suitcase has been disconnected"="スーツケースの接続が解除されました";
+
+/// func caBot service notification
+"No destination is selected"="目的地が設定されていません";
+"You have arrived at %@. "="%@に到着しました。";
+"You can check detail of %@ on the phone. "="%@の詳細についてスマホを使って読むことができます。";
+"You can proceed to %@ by pressing the right button of the suitcase handle. "="スーツケースハンドルの右ボタンを押すと%@へ進みます。";
+"Or by pressing the center button to proceed a subtour %@."="もしくは、真ん中ボタンを押してサブツアーに進みます。%@。";
+"Press the center button to proceed a subtour %@."="真ん中ボタンを押すとサブツアーに進みます。%@.";
+
+
+// RootView
+"Let the suitcase wait"="スーツケースを待たせる";
+"Let the suitcase wait message %@"="%@にスーツケースを待たせるコマンドを送ろうとしています。よろしいですか？";
+
+
+//OnboardGrantAccess
 "ONBOARD_MESSAGE"="位置情報、Bluetooth、通知の利用を許可してください";
 "Enable Location Update"="位置情報を許可する";
 "Location Update Enabled"="位置情報が許可されました";
@@ -113,23 +77,148 @@
 "Notification Enabled"="通知が許可されました";
 "Notification Denied"="通知が許可されませんでした";
 
+
+// MainMenuView
+"No Suitcase Debug mode"="スーツケース無しデバッグモード";
+
+"Actions"="アクション";
+"PAUSE_NAVIGATION"="ナビゲーションを一時停止";
+"START"="ナビゲーションを開始";
+
+"Open Content for %@"="%@の説明ページを開く";
+"Let the suitcase wait at %@"="%@にスーツケースを待たせる";
+"Repeat the message"="もう一度音声を流す";
+"Begin Subtour %@"="サブツアーを開始。%@";
+"End Subtour"="サブツアーを終了";
+
+"Destinations"="目的地";
+"Navigating to %@"="%@に移動ちゅう";  // accessibility label
 "Complete Destination"="目的地に到着";
 "Complete Destination Message"="目的地に到着したことにしてよろしいですか？";
+"See detail"="詳細を見る";
 
-"You can check detail of %@ on the phone. "="%@の詳細についてスマホを使って読むことができます。";
-"You can proceed to %@ by pressing the right button of the suitcase handle. "="スーツケースハンドルの右ボタンを押すと%@へ進みます。";
-"Or by pressing the center button to proceed a subtour %@."="もしくは、真ん中ボタンを押してサブツアーに進みます。%@。";
-"Press the center button to proceed a subtour %@."="真ん中ボタンを押すとサブツアーに進みます。%@.";
+"Navigation"="ナビゲーション";
+"START_CONVERSATION"="対話を開始";
+"SELECT_DESTINATION"="行き先を選択";
+"SELECT_TOUR"="ツアーを選択";
+"Others"="その他";
 
-"No destination is selected"="目的地が設定されていません";
+"Status"="ステータス";
+"BLE Connected"="BLE 接続あり";
+"BLE Not Connected"="BLE 接続なし";
+"TCP Connected"="TCP 接続あり";
+"TCP Not Connected"="TCP 接続なし";
+"Protocol mismatch %@"="通信規格の不一致 %@";
+"Battery"="バッテリー";
+"Device"="デバイス";
 
+"System"="システム";
+"Settings"="設定";
+"Version: %@ (%@) - %@"="バージョン: %@ (%@) - %@";
+
+
+// DeviceStatusView
+"Details"="詳細";
+"Reboot"="リブート";
+"Suitcase Not Connected"="スーツケース接続なし";
+"Reboot Computer"="コンピュータをリブート";
+"The app will be disconnected."="スーツケースとの接続が解除されます";
+"Power off"="電源オフ";
+"Device Status"="デバイス状態";
+
+
+// BatteryStatusView
+"Battery Status"="バッテリ状態";
+
+
+// SystemStatusView
+"Start System"="システム起動";
+"Stop System"="システム停止";
+"Are you sure to stop the suitcase system?"="スーツケースのシステム停止しますが、よろしいですか？";
+"System Status"="システム状態";
+
+
+// DestinationsView
+"ADD_A_DESTINATION"="目的地を追加する";
+"ADD_A_DESTINATION_MESSAGE %d"="既に%d個の目的地が設定されています。どのようにしますか？";
+"CLEAR_ALL_THEN_ADD"="全部消してから追加する";
+"ADD_TO_FIRST"="最初に追加する";
+"ADD_TO_LAST"="最後に追加する";
+
+
+// DestinationDetailView
 "Show more detail"="詳細を表示する";
 "Add to destinations"="目的地に追加する";
+
+
+// TourDetailView
+/// StaticTourDetailView
+"SET_TOUR"="ツアーを設定する";
+"ADD_TOUR"="これらの行先を追加する";
+"ADD_TOUR_MESSAGE %d"="既に%d個の目的地が設定されていますが、上書きしてよろしいですか？";
+"OVERWRITE_TOUR"="上書きする";
+
+/// DynamicTourDetailView
+"CANCEL_NAVIGATION"="ナビゲーションを中止";
+"CANCEL_NAVIGATION_MESSAGE %d"="%d個の目的地が設定されています。全てキャンセルしてよろしいですか？";
+"CANCEL_ALL"="全ての目的地を中止";
+
+
+// SettingView
+"Speech Voice"="読み上げ音声";
+"Voice"="音声";
+"Speech Speed"="速度";
+"Connection"="接続";
+
+"PRIORITY_CONNECTION"="優先接続先";
+"ROBOT_NAME"="ロボット名";
+"ROBOT_NAME_LABEL"="ロボット名 (BLE)";
+"SOCKET_ADDRESS"="ソケットアドレス";
+"SOCKET_ADDRESS_LABEL"="ソケットアドレス";
+
+"DETAIL_SETTING"="詳細設定";
+
+"DEBUG"="デバッグ";
+"SELECT_RESOURCE"="リソースの選択";
+"LANGUAGE"="言語";
+"MENU_DEBUG"="メニューデバッグ";
+"NO_SUITCASE_DEBUG"="スーツケース無しデバッグ";
+
+
+// DetailSettingView
+"Tour"="ツアー";
+"Enable subtour on handle"="ハンドルでサブツアーを有効化";
+"Show content when arrive"="到着時に詳細ページを表示";
+
+"Audio Effect"="効果音";
+"Start"="開始";
+"Arrived"="到着";
+"SpeedUp"="速度上";
+"SpeedDown"="速度下";
 
 "VoiceOver adjustment"="VoiceOver 調整";
 "Delay after closing browser"="ブラウザを閉じた後の待ち時間";
 "%.1f seconds"="%.1f秒";
 "%.1f sec"="%.1f秒";
 
+
+// TTSHelper
+"Hello Suitcase!"="こんにちは、スーツケース";
+
+
+// ResourceManager
 "Robot Waiting Spot (%@)"="ロボット待機場所 (%@)";
 "Robot Waiting Spot (%@)-pron"="ロボット待機場所 (%@)";
+
+
+// CaBotServiceCommon
+/// DeviceStatusLevel
+"OK"="正常";
+"Error"="エラー";
+"Unknown"="不明";
+
+/// CaBotSystemLevel
+"Inactive"="停止";
+"Active"="起動";
+"Activating"="起動中";
+"Deactivating"="停止中";

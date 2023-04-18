@@ -1,4 +1,4 @@
-name: CMUデモ
+name: CMUデモ (日本語のみ)
 language: ja-JP
 destinations:
   type: local

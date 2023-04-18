@@ -162,6 +162,7 @@ class TourManager: TourProtocol {
                 dest.parent != tour
             }
         }
+        _arrivedDestination = nil
         delegate?.tourUpdated(manager: self)
         delegate?.tour(manager: self, destinationChanged: nil)
     }

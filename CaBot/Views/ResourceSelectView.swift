@@ -29,7 +29,7 @@ struct ResourceSelectView: View {
 
     var body: some View {
         Form {
-            Section(header:Text("Select Resource")) {
+            Section() {
                 ForEach (model.resourceManager.resources, id: \.self) { resource in
                     Button(action: {
                         UserDefaults.standard.setValue(true, forKey: ResourceSelectView.resourceSelectedKey)

@@ -49,9 +49,9 @@ enum DisplayedScene {
             case .Onboard:
                 return Text("")
             case .ResourceSelect:
-                return Text("Select Resource")
+                return Text("SELECT_RESOURCE")
             case .App:
-                return Text("Main Menu")
+                return Text("MAIN_MENU")
             }
         }
     }
@@ -185,7 +185,7 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
         }
     }
     
-    @Published var showContentWhenArrive: Bool = true {
+    @Published var showContentWhenArrive: Bool = false {
         didSet {
             UserDefaults.standard.setValue(showContentWhenArrive, forKey: showContentWhenArriveKey)
             UserDefaults.standard.synchronize()
@@ -211,6 +211,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private let DEFAULT_LANG = "en"
     
     private let selectedResourceKey = "SelectedResourceKey"
+    private let selectedResourceLangKey = "selectedResourceLangKey"
     private let selectedVoiceKey = "SelectedVoiceKey"
     private let speechRateKey = "speechRateKey"
     private let connectionTypeKey = "connection_type"
@@ -220,7 +221,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private let noSuitcaseDebugKey = "noSuitcaseDebugKey"
     private let adminModeKey = "adminModeKey"
     
-    let detailSettingModel = DetailSettingModel()
+    let detailSettingModel: DetailSettingModel
 
     @Published var versionMatchedBLE: Bool = false
     @Published var serverBLEVersion: String? = nil
@@ -276,11 +277,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 } else {
                     self.voice = TTSHelper.getVoices(by: resource.locale)[0]
                 }
+                NSLog("resource.identifier = \(resource.identifier)")
+                UserDefaults.standard.setValue(resource.identifier, forKey: selectedResourceKey)
+                if let langOverride = resource.langOverride {
+                    NSLog("resource.langOverride = \(langOverride)")
+                    UserDefaults.standard.setValue(langOverride, forKey: selectedResourceLangKey)
+                }
+                UserDefaults.standard.synchronize()
             }
-
-            NSLog("resource.identifier = \(resource?.identifier)")
-            UserDefaults.standard.setValue(resource?.identifier, forKey: selectedResourceKey)
-            UserDefaults.standard.synchronize()
         }
     }
 
@@ -313,12 +317,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     @Published var suitcaseConnectedBLE: Bool = false {
         didSet {
-            self.suitcaseConnected = self.suitcaseConnectedBLE || self.suitcaseConnectedTCP
+            self.suitcaseConnected = self.suitcaseConnectedBLE || self.suitcaseConnectedTCP || self.noSuitcaseDebug
         }
     }
     @Published var suitcaseConnectedTCP: Bool = false {
         didSet {
-            self.suitcaseConnected = self.suitcaseConnectedBLE || self.suitcaseConnectedTCP
+            self.suitcaseConnected = self.suitcaseConnectedBLE || self.suitcaseConnectedTCP || self.noSuitcaseDebug
         }
     }
     @Published var suitcaseConnected: Bool = false {
@@ -412,6 +416,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     init(preview: Bool) {
+        self.detailSettingModel = DetailSettingModel()
+
         self.preview = preview
         self.tts = CaBotTTS(voice: nil)
         let bleService = CaBotServiceBLE(with: self.tts)
@@ -443,6 +449,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
         if let selectedIdentifier = UserDefaults.standard.value(forKey: selectedResourceKey) as? String {
             self.resource = resourceManager.resource(by: selectedIdentifier)
+        }
+        if let selectedLang = UserDefaults.standard.value(forKey: selectedResourceLangKey) as? String {
+            self.resource?.langOverride = selectedLang
         }
         if let groupID = UserDefaults.standard.value(forKey: teamIDKey) as? String {
             self.teamID = groupID
