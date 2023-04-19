@@ -113,6 +113,7 @@ struct SettingView: View {
                         modelData.resource?.lang = lang
                         self.isResourceChanging = true
                         modelData.resource = modelData.resource
+                        modelData.updateVoice()
                     }
                 }
 

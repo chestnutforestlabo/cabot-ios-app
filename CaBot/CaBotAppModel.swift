@@ -270,13 +270,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         didSet {
             if let resource = resource {
 
-                let key = "\(selectedVoiceKey)_\(resource.locale.identifier)"
-                print(key)
-                if let id = UserDefaults.standard.value(forKey: key) as? String {
-                    self.voice = TTSHelper.getVoice(by: id)
-                } else {
-                    self.voice = TTSHelper.getVoices(by: resource.locale)[0]
-                }
                 NSLog("resource.identifier = \(resource.identifier)")
                 UserDefaults.standard.setValue(resource.identifier, forKey: selectedResourceKey)
                 if let langOverride = resource.langOverride {
@@ -307,6 +300,18 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             }
         }
     }
+    func updateVoice() {
+        if let resource = self.resource {
+            let key = "\(selectedVoiceKey)_\(resource.locale.identifier)"
+            print(key)
+            if let id = UserDefaults.standard.value(forKey: key) as? String {
+                self.voice = TTSHelper.getVoice(by: id)
+            } else {
+                self.voice = TTSHelper.getVoices(by: resource.locale)[0]
+            }
+        }
+    }
+
     @Published var speechRate: Double = 0.5 {
         didSet {
             UserDefaults.standard.setValue(speechRate, forKey: speechRateKey)
@@ -452,6 +457,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
         if let selectedLang = UserDefaults.standard.value(forKey: selectedResourceLangKey) as? String {
             self.resource?.langOverride = selectedLang
+            self.updateVoice()
         }
         if let groupID = UserDefaults.standard.value(forKey: teamIDKey) as? String {
             self.teamID = groupID
