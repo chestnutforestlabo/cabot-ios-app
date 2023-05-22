@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021  Carnegie Mellon University
+ * Copyright (c) 2014, 2021  IBM Corporation, Carnegie Mellon University and others
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,39 +19,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *******************************************************************************/
+let tana = new RegExp("靴下|棚")
+let regi = new RegExp("レジ|精算")
+let find_person = new RegExp("(.*?)(さん|君|くん|ちゃん)?(を)?(探す|探して)")
 
-import SwiftUI
+function getResponse(request) {
+    let text = request.input.text
 
-struct ToursView: View {
-    @EnvironmentObject var modelData: CaBotAppModel
-    
-    var src:Source
+    var speak = "すみません。もう一度お願いします。"
+    var navi = false
+    var dest_info = null
+    var find_info = null
 
-    var body: some View {
-        let tours = try! Tour.load(at: src)
-
-        Form {
-            Section(header: Text("SELECT_TOUR")) {
-                ForEach(tours, id: \.self) { tour in
-                    NavigationLink(
-                        destination: StaticTourDetailView(tour: tour),
-                        label: {
-                            Text(tour.title.text)
-                        })
-                }
+    if (text) {
+	if (tana.test(text)) {
+            speak = "わかりました。"
+            navi = true
+            dest_info = {
+                "nodes": "EDITOR_node_1601605415482"
             }
-        }.listStyle(PlainListStyle())
+        }else if (regi.test(text)) {
+            speak = "わかりました。レジに向かいます。"
+            navi = true
+            dest_info = {
+                "nodes": "EDITOR_node_1482995134771"
+            }
+        }
+    }else{
+        speak = "ご用件はなんでしょう？"
     }
-}
-
-struct ToursView_Previews: PreviewProvider {
-    static var previews: some View {
-        let modelData = CaBotAppModel()
-
-        let resource = modelData.resourceManager.resource(by: "Test data")!
-        let tours = resource.toursSource!
-
-        return ToursView(src: tours)
-            .environmentObject(modelData)
+    return {
+        "output": {
+            "log_messages":[],
+            "text": [speak]
+        },
+        "intents":[],
+        "entities":[],
+        "context":{
+            "navi": navi,
+            "dest_info": dest_info,
+            "system":{
+                "dialog_request_counter":0
+            }
+        }
     }
 }

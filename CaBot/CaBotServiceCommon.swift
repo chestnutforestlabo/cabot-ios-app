@@ -58,6 +58,8 @@ protocol CaBotServiceDelegate {
 enum NavigationNotification:String {
     case next
     case arrived
+    case subtour
+    case skip
 }
 
 enum CaBotManageCommand:String {
@@ -299,6 +301,8 @@ enum NavigationEventType:String, Decodable {
     case arrived
     case content
     case sound
+    case subtour
+    case skip
     case unknown
 }
 
@@ -351,7 +355,7 @@ class CaBotServiceActions {
 
         DispatchQueue.main.async {
             switch(request.type) {
-            case .next, .arrived:
+            case .next, .arrived, .subtour, .skip:
                 if let note = NavigationNotification(rawValue: request.type.rawValue) {
                     delegate.cabot(service: service, notification: note)
                 } else {

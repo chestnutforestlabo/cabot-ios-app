@@ -27,33 +27,44 @@ struct DestinationsView: View {
     @State private var isConfirming = false
     @State private var targetDestination: Destination?
 
-    var url: URL
+    var src: Source
     var destination: Destination?
 
     var body: some View {
         let tourManager = modelData.tourManager
-        let destinations = try! Destinations(at: url)
+        let destinations = try! Destination.load(at: src)
+        var header: Text?
+        if let title = destination?.title {
+            header = Text(title.text)
+        } else {
+            header = Text("SELECT_DESTINATION")
+        }
 
-        Form {
-            Section(header: Text(destination?.title ?? NSLocalizedString("SELECT_DESTINATION", comment: ""))) {
-                ForEach(destinations.list, id: \.self) { destination in
-
-                    if let url = destination.file?.url {
+        return Form {
+            Section(
+                header: header) {
+                ForEach(destinations, id: \.self) { destination in
+                    if let error = destination.error {
+                        HStack{
+                            Text(destination.title.text)
+                            Text(error).font(.system(size: 11))
+                        }.foregroundColor(Color.red)
+                    } else if let src = destination.file {
                         NavigationLink(
-                            destination: DestinationsView(url: url, destination: destination)
+                            destination: DestinationsView(src: src, destination: destination)
                                 .environmentObject(modelData),
                             label: {
-                                Text(destination.title)
-                                    .accessibilityLabel(destination.pron ?? destination.title)
+                                Text(destination.title.text)
+                                    .accessibilityLabel(destination.title.pron)
                             })
                     } else {
-                        if let _ = destination.message {
+                        if let _ = destination.startMessage {
                             NavigationLink(
                                 destination: DestinationDetailView(destination: destination)
                                     .environmentObject(modelData),
                                 label: {
-                                    Text(destination.title)
-                                        .accessibilityLabel(destination.pron ?? destination.title)
+                                    Text(destination.title.text)
+                                        .accessibilityLabel(destination.title.pron)
                                 })
                         } else {
                             Button(action: {
@@ -67,13 +78,12 @@ struct DestinationsView: View {
                                     NavigationUtil.popToRootView()
                                 }
                             }){
-                                Text(destination.title)
-                                    .accessibilityLabel(destination.pron ?? destination.title)
+                                Text(destination.title.text)
+                                    .accessibilityLabel(destination.title.pron)
                             }
                             // deprecated
                             .actionSheet(isPresented: $isConfirming) {
-                                let message = String(format: NSLocalizedString("ADD_A_DESTINATION_MESSAGE", comment: ""),
-                                                     arguments: [modelData.tourManager.destinationCount])
+                                let message = LocalizedStringKey("ADD_A_DESTINATION_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
                                 return ActionSheet(title: Text("ADD_A_DESTINATION"),
                                             message: Text(message),
                                             buttons: [
@@ -148,20 +158,20 @@ struct DestinationsView_Previews: PreviewProvider {
     static var preview1: some View {
         let modelData = CaBotAppModel()
 
-        let resource = modelData.resourceManager.resource(by: "place0")!
+        let resource = modelData.resourceManager.resource(by: "Test data")!
 
-        return DestinationsView(url: resource.destinationsURL!)
+        return DestinationsView(src: resource.destinationsSource!)
             .environmentObject(modelData)
     }
 
     static var preview2: some View {
         let modelData = CaBotAppModel()
 
-        let resource = modelData.resourceManager.resource(by: "place0")!
+        let resource = modelData.resourceManager.resource(by: "Test data")!
 
-        let destinations = try! Destinations(at: resource.destinationsURL!)
+        let destinations = try! Destination.load(at: resource.destinationsSource!)
 
-        return DestinationsView(url: destinations.list[0].file!.url!)
+        return DestinationsView(src: destinations[0].file!)
             .environmentObject(modelData)
     }
 }

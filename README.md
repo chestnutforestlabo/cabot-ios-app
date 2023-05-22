@@ -15,12 +15,16 @@
 
 type|ID|IN/OUT|data|description
 ---|---|---|---|---
-summons|0x09|OUT|text|set the destination of the robot (summon mode), specify a node id
-destination|0x10|OUT|text|set the destination of the robot (normal mode), specify a node id or `__cancel__` for cancel
-speech|0x200|IN|text|speak input text
-navi|0x300|IN|text|navigation status, next or arrived
-content|0x400|IN|text|open text as URL in browser
-sound|0x500|IN|text|play specified sound, speedUp or speedDown
+version|0x00|IN|text|protocol version
+manage|0x01|OUT|text|send command to control system (reboot, restart, etc)
+device status|0x02|IN|text|device status JSON
+system status|0x03|IN|text|system status JSON
+battery status|0x04|IN|text|battery status JSON
+log|0x05|OUT|text|send log text
+summons|0x010|OUT|text|set the destination of the robot (summon mode), specify a node id
+destination|0x11|OUT|text|set the destination of the robot (normal mode), specify a node id or `__cancel__` for cancel
+speech|0x30|IN|text|speak input text
+navi|0x40|IN|text|navigation status, next or arrived, sound, content, subtour
 heart_beat|0x9999|OUT|text|send heart beat every second
 
 ## How to build
@@ -33,24 +37,95 @@ $ open CaBot.xcworkspace
 ### Model data structure
 ```
 Main Bundle
- | _ Resource
-     | _ [Model_DIR]
-         | _ _metadata.yaml
-	 | _ ...
+ | - Resource
+     | - Resource_DIR
+         | - _metadata.yaml
+	 | - ...
 ```
 
 ### Metadata format
-```
-name: <String>
-language: <Locale>
-conversation:
-  type: "local" / "remote"
-  src: <relative path> / <URL>
-destinations:
-  type: "local" / "remote"
-  src: <relative path> / <URL>
+```yaml
+name: I18NText                       # this should be unique among Resource_DIRs
+language: LanguageCode?              # optional, if specified, use the language instead of the system setting
+conversation: Source<Conversation>?  # optional, conversation source
+destinations: Source<Destinations>?  # optional, destinations source
+tours: Source<Tours>?                # optional, tours source
 location:
-  ibeacon-uuid: <UUID String> # for beacon scanning
-  latlng: <Lat,Lng> # to determine location automatically
-  radius: <number> # in meters
+  ibeacon-uuid: [String]             # for beacon scanning
+  lat: Float                         # to determine location automatically
+  lng: Float                         #
+  radius: Int                        # in meters
+```
+
+### I18NText format
+`<key>` can be any property string such as `name` and `title`.
+
+```
+<key>: text           # text for the system language
+<key>-ja: text        # text for the language specified by the 2-characters lang code (ja in this case)
+<key>-ja-pron: text   # reading text for the language specified by the 2-characters lang code (ja in this case)
+```
+
+### Source format
+```yaml
+type: String (local / remote)
+src: String (relative path / URL)
+```
+
+### Conversation format
+- JavaScript to handle conversation
+- it needs to implement `function getResponse(request)`
+
+```
+custom global objects
+Bundle.loadYaml       : returns a list of destination from a specified yaml file
+Console.log           : print log
+Bluetooth.scanBeacons : scan beacons
+Device.type           : device type like iPhone13,3
+Device.id             : device vendor uuid
+HTTPS.postJSON        : post JSON to a host (not implemented yet)
+View.showModalWaitingWithMessage : show modal wait and a message
+View.hideModalWaiting            : hide the modal wait
+View.alert                       : show an alert with title and message
+```
+
+### Destinations format
+```
+[Destination | DestinationRef | DestinationSource]
+```
+
+#### Destination format
+```yaml
+title: I18NText
+value: String
+startMessage: Source?
+arriveMessages: [Source]?
+content: Source?
+waitingDestination: DestinationRef
+subtour: <file name>/<id of a tour>
+```
+
+#### DestinationRef
+```yaml
+ref: <file name>/<value of a destination>
+if other keys of the Destination format are specified, it will override the reference destination
+```
+
+#### DestinationSource format
+```
+title: I18NText
+file:  Source?
+```
+
+### Tours format
+```
+[Tour]
+```
+
+#### Tour format
+```
+id: String
+title: I18NText
+introduction: I18NText          # brief description of the tour
+destinations: Destinations
 ```

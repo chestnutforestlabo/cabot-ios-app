@@ -28,8 +28,7 @@ protocol TourManagerDelegate {
 }
 
 class TourManager: TourProtocol {
-    var title: String = "No Name"
-    var pron: String? = "No Name"
+    var title: I18NText = I18NText(text: [:], pron: [:])
     let id: String = "TourManager"
     var destinations: [Destination] {
         get {
@@ -51,19 +50,42 @@ class TourManager: TourProtocol {
             return _destinations.count > 0 || _currentDestination != nil
         }
     }
+    var nextDestination: Destination? {
+        get {
+            return _destinations.first
+        }
+    }
     var destinationCount: Int {
         get {
             _destinations.count + (currentDestination == nil ? 0 : 1)
+        }
+    }
+    var isSubtour: Bool {
+        get {
+            _subtours.count > 0
+        }
+    }
+    var setting: NavigationSettingProtocol {
+        get {
+            if let setting = _tempNavigationSetting {
+                return setting
+            }
+            return _defaultNavigationSetting
         }
     }
 
     private var _destinations: [Destination]
     private var _currentDestination: Destination?
     private var _arrivedDestination: Destination?
+    private var _subtours: [Tour]
+    private var _defaultNavigationSetting: NavigationSettingProtocol
+    private var _tempNavigationSetting: NavigationSettingProtocol?
     var delegate:TourManagerDelegate?
 
-    init() {
+    init(setting: NavigationSettingProtocol) {
         _destinations = []
+        _subtours = []
+        _defaultNavigationSetting = setting
     }
 
     func first(n: Int) -> [Destination] {
@@ -80,12 +102,12 @@ class TourManager: TourProtocol {
         delegate?.tourUpdated(manager: self)
     }
 
-    func set(tour: TourProtocol) {
+    func set(tour: Tour) {
         _destinations.removeAll()
         _currentDestination = nil
         _arrivedDestination = nil
+        _tempNavigationSetting = tour.setting
         self.title = tour.title
-        self.pron = tour.pron
         for d in tour.destinations {
             _destinations.append(d)
         }
@@ -127,8 +149,25 @@ class TourManager: TourProtocol {
         delegate?.tourUpdated(manager: self)
         delegate?.tour(manager: self, destinationChanged: nil)
     }
+        
+    func addSubTour(tour: Tour) {
+        _subtours.append(tour)
+        _destinations.insert(contentsOf: tour.destinations, at: 0)
+        delegate?.tourUpdated(manager: self)
+    }
 
-    func nextDestination() -> Bool {
+    func clearSubTour() {
+        if let tour = _subtours.popLast() {
+            _destinations = _destinations.filter { dest in
+                dest.parent != tour
+            }
+        }
+        _arrivedDestination = nil
+        delegate?.tourUpdated(manager: self)
+        delegate?.tour(manager: self, destinationChanged: nil)
+    }
+
+    func proceedToNextDestination() -> Bool {
         if _destinations.count == 0  {
             self._currentDestination = nil
             delegate?.tourUpdated(manager: self)
@@ -141,7 +180,24 @@ class TourManager: TourProtocol {
         return true
     }
 
+    func skipDestination() -> Destination {
+        let skip: Destination = _currentDestination ?? pop()
+        if (_currentDestination != nil) {
+            clearCurrent()
+        } else {
+            delegate?.tourUpdated(manager: self)
+        }
+        return skip
+    }
+
     func pop() -> Destination {
-        return _destinations.removeFirst()
+        let dest = _destinations.removeFirst()
+        
+        if let last = _subtours.last,
+           last.destinations.last == dest {
+            _ = _subtours.popLast()
+        }
+        
+        return dest
     }
 }

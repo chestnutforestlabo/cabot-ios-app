@@ -1,15 +1,9 @@
 -
   title: 1st floor
-  file:
-    type: local
-    src: destinations_1.yaml
+  file: destinations_1.yaml
 -
   title: 2nd floor
-  file:
-    type: local
-    src: destinations_2.yaml
+  file: destinations_2.yaml
 -
   title: 3rd floor
-  file:
-    type: local
-    src: destinations_3.yaml
+  file: destinations_3.yaml

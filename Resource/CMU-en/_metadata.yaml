@@ -1,0 +1,8 @@
+name: CMU Demo (en only)
+language: en-US
+destinations:
+  type: local
+  src: destinations.yaml
+conversation:
+  type: local
+  src: conv_cabot_cmu.js

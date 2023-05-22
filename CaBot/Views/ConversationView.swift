@@ -29,7 +29,7 @@ struct ConversationView: UIViewControllerRepresentable {
 
     let REQUEST_START_NAVIGATION:Notification.Name = Notification.Name(rawValue:"request_start_navigation")
 
-    var url: URL
+    var src: Source
 
     class Observer {
         static var shared: Observer? = nil
@@ -46,8 +46,8 @@ struct ConversationView: UIViewControllerRepresentable {
             if let toID = note.userInfo?["toID"] as? String {
                 let title = note.userInfo?["title"] as? String ?? "From Conversation"
                 let pron = note.userInfo?["pron"] as? String
-                owner.modelData.tourManager.addToLast(destination: Destination(title: title, value: toID, pron: pron, file: nil, message: nil, content: nil, waitingDestination: nil))
-                owner.modelData.tourManager.nextDestination()
+                owner.modelData.tourManager.addToLast(destination: Destination(title: title, value: toID, pron: pron, file: nil, message: nil, content: nil, waitingDestination: nil, subtour: nil))
+                owner.modelData.tourManager.proceedToNextDestination()
             }
             DispatchQueue.main.async {
                 self.owner.presentationMode.wrappedValue.dismiss()
@@ -63,7 +63,7 @@ struct ConversationView: UIViewControllerRepresentable {
         let view = DialogViewControllerCabot()
         view.baseHelper = modelData.dialogViewHelper
         view.voice = modelData.voice!.AVvoice
-        view.modelURL = url
+        view.modelURL = src.url
 
         let observer = Observer.getInstance(owner:self)
         NotificationCenter.default.addObserver(observer,
@@ -83,6 +83,6 @@ struct ConversationView_Previews: PreviewProvider {
         let modelData = CaBotAppModel()
 
         let resource = modelData.resourceManager.resources[0]
-        ConversationView(url: resource.conversationURL!)
+        ConversationView(src: resource.conversationSource!)
     }
 }

@@ -40,7 +40,6 @@ struct RootView: View {
                 case .App:
                     MainMenuView()
                         .environmentObject(modelData)
-                        .environment(\.locale, modelData.resource?.locale ?? .init(identifier: "base"))
                 }
             }
             .navigationTitle(modelData.displayedScene.text)
@@ -64,10 +63,10 @@ struct RootView: View {
             })
             .alert(isPresented: $modelData.isConfirmingSummons) {
                 let ad = modelData.tourManager.arrivedDestination
-                let destination = ad!.waitingDestination!.value!
+                let destination = ad!.waitingDestination!.value
                 let title = ad!.waitingDestination!.title
                 return Alert(title: Text("Let the suitcase wait"),
-                             message: Text(String(format:NSLocalizedString("Let the suitcase wait message", comment: ""), arguments: [title])),
+                             message: Text(LocalizedStringKey("Let the suitcase wait message \(title.text)")),
                              primaryButton: .default(Text("No")) {
                                 // noop
                              },
@@ -76,7 +75,7 @@ struct RootView: View {
                              })
             }
         }
-        
+        .environment(\.locale, modelData.resource?.locale ?? .init(identifier: "base"))
     }
 }
 

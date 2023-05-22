@@ -1,4 +1,28 @@
 -
-  pron : reading content
-  title : title
-  value : <NODE_ID>
+  title: Destination 1
+  title-ja: 行き先 1
+  title-ja-pron : いきさき、いち
+  value : destination1_node_value
+  startMessage:
+    type: local
+    src: destination1_message.txt
+-
+  title: Destination 2
+  title-ja: 行き先 2
+  title-ja-pron : いきさき、に
+  value : destination2_node_value
+-
+  title: Destination 3
+  title-ja: 行き先 3
+  title-ja-pron : いきさき、さん
+  value : destination3_node_value
+-
+  title: Destination 4
+  title-ja: 行き先 4
+  title-ja-pron : いきさき、よん
+  value : destination4_node_value
+-
+  title: Destination 5
+  title-ja: 行き先 5
+  title-ja-pron : いきさき、ご
+  value : destination5_node_value

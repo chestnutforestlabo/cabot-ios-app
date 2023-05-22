@@ -29,7 +29,7 @@ struct MainMenuView: View {
     var body: some View {
         Form {
             if modelData.noSuitcaseDebug {
-                Label("No Suitcase Debug mode (better to restart app to connect to a suitcase)", systemImage: "exclamationmark.triangle")
+                Label("No Suitcase Debug mode", systemImage: "exclamationmark.triangle")
                     .foregroundColor(.red)
             }
             if hasAnyAction() {
@@ -68,7 +68,7 @@ struct MainMenuView: View {
 
 struct ActionMenus: View {
     @EnvironmentObject var modelData: CaBotAppModel
-
+    
     var body: some View {
         Section(header: Text("Actions")) {
             if modelData.tourManager.hasDestination && modelData.menuDebug {
@@ -81,7 +81,7 @@ struct ActionMenus: View {
                     .disabled(!modelData.suitcaseConnected)
                 } else if modelData.tourManager.destinations.count > 0 {
                     Button(action: {
-                        _ = modelData.tourManager.nextDestination()
+                        _ = modelData.tourManager.proceedToNextDestination()
                     }) {
                         Label{
                             Text("START")
@@ -90,29 +90,96 @@ struct ActionMenus: View {
                         }
                     }
                     .disabled(!modelData.suitcaseConnected)
-               }
+                }
             }
+            
+            ArrivedActionMenus()
+                .environmentObject(modelData)
+        }
+    }
+}
 
-            if let ad = modelData.tourManager.arrivedDestination {
-                if let contentURL = ad.content?.url {
+
+struct ArrivedActionMenus: View {
+    @EnvironmentObject var modelData: CaBotAppModel
+    
+    var body: some View {
+        if let ad = modelData.tourManager.arrivedDestination {
+            if let contentURL = ad.content?.url {
+                Button(action: {
+                    modelData.open(content: contentURL)
+                }) {
+                    Label(title: {
+                        Text("Open Content for \(ad.title.text)")
+                    }, icon: {
+                        Image(systemName: "newspaper")
+                    })
+                }
+            }
+            if modelData.tourManager.currentDestination == nil,
+               let _ = ad.waitingDestination?.value,
+               let title = ad.waitingDestination?.title {
+                Button(action: {
+                    modelData.isConfirmingSummons = true
+                }) {
+                    Label(title: {
+                        Text("Let the suitcase wait at \(title.text)")
+                    }, icon: {
+                        Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                    })
+                }
+                .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
+            }
+            if let count = ad.arriveMessages?.count {
+                if let text = ad.arriveMessages?[count-1].content {
                     Button(action: {
-                        modelData.open(content: contentURL)
+                        modelData.speak(text) {}
                     }) {
-                        Label(String(format:NSLocalizedString("Open Content for %@", comment: ""), arguments: [ad.title]),
-                              systemImage: "newspaper")
+                        Label{
+                            Text("Repeat the message")
+                        } icon: {
+                            Image(systemName: "arrow.counterclockwise")
+                        }
                     }
                 }
-                if modelData.tourManager.currentDestination == nil,
-                   let _ = ad.waitingDestination?.value,
-                   let title = ad.waitingDestination?.title {
-                    Button(action: {
-                        modelData.isConfirmingSummons = true
-                    }) {
-                        Label(String(format:NSLocalizedString("Let the suitcase wait at %@", comment: ""), arguments: [title]),
-                              systemImage: "arrow.triangle.turn.up.right.diamond")
+            }
+            if let subtour = ad.subtour {
+                Button(action: {
+                    modelData.addSubTour(tour: subtour)
+                }) {
+                    Label{
+                        Text("Begin Subtour \(subtour.introduction.text)")
+                    } icon: {
+                        Image(systemName: "arrow.triangle.turn.up.right.diamond")
                     }
-                    .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
                 }
+            }
+            if modelData.tourManager.isSubtour {
+                Button(action: {
+                    modelData.tourManager.clearSubTour()
+                }) {
+                    Label{
+                        Text("End Subtour")
+                    } icon: {
+                        Image(systemName: "xmark.circle")
+                    }
+                }
+            }
+        }
+
+        if modelData.tourManager.currentDestination == nil &&
+            modelData.tourManager.hasDestination {
+            if let next = modelData.tourManager.nextDestination {
+                Button(action: {
+                    modelData.skipDestination()
+                }) {
+                    Label{
+                        Text("Skip Label \(next.title.text)")
+                    } icon: {
+                        Image(systemName: "arrow.right.to.line")
+                    }
+                }
+                .disabled(!modelData.suitcaseConnected)
             }
         }
     }
@@ -130,10 +197,9 @@ struct DestinationMenus: View {
 
                 if let cd = modelData.tourManager.currentDestination {
                     HStack {
-                        Label(cd.title,
+                        Label(cd.title.text,
                               systemImage: "arrow.triangle.turn.up.right.diamond")
-                            .accessibilityLabel(String(format: NSLocalizedString("Navigating to %@", comment: ""),
-                                                       arguments: [cd.title]))
+                        .accessibilityLabel(Text("Navigating to \(cd.title.text)"))
                         if modelData.menuDebug {
                             Spacer()
                             Button(action: {
@@ -158,13 +224,11 @@ struct DestinationMenus: View {
                     }
                 }
                 ForEach(modelData.tourManager.first(n: maxDestinationNumber-1), id: \.self) {dest in
-                    Label(dest.title, systemImage: "mappin.and.ellipse")
+                    Label(dest.title.text, systemImage: "mappin.and.ellipse")
                 }
                 if modelData.tourManager.destinations.count > 0 {
                     NavigationLink(
-                        destination: TourDetailView(tour: modelData.tourManager,
-                                                    showStartButton: false,
-                                                    showCancelButton: true),
+                        destination: DynamicTourDetailView(tour: modelData.tourManager),
                         label: {
                             HStack {
                                 Spacer()
@@ -183,9 +247,9 @@ struct MainMenus: View {
     var body: some View {
         if let cm = modelData.resource {
             Section(header: Text("Navigation")) {
-                if let url = cm.conversationURL{
+                if let src = cm.conversationSource{
                     NavigationLink(
-                        destination: ConversationView(url: url)
+                        destination: ConversationView(src: src)
                             .onDisappear(){
                                 modelData.resetAudioSession()
                             }
@@ -194,17 +258,17 @@ struct MainMenus: View {
                             Text("START_CONVERSATION")
                         })
                 }
-                if let url = cm.destinationsURL {
+                if let src = cm.destinationsSource {
                     NavigationLink(
-                        destination: DestinationsView(url: url)
+                        destination: DestinationsView(src: src)
                             .environmentObject(modelData),
                         label: {
                             Text("SELECT_DESTINATION")
                         })
                 }
-                if let url = cm.toursURL {
+                if let src = cm.toursSource {
                     NavigationLink(
-                        destination: ToursView(url: url)
+                        destination: ToursView(src: src)
                             .environmentObject(modelData),
                         label: {
                             Text("SELECT_TOUR")
@@ -230,6 +294,7 @@ struct MainMenus: View {
         }
     }
 }
+
 
 struct StatusMenus: View {
     @EnvironmentObject var modelData: CaBotAppModel
@@ -320,11 +385,10 @@ struct SettingMenus: View {
         let buildNo = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
 
         Section(header:Text("System")) {
-            NavigationLink (destination: SettingView()
-                                .environmentObject(modelData)
-                                .environment(\.locale, modelData.resource?.locale ?? .init(identifier: "base"))) {
+            NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
+                                .environmentObject(modelData)) {
                 HStack {
-                    Label(NSLocalizedString("Settings", comment: ""), systemImage: "gearshape")
+                    Label(LocalizedStringKey("Settings"), systemImage: "gearshape")
                 }
             }
 
@@ -357,7 +421,7 @@ struct ContentView_Previews: PreviewProvider {
         modelData.serverBLEVersion = CaBotServiceBLE.CABOT_BLE_VERSION
         modelData.serverTCPVersion = CaBotServiceBLE.CABOT_BLE_VERSION
 
-        if let r = modelData.resourceManager.resource(by: "place0") {
+        if let r = modelData.resourceManager.resource(by: "Test data") {
             modelData.resource = r
         }
 
@@ -373,10 +437,10 @@ struct ContentView_Previews: PreviewProvider {
 
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
-            if let url = r.toursURL {
-                if let tours = try? Tours(at: url) {
-                    modelData.tourManager.set(tour: tours.list[0])
-                    _ = modelData.tourManager.nextDestination()
+            if let url = r.toursSource {
+                if let tours = try? Tour.load(at: url) {
+                    modelData.tourManager.set(tour: tours[0])
+                    _ = modelData.tourManager.proceedToNextDestination()
                 }
             }
         }
@@ -390,9 +454,9 @@ struct ContentView_Previews: PreviewProvider {
 
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
-            if let url = r.toursURL {
-                if let tours = try? Tours(at: url) {
-                    modelData.tourManager.set(tour: tours.list[0])
+            if let url = r.toursSource {
+                if let tours = try? Tour.load(at: url) {
+                    modelData.tourManager.set(tour: tours[0])
                 }
             }
         }
@@ -406,9 +470,9 @@ struct ContentView_Previews: PreviewProvider {
 
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
-            if let url = r.toursURL {
-                if let tours = try? Tours(at: url) {
-                    modelData.tourManager.set(tour: tours.list[1])
+            if let url = r.toursSource {
+                if let tours = try? Tour.load(at: url) {
+                    modelData.tourManager.set(tour: tours[1])
                 }
             }
         }
@@ -422,9 +486,9 @@ struct ContentView_Previews: PreviewProvider {
 
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
-            if let url = r.toursURL {
-                if let tours = try? Tours(at: url) {
-                    modelData.tourManager.set(tour: tours.list[1])
+            if let url = r.toursSource {
+                if let tours = try? Tour.load(at: url) {
+                    modelData.tourManager.set(tour: tours[1])
                 }
             }
         }

@@ -32,8 +32,8 @@ struct DestinationDetailView: View {
     var body: some View {
         let tourManager = modelData.tourManager
         Form {
-            Section(header: Text(destination.title)) {
-                if let content =  destination.message?.content {
+            Section(header: Text(destination.title.text)) {
+                if let content =  destination.startMessage?.content {
                     Text(content)
                 }
                 if let url = destination.content?.url {
@@ -54,8 +54,7 @@ struct DestinationDetailView: View {
                     }
                 }
                 .actionSheet(isPresented: $isConfirming) {
-                    let message = String(format: NSLocalizedString("ADD_A_DESTINATION_MESSAGE", comment: ""),
-                                         arguments: [modelData.tourManager.destinationCount])
+                    let message = LocalizedStringKey("ADD_A_DESTINATION_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
                     return ActionSheet(title: Text("ADD_A_DESTINATION"),
                                 message: Text(message),
                                 buttons: [
@@ -104,10 +103,12 @@ struct DestinationDetailView_Previews: PreviewProvider {
     static var previews: some View {
         let modelData = CaBotAppModel()
 
-        let resource = modelData.resourceManager.resource(by: "place0")!
-        let destinations = try! Destinations(at: resource.destinationsURL!)
-        let destination = destinations.list[0]
+        let resource = modelData.resourceManager.resource(by: "Test data")!
+        let destinations = try! Destination.load(at: resource.destinationsSource!)
+        let destination = destinations[0]
+        let destinations2 = try! Destination.load(at: destination.file!)
 
-        DestinationDetailView(destination: destination)
+        DestinationDetailView(destination: destinations2[0])
+            .environmentObject(modelData)
     }
 }

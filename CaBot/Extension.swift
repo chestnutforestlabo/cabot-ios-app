@@ -58,3 +58,4 @@ struct NavigationUtil {
     return nil
   }
 }
+

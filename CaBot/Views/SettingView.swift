@@ -28,46 +28,25 @@ struct SettingView: View {
     @EnvironmentObject var modelData: CaBotAppModel
 
     @State var timer:Timer?
-
-    let startSounds:[String] = [
-        "/System/Library/Audio/UISounds/nano/3rdParty_Success_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/3rdParty_Start_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/Alert_SpartanConnecting_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/Warsaw_Haptic.caf",
-    ]
-    let arrivedSounds:[String] = [
-        "/System/Library/Audio/UISounds/nano/HummingbirdNotification_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/Alarm_Nightstand_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/WorkoutStartAutodetect.caf",
-        "/System/Library/Audio/UISounds/nano/Alert_MapsDirectionsInApp_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/WorkoutSaved_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/MultiwayInvitation.caf",
-        "/System/Library/Audio/UISounds/nano/SiriStopSuccess_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/NavigationGenericManeuver_Haptic.caf",
-    ]
-    let speedUpSounds:[String] = [
-        "/System/Library/Audio/UISounds/nano/WalkieTalkieActiveStart_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/3rdParty_DirectionUp_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/WalkieTalkieReceiveStart_Haptic.caf",
-    ]
-    let speedDownSounds:[String] = [
-        "/System/Library/Audio/UISounds/nano/ET_RemoteTap_Receive_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/3rdParty_DirectionDown_Haptic.caf",
-        "/System/Library/Audio/UISounds/nano/WalkieTalkieReceiveEnd_Haptic.caf",
-    ]
+    @State var langOverride:String
+    @State var isResourceChanging:Bool = false
 
     var body: some View {
         return Form {
             Section(header: Text("Speech Voice")) {
-                Picker(NSLocalizedString("Voice", comment:""), selection: $modelData.voice) {
+                Picker(LocalizedStringKey("Voice"), selection: $modelData.voice) {
                     ForEach(TTSHelper.getVoices(by: locale), id: \.self) { voice in
                         Text(voice.AVvoice.name).tag(voice as Voice?)
                     }
                 }.onChange(of: modelData.voice, perform: { value in
                     if let voice = modelData.voice {
-                        TTSHelper.playSample(of: voice)
+                        if !isResourceChanging {
+                            TTSHelper.playSample(of: voice)
+                        }
                     }
-                })
+                }).onTapGesture {
+                    isResourceChanging = false
+                }
                 .pickerStyle(DefaultPickerStyle())
 
                 HStack {
@@ -88,72 +67,34 @@ struct SettingView: View {
                         .accessibility(hidden: true)
                 }
             }
-            Section(header: Text("Audio Effect")) {
-                Picker("Start", selection: $modelData.startSound) {
-                    ForEach(startSounds, id: \.self) { sound in
-                        Text(NSString(string: sound).lastPathComponent).tag(sound)
-                    }
-                }.onChange(of: modelData.startSound) { value in
-                    modelData.playAudio(file: value)
-                }
-                Picker("Arrived", selection: $modelData.arrivedSound) {
-                    ForEach(arrivedSounds, id: \.self) { sound in
-                        Text(NSString(string: sound).lastPathComponent).tag(sound)
-                    }
-                }.onChange(of: modelData.arrivedSound) { value in
-                    modelData.playAudio(file: value)
-                }
-                Picker("SpeedUp", selection: $modelData.speedUpSound) {
-                    ForEach(speedUpSounds, id: \.self) { sound in
-                        Text(NSString(string: sound).lastPathComponent).tag(sound)
-                    }
-                }.onChange(of: modelData.speedUpSound) { value in
-                    modelData.playAudio(file: value)
-                }
-                Picker("SpeedDown", selection: $modelData.speedDownSound) {
-                    ForEach(speedDownSounds, id: \.self) { sound in
-                        Text(NSString(string: sound).lastPathComponent).tag(sound)
-                    }
-                }.onChange(of: modelData.speedDownSound) { value in
-                    modelData.playAudio(file: value)
-                }
-            }
             Section(header: Text("Connection")) {
-                Picker("", selection: $modelData.connectionType){
-                    ForEach(ConnectionType.allCases, id: \.self){ (type) in
-                        Text(type.rawValue).tag(type)
-                    }
-                }.pickerStyle(SegmentedPickerStyle())
-                if modelData.connectionType == ConnectionType.BLE{
-                    HStack {
-                        Text("Team ID(ble)")
-                        TextField("Team ID", text: $modelData.teamID)
-                    }
-                }else{
-                    HStack {
-                        Text("Socket Address")
-                        TextField("Socket Address", text:
-                                    $modelData.socketAddr)
-                    }
-                }
-            }
-            Section(header: Text("VoiceOver adjustment")) {
                 VStack {
-                    Text("Delay after closing browser")
-                        .accessibility(hidden: true)
-                    HStack {
-                        Slider(value: $modelData.browserCloseDelay,
-                               in: 1...2,
-                               step: 0.1)
-                            .accessibility(label: Text("Delay after closing browser"))
-                            .accessibility(value: Text(String(format:NSLocalizedString("%.1f seconds", comment:""), arguments:[modelData.browserCloseDelay])))
-                        Text(String(format:NSLocalizedString("%.1f sec", comment:""), arguments:[modelData.browserCloseDelay]))
-                            .accessibility(hidden: true)
+                    HStack{
+                        Text("PRIORITY_CONNECTION")
+                        Spacer()
                     }
+                    Picker("", selection: $modelData.connectionType){
+                        ForEach(ConnectionType.allCases, id: \.self){ (type) in
+                            Text(type.rawValue).tag(type)
+                        }
+                    }.pickerStyle(SegmentedPickerStyle())
+                }
+                HStack {
+                    Text("ROBOT_NAME_LABEL")
+                    TextField("ROBOT_NAME", text: $modelData.teamID)
+                }
+                HStack {
+                    Text("SOCKET_ADDRESS_LABEL")
+                    TextField("SOCKET_ADDRESS", text:
+                                $modelData.socketAddr)
                 }
             }
-
-            Section(header: Text("Others")) {
+            
+            NavigationLink(destination: DetailSettingView().environmentObject(modelData.detailSettingModel), label: {
+                Text("DETAIL_SETTING")
+            })
+            
+            Section(header: Text("DEBUG")) {
                 Button(action: {
                     UserDefaults.standard.setValue(false, forKey: ResourceSelectView.resourceSelectedKey)
                     UserDefaults.standard.synchronize()
@@ -163,8 +104,21 @@ struct SettingView: View {
                     Text("SELECT_RESOURCE")
                 }
 
-                Toggle("Menu Debug", isOn: $modelData.menuDebug)
-                Toggle("No Suitcase Debug", isOn: $modelData.noSuitcaseDebug)
+                if let resource = modelData.resource {
+                    Picker("LANGUAGE", selection: $langOverride) {
+                        ForEach(resource.languages, id: \.self) { language in
+                            Text(language).tag(language)
+                        }
+                    }.onChange(of: langOverride) { lang in
+                        modelData.resource?.lang = lang
+                        self.isResourceChanging = true
+                        modelData.resource = modelData.resource
+                        modelData.updateVoice()
+                    }
+                }
+
+                Toggle("MENU_DEBUG", isOn: $modelData.menuDebug)
+                Toggle("NO_SUITCASE_DEBUG", isOn: $modelData.noSuitcaseDebug)
             }
         }
     }
@@ -174,12 +128,9 @@ struct SettingView_Previews: PreviewProvider {
     static var previews: some View {
         let modelData = CaBotAppModel()
 
-        let resource = modelData.resourceManager.resource(by: "place0")!
-
-        modelData.resource = resource
         modelData.teamID = "test"
-
-        return SettingView()
+        
+        return SettingView(langOverride: "en-US")
             .environmentObject(modelData)
             .environment(\.locale, Locale.init(identifier: "en-US"))
     }

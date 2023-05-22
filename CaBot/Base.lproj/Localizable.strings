@@ -20,83 +20,52 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-
-"Main Menu"="Main Menu";
-"Okay"="Okay";
-"ERROR"="Error";
-"Select"="Select";
-"Settings"="Settings";
-"Select Resource"="Select Resource";
-"Actions"="Actions";
-"Status"="Status";
-"System"="System";
-
-"Battery Status"="Battery Status";
-"Device Status"="Device Status";
-"System Status"="System Status";
-"OK"="OK";
-"NG"="NG";
-"Unknown"="Unknown";
-"Starting"="Starting";
-
-"Suitcase may not be connected"="Suitcase may not be connected";
-"Suitcase has been connected"="Suitcase has been connected";
-"Suitcase has been disconnected"="Suitcase has been disconnected";
-"Protocol mismatch %@"="Protocol mismatch %@";
-
-"START_CONVERSATION"="Start Conversation";
-"SELECT_DESTINATION"="Select Destination";
-"SELECT_TOUR"="Select Tour";
-"See detail"="See detail";
-
-"PAUSE_NAVIGATION"="Pause Navigation";
-"CANCEL_NAVIGATION"="Cancel Navigation";
-"CANCEL_NAVIGATION_MESSAGE"="You have %d destination(s). Are you sure to cancel all?";
-"CANCEL_ALL"="Cancel all destination";
-"START"="Start Navigation";
-
-"Destinations"="Destinations";
-"SETTINGS_LABEL"="Settings";
-"SET_TOUR"="Set Tour";
-"ADD_A_DESTINATION"="Add a destination";
-"ADD_A_DESTINATION_MESSAGE"="You already have %d destination(s). What do you want to do?";
-"CLEAR_ALL_THEN_ADD"="Clear All then Add";
-"ADD_TO_FIRST"="Add to first";
-"ADD_TO_LAST"="Add to last";
-"ADD_TOUR"="Add These Points";
-"ADD_TOUR_MESSAGE"="You already have %d destination(s), do you want overwrite?";
-"OVERWRITE_TOUR"="Overwrite";
-"SELECT_RESOURCE"="Select Resource";
-
-"Speech Voice"="Speech Voice";
-"Voice"="Voice";
-"Speech Speed"="Speed";
-"Audio Effect"="Audio Effect";
-"Start"="Start";
-"Arrived"="Arrived";
-"SpeedUp"="Spd Up";
-"SpeedDown"="Spd Dwn";
-"Others"="Others";
-"Navigation"="Navigation";
-"Connection"="Connection";
-
-"BLE Connected"="BLE Connected";
-"BLE Not Connected"="BLE Not Connected";
-"TCP Connected"="TCP Connected";
-"TCP Not Connected"="TCP Not Connected";
-
-"processing..."="processing...";
-"Navigating to %@"="Navigating to %@";
-"Going to %@"="Going to %@. ";
-"You have arrived at %@"="You have arrived at %@. ";
-"Open Content for %@"="Open Content for %@";
-"Let the suitcase wait"="Let the suitcase wait";
-"Let the suitcase wait message"="You are going to send a command to let the suitcase wait at %@. Are you okay with it?";
+// General
 "Yes"="Yes";
 "No"="No";
-"Let the suitcase wait at %@"="Let the suitcase wait at %@";
+"Okay"="Okay";
+"ERROR"="Error";
+
+
+// CaBotAppModel
+"SELECT_RESOURCE"="Select Resource";
+"MAIN_MENU"="Main Menu";
+
+/// func summon
 "Sending the command to the suitcase"="Sending the command to the suitcase. Please let the suitcase go.";
 
+/// func summon, func send
+"processing..."="processing...";
+"Suitcase may not be connected"="Suitcase may not be connected";
+
+/// func skipDestination
+"Skip Message %@"="Skip %@";
+
+/// func needToStartAnnounce
+"You can proceed by pressing the right button of the suitcase handle"="You can proceed by pressing the right button of the suitcase handle";
+
+/// func tour
+"Going to %@"="Going to %@. ";
+
+/// func caBot service centralConnected
+"Suitcase has been connected"="Suitcase has been connected";
+"Suitcase has been disconnected"="Suitcase has been disconnected";
+
+/// func caBot service notification
+"No destination is selected"="No destination is selected";
+"You have arrived at %@. "="You have arrived at %@. ";
+"You can check detail of %@ on the phone. "="You can check detail of %@ on the phone. ";
+"You can proceed to %@ by pressing the right button of the suitcase handle. "="You can proceed to %@ by pressing the right button of the suitcase handle. ";
+"Or by pressing the center button to proceed a subtour %@."="Or by pressing the center button to proceed a subtour %@.";
+"Press the center button to proceed a subtour %@."="Press the center button to proceed a subtour %@.";
+
+
+// RootView
+"Let the suitcase wait"="Let the suitcase wait";
+"Let the suitcase wait message %@"="You are going to send a command to let the suitcase wait at %@. Are you okay with it?";
+
+
+//OnboardGrantAccess
 "ONBOARD_MESSAGE"="Please allow the app to access Location, Bluetooth device and Notification.";
 "Enable Location Update"="Enable Location Update";
 "Location Update Enabled"="Location Update Enabled";
@@ -111,18 +80,149 @@
 "Notification Enabled"="Notification Enabled";
 "Notification Denied"="Notification Denied";
 
+
+// MainMenuView
+"No Suitcase Debug mode"="No Suitcase Debug mode";
+
+"Actions"="Actions";
+"PAUSE_NAVIGATION"="Pause Navigation";
+"START"="Start Navigation";
+
+"Open Content for %@"="Open Content for %@";
+"Let the suitcase wait at %@"="Let the suitcase wait at %@";
+"Repeat the message"="Repeat the message";
+"Begin Subtour %@"="Begin Subtour %@";
+"End Subtour"="End Subtour";
+"Skip Label %@"="Skip %@";
+
+"Destinations"="Destinations";
+"Navigating to %@"="Navigating to %@";  // accessibility label
 "Complete Destination"="Complete Destination";
 "Complete Destination Message"="Are you sure to complete the current destination?";
+"See detail"="See detail";
 
-"You can check detail of %@ on the phone"="You can check detail of %@ on the phone. ";
-"You can proceed by pressing the right button of the suitcase handle"="You can proceed by pressing the right button of the suitcase handle. ";
+"Navigation"="Navigation";
+"START_CONVERSATION"="Start Conversation";
+"SELECT_DESTINATION"="Select Destination";
+"SELECT_TOUR"="Select Tour";
+"Others"="Others";
 
-"No destination is selected"="No destination is selected";
+"Status"="Status";
+"BLE Connected"="BLE Connected";
+"BLE Not Connected"="BLE Not Connected";
+"TCP Connected"="TCP Connected";
+"TCP Not Connected"="TCP Not Connected";
+"Protocol mismatch %@"="Protocol mismatch %@";
+"Battery"="Battery";
+"Device"="Device";
 
+"System"="System";
+"Settings"="Settings";
+"Version: %@ (%@) - %@"="Version: %@ (%@) - %@";
+
+
+// DeviceStatusView
+"Details"="Details";
+"Reboot"="Reboot";
+"Suitcase Not Connected"="Suitcase Not Connected";
+"Reboot Computer"="Reboot Computer";
+"The app will be disconnected."="The app will be disconnected.";
+"Power off"="Power off";
+"Device Status"="Device Status";
+
+
+// BatteryStatusView
+"Battery Status"="Battery Status";
+
+
+// SystemStatusView
+"Start System"="Start System";
+"Stop System"="Stop System";
+"Are you sure to stop the suitcase system?"="Are you sure to stop the suitcase system?";
+"System Status"="System Status";
+
+
+// DestinationsView
+"ADD_A_DESTINATION"="Add a destination";
+"ADD_A_DESTINATION_MESSAGE %d"="You already have %d destination(s). What do you want to do?";
+"CLEAR_ALL_THEN_ADD"="Clear All then Add";
+"ADD_TO_FIRST"="Add to first";
+"ADD_TO_LAST"="Add to last";
+
+
+// DestinationDetailView
 "Show more detail"="Show more detail";
 "Add to destinations"="Add to destinations";
+
+
+// TourDetailView
+/// StaticTourDetailView
+"SET_TOUR"="Set Tour";
+"ADD_TOUR"="Add These Points";
+"ADD_TOUR_MESSAGE %d"="You already have %d destination(s), do you want overwrite?";
+"OVERWRITE_TOUR"="Overwrite";
+
+/// DynamicTourDetailView
+"CANCEL_NAVIGATION"="Cancel Navigation";
+"CANCEL_NAVIGATION_MESSAGE %d"="You have %d destination(s). Are you sure to cancel all?";
+"CANCEL_ALL"="Cancel all destination";
+
+
+// SettingView
+"Speech Voice"="Speech Voice";
+"Voice"="Voice";
+"Speech Speed"="Speed";
+"Connection"="Connection";
+
+"PRIORITY_CONNECTION"="Priority Connection";
+"ROBOT_NAME"="Robot Name";
+"ROBOT_NAME_LABEL"="Robot Name (BLE)";
+"SOCKET_ADDRESS"="Socket Address";
+"SOCKET_ADDRESS_LABEL"="Socket Address";
+
+"DETAIL_SETTING"="Detail Setting";
+
+"DEBUG"="DEBUG";
+"SELECT_RESOURCE"="Select Resource";
+"LANGUAGE"="Language";
+"MENU_DEBUG"="Menu Debug";
+"NO_SUITCASE_DEBUG"="No Suitcase Debug";
+
+
+// DetailSettingView
+"Tour"="Tour";
+"Enable subtour on handle"="Enable subtour on handle";
+"Show content when arrive"="Show content when arrive";
+
+"Audio Effect"="Audio Effect";
+"Start"="Start";
+"Arrived"="Arrived";
+"SpeedUp"="Spd Up";
+"SpeedDown"="Spd Dwn";
 
 "VoiceOver adjustment"="VoiceOver adjustment";
 "Delay after closing browser"="Delay after closing browser";
 "%.1f seconds"="%.1f seconds";
 "%.1f sec"="%.1f sec";
+
+
+// TTSHelper
+"Hello Suitcase!"="Hello Suitcase!";
+
+
+// ResourceManager
+"Robot Waiting Spot (%@)"="Robot Waiting Spot (%@)";
+"Robot Waiting Spot (%@)-pron"="Robot Waiting Spot (%@)";
+
+
+// CaBotServiceCommon
+/// DeviceStatusLevel
+"OK"="OK";
+"Error"="Error";
+"Unknown"="Unknown";
+
+/// CaBotSystemLevel
+"Inactive"="Inactive";
+"Active"="Active";
+"Activating"="Activating";
+"Deactivating"="Deactivating";

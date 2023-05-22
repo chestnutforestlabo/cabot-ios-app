@@ -23,6 +23,7 @@
 import Foundation
 import AVKit
 import HLPDialog
+import SwiftUI
 
 
 protocol CaBotTTSDelegate {
@@ -139,6 +140,15 @@ class TTSHelper {
                 voices.append(Voice(AVvoice: voice))
             }
         }
+        if voices.count == 0 {
+            let search = String(locale.identifier.prefix(2))
+            for voice in AVSpeechSynthesisVoice.speechVoices() {
+                if voice.language.starts(with: search) {
+                    voices.append(Voice(AVvoice: voice))
+                }
+            }
+        }
+
         return voices
     }
 
@@ -146,7 +156,7 @@ class TTSHelper {
         let tts = CaBotTTS(voice: voice.AVvoice)
         tts.rate = rate
 
-        tts.speak(NSLocalizedString("Hello Suitcase!", comment: ""), forceSelfvoice:true, force:true) {_ in
+        tts.speak(CustomLocalizedString("Hello Suitcase!", lang: voice.AVvoice.language), forceSelfvoice:true, force:true) {_ in
 
         }
     }

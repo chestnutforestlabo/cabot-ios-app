@@ -1,4 +1,5 @@
 -
-  pron : reading content
-  title : title
-  value : <NODE_ID>
+  ref: destinations_all.yaml/destination1_node_value
+  startMessage:
+    type: local
+    src: destination1_message.txt

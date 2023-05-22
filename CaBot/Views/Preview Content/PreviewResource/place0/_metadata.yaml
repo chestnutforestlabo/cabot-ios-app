@@ -1,5 +1,6 @@
-name: place0
-language: en-US
+name-en: Test data
+name-ja: テストデータ
+language: en
 conversation:
   type: local
   src: place0.js
@@ -11,7 +12,8 @@ tours:
   src: tours.yaml
 custom_menus:
   -
-    title: Custom Menu 0
+    title: Custom Menu
+    title-ja: カスタムメニュー
     id: custom_menu0
     script:
       type: local

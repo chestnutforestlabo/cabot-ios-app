@@ -22,111 +22,154 @@
 
 import SwiftUI
 
-struct TourDetailView: View {
+struct StaticTourDetailView: View {
     @EnvironmentObject var modelData: CaBotAppModel
     @State private var isConfirming = false
-    @State private var targetTour: TourProtocol?
+    @State private var targetTour: Tour?
 
-    var tour: TourProtocol
-    var showStartButton: Bool = true
-    var showCancelButton: Bool = false
+    var tour: Tour
 
     var body: some View {
         let tourManager = modelData.tourManager
+        let hasError = tour.destinations.first(where: {d in d.error != nil}) != nil
 
         Form {
             Section(header: Text("Actions")) {
-                if showStartButton {
-                    Button(action: {
-                        if tourManager.hasDestination {
-                            targetTour = tour
-                            isConfirming = true
-                        } else {
-                            tourManager.set(tour: tour)
-                            modelData.needToStartAnnounce(wait: true)
-                            NavigationUtil.popToRootView()
-                        }
-                    }) {
-                        Label{
-                            Text("SET_TOUR")
-                        } icon: {
-                            Image(systemName: "arrow.triangle.turn.up.right.diamond")
-                        }
+                Button(action: {
+                    if tourManager.hasDestination {
+                        targetTour = tour
+                        isConfirming = true
+                    } else {
+                        tourManager.set(tour: tour)
+                        modelData.needToStartAnnounce(wait: true)
+                        NavigationUtil.popToRootView()
                     }
-                    .actionSheet(isPresented: $isConfirming) {
-                        let message = String(format: NSLocalizedString("ADD_TOUR_MESSAGE", comment: ""),
-                                             arguments: [modelData.tourManager.destinationCount])
-                        return ActionSheet(title: Text("ADD_TOUR"),
-                                           message: Text(message),
-                                           buttons: [
-                                            .cancel(),
-                                            .destructive(
-                                                Text("OVERWRITE_TOUR"),
-                                                action: {
-                                                    if let tour = targetTour {
-                                                        tourManager.set(tour: tour)
-                                                        NavigationUtil.popToRootView()
-                                                        targetTour = nil
-                                                    }
-                                                }
-                                            )
-                                           ])
+                }) {
+                    Label{
+                        Text("SET_TOUR")
+                    } icon: {
+                        Image(systemName: "arrow.triangle.turn.up.right.diamond")
                     }
                 }
-
-                if showCancelButton {
-                    Button(action: {
-                        isConfirming = true
-                    }) {
-                        Label{
-                            Text("CANCEL_NAVIGATION")
-                        } icon: {
-                            Image(systemName: "xmark.circle")
-                        }
-                    }
-                    .actionSheet(isPresented: $isConfirming) {
-                        let message = String(format: NSLocalizedString("CANCEL_NAVIGATION_MESSAGE", comment: ""),
-                                             arguments: [modelData.tourManager.destinationCount])
-                        return ActionSheet(title: Text("CANCEL_NAVIGATION"),
-                                           message: Text(message),
-                                           buttons: [
-                                            .cancel(),
-                                            .destructive(
-                                                Text("CANCEL_ALL"),
-                                                action: {
-                                                    modelData.tourManager.clearAll()
+                .disabled(hasError)
+                .actionSheet(isPresented: $isConfirming) {
+                    let message = LocalizedStringKey("ADD_TOUR_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
+                    return ActionSheet(title: Text("ADD_TOUR"),
+                                       message: Text(message),
+                                       buttons: [
+                                        .cancel(),
+                                        .destructive(
+                                            Text("OVERWRITE_TOUR"),
+                                            action: {
+                                                if let tour = targetTour {
+                                                    tourManager.set(tour: tour)
                                                     NavigationUtil.popToRootView()
+                                                    targetTour = nil
                                                 }
-                                            )
-                                           ]
-                        )
-                    }
+                                            }
+                                        )
+                                       ])
                 }
             }
-            Section(header: Text(tour.title)) {
+            Section(header: Text(tour.title.text)) {
                 if let cd = tour.currentDestination {
-                    Label(cd.title, systemImage: "arrow.triangle.turn.up.right.diamond")
+                    Label(cd.title.text, systemImage: "arrow.triangle.turn.up.right.diamond")
                 }
 
                 ForEach(tour.destinations, id: \.self) { dest in
-                    Label(dest.title, systemImage: "mappin.and.ellipse")
+                    if let error = dest.error {
+                        HStack{
+                            Text(dest.title.text)
+                            Text(error).font(.system(size: 11))
+                        }.foregroundColor(Color.red)
+                    } else {
+                        Label(dest.title.text, systemImage: "mappin.and.ellipse")
+                    }
                 }
             }
         }
     }
 }
 
+struct DynamicTourDetailView: View {
+    @EnvironmentObject var modelData: CaBotAppModel
+    @State private var isConfirming = false
+
+    var tour: TourProtocol
+
+    var body: some View {
+        Form {
+            Section(header: Text("Actions")) {
+                Button(action: {
+                    isConfirming = true
+                }) {
+                    Label{
+                        Text("CANCEL_NAVIGATION")
+                    } icon: {
+                        Image(systemName: "xmark.circle")
+                    }
+                }
+                .actionSheet(isPresented: $isConfirming) {
+                    let message = LocalizedStringKey("CANCEL_NAVIGATION_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
+                    return ActionSheet(title: Text("CANCEL_NAVIGATION"),
+                                       message: Text(message),
+                                       buttons: [
+                                        .cancel(),
+                                        .destructive(
+                                            Text("CANCEL_ALL"),
+                                            action: {
+                                                modelData.tourManager.clearAll()
+                                                NavigationUtil.popToRootView()
+                                            }
+                                        )
+                                       ]
+                    )
+                }
+            }
+            Section(header: Text(tour.title.text)) {
+                if let cd = tour.currentDestination {
+                    Label(cd.title.text, systemImage: "arrow.triangle.turn.up.right.diamond")
+                }
+
+                ForEach(tour.destinations, id: \.self) { dest in
+                    if let error = dest.error {
+                        HStack{
+                            Text(dest.title.text)
+                            Text(error).font(.system(size: 11))
+                        }.foregroundColor(Color.red)
+                    } else {
+                        Label(dest.title.text, systemImage: "mappin.and.ellipse")
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 struct TourDetailView_Previews: PreviewProvider {
     static var previews: some View {
+        preview2
+        preview1
+    }
+
+    static var preview2: some View {
         let modelData = CaBotAppModel()
 
-        let resource = modelData.resourceManager.resource(by: "place0")!
-        let tours = try! Tours(at: resource.toursURL!)
+        let resource = modelData.resourceManager.resource(by: "Test data")!
+        let tours = try! Tour.load(at: resource.toursSource!)
 
-        return TourDetailView(tour: tours.list[0],
-                              showStartButton: true,
-                              showCancelButton: true
-                              )
+        return StaticTourDetailView(tour: tours[0])
+            .environmentObject(modelData)
+    }
+
+    static var preview1: some View {
+        let modelData = CaBotAppModel()
+
+        let resource = modelData.resourceManager.resource(by: "Test data")!
+        let tours = try! Tour.load(at: resource.toursSource!)
+
+        return StaticTourDetailView(tour: tours[1])
             .environmentObject(modelData)
     }
 }

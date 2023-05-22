@@ -21,3 +21,11 @@
  *******************************************************************************/
 
 CFBundleDisplayName = "AI Suitcase";
+
+NSBluetoothAlwaysUsageDescription = "This app works as an peripheral device of your robot.";
+NSBluetoothPeripheralUsageDescription = "This app works as an peripheral device of your robot.";
+NSLocationAlwaysAndWhenInUseUsageDescription = "This app uses your location always and When in use";
+NSLocationAlwaysUsageDescription = "This app uses your location always";
+NSLocationWhenInUseUsageDescription = "This app uses your location when in use";
+NSMicrophoneUsageDescription = "This app uses your microphone";
+NSSpeechRecognitionUsageDescription = "This app uses speech recognition";
