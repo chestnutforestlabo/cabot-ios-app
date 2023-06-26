@@ -456,7 +456,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.resource = resourceManager.resource(by: selectedIdentifier)
         }
         if let selectedLang = UserDefaults.standard.value(forKey: selectedResourceLangKey) as? String {
-            self.resource?.langOverride = selectedLang
+            self.resource?.lang = selectedLang
             self.updateVoice()
         }
         if let groupID = UserDefaults.standard.value(forKey: teamIDKey) as? String {
