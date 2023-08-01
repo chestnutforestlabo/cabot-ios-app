@@ -118,15 +118,14 @@ class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProt
     
     internal func startHeartBeat() {
         self.heartBeatTimer?.invalidate()
-        self.heartBeatTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { (timer) in
-            DispatchQueue.main.async {
+        DispatchQueue.global(qos: .utility).async {
+            self.heartBeatTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { (timer) in
                 //NSLog("heartbeat")
                 if self.checkAdvertisement() == false {
                     NSLog("disconnected from the server")
                     timer.invalidate()
                     self.contrialCount = 0
                 }
-
                 if (self.heartbeatChar.notify(value: "1", retry: 0)) {
                     self.contrialCount = CaBotServiceBLE.CONTRIAL_MAX
                     NSLog("BLE heartBeat success")
@@ -136,12 +135,17 @@ class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProt
                 }
                 if(self.contrialCount > 0){
                     self.connected = true
-                    self.delegate?.caBot(service: self, centralConnected: self.connected)
+                    DispatchQueue.main.async {
+                        self.delegate?.caBot(service: self, centralConnected: self.connected)
+                    }
                 }else{
                     self.connected = false
-                    self.delegate?.caBot(service: self, centralConnected: self.connected)
+                    DispatchQueue.main.async {
+                        self.delegate?.caBot(service: self, centralConnected: self.connected)
+                    }
                 }
             }
+            RunLoop.current.run()
         }
     }
 
