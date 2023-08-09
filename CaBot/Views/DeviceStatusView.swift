@@ -30,18 +30,20 @@ struct DeviceStatusView: View {
     var body: some View {
         return VStack {
             Form {
-                Section(header:Text("Details")) {
-                    List {
-                        Label(modelData.deviceStatus.level.rawValue, systemImage: modelData.deviceStatus.level.icon)
-                            .labelStyle(StatusLabelStyle(color: modelData.deviceStatus.level.color))
-                        ForEach (modelData.deviceStatus.devices, id: \.self) {device in
-                            VStack(alignment: .leading, spacing: 5) {
-                                Label(device.type, systemImage: device.level.icon)
-                                    .labelStyle(StatusLabelStyle(color: device.level.color))
-                                Label(device.model, systemImage: "gearshape.2")
-                                    .labelStyle(StatusLabelStyle(color: .gray))
-                                Label(device.message, systemImage: "text.bubble")
-                                    .labelStyle(StatusLabelStyle(color: .gray))
+                if (modelData.userType == .Engineer){
+                    Section(header:Text("Details")) {
+                        List {
+                            Label(modelData.deviceStatus.level.rawValue, systemImage: modelData.deviceStatus.level.icon)
+                                .labelStyle(StatusLabelStyle(color: modelData.deviceStatus.level.color))
+                            ForEach (modelData.deviceStatus.devices, id: \.self) {device in
+                                VStack(alignment: .leading, spacing: 5) {
+                                    Label(device.type, systemImage: device.level.icon)
+                                        .labelStyle(StatusLabelStyle(color: device.level.color))
+                                    Label(device.model, systemImage: "gearshape.2")
+                                        .labelStyle(StatusLabelStyle(color: .gray))
+                                    Label(device.message, systemImage: "text.bubble")
+                                        .labelStyle(StatusLabelStyle(color: .gray))
+                                }
                             }
                         }
                     }

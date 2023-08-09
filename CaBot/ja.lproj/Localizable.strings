@@ -124,6 +124,7 @@
 // DeviceStatusView
 "Details"="詳細";
 "Reboot"="リブート";
+"Suitcase Connected"="スーツケース接続あり";
 "Suitcase Not Connected"="スーツケース接続なし";
 "Reboot Computer"="コンピュータをリブート";
 "The app will be disconnected."="スーツケースとの接続が解除されます";
@@ -179,6 +180,11 @@
 "ROBOT_NAME_LABEL"="ロボット名 (BLE)";
 "SOCKET_ADDRESS"="ソケットアドレス";
 "SOCKET_ADDRESS_LABEL"="ソケットアドレス";
+
+"USER_TYPE"="ユーザ設定";
+"Blind User"="視覚障害者";
+"Attendant"="アテンダント";
+"Engineer"="エンジニア";
 
 "DETAIL_SETTING"="詳細設定";
 

@@ -301,30 +301,41 @@ struct StatusMenus: View {
 
     var body: some View {
         Section(header:Text("Status")) {
-            HStack {
-                if modelData.suitcaseConnectedBLE {
-                    Label(LocalizedStringKey("BLE Connected"),
-                          systemImage: "antenna.radiowaves.left.and.right")
-                    if let version = modelData.serverBLEVersion {
-                        Text("(\(version))")
+            if modelData.userType == .Engineer{
+                HStack {
+                    if modelData.suitcaseConnectedBLE {
+                        Label(LocalizedStringKey("BLE Connected"),
+                              systemImage: "antenna.radiowaves.left.and.right")
+                        if let version = modelData.serverBLEVersion {
+                            Text("(\(version))")
+                        }
+                    } else {
+                        Label(LocalizedStringKey("BLE Not Connected"),
+                              systemImage: "antenna.radiowaves.left.and.right")
+                        .opacity(0.1)
                     }
-                } else {
-                    Label(LocalizedStringKey("BLE Not Connected"),
+                }
+                HStack {
+                    if modelData.suitcaseConnectedTCP {
+                        Label(LocalizedStringKey("TCP Connected"),
+                              systemImage: "antenna.radiowaves.left.and.right")
+                        if let version = modelData.serverTCPVersion {
+                            Text("(\(version))")
+                        }
+                    } else {
+                        Label(LocalizedStringKey("TCP Not Connected"),
+                              systemImage: "antenna.radiowaves.left.and.right")
+                            .opacity(0.1)
+                    }
+                }
+            }else{
+                if modelData.suitcaseConnected{
+                    Label(LocalizedStringKey("Suitcase Connected"),
+                          systemImage: "antenna.radiowaves.left.and.right")
+                }else{
+                    Label(LocalizedStringKey("Suitcase Not Connected"),
                           systemImage: "antenna.radiowaves.left.and.right")
                     .opacity(0.1)
-                }
-            }
-            HStack {
-                if modelData.suitcaseConnectedTCP {
-                    Label(LocalizedStringKey("TCP Connected"),
-                          systemImage: "antenna.radiowaves.left.and.right")
-                    if let version = modelData.serverTCPVersion {
-                        Text("(\(version))")
-                    }
-                } else {
-                    Label(LocalizedStringKey("TCP Not Connected"),
-                          systemImage: "antenna.radiowaves.left.and.right")
-                        .opacity(0.1)
                 }
             }
             if modelData.suitcaseConnected {
@@ -346,32 +357,34 @@ struct StatusMenus: View {
                         }
                     }
                 ).isDetailLink(false)
-                NavigationLink(
-                    destination: DeviceStatusView().environmentObject(modelData),
-                    label: {
-                        HStack {
-                            Label(LocalizedStringKey("Device"),
-                                  systemImage: modelData.deviceStatus.level.icon)
+                if (modelData.userType == .Attendant || modelData.userType == .Engineer) {
+                    NavigationLink(
+                        destination: DeviceStatusView().environmentObject(modelData),
+                        label: {
+                            HStack {
+                                Label(LocalizedStringKey("Device"),
+                                      systemImage: modelData.deviceStatus.level.icon)
                                 .labelStyle(StatusLabelStyle(color: modelData.deviceStatus.level.color))
-                            Text(":")
-                            Text(LocalizedStringKey(modelData.deviceStatus.level.rawValue))
+                                Text(":")
+                                Text(LocalizedStringKey(modelData.deviceStatus.level.rawValue))
+                            }
                         }
-                    }
-                ).isDetailLink(false)
-                NavigationLink(
-                    destination: SystemStatusView().environmentObject(modelData),
-                    label: {
-                        HStack {
-                            Label(LocalizedStringKey("System"),
-                                  systemImage: modelData.systemStatus.summary.icon)
+                    ).isDetailLink(false)
+                    NavigationLink(
+                        destination: SystemStatusView().environmentObject(modelData),
+                        label: {
+                            HStack {
+                                Label(LocalizedStringKey("System"),
+                                      systemImage: modelData.systemStatus.summary.icon)
                                 .labelStyle(StatusLabelStyle(color: modelData.systemStatus.summary.color))
-                            Text(":")
-                            Text(LocalizedStringKey(modelData.systemStatus.levelText()))
-                            Text("-")
-                            Text(LocalizedStringKey(modelData.systemStatus.summary.text))
+                                Text(":")
+                                Text(LocalizedStringKey(modelData.systemStatus.levelText()))
+                                Text("-")
+                                Text(LocalizedStringKey(modelData.systemStatus.summary.text))
+                            }
                         }
-                    }
-                ).isDetailLink(false)
+                    ).isDetailLink(false)
+                }
             }
         }
     }
@@ -379,20 +392,66 @@ struct StatusMenus: View {
 
 struct SettingMenus: View {
     @EnvironmentObject var modelData: CaBotAppModel
-
+    @Environment(\.locale) var locale: Locale
+    
+    @State var timer:Timer?
+    @State var isResourceChanging:Bool = false
+    
     var body: some View {
         let versionNo = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
         let buildNo = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
 
         Section(header:Text("System")) {
-            NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
-                                .environmentObject(modelData)) {
-                HStack {
-                    Label(LocalizedStringKey("Settings"), systemImage: "gearshape")
+            Picker(LocalizedStringKey("Voice"), selection: $modelData.voice) {
+                ForEach(TTSHelper.getVoices(by: locale), id: \.self) { voice in
+                    Text(voice.AVvoice.name).tag(voice as Voice?)
+                }
+            }.onChange(of: modelData.voice, perform: { value in
+                if let voice = modelData.voice {
+                    if !isResourceChanging {
+                        TTSHelper.playSample(of: voice)
+                    }
+                }
+            }).onTapGesture {
+                isResourceChanging = false
+            }
+            .pickerStyle(DefaultPickerStyle())
+
+            HStack {
+                Text("Speech Speed")
+                    .accessibility(hidden: true)
+                Slider(value: $modelData.speechRate,
+                       in: 0...1,
+                       step: 0.05,
+                       onEditingChanged: { editing in
+                        timer?.invalidate()
+                        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
+                            TTSHelper.playSample(of: modelData.voice!, at: modelData.speechRate)
+                        }
+                })
+                    .accessibility(label: Text("Speech Speed"))
+                    .accessibility(value: Text(String(format:"%.0f %%", arguments:[modelData.speechRate*100.0])))
+                Text(String(format:"%.0f %%", arguments:[modelData.speechRate*100.0]))
+                    .accessibility(hidden: true)
+            }
+            if (modelData.userType == .Attendant || modelData.userType == .Engineer) {
+                NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
+                                    .environmentObject(modelData)) {
+                    HStack {
+                        Label(LocalizedStringKey("Settings"), systemImage: "gearshape")
+                    }
                 }
             }
-
             Text("Version: \(versionNo) (\(buildNo)) - \(CaBotServiceBLE.CABOT_BLE_VERSION)")
+        }
+        Section(header:Text("USER_TYPE")) {
+            VStack {
+                Picker("", selection: $modelData.userType){
+                    ForEach(UserType.allCases, id: \.self){ (type) in
+                        Text(LocalizedStringKey(type.rawValue)).tag(type)
+                    }
+                }.pickerStyle(SegmentedPickerStyle())
+            }
         }
     }
 }
