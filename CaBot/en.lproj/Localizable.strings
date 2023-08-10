@@ -181,10 +181,10 @@
 "SOCKET_ADDRESS"="Socket Address";
 "SOCKET_ADDRESS_LABEL"="Socket Address";
 
-"USER_TYPE"="User Type";
-"Blind User"="Blind User";
-"Attendant"="Attendant";
-"Engineer"="Engineer";
+"MODE_TYPE"="Mode";
+"Normal"="Normal";
+"Advanced"="Advanced";
+"Debug"="Debug";
 
 "DETAIL_SETTING"="Detail Setting";
 

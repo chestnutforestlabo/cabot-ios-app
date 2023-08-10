@@ -181,10 +181,10 @@
 "SOCKET_ADDRESS"="ソケットアドレス";
 "SOCKET_ADDRESS_LABEL"="ソケットアドレス";
 
-"USER_TYPE"="ユーザ設定";
-"Blind User"="視覚障害者";
-"Attendant"="アテンダント";
-"Engineer"="エンジニア";
+"MODE_TYPE"="モード設定";
+"Normal"="通常";
+"Advanced"="詳細";
+"Debug"="デバッグ";
 
 "DETAIL_SETTING"="詳細設定";
 

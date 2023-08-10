@@ -56,7 +56,7 @@ struct SettingView: View {
                 }
             }
 
-            if (modelData.userType == .Engineer){
+            if (modelData.modeType == .Debug){
                 NavigationLink(destination: DetailSettingView().environmentObject(modelData.detailSettingModel), label: {
                     Text("DETAIL_SETTING")
                 })

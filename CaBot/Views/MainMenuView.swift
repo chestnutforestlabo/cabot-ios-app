@@ -301,7 +301,7 @@ struct StatusMenus: View {
 
     var body: some View {
         Section(header:Text("Status")) {
-            if modelData.userType == .Engineer{
+            if modelData.modeType == .Debug{
                 HStack {
                     if modelData.suitcaseConnectedBLE {
                         Label(LocalizedStringKey("BLE Connected"),
@@ -357,7 +357,7 @@ struct StatusMenus: View {
                         }
                     }
                 ).isDetailLink(false)
-                if (modelData.userType == .Attendant || modelData.userType == .Engineer) {
+                if (modelData.modeType == .Advanced || modelData.modeType == .Debug) {
                     NavigationLink(
                         destination: DeviceStatusView().environmentObject(modelData),
                         label: {
@@ -434,7 +434,7 @@ struct SettingMenus: View {
                 Text(String(format:"%.0f %%", arguments:[modelData.speechRate*100.0]))
                     .accessibility(hidden: true)
             }
-            if (modelData.userType == .Attendant || modelData.userType == .Engineer) {
+            if (modelData.modeType == .Advanced || modelData.modeType == .Debug) {
                 NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
                                     .environmentObject(modelData)) {
                     HStack {
@@ -442,16 +442,24 @@ struct SettingMenus: View {
                     }
                 }
             }
-            Text("Version: \(versionNo) (\(buildNo)) - \(CaBotServiceBLE.CABOT_BLE_VERSION)")
-        }
-        Section(header:Text("USER_TYPE")) {
             VStack {
-                Picker("", selection: $modelData.userType){
-                    ForEach(UserType.allCases, id: \.self){ (type) in
-                        Text(LocalizedStringKey(type.rawValue)).tag(type)
+                HStack{
+                    Text("MODE_TYPE").onTapGesture(count: 5) {
+                        if (modelData.modeType != .Debug){
+                            modelData.modeType = .Debug
+                        }
+                    }
+                    Spacer()
+                }
+                Picker("", selection: $modelData.modeType){
+                    Text(LocalizedStringKey(ModeType.Normal.rawValue)).tag(ModeType.Normal)
+                    Text(LocalizedStringKey(ModeType.Advanced.rawValue)).tag(ModeType.Advanced)
+                    if(modelData.modeType == .Debug){
+                        Text(LocalizedStringKey(ModeType.Debug.rawValue)).tag(ModeType.Debug)
                     }
                 }.pickerStyle(SegmentedPickerStyle())
             }
+            Text("Version: \(versionNo) (\(buildNo)) - \(CaBotServiceBLE.CABOT_BLE_VERSION)")
         }
     }
 }

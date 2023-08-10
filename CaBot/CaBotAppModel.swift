@@ -57,10 +57,10 @@ enum DisplayedScene {
     }
 }
 
-enum UserType: String, CaseIterable{
-    case BlindUser = "Blind User"
-    case Attendant = "Attendant"
-    case Engineer  = "Engineer"
+enum ModeType: String, CaseIterable{
+    case Normal = "Normal"
+    case Advanced = "Advanced"
+    case Debug  = "Debug"
 }
 
 class FallbackService: CaBotServiceProtocol {
@@ -225,8 +225,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private let socketAddrKey = "socket_url"
     private let menuDebugKey = "menu_debug"
     private let noSuitcaseDebugKey = "noSuitcaseDebugKey"
-    private let adminModeKey = "adminModeKey"
-    private let userTypeKey = "userTypeKey"
+    private let modeTypeKey = "modeTypeKey"
     
     let detailSettingModel: DetailSettingModel
 
@@ -390,15 +389,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             suitcaseConnected = true
         }
     }
-    @Published var adminMode: Bool = true {
+    @Published var modeType:ModeType = .Normal{
         didSet {
-            UserDefaults.standard.setValue(noSuitcaseDebug, forKey: adminModeKey)
-            UserDefaults.standard.synchronize()
-        }
-    }
-    @Published var userType:UserType = .BlindUser{
-        didSet {
-            UserDefaults.standard.setValue(userType.rawValue, forKey: userTypeKey)
+            UserDefaults.standard.setValue(modeType.rawValue, forKey: modeTypeKey)
             UserDefaults.standard.synchronize()
         }
     }

@@ -30,7 +30,7 @@ struct SystemStatusView: View {
     var body: some View {
         return VStack {
             Form {
-                if (modelData.userType == .Engineer){
+                if (modelData.modeType == .Debug){
                     Section(header:Text("Details")) {
                         List {
                             HStack {
@@ -55,7 +55,7 @@ struct SystemStatusView: View {
                     }
                 }
 
-                if modelData.adminMode {
+                if (modelData.modeType == .Advanced || modelData.modeType == .Debug) {
                     Section(header:Text("Actions")) {
                         if !modelData.suitcaseConnected {
                             Label(LocalizedStringKey("Suitcase Not Connected"),
