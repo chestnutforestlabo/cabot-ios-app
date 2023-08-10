@@ -9,3 +9,10 @@ Podfile.lock
 Carthage/
 lastcommit.txt
 project.xcworkspace/
+three.min.js
+three.js
+roslib.js
+ros3d.min.js
+ros3d.js
+eventemitter2.min.js
+eventemitter2.js

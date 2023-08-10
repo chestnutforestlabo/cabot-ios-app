@@ -223,6 +223,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private let connectionTypeKey = "connection_type"
     private let teamIDKey = "team_id"
     private let socketAddrKey = "socket_url"
+    private let rosSocketAddrKey = "ros_socket_url"
     private let menuDebugKey = "menu_debug"
     private let noSuitcaseDebugKey = "noSuitcaseDebugKey"
     private let modeTypeKey = "modeTypeKey"
@@ -376,6 +377,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             tcpService.start()
         }
     }
+    var rosSocketAddr: String = "172.20.10.7:9091" {
+        didSet {
+            UserDefaults.standard.setValue(rosSocketAddr, forKey: rosSocketAddrKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
     @Published var menuDebug: Bool = false {
         didSet {
             UserDefaults.standard.setValue(menuDebug, forKey: menuDebugKey)
@@ -470,6 +477,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
         if let socketUrl = UserDefaults.standard.value(forKey: socketAddrKey) as? String{
             self.socketAddr = socketUrl
+        }
+        if let rosSocketUrl = UserDefaults.standard.value(forKey: rosSocketAddrKey) as? String{
+            self.rosSocketAddr = rosSocketUrl
         }
         if let menuDebug = UserDefaults.standard.value(forKey: menuDebugKey) as? Bool {
             self.menuDebug = menuDebug
