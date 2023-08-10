@@ -594,6 +594,7 @@ class Destination: Decodable, Hashable {
     let ref:Reference?
     let refDest:Destination?
     var parent: Tour? = nil
+    let debug:Bool
 
     enum CodingKeys: String, CodingKey {
         case title
@@ -606,6 +607,7 @@ class Destination: Decodable, Hashable {
         case content
         case waitingDestination
         case subtour
+        case debug
     }
 
     static func load(at src: Source, refCount: Int = 0, reference: Reference? = nil) throws -> [Destination] {
@@ -693,7 +695,11 @@ class Destination: Decodable, Hashable {
             }
         }
         
-        
+        if let debug = try? container.decode(Bool.self, forKey: .debug) {
+            self.debug = debug
+        } else {
+            self.debug = false
+        }
 
         if let value = try? container.decode(String.self, forKey: .value) {
             self.value = value
@@ -796,6 +802,7 @@ class Destination: Decodable, Hashable {
         self.warning = nil
         self.ref = nil
         self.refDest = nil
+        self.debug = false
     }
 }
 
@@ -855,6 +862,7 @@ class Tour: Decodable, Hashable, TourProtocol {
     var currentDestination: Destination? = nil
     let error: String?
     let setting: NavigationSetting?
+    let debug: Bool
     
     enum CodingKeys: String, CodingKey {
         case title
@@ -862,6 +870,7 @@ class Tour: Decodable, Hashable, TourProtocol {
         case introduction
         case destinations
         case navigationSetting
+        case debug
     }
     
     static func load(at src: Source, refCount: Int = 0, reference: Reference? = nil) throws -> [Tour] {
@@ -907,6 +916,12 @@ class Tour: Decodable, Hashable, TourProtocol {
             error.add(info: CustomLocalizedString("No ID specified", lang: i18n.langCode))
         }
         
+        if let debug = try? container.decode(Bool.self, forKey: .debug) {
+            self.debug = debug
+        } else {
+            self.debug = false
+        }
+
         self.introduction = I18NText.decode(decoder: decoder, baseKey: CodingKeys.introduction.stringValue)
 
         if let destinations = try? container.decode([Destination].self, forKey: .destinations) {

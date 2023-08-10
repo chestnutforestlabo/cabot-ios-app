@@ -33,11 +33,13 @@ struct ToursView: View {
         Form {
             Section(header: Text("SELECT_TOUR")) {
                 ForEach(tours, id: \.self) { tour in
-                    NavigationLink(
-                        destination: StaticTourDetailView(tour: tour),
-                        label: {
-                            Text(tour.title.text)
-                        })
+                    if (modelData.modeType == .Debug || !tour.debug){
+                        NavigationLink(
+                            destination: StaticTourDetailView(tour: tour),
+                            label: {
+                                Text(tour.title.text)
+                            })
+                    }
                 }
             }
         }.listStyle(PlainListStyle())
