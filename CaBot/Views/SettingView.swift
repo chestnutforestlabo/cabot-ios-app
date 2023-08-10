@@ -88,6 +88,11 @@ struct SettingView: View {
                     TextField("SOCKET_ADDRESS", text:
                                 $modelData.socketAddr)
                 }
+                HStack {
+                    Text("ROS_SOCKET_ADDRESS_LABEL")
+                    TextField("ROS_SOCKET_ADDRESS", text:
+                                $modelData.rosSocketAddr)
+                }
             }
             
             NavigationLink(destination: DetailSettingView().environmentObject(modelData.detailSettingModel), label: {

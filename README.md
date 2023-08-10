@@ -1,13 +1,17 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 # cabot-app
 
-- CaBot app is a bluetooth peripheral app of CaBot. 
+- CaBot app is a bluetooth peripheral app of CaBot.
 - The user need to specify a **team name** in the setting view
   - The app will advertise BLE service as **`CaBot-<team name>`** when it is in foreground
 - CaBot's ros1 system needs to be launched with `-e <team name>` option
   - CaBot scans the name and tries to connect when found
 - There are multiple IN/OUT characteristics (subject to be changed)
-	
+- The map screen incorporates a Java script file, which is copied by a script at build time.
+  - The java script file is the 3D Visualization Library for use with the ROS JavaScript Libraries
+  - The map screen receives data using web sockets.
+  - For more information on ros3djs, check [here](https://github.com/RobotWebTools/ros3djs/).
+
 ## BLE spec
 
 - Service UUID: `35CE0000-5E89-4C0D-A3F6-8A6A507C1BF1`

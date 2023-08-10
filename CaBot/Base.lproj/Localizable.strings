@@ -179,6 +179,7 @@
 "ROBOT_NAME_LABEL"="Robot Name (BLE)";
 "SOCKET_ADDRESS"="Socket Address";
 "SOCKET_ADDRESS_LABEL"="Socket Address";
+"ROS_SOCKET_ADDRESS_LABEL"="ROS Bridge Address";
 
 "DETAIL_SETTING"="Detail Setting";
 

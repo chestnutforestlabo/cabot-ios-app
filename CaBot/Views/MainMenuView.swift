@@ -43,6 +43,8 @@ struct MainMenuView: View {
                 .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
             StatusMenus()
                 .environmentObject(modelData)
+            MapMenus()
+                .environmentObject(modelData)
             SettingMenus()
                 .environmentObject(modelData)
         }
@@ -372,6 +374,22 @@ struct StatusMenus: View {
                         }
                     }
                 ).isDetailLink(false)
+            }
+        }
+    }
+}
+
+struct MapMenus: View {
+    @EnvironmentObject var modelData: CaBotAppModel
+
+    var body: some View {
+        Section(header:Text("Map")) {
+            HStack {
+                NavigationLink(
+                    destination: RosWebView(socketAddr: modelData.rosSocketAddr),
+                    label: {
+                        Text("ROS Map")
+                    })
             }
         }
     }

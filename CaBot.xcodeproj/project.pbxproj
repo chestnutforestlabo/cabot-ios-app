@@ -62,6 +62,7 @@
 		7EDF3C4429D48C3200AD1115 /* Localizable.strings in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7E557EFE2581C79B00B1B9CA /* Localizable.strings */; };
 		7EDF3C4529D4901000AD1115 /* Resource in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3099132A265DE50A000C1BFE /* Resource */; };
 		7EF5F1EA228DB07100788987 /* NavUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EF5F1E8228DB07100788987 /* NavUtil.m */; };
+		E561455F2A6E02A8005CF82F /* RosWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E561455E2A6E02A8005CF82F /* RosWebView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -156,6 +157,7 @@
 		7EDF3C4129D4776D00AD1115 /* I18NExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = I18NExtension.swift; sourceTree = "<group>"; };
 		7EF5F1E8228DB07100788987 /* NavUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NavUtil.m; sourceTree = "<group>"; };
 		7EF5F1E9228DB07100788987 /* NavUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NavUtil.h; sourceTree = "<group>"; };
+		E561455E2A6E02A8005CF82F /* RosWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RosWebView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -241,6 +243,7 @@
 				3013614626A1E77B0050CF9E /* WebContentView.swift */,
 				3096BF1326A5C29F0066F256 /* SettingView.swift */,
 				7E9690C229EAF25C0062DEBD /* DetailSettingView.swift */,
+				E561455E2A6E02A8005CF82F /* RosWebView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -350,6 +353,7 @@
 			buildPhases = (
 				7E29F005228B548100CA7DD6 /* Sources */,
 				7E29F006228B548100CA7DD6 /* Frameworks */,
+				E5FD56542A835D56008237DC /* ShellScript */,
 				7E29F007228B548100CA7DD6 /* Resources */,
 			);
 			buildRules = (
@@ -514,6 +518,26 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		E5FD56542A835D56008237DC /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nTHREE_JS=${TEMP_DIR}/three.min.js\ncurl -o $THREE_JS https://cdn.jsdelivr.net/npm/three@0.89.0/build/three.min.js\ncp -f $THREE_JS ${SRCROOT}/Resource/localserver/js/\n\nEVENTEMITTER2_JS=${TEMP_DIR}/eventemitter2.min.js\ncurl -o $EVENTEMITTER2_JS https://cdn.jsdelivr.net/npm/eventemitter2@6.4/lib/eventemitter2.min.js\ncp -f $EVENTEMITTER2_JS ${SRCROOT}/Resource/localserver/js/\n\nROSLIB_JS=${TEMP_DIR}/roslib.js\ncurl -o $ROSLIB_JS https://cdn.jsdelivr.net/npm/roslib@1/build/roslib.js\ncp -f $ROSLIB_JS ${SRCROOT}/Resource/localserver/js/\n\nROS3D_JS=${TEMP_DIR}/ros3d.min.js\ncurl -o $ROS3D_JS https://raw.githubusercontent.com/CMU-cabot/ros3djs/cabot-ros2/build/ros3d.min.js\ncp -f $ROS3D_JS ${SRCROOT}/Resource/localserver/js/\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		7E29F005228B548100CA7DD6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -538,6 +562,7 @@
 				7EF5F1EA228DB07100788987 /* NavUtil.m in Sources */,
 				30E50DDF26A0B21200729ABD /* ConversationView.swift in Sources */,
 				3096BF1426A5C29F0066F256 /* SettingView.swift in Sources */,
+				E561455F2A6E02A8005CF82F /* RosWebView.swift in Sources */,
 				30E50DD8269F784A00729ABD /* MainMenuView.swift in Sources */,
 				7EDF3C4229D4776D00AD1115 /* I18NExtension.swift in Sources */,
 				3096BF1826A5D0990066F256 /* TTSHelper.swift in Sources */,

@@ -179,6 +179,7 @@
 "ROBOT_NAME_LABEL"="ロボット名 (BLE)";
 "SOCKET_ADDRESS"="ソケットアドレス";
 "SOCKET_ADDRESS_LABEL"="ソケットアドレス";
+"ROS_SOCKET_ADDRESS_LABEL"="ROSブリッジアドレス";
 
 "DETAIL_SETTING"="詳細設定";
 
