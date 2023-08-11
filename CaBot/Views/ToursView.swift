@@ -29,10 +29,12 @@ struct ToursView: View {
 
     var body: some View {
         let tours = try! Tour.load(at: src)
+        let filteredTours = tours.filter{
+            tour in (modelData.modeType == .Debug || !tour.debug)}
 
         Form {
             Section(header: Text("SELECT_TOUR")) {
-                ForEach(tours, id: \.self) { tour in
+                ForEach(filteredTours, id: \.self) { tour in
                     NavigationLink(
                         destination: StaticTourDetailView(tour: tour),
                         label: {

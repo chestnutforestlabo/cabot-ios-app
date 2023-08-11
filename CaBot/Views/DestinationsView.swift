@@ -40,10 +40,13 @@ struct DestinationsView: View {
             header = Text("SELECT_DESTINATION")
         }
 
+        let filteredDestinations = destinations.filter{
+            destination in (modelData.modeType == .Debug || !destination.debug)}
+
         return Form {
             Section(
                 header: header) {
-                ForEach(destinations, id: \.self) { destination in
+                ForEach(filteredDestinations, id: \.self) { destination in
                     if let error = destination.error {
                         HStack{
                             Text(destination.title.text)
