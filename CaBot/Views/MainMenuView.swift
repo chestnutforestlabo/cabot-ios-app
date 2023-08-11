@@ -396,13 +396,15 @@ struct MapMenus: View {
     @EnvironmentObject var modelData: CaBotAppModel
 
     var body: some View {
-        Section(header:Text("Map")) {
-            HStack {
-                NavigationLink(
-                    destination: RosWebView(socketAddr: modelData.rosSocketAddr),
-                    label: {
-                        Text("ROS Map")
-                    })
+        if modelData.modeType == .Advanced || modelData.modeType == .Debug{
+            Section(header:Text("Map")) {
+                HStack {
+                    NavigationLink(
+                        destination: RosWebView(socketAddr: modelData.rosSocketAddr),
+                        label: {
+                            Text("ROS Map")
+                        })
+                }
             }
         }
     }
