@@ -30,30 +30,32 @@ struct SystemStatusView: View {
     var body: some View {
         return VStack {
             Form {
-                Section(header:Text("Details")) {
-                    List {
-                        HStack {
-                            Label(modelData.systemStatus.levelText(),
-                                  systemImage: modelData.systemStatus.summary.icon)
+                if (modelData.modeType == .Debug){
+                    Section(header:Text("Details")) {
+                        List {
+                            HStack {
+                                Label(modelData.systemStatus.levelText(),
+                                      systemImage: modelData.systemStatus.summary.icon)
                                 .labelStyle(StatusLabelStyle(color: modelData.systemStatus.summary.color))
-                            Text(":")
-                            Text(modelData.systemStatus.summary.text)
-                        }
-                        ForEach (modelData.systemStatus.components.keys, id:\.self) { key in
-                            let component = modelData.systemStatus.components[key]!
-                            NavigationLink(destination: SystemStatusDetailView(key: key)
-                                            .environmentObject(modelData),
-                                           label: {
-                                HStack {
-                                    Label(component.name, systemImage: component.level.icon)
-                                        .labelStyle(StatusLabelStyle(color: component.level.color))
-                                }
-                            }).isDetailLink(false)
+                                Text(":")
+                                Text(modelData.systemStatus.summary.text)
+                            }
+                            ForEach (modelData.systemStatus.components.keys, id:\.self) { key in
+                                let component = modelData.systemStatus.components[key]!
+                                NavigationLink(destination: SystemStatusDetailView(key: key)
+                                    .environmentObject(modelData),
+                                               label: {
+                                    HStack {
+                                        Label(component.name, systemImage: component.level.icon)
+                                            .labelStyle(StatusLabelStyle(color: component.level.color))
+                                    }
+                                }).isDetailLink(false)
+                            }
                         }
                     }
                 }
 
-                if modelData.adminMode {
+                if (modelData.modeType == .Advanced || modelData.modeType == .Debug) {
                     Section(header:Text("Actions")) {
                         if !modelData.suitcaseConnected {
                             Label(LocalizedStringKey("Suitcase Not Connected"),

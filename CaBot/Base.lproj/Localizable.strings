@@ -124,6 +124,7 @@
 // DeviceStatusView
 "Details"="Details";
 "Reboot"="Reboot";
+"Suitcase Connected"="Suitcase Connected";
 "Suitcase Not Connected"="Suitcase Not Connected";
 "Reboot Computer"="Reboot Computer";
 "The app will be disconnected."="The app will be disconnected.";
@@ -180,6 +181,11 @@
 "SOCKET_ADDRESS"="Socket Address";
 "SOCKET_ADDRESS_LABEL"="Socket Address";
 "ROS_SOCKET_ADDRESS_LABEL"="ROS Bridge Address";
+
+"MODE_TYPE"="Mode";
+"Normal"="Normal";
+"Advanced"="Advanced";
+"Debug"="Debug";
 
 "DETAIL_SETTING"="Detail Setting";
 

@@ -57,6 +57,12 @@ enum DisplayedScene {
     }
 }
 
+enum ModeType: String, CaseIterable{
+    case Normal = "Normal"
+    case Advanced = "Advanced"
+    case Debug  = "Debug"
+}
+
 class FallbackService: CaBotServiceProtocol {
     private let services: [CaBotServiceProtocol]
     private var selectedService: CaBotServiceProtocol?
@@ -220,7 +226,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private let rosSocketAddrKey = "ros_socket_url"
     private let menuDebugKey = "menu_debug"
     private let noSuitcaseDebugKey = "noSuitcaseDebugKey"
-    private let adminModeKey = "adminModeKey"
+    private let modeTypeKey = "modeTypeKey"
     
     let detailSettingModel: DetailSettingModel
 
@@ -390,9 +396,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             suitcaseConnected = true
         }
     }
-    @Published var adminMode: Bool = true {
+    @Published var modeType:ModeType = .Normal{
         didSet {
-            UserDefaults.standard.setValue(noSuitcaseDebug, forKey: adminModeKey)
+            UserDefaults.standard.setValue(modeType.rawValue, forKey: modeTypeKey)
             UserDefaults.standard.synchronize()
         }
     }
