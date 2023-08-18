@@ -249,16 +249,18 @@ struct MainMenus: View {
     var body: some View {
         if let cm = modelData.resource {
             Section(header: Text("Navigation")) {
-                if let src = cm.conversationSource{
-                    NavigationLink(
-                        destination: ConversationView(src: src)
-                            .onDisappear(){
-                                modelData.resetAudioSession()
-                            }
-                            .environmentObject(modelData),
-                        label: {
-                            Text("START_CONVERSATION")
-                        })
+                if modelData.modeType == .Debug{
+                    if let src = cm.conversationSource{
+                        NavigationLink(
+                            destination: ConversationView(src: src)
+                                .onDisappear(){
+                                    modelData.resetAudioSession()
+                                }
+                                .environmentObject(modelData),
+                            label: {
+                                Text("START_CONVERSATION")
+                            })
+                    }
                 }
                 if let src = cm.destinationsSource {
                     NavigationLink(
@@ -268,13 +270,15 @@ struct MainMenus: View {
                             Text("SELECT_DESTINATION")
                         })
                 }
-                if let src = cm.toursSource {
-                    NavigationLink(
-                        destination: ToursView(src: src)
-                            .environmentObject(modelData),
-                        label: {
-                            Text("SELECT_TOUR")
-                        })
+                if modelData.modeType == .Debug{
+                    if let src = cm.toursSource {
+                        NavigationLink(
+                            destination: ToursView(src: src)
+                                .environmentObject(modelData),
+                            label: {
+                                Text("SELECT_TOUR")
+                            })
+                    }
                 }
             }
 
