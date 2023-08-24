@@ -30,6 +30,7 @@ struct ConversationView: UIViewControllerRepresentable {
     let REQUEST_START_NAVIGATION:Notification.Name = Notification.Name(rawValue:"request_start_navigation")
 
     var src: Source
+    var dsrc: Source?
 
     class Observer {
         static var shared: Observer? = nil
@@ -46,7 +47,19 @@ struct ConversationView: UIViewControllerRepresentable {
             if let toID = note.userInfo?["toID"] as? String {
                 let title = note.userInfo?["title"] as? String ?? "From Conversation"
                 let pron = note.userInfo?["pron"] as? String
-                owner.modelData.tourManager.addToLast(destination: Destination(title: title, value: toID, pron: pron, file: nil, message: nil, content: nil, waitingDestination: nil, subtour: nil))
+                
+                if let src = owner.dsrc {
+                   let destinations = try! Destination.load(at: src)
+                   if let destination = destinations.first(where: { $0.value == toID })
+                    {
+                       owner.modelData.tourManager.addToLast(destination: destination)
+                   }else {
+                       owner.modelData.tourManager.addToLast(destination: Destination(title: title, value: toID, pron: pron, file: nil, message: nil, content: nil, waitingDestination: nil, subtour: nil))
+                   }
+                }else {
+                    owner.modelData.tourManager.addToLast(destination: Destination(title: title, value: toID, pron: pron, file: nil, message: nil, content: nil, waitingDestination: nil, subtour: nil))
+                }
+                
                 owner.modelData.tourManager.proceedToNextDestination()
             }
             DispatchQueue.main.async {

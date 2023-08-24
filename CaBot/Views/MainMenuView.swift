@@ -251,7 +251,7 @@ struct MainMenus: View {
             Section(header: Text("Navigation")) {
                 if let src = cm.conversationSource{
                     NavigationLink(
-                        destination: ConversationView(src: src)
+                        destination: ConversationView(src: src, dsrc: cm.destinationAllSource)
                             .onDisappear(){
                                 modelData.resetAudioSession()
                             }
