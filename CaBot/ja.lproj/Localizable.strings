@@ -213,6 +213,17 @@
 "%.1f sec"="%.1f秒";
 
 
+// Report a Bag
+"REPORT_BUG" = "バグを報告";
+"SELECT_LOG" = "ログを選択";
+"REPORT_TITLE" = "件名";
+"REPORT_DETAILS" = "詳細";
+"ENTER_REPORT_TITLE" = "件名を入力";
+"ENTER_REPORT_DETAILS" = "詳細を入力";
+"CHECK_YOUR_REPORT" = "レポートを確認";
+"SUBMIT_REPORT" = "レポートを提出しメインメニューへ戻る";
+
+
 // TTSHelper
 "Hello Suitcase!"="こんにちは、スーツケース";
 
