@@ -48,15 +48,11 @@ struct ConversationView: UIViewControllerRepresentable {
                 let title = note.userInfo?["title"] as? String ?? "From Conversation"
                 let pron = note.userInfo?["pron"] as? String
                 
-                if let src = owner.dsrc {
-                   let destinations = try! Destination.load(at: src)
-                   if let destination = destinations.first(where: { $0.value == toID })
-                    {
-                       owner.modelData.tourManager.addToLast(destination: destination)
-                   }else {
-                       owner.modelData.tourManager.addToLast(destination: Destination(title: title, value: toID, pron: pron, file: nil, message: nil, content: nil, waitingDestination: nil, subtour: nil))
-                   }
-                }else {
+                if let src = owner.dsrc,
+                   let destinations = try? Destination.load(at: src),
+                   let destination = destinations.first(where: { $0.value == toID }) {
+                    owner.modelData.tourManager.addToLast(destination: destination)
+                } else {
                     owner.modelData.tourManager.addToLast(destination: Destination(title: title, value: toID, pron: pron, file: nil, message: nil, content: nil, waitingDestination: nil, subtour: nil))
                 }
                 
