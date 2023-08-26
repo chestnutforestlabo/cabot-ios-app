@@ -220,7 +220,7 @@
 "REPORT_DETAILS" = "Details";
 "ENTER_REPORT_TITLE" = "Enter the report's title";
 "ENTER_REPORT_DETAILS" = "Enter the details of the bug";
-"CHECK_YOUR_REPORT" = "Check your report";
+"SAVE_YOUR_REPORT" = "Save your report";
 "SUBMIT_REPORT" = "Submit your report and back to Main Menu";
 
 
