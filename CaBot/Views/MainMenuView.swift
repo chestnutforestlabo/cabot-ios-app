@@ -455,11 +455,13 @@ struct SettingMenus: View {
                     .accessibility(hidden: true)
             }
             if (modelData.modeType == .Advanced || modelData.modeType == .Debug) {
-                NavigationLink (destination: LogFilesView(langOverride: modelData.resourceLang)
-                    .environmentObject(modelData),
-                    label: {
+                if #available(iOS 15.0, *) {
+                    NavigationLink (destination: LogFilesView(langOverride: modelData.resourceLang)
+                        .environmentObject(modelData),
+                                    label: {
                         Text("REPORT_BUG")
                     })
+                }
                 NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
                                     .environmentObject(modelData)) {
                     HStack {

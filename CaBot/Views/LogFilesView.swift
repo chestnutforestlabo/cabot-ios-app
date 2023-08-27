@@ -9,6 +9,7 @@
 import SwiftUI
 
 
+@available(iOS 15.0, *)
 struct LogFilesView: View {
     @Environment(\.locale) var locale: Locale
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
@@ -22,27 +23,22 @@ struct LogFilesView: View {
         let logFileList = ["cabot_2023-9-1-12-00-00","cabot_2023-9-1-13-00-00","cabot_2023-9-1-14-00-00"]
         let header = Text("SELECT_LOG")
         return Form{
-            Section(
-                header: header){
-                    ForEach(logFileList, id: \.self) { logFile in
-                        Button(action: {isShowingSheet.toggle()
-                            selectedLogFile = logFile
-                        },
-                               label: {Text(logFile)})
-                        .sheet(isPresented: $isShowingSheet) {
-                            if #available(iOS 15.0, *) {
-                                ReportSubmissionForm(logFileName: selectedLogFile)
-                            } else {
-                                // Fallback on earlier versions
-                            }
-                        }
+            Section(header: header){
+                ForEach(logFileList, id: \.self) { logFile in
+                    Button(action: {isShowingSheet.toggle()
+                        selectedLogFile = logFile
+                    },
+                           label: {Text(logFile)})
+                    .sheet(isPresented: $isShowingSheet) {
+                        ReportSubmissionForm(logFileName: selectedLogFile)
                     }
                 }
-        }
-        .listStyle(PlainListStyle())
+            }
+        }.listStyle(PlainListStyle())
     }
 }
 
+@available(iOS 15.0, *)
 struct LogFilesView_Previews: PreviewProvider {
     static var previews: some View {
         let modelData = CaBotAppModel()
@@ -54,7 +50,6 @@ struct LogFilesView_Previews: PreviewProvider {
             .environment(\.locale, Locale.init(identifier: "en-US"))
     }
 }
-
 
 @available(iOS 15.0, *)
 struct ReportSubmissionForm: View {
@@ -91,9 +86,16 @@ struct ReportSubmissionForm: View {
                 }
             }
             Button(
-                action: {dismiss()})
-            {Text("SAVE_YOUR_REPORT")}
+                action: {
+                    saveReports()
+                    dismiss()
+                })
+                {Text("SAVE_YOUR_REPORT")}
                 .disabled(inputTitleText.count==0 || inputDetailsText.count==0)
         }
     }
+}
+
+func saveReports(){
+    
 }
