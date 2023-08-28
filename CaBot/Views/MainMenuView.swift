@@ -400,7 +400,9 @@ struct MapMenus: View {
             Section(header:Text("Map")) {
                 HStack {
                     NavigationLink(
-                        destination: RosWebView(socketAddr: modelData.rosSocketAddr),
+                        destination: RosWebView(primaryAddr: modelData.primaryAddr,
+                                                secondaryAddr: modelData.secondaryAddr,
+                                                port: modelData.rosPort),
                         label: {
                             Text("ROS Map")
                         })

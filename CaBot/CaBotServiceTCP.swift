@@ -26,13 +26,17 @@ import SocketIO
 
 class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
     fileprivate var tts:CaBotTTS
-    fileprivate var socketURL:String?
+    fileprivate var primaryAddr: String?
+    fileprivate var secondaryAddr: String?
+    fileprivate var port: String?
     fileprivate var manager: SocketManager?
     fileprivate var socket: SocketIOClient?
     fileprivate let version:String = CaBotServiceBLE.CABOT_BLE_VERSION
 
     private let actions = CaBotServiceActions.shared
     private var connected: Bool = true
+    private var primaryIP = true
+    private var connectTimer: Timer?
 
     var delegate:CaBotServiceDelegate?
 
@@ -43,14 +47,22 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
     init(with tts:CaBotTTS) {
         self.tts = tts
     }
-    func set_addr(addr:String){
-        self.socketURL = "ws://" + addr + "/cabot"
-    }
     func emit(_ event: String, _ items: SocketData..., completion: (() -> ())? = nil)  {
         guard let socket = self.socket else { return }
         guard socket.status == .connected else { return }
 
         socket.emit(event, items)
+    }
+
+    func updateAddr(addr: String, port: String, secondary: Bool = false) {
+        if secondary {
+            guard self.secondaryAddr != addr else { return }
+            self.secondaryAddr = addr
+        } else {
+            guard self.primaryAddr != addr else { return }
+            self.primaryAddr = addr
+        }
+        self.port = port
     }
 
     // MARK: CaBotServiceProtocol
@@ -135,7 +147,11 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
         self.socket = nil
     }
     func start() {
-        guard let socketURL = self.socketURL else { return }
+        let addr = getAddr()
+        guard !addr.isEmpty else { return }
+        guard let port = self.port else { return }
+
+        let socketURL = "ws://" + addr + ":" + port + "/cabot"
         guard let url = URL(string: socketURL) else { return }
 
         let manager = SocketManager(socketURL: url, config: [.log(true), .compress, .reconnects(true), .reconnectWait(1), .reconnectAttempts(-1)])
@@ -157,6 +173,7 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
             guard let delegate = weakself.delegate else { return }
             DispatchQueue.main.async {
                 weakself.connected = false
+                weakself.stop()
                 delegate.caBot(service: weakself, centralConnected: weakself.connected)
             }
         }
@@ -165,6 +182,7 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
             guard let delegate = weakself.delegate else { return }
             DispatchQueue.main.async {
                 weakself.connected = false
+                weakself.changeURL()
                 delegate.caBot(service: weakself, centralConnected: weakself.connected)
             }
         }
@@ -246,5 +264,56 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
             }
         }
         socket.connect()
+    }
+
+    private func changeURL() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0,
+                                      execute: {
+            if let primaryAddr = self.primaryAddr,
+               !primaryAddr.isEmpty,
+               let secondaryAddr = self.secondaryAddr,
+               !secondaryAddr.isEmpty {
+                self.primaryIP = !self.primaryIP
+            }
+            
+            self.stop()
+            self.start()
+        })
+    }
+
+    private func getAddr() -> String {
+        let primaryAddr = self.getPrimaryAddr()
+        let secondaryAddr = self.getSecondaryAddr()
+
+        let addr = self.primaryIP ? primaryAddr : secondaryAddr
+        if !addr.isEmpty {
+            return addr
+        }
+
+        if !primaryAddr.isEmpty {
+            self.primaryIP = true
+            return primaryAddr
+        } else if !secondaryAddr.isEmpty {
+            self.primaryIP = false
+            return secondaryAddr
+        }
+
+        return ""
+    }
+
+    private func getPrimaryAddr() -> String {
+        if let primaryAddr = self.primaryAddr,
+           !primaryAddr.isEmpty {
+            return primaryAddr
+        }
+        return ""
+    }
+
+    private func getSecondaryAddr() -> String {
+        if let secondaryAddr = self.secondaryAddr,
+           !secondaryAddr.isEmpty {
+            return secondaryAddr
+        }
+        return ""
     }
 }

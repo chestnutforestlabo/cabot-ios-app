@@ -50,14 +50,15 @@ struct SettingView: View {
                     TextField("ROBOT_NAME", text: $modelData.teamID)
                 }
                 HStack {
-                    Text("SOCKET_ADDRESS_LABEL")
-                    TextField("SOCKET_ADDRESS", text:
-                                $modelData.socketAddr)
+                    Text("PRIMARY_IP_ADDRESS")
+                    TextField("PLACEHOLDER_IP_ADDRESS", text:
+                                $modelData.primaryAddr
+                    )
                 }
                 HStack {
-                    Text("ROS_SOCKET_ADDRESS_LABEL")
-                    TextField("ROS_SOCKET_ADDRESS", text:
-                                $modelData.rosSocketAddr)
+                    Text("SECONDARY_IP_ADDRESS")
+                    TextField("PLACEHOLDER_IP_ADDRESS", text:
+                                $modelData.secondaryAddr)
                 }
             }
 

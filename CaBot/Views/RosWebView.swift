@@ -25,12 +25,14 @@ import WebKit
 
 struct RosWebView: View {
 
-    var socketAddr: String
+    var primaryAddr: String?
+    var secondaryAddr: String?
+    var port: String
     @State private var shouldRefresh = false
 
     var body: some View {
         VStack {
-            LocalWebView(socketAddr: socketAddr, reload: $shouldRefresh)
+            LocalWebView(primaryAddr: primaryAddr, secondaryAddr: secondaryAddr, port: port, reload: $shouldRefresh)
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -51,13 +53,16 @@ struct RosWebView: View {
 
 struct RosWebView_Previews: PreviewProvider {
     static var previews: some View {
-        RosWebView(socketAddr: "")
+        RosWebView(primaryAddr: "", secondaryAddr: "", port: "")
     }
 }
 
 struct LocalWebView: UIViewRepresentable {
     
-    var socketAddr: String
+    var primaryAddr: String?
+    var secondaryAddr: String?
+    var port: String
+    @State var primaryIP = true
     @Binding var reload: Bool
 
     private let webView = WKWebView()
@@ -79,6 +84,7 @@ struct LocalWebView: UIViewRepresentable {
     func makeUIView(context: UIViewRepresentableContext<LocalWebView>) -> WKWebView {
         UIApplication.shared.isIdleTimerDisabled = true
         webView.navigationDelegate = context.coordinator
+        webView.configuration.userContentController.add(context.coordinator, name: "callbackHandler")
         loadRequest(in: webView)
         return webView
     }
@@ -95,10 +101,79 @@ struct LocalWebView: UIViewRepresentable {
     func makeCoordinator() -> Coordinator {
         return Coordinator(self)
     }
+    
+    func setTimer() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0,
+                                      execute: {
+            changeURL()
+        })
+    }
+    
+    func changeURL() {
+        if let primaryAddr = self.primaryAddr,
+           !primaryAddr.isEmpty,
+           let secondaryAddr = self.secondaryAddr,
+           !secondaryAddr.isEmpty {
+            self.primaryIP = !self.primaryIP
+        }
+        connection()
+    }
+
+    private func getAddr() -> String {
+        let primaryAddr = self.getPrimaryAddr()
+        let secondaryAddr = self.getSecondaryAddr()
+
+        let addr = self.primaryIP ? primaryAddr : secondaryAddr
+        if !addr.isEmpty {
+            return addr
+        }
+
+        if !primaryAddr.isEmpty {
+            self.primaryIP = true
+            return primaryAddr
+        } else if !secondaryAddr.isEmpty {
+            self.primaryIP = false
+            return secondaryAddr
+        }
+
+        return ""
+    }
+
+    private func getPrimaryAddr() -> String {
+        if let primaryAddr = self.primaryAddr,
+           !primaryAddr.isEmpty {
+            return primaryAddr
+        }
+        return ""
+    }
+
+    private func getSecondaryAddr() -> String {
+        if let secondaryAddr = self.secondaryAddr,
+           !secondaryAddr.isEmpty {
+            return secondaryAddr
+        }
+        return ""
+    }
+
+    func connection() {
+        let addr = getAddr()
+        guard !addr.isEmpty else { return }
+
+        let jsString = String(format: "connection(\'ws://%@:%@\');", addr, self.port)
+        NSLog(jsString)
+        self.webView.evaluateJavaScript(jsString) { value, error in
+            if let value = value as? String {
+                NSLog("value: " + value)
+            }
+            if let error = error?.localizedDescription as? String {
+                NSLog("error: " + error)
+            }
+        }
+    }
 }
 
 extension LocalWebView {
-    class Coordinator: NSObject, WKNavigationDelegate {
+    class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
         var parent: LocalWebView
 
         init(_ parent: LocalWebView) {
@@ -106,14 +181,16 @@ extension LocalWebView {
         }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            let jsString = String(format: "connection(\'ws://%@\');", parent.socketAddr)
-            NSLog(jsString)
-            parent.webView.evaluateJavaScript(jsString) { value, error in
-                if let value = value as? String {
-                    NSLog("value: " + value)
-                }
-                if let error = error?.localizedDescription as? String {
-                    NSLog("error: " + error)
+            parent.connection()
+        }
+
+        func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+            if message.name == "callbackHandler" {
+                NSLog("\(message.body)")
+                if let body = message.body as? String {
+                    if body.contains("connection closed") {
+                        parent.setTimer()
+                    }
                 }
             }
         }

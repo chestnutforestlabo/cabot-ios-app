@@ -224,6 +224,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private let teamIDKey = "team_id"
     private let socketAddrKey = "socket_url"
     private let rosSocketAddrKey = "ros_socket_url"
+    private let primaryAddrKey = "primary_ip_address"
+    private let secondaryAddrKey = "secondary_ip_address"
     private let menuDebugKey = "menu_debug"
     private let noSuitcaseDebugKey = "noSuitcaseDebugKey"
     private let modeTypeKey = "modeTypeKey"
@@ -368,21 +370,22 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             bleService.startAdvertising()
         }
     }
-    @Published var socketAddr: String = "172.20.10.7:5000" {
+    @Published var primaryAddr: String = "172.20.10.7" {
         didSet {
-            UserDefaults.standard.setValue(socketAddr, forKey: socketAddrKey)
+            UserDefaults.standard.setValue(primaryAddr, forKey: primaryAddrKey)
             UserDefaults.standard.synchronize()
-            tcpService.stop()
-            tcpService.set_addr(addr: socketAddr)
-            tcpService.start()
+            tcpService.updateAddr(addr: primaryAddr, port: socketPort)
         }
     }
-    var rosSocketAddr: String = "172.20.10.7:9091" {
+    @Published var secondaryAddr: String = "" {
         didSet {
-            UserDefaults.standard.setValue(rosSocketAddr, forKey: rosSocketAddrKey)
+            UserDefaults.standard.setValue(secondaryAddr, forKey: secondaryAddrKey)
             UserDefaults.standard.synchronize()
+            tcpService.updateAddr(addr: secondaryAddr, port: socketPort, secondary: true)
         }
     }
+    let socketPort: String = "5000"
+    let rosPort: String = "9091"
     @Published var menuDebug: Bool = false {
         didSet {
             UserDefaults.standard.setValue(menuDebug, forKey: menuDebugKey)
@@ -475,11 +478,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if let groupID = UserDefaults.standard.value(forKey: teamIDKey) as? String {
             self.teamID = groupID
         }
-        if let socketUrl = UserDefaults.standard.value(forKey: socketAddrKey) as? String{
-            self.socketAddr = socketUrl
+        if let primaryAddr = UserDefaults.standard.value(forKey: primaryAddrKey) as? String{
+            self.primaryAddr = primaryAddr
         }
-        if let rosSocketUrl = UserDefaults.standard.value(forKey: rosSocketAddrKey) as? String{
-            self.rosSocketAddr = rosSocketUrl
+        if let secondaryAddr = UserDefaults.standard.value(forKey: secondaryAddrKey) as? String{
+            self.secondaryAddr = secondaryAddr
         }
         if let menuDebug = UserDefaults.standard.value(forKey: menuDebugKey) as? Bool {
             self.menuDebug = menuDebug
@@ -495,7 +498,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.bleService.delegate = self
         self.bleService.startIfAuthorized()
 
-        self.tcpService.set_addr(addr: self.socketAddr)
         self.tcpService.delegate = self
         self.tcpService.start()
 
