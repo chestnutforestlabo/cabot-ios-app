@@ -56,7 +56,8 @@ struct ConversationView: UIViewControllerRepresentable {
                     owner.modelData.tourManager.addToLast(destination: Destination(title: title, value: toID, pron: pron, file: nil, message: nil, content: nil, waitingDestination: nil, subtour: nil))
                 }
                 
-                owner.modelData.tourManager.proceedToNextDestination()
+                owner.modelData.needToStartAnnounce(wait: true)
+                NavigationUtil.popToRootView()
             }
             DispatchQueue.main.async {
                 self.owner.presentationMode.wrappedValue.dismiss()
