@@ -498,6 +498,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.bleService.delegate = self
         self.bleService.startIfAuthorized()
 
+        self.tcpService.updateAddr(addr: self.primaryAddr , port: socketPort)
+        self.tcpService.updateAddr(addr: self.secondaryAddr, port: socketPort, secondary: true)
         self.tcpService.delegate = self
         self.tcpService.start()
 
