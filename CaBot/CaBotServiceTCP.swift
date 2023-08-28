@@ -107,6 +107,10 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
         return self.connected
     }
     
+    public func isSocket() -> Bool {
+        self.socket != nil
+    }
+
     // MARK: CaBotTransportProtocol
 
     func connectionType() -> ConnectionType {
@@ -298,6 +302,7 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
             return secondaryAddr
         }
 
+        self.stop()
         return ""
     }
 

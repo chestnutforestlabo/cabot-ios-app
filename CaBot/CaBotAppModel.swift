@@ -374,14 +374,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         didSet {
             UserDefaults.standard.setValue(primaryAddr, forKey: primaryAddrKey)
             UserDefaults.standard.synchronize()
-            tcpService.updateAddr(addr: primaryAddr, port: socketPort)
         }
     }
     @Published var secondaryAddr: String = "" {
         didSet {
             UserDefaults.standard.setValue(secondaryAddr, forKey: secondaryAddrKey)
             UserDefaults.standard.synchronize()
-            tcpService.updateAddr(addr: secondaryAddr, port: socketPort, secondary: true)
         }
     }
     let socketPort: String = "5000"
@@ -498,7 +496,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.bleService.delegate = self
         self.bleService.startIfAuthorized()
 
-        self.tcpService.updateAddr(addr: self.primaryAddr , port: socketPort)
+        self.tcpService.updateAddr(addr: self.primaryAddr, port: socketPort)
         self.tcpService.updateAddr(addr: self.secondaryAddr, port: socketPort, secondary: true)
         self.tcpService.delegate = self
         self.tcpService.start()
@@ -567,6 +565,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
     }
 
+    func tcpServiceRestart() {
+        self.tcpService.updateAddr(addr: self.primaryAddr, port: socketPort)
+        self.tcpService.updateAddr(addr: self.secondaryAddr, port: socketPort, secondary: true)
+        if !self.tcpService.isSocket() {
+            self.tcpService.start()
+        }
+    }
+ 
     // MARK: CaBotTTSDelegate
 
     func activityLog(category: String, text: String, memo: String) {

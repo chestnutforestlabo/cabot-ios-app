@@ -458,7 +458,11 @@ struct SettingMenus: View {
             }
             if (modelData.modeType == .Advanced || modelData.modeType == .Debug) {
                 NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
-                                    .environmentObject(modelData)) {
+                    .environmentObject(modelData)
+                    .onDisappear {
+                        modelData.tcpServiceRestart()
+                    }
+                ) {
                     HStack {
                         Label(LocalizedStringKey("Settings"), systemImage: "gearshape")
                     }
