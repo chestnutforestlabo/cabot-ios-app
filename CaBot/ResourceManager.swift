@@ -333,6 +333,7 @@ struct Metadata: Decodable{
     let i18n: I18N
     let langCode: String
     let conversation: Source?
+    let destinationAll: Source?
     let destinations: Source?
     let tours: Source?
     let custom_menus: [CustomMenu]?
@@ -355,6 +356,7 @@ struct Metadata: Decodable{
         case language
         case i18n
         case conversation
+        case destinationAll
         case destinations
         case tours
         case custom_menus
@@ -374,6 +376,7 @@ struct Metadata: Decodable{
         self.name = I18NText.decode(decoder: decoder, baseKey: CodingKeys.name.stringValue)
         self.identifier = self.name.text
         self.conversation = try? container.decodeIfPresent(Source.self, forKey: .conversation)
+        self.destinationAll = try? container.decodeIfPresent(Source.self, forKey: .destinationAll)
         self.destinations = try? container.decodeIfPresent(Source.self, forKey: .destinations)
         self.tours = try? container.decodeIfPresent(Source.self, forKey: .tours)
         self.custom_menus = try? container.decodeIfPresent([CustomMenu].self, forKey: .custom_menus)
@@ -437,6 +440,15 @@ class Resource: Hashable {
         get {
             if let c = metadata.conversation {
                 return c
+            }
+            return nil
+        }
+    }
+    
+    var destinationAllSource: Source? {
+        get {
+            if let d = metadata.destinationAll {
+                return d
             }
             return nil
         }
