@@ -194,8 +194,8 @@ class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProt
     }
     
     public func request(command: CaBotLogRequestCommand) -> Bool {
-        NSLog("manage \(command.rawValue)")
-        return (self.manageChar.notify(value: command.rawValue))
+        NSLog("request \(command.rawValue)")
+        return (self.getLogChar.notify(value: command.rawValue))
     }
 
     public func isConnected() -> Bool {
