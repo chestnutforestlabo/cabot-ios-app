@@ -35,6 +35,7 @@ protocol CaBotServiceProtocol {
     func send(destination: String) -> Bool
     func summon(destination: String) -> Bool
     func manage(command: CaBotManageCommand) -> Bool
+    func request(command: CaBotLogRequestCommand) -> Bool
     func isConnected() -> Bool
 }
 
@@ -53,6 +54,7 @@ protocol CaBotServiceDelegate {
     func cabot(service:any CaBotTransportProtocol, deviceStatus:DeviceStatus)
     func cabot(service:any CaBotTransportProtocol, systemStatus:SystemStatus)
     func cabot(service:any CaBotTransportProtocol, batteryStatus:BatteryStatus)
+    func cabot(service:any CaBotTransportProtocol, data:[String])
 }
 
 enum NavigationNotification:String {
@@ -67,6 +69,11 @@ enum CaBotManageCommand:String {
     case poweroff
     case start
     case stop
+}
+
+enum CaBotLogRequestCommand:String {
+    case list
+    case detail
 }
 
 struct DeviceStatus: Decodable {
@@ -312,6 +319,18 @@ struct NavigationEventRequest: Decodable {
     var param: String = ""
 }
 
+struct ReportRequest: Decodable {
+    var request_id: Int64
+    var report_title: String = ""
+    var report_details: String = ""
+}
+
+struct LogListResponse: Decodable {
+    var response_id: Int64
+    var file_name: [String] = []
+//    var is_report_submitted: Bool = false
+}
+
 class CaBotServiceActions {
     static let shared = CaBotServiceActions()
     private init() {
@@ -371,6 +390,16 @@ class CaBotServiceActions {
             case .unknown:
                 break
             }
+        }
+    }
+    
+    func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, response: LogListResponse) {
+        // noop for same request ID from different transport
+        guard lastNavigationEventRequestID < response.response_id else { return }
+        lastNavigationEventRequestID = response.response_id
+
+        DispatchQueue.main.async {
+            delegate.cabot(service: service, data: response.file_name)
         }
     }
 }

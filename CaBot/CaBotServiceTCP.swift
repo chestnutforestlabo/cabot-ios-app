@@ -90,6 +90,13 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
         self.emit("manage_cabot", command.rawValue)//TODO emitwithack??
         return true
     }
+    
+    func request(command: CaBotLogRequestCommand) -> Bool {
+        NSLog("manage \(command.rawValue)")
+        self.emit("manage_cabot", command.rawValue)//TODO emitwithack??
+        return true
+    }
+
 
     public func isConnected() -> Bool {
         return self.connected

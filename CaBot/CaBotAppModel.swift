@@ -117,6 +117,11 @@ class FallbackService: CaBotServiceProtocol {
         guard let service = getService() else { return false }
         return service.manage(command: command)
     }
+    
+    func request(command: CaBotLogRequestCommand) -> Bool {
+        guard let service = getService() else { return false }
+        return service.request(command: command)
+    }
 }
 
 final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
@@ -411,6 +416,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     @Published var deviceStatus: DeviceStatus = DeviceStatus()
     @Published var systemStatus: SystemStatusData = SystemStatusData()
+    @Published var logList: LogListData = LogListData()
     @Published var batteryStatus: BatteryStatus = BatteryStatus()
 
     private var bleService: CaBotServiceBLE
@@ -716,6 +722,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             objectWillChange.send()
         }
     }
+    
+    func getLogCommand(command: CaBotLogRequestCommand) {
+        self.fallbackService.request(command: command)
+    }
 
     func debugCabotArrived() {
         self.cabot(service: self.bleService, notification: .arrived)
@@ -922,6 +932,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     func cabot(service: any CaBotTransportProtocol, batteryStatus: BatteryStatus) -> Void {
         self.batteryStatus = batteryStatus
     }
+    
+    func cabot(service: any CaBotTransportProtocol, data: [String]) {
+        self.logList.set_list(data: data)
+    }
 }
 
 class DiagnosticStatusData: NSObject, ObservableObject {
@@ -1037,6 +1051,28 @@ class SystemStatusData: NSObject, ObservableObject {
         }
     }
 }
+
+class LogListData: NSObject, ObservableObject {
+    @Published var file_name: [String]
+    
+    override init() {
+        self.file_name = []
+    }
+    
+    func set_list(data: [String]){
+        self.file_name = data
+    }
+    
+    func clear(){
+        self.file_name = []
+    }
+    
+    func get_list() -> [String]{
+        return self.file_name
+    }
+    
+}
+    
 
 struct PersistenceController {
     static let shared = PersistenceController()

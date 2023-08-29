@@ -68,6 +68,8 @@ class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProt
     private var heartbeatChar:CaBotNotifyChar!
     private var speechChar:CaBotSpeechChar!
     private var manageChar:CaBotNotifyChar!
+    private var getLogChar:CaBotNotifyChar!
+    private var logListChar:CaBotLogListChar!
     private var characteristics:[CBCharacteristic] = []
     private var chars:[CaBotChar] = []
     private let peripheralRestoreKey:String = UUID().uuidString
@@ -108,6 +110,12 @@ class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProt
 
         self.naviChar = CaBotNaviChar(service: self, handle:0x0040)
         self.chars.append(self.naviChar)
+        
+        self.getLogChar = CaBotNotifyChar(service: self, handle:0x0050)
+        self.chars.append(self.getLogChar)
+        
+        self.logListChar = CaBotLogListChar(service: self, handle:0x0051)
+        self.chars.append(self.getLogChar)
 
         self.heartbeatChar = CaBotNotifyChar(service: self, handle:0x9999)
         self.chars.append(self.heartbeatChar)
@@ -181,6 +189,11 @@ class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProt
     }
 
     public func manage(command: CaBotManageCommand) -> Bool {
+        NSLog("manage \(command.rawValue)")
+        return (self.manageChar.notify(value: command.rawValue))
+    }
+    
+    public func request(command: CaBotLogRequestCommand) -> Bool {
         NSLog("manage \(command.rawValue)")
         return (self.manageChar.notify(value: command.rawValue))
     }
@@ -531,6 +544,13 @@ class CaBotNaviChar: CaBotJSONChar<NavigationEventRequest> {
     override func handle(json: NavigationEventRequest) {
         guard let delegate = self.service.delegate else { return }
         self.service.actions.handle(service: self.service, delegate: delegate, request: json)
+    }
+}
+
+class CaBotLogListChar: CaBotJSONChar<LogListResponse> {
+    override func handle(json: LogListResponse) {
+        guard let delegate = self.service.delegate else { return }
+        self.service.actions.handle(service: self.service, delegate: delegate, response: json)
     }
 }
 

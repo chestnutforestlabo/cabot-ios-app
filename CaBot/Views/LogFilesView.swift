@@ -19,8 +19,24 @@ struct LogFilesView: View {
     @State private var isShowingSheet = false
     @State private var selectedLogFile = ""
     var body: some View {
+        var logFileList:[String] = []
         // Load log file list from CaBot
-        let logFileList = ["cabot_2023-9-1-12-00-00","cabot_2023-9-1-13-00-00","cabot_2023-9-1-14-00-00"]
+        modelData.getLogCommand(command: .list)
+        for _ in 1...10 {
+            Task {
+                try await Task.sleep(nanoseconds: 1 * 1000 * 1000 * 1000)
+                logFileList = modelData.logList.get_list()
+            }
+            
+            if !logFileList.isEmpty {
+                break
+            }
+        }
+        
+        if logFileList.isEmpty {
+            logFileList = ["cabot_2023-9-1-12-00-00","cabot_2023-9-1-13-00-00","cabot_2023-9-1-14-00-00"]
+        }
+        
         let header = Text("SELECT_LOG")
         return Form{
             Section(header: header){
