@@ -18,6 +18,9 @@ struct LogFilesView: View {
     @State var langOverride:String
     @State private var isShowingSheet = false
     @State private var selectedLogFile = ""
+
+    var reportTitle = ""
+    var reportDetails = ""
     var body: some View {
         // Load log file list from CaBot
         let logFileList = ["cabot_2023-9-1-12-00-00","cabot_2023-9-1-13-00-00","cabot_2023-9-1-14-00-00"]
@@ -30,7 +33,7 @@ struct LogFilesView: View {
                     },
                            label: {Text(logFile)})
                     .sheet(isPresented: $isShowingSheet) {
-                        ReportSubmissionForm(logFileName: selectedLogFile)
+                        ReportSubmissionForm(langOverride: modelData.resourceLang, logFileName: selectedLogFile)
                     }
                 }
             }
@@ -53,11 +56,14 @@ struct LogFilesView_Previews: PreviewProvider {
 
 @available(iOS 15.0, *)
 struct ReportSubmissionForm: View {
+    @State var langOverride:String
     let logFileName: String
+
     @Environment(\.dismiss) var dismiss
     @State var inputTitleText = ""
     @State var inputDetailsText = ""
     
+    @State private var showingConfirmationAlert = false
     var body: some View {
         return Form{
             Section(
@@ -87,15 +93,21 @@ struct ReportSubmissionForm: View {
             }
             Button(
                 action: {
-                    saveReports()
-                    dismiss()
+                    self.showingConfirmationAlert = true
                 })
-                {Text("SAVE_YOUR_REPORT")}
+                {Text("SUBMIT_REPORT")}
                 .disabled(inputTitleText.count==0 || inputDetailsText.count==0)
+                .alert(Text("CONFIRM_REPORT_SUBMISSION"), isPresented: $showingConfirmationAlert){
+                    Button(role: .destructive,
+                           action: {
+                            submitReport()
+                            dismiss()},
+                           label: {Text("SUBMIT")})
+                        }
         }
     }
 }
 
-func saveReports(){
+func submitReport(){
     
 }
