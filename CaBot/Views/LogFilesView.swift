@@ -25,12 +25,21 @@ struct LogFilesView: View {
             Form{
                 Section(header: Text("SELECT_LOG")){
                     ForEach($modelData.log_list, id: \.self) { log_entry in
-                        Button(action: {
+                    Button(action: {
                             isShowingSheet = true
                             modelData.requestDetail(log: log_entry.wrappedValue)
                         },
                                label: {
-                            Text(log_entry.wrappedValue.name)
+                            HStack {
+                                Text(log_entry.wrappedValue.name)
+                                
+                                Spacer()
+                                if log_entry.wrappedValue.is_uploaded_to_box ?? false {
+                                    Image(systemName: "shippingbox")
+                                } else {
+                                    Image(systemName: "newspaper.circle").disabled(!(log_entry.wrappedValue.is_report_submitted ?? false))
+                                }
+                            }
                         })
                         .sheet(isPresented: $isShowingSheet) {
                             ReportSubmissionForm(langOverride: locale.identifier)
@@ -112,25 +121,33 @@ struct ReportSubmissionForm: View {
                         }
                     }
                 }
-                Button(
-                    action: {
-                        self.showingConfirmationAlert = true
-                    },
-                    label: {
-                        if modelData.isOkayToSubmit{
-                            Text("SUBMIT_REPORT")
-                        } else {
-                            Text("PLEASE_CONNECT_TO_SUITCASE")
-                        }
-                    })
-                .disabled(!modelData.isSubmitDataReady || !modelData.isOkayToSubmit)
-                .alert(Text("CONFIRM_REPORT_SUBMISSION"), isPresented: $showingConfirmationAlert){
-                    Button(role: .destructive,
-                           action: {
-                        modelData.submit(log: modelData.selectedLog)
-                        dismiss()
-                    },
-                           label: {Text("SUBMIT")})
+                if !(modelData.selectedLog.is_uploaded_to_box ?? false) {
+                    Button(
+                        action: {
+                            self.showingConfirmationAlert = true
+                        },
+                        label: {
+                            if modelData.isOkayToSubmit{
+                                if modelData.selectedLog.is_report_submitted ?? false {
+                                    Text("UPDATE_REPORT")
+                                } else {
+                                    Text("SUBMIT_REPORT")
+                                }
+                            } else {
+                                Text("PLEASE_CONNECT_TO_SUITCASE")
+                            }
+                        })
+                    .disabled(!modelData.isSubmitDataReady || !modelData.isOkayToSubmit)
+                    .alert(Text("CONFIRM_REPORT_SUBMISSION"), isPresented: $showingConfirmationAlert){
+                        Button(role: .destructive,
+                               action: {
+                            modelData.submit(log: modelData.selectedLog)
+                            dismiss()
+                        },
+                               label: {Text("SUBMIT")})
+                    }
+                } else {
+                    Text("REPORT_IS_UPLOADED")
                 }
             }
         } else {

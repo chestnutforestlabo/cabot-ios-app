@@ -326,8 +326,7 @@ struct LogEntry: Decodable, Hashable {
     var title: String?
     var detail: String?
     var is_report_submitted: Bool? = false
-    var is_uploaded_to_box: Bool?
-    = false
+    var is_uploaded_to_box: Bool? = false
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(name)

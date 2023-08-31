@@ -961,12 +961,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
     
     func cabot(service: any CaBotTransportProtocol, logList: [LogEntry]) {
-        NSLog("set log list %@", logList)
+        NSLog("set log list \(logList)")
         self.logList.set(list: logList)
     }
     
     func cabot(service: any CaBotTransportProtocol, logDetail: LogEntry) {
-        NSLog("set log list %@", logList)
+        NSLog("set log detail \(logDetail)")
         self.logList.set(detail: logDetail)
     }
 }

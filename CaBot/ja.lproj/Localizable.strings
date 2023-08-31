@@ -221,6 +221,8 @@
 "ENTER_REPORT_TITLE" = "件名を入力";
 "ENTER_REPORT_DETAILS" = "詳細を入力";
 "SUBMIT_REPORT" = "レポートを提出";
+"UPDATE_REPORT" = "レポートを更新";
+"REPORT_IS_UPLOADED" = "レポートは既にアップロードされました";
 "SUBMIT" = "提出";
 "CONFIRM_REPORT_SUBMISSION" = "レポートを提出しますか？";
 "PLEASE_CONNECT_TO_SUITCASE" = "スーツケースと接続してください";
