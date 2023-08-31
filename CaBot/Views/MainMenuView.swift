@@ -251,7 +251,7 @@ struct MainMenus: View {
             Section(header: Text("Navigation")) {
                 if let src = cm.conversationSource{
                     NavigationLink(
-                        destination: ConversationView(src: src)
+                        destination: ConversationView(src: src, dsrc: cm.destinationAllSource)
                             .onDisappear(){
                                 modelData.resetAudioSession()
                             }
@@ -460,7 +460,7 @@ struct SettingMenus: View {
                         .environmentObject(modelData),
                                     label: {
                         Text("REPORT_BUG")
-                    })
+                    }).disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
                 }
                 NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
                                     .environmentObject(modelData)) {

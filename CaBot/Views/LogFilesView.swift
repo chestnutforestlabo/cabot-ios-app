@@ -9,6 +9,17 @@
 import SwiftUI
 
 
+struct LogFiles: Codable, Hashable{
+    var status: String
+    var log_files: [LogFile]
+}
+
+struct LogFile: Codable, Hashable{
+    var file_name: String
+    var is_report_submitted: Bool
+    var is_uploaded_to_box: Bool
+}
+
 @available(iOS 15.0, *)
 struct LogFilesView: View {
     @Environment(\.locale) var locale: Locale
@@ -18,6 +29,9 @@ struct LogFilesView: View {
     @State var langOverride:String
     @State private var isShowingSheet = false
     @State private var selectedLogFile = ""
+
+    var reportTitle = ""
+    var reportDetails = ""
     var body: some View {
         var logFileList:[String] = []
         // Load log file list from CaBot
@@ -37,16 +51,39 @@ struct LogFilesView: View {
             logFileList = ["cabot_2023-9-1-12-00-00","cabot_2023-9-1-13-00-00","cabot_2023-9-1-14-00-00"]
         }
         
+        let jsonDataFromCaBot = """
+        {
+            "status": "OK",
+            "log_files": [
+                {
+                    "file_name": "cabot_2023-9-1-12-00-00",
+                    "is_report_submitted": false,
+                    "is_uploaded_to_box": false,
+                },{
+                    "file_name": "cabot_2023-9-1-13-00-00",
+                    "is_report_submitted": false,
+                    "is_uploaded_to_box": false,
+                },{
+                    "file_name": "cabot_2023-9-1-15-00-00",
+                    "is_report_submitted": false,
+                    "is_uploaded_to_box": false,
+                }
+            ]
+        }
+        """.data(using: .utf8)!
+        var logFiles = try! JSONDecoder().decode(LogFiles.self, from: jsonDataFromCaBot)
+
         let header = Text("SELECT_LOG")
         return Form{
             Section(header: header){
-                ForEach(logFileList, id: \.self) { logFile in
+                ForEach(logFiles.log_files, id: \.self) { logFile in
                     Button(action: {isShowingSheet.toggle()
-                        selectedLogFile = logFile
+                        selectedLogFile = logFile.file_name
                     },
-                           label: {Text(logFile)})
+                           label: {Text(logFile.file_name)})
                     .sheet(isPresented: $isShowingSheet) {
-                        ReportSubmissionForm(logFileName: selectedLogFile)
+                        ReportSubmissionForm(langOverride: modelData.resourceLang, logFileName: selectedLogFile)
+                            .environmentObject(modelData)
                     }
                 }
             }
@@ -69,11 +106,15 @@ struct LogFilesView_Previews: PreviewProvider {
 
 @available(iOS 15.0, *)
 struct ReportSubmissionForm: View {
+    @State var langOverride:String
     let logFileName: String
+
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var modelData: CaBotAppModel
     @State var inputTitleText = ""
     @State var inputDetailsText = ""
     
+    @State private var showingConfirmationAlert = false
     var body: some View {
         return Form{
             Section(
@@ -103,15 +144,23 @@ struct ReportSubmissionForm: View {
             }
             Button(
                 action: {
-                    saveReports()
-                    dismiss()
+                    self.showingConfirmationAlert = true
+                },
+                label: {if(modelData.suitcaseConnected){Text("SUBMIT_REPORT")}
+                    else{Text("PLEASE_CONNECT_TO_SUITCASE")}
                 })
-                {Text("SAVE_YOUR_REPORT")}
-                .disabled(inputTitleText.count==0 || inputDetailsText.count==0)
+                .disabled(inputTitleText.count==0 || inputDetailsText.count==0 || !modelData.suitcaseConnected)
+                .alert(Text("CONFIRM_REPORT_SUBMISSION"), isPresented: $showingConfirmationAlert){
+                    Button(role: .destructive,
+                           action: {
+                            submitReport()
+                            dismiss()},
+                           label: {Text("SUBMIT")})
+                        }
         }
     }
 }
 
-func saveReports(){
+func submitReport(){
     
 }

@@ -220,8 +220,10 @@
 "REPORT_DETAILS" = "詳細";
 "ENTER_REPORT_TITLE" = "件名を入力";
 "ENTER_REPORT_DETAILS" = "詳細を入力";
-"SAVE_YOUR_REPORT" = "レポートを保存";
-"SUBMIT_REPORT" = "レポートを提出しメインメニューへ戻る";
+"SUBMIT_REPORT" = "レポートを提出";
+"SUBMIT" = "提出";
+"CONFIRM_REPORT_SUBMISSION" = "レポートを提出しますか？";
+"PLEASE_CONNECT_TO_SUITCASE" = "スーツケースと接続してください";
 
 
 // TTSHelper
