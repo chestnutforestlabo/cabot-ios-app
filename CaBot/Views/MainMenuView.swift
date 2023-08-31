@@ -460,7 +460,7 @@ struct SettingMenus: View {
                         .environmentObject(modelData),
                                     label: {
                         Text("REPORT_BUG")
-                    })
+                    }).disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
                 }
                 NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
                                     .environmentObject(modelData)) {

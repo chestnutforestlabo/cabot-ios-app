@@ -223,6 +223,7 @@
 "SUBMIT_REPORT" = "レポートを提出";
 "SUBMIT" = "提出";
 "CONFIRM_REPORT_SUBMISSION" = "レポートを提出しますか？";
+"PLEASE_CONNECT_TO_SUITCASE" = "スーツケースと接続してください";
 
 
 // TTSHelper

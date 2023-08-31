@@ -66,6 +66,7 @@ struct LogFilesView: View {
                            label: {Text(logFile.file_name)})
                     .sheet(isPresented: $isShowingSheet) {
                         ReportSubmissionForm(langOverride: modelData.resourceLang, logFileName: selectedLogFile)
+                            .environmentObject(modelData)
                     }
                 }
             }
@@ -92,6 +93,7 @@ struct ReportSubmissionForm: View {
     let logFileName: String
 
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var modelData: CaBotAppModel
     @State var inputTitleText = ""
     @State var inputDetailsText = ""
     
@@ -126,9 +128,11 @@ struct ReportSubmissionForm: View {
             Button(
                 action: {
                     self.showingConfirmationAlert = true
+                },
+                label: {if(modelData.suitcaseConnected){Text("SUBMIT_REPORT")}
+                    else{Text("PLEASE_CONNECT_TO_SUITCASE")}
                 })
-                {Text("SUBMIT_REPORT")}
-                .disabled(inputTitleText.count==0 || inputDetailsText.count==0)
+                .disabled(inputTitleText.count==0 || inputDetailsText.count==0 || !modelData.suitcaseConnected)
                 .alert(Text("CONFIRM_REPORT_SUBMISSION"), isPresented: $showingConfirmationAlert){
                     Button(role: .destructive,
                            action: {
