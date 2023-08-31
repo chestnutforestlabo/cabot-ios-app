@@ -35,7 +35,7 @@ protocol CaBotServiceProtocol {
     func send(destination: String) -> Bool
     func summon(destination: String) -> Bool
     func manage(command: CaBotManageCommand) -> Bool
-    func request(command: CaBotLogRequestCommand) -> Bool
+    func log_request(command: CaBotLogRequestCommand) -> Bool
     func isConnected() -> Bool
 }
 
@@ -327,7 +327,7 @@ struct ReportRequest: Decodable {
 
 struct LogListResponse: Decodable {
     var response_id: Int64
-    var file_name: [String] = []
+    var log_names: [String] = []
 //    var is_report_submitted: Bool = false
 }
 
@@ -338,6 +338,7 @@ class CaBotServiceActions {
 
     private var lastSpeakRequestID: Int64 = 0
     private var lastNavigationEventRequestID: Int64 = 0
+    private var lastLogResponseID: Int64 = 0
 
     func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, tts: CaBotTTS, request: SpeakRequest) {
         // noop for same request ID from different transport
@@ -395,11 +396,11 @@ class CaBotServiceActions {
     
     func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, response: LogListResponse) {
         // noop for same request ID from different transport
-        guard lastNavigationEventRequestID < response.response_id else { return }
-        lastNavigationEventRequestID = response.response_id
+        guard lastLogResponseID < response.response_id else { return }
+        lastLogResponseID = response.response_id
 
         DispatchQueue.main.async {
-            delegate.cabot(service: service, data: response.file_name)
+            delegate.cabot(service: service, data: response.log_names)
         }
     }
 }

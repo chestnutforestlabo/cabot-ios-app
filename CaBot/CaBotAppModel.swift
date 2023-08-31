@@ -118,9 +118,9 @@ class FallbackService: CaBotServiceProtocol {
         return service.manage(command: command)
     }
     
-    func request(command: CaBotLogRequestCommand) -> Bool {
+    func log_request(command: CaBotLogRequestCommand) -> Bool {
         guard let service = getService() else { return false }
-        return service.request(command: command)
+        return service.log_request(command: command)
     }
 }
 
@@ -217,7 +217,7 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
     }
 }
 
-final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, TourManagerDelegate, CLLocationManagerDelegate, CaBotTTSDelegate {
+final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, TourManagerDelegate, CLLocationManagerDelegate, CaBotTTSDelegate, LogListDataDelegate{
 
     private let DEFAULT_LANG = "en"
     
@@ -413,10 +413,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var contentURL: URL? = nil
     @Published var tourUpdated: Bool = false
 
-
     @Published var deviceStatus: DeviceStatus = DeviceStatus()
     @Published var systemStatus: SystemStatusData = SystemStatusData()
-    @Published var logList: LogListData = LogListData()
     @Published var batteryStatus: BatteryStatus = BatteryStatus()
 
     private var bleService: CaBotServiceBLE
@@ -424,6 +422,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private var fallbackService: FallbackService
     private let tts: CaBotTTS
     private var lastUpdated: Int64 = 0
+    let logList: LogListData = LogListData()
     let preview: Bool
     let resourceManager: ResourceManager
     let tourManager: TourManager
@@ -470,6 +469,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         super.init()
 
         self.tts.delegate = self
+        self.logList.delegate = self
 
         if let selectedIdentifier = UserDefaults.standard.value(forKey: selectedResourceKey) as? String {
             self.resource = resourceManager.resource(by: selectedIdentifier)
@@ -573,6 +573,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func activityLog(category: String, text: String, memo: String) {
         _ = self.fallbackService.activityLog(category: category, text: text, memo: memo)
+    }
+    
+    // MARK: LogListDataDelegate
+    
+    func refreshLogList() {
+        self.getLogCommand(command: .list)
     }
 
     // MARK: LocationManagerDelegate
@@ -724,7 +730,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
     
     func getLogCommand(command: CaBotLogRequestCommand) {
-        self.fallbackService.request(command: command)
+        self.fallbackService.log_request(command: command)
     }
 
     func debugCabotArrived() {
@@ -934,6 +940,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
     
     func cabot(service: any CaBotTransportProtocol, data: [String]) {
+        NSLog("set log list %@", data)
         self.logList.set_list(data: data)
     }
 }
@@ -1052,8 +1059,13 @@ class SystemStatusData: NSObject, ObservableObject {
     }
 }
 
+protocol LogListDataDelegate {
+    func refreshLogList()
+}
+
 class LogListData: NSObject, ObservableObject {
     @Published var file_name: [String]
+    var delegate: LogListDataDelegate? = nil
     
     override init() {
         self.file_name = []
@@ -1067,10 +1079,9 @@ class LogListData: NSObject, ObservableObject {
         self.file_name = []
     }
     
-    func get_list() -> [String]{
-        return self.file_name
+    func refresh() {
+        self.delegate?.refreshLogList()
     }
-    
 }
     
 

@@ -24,7 +24,7 @@ struct LogFile: Codable, Hashable{
 struct LogFilesView: View {
     @Environment(\.locale) var locale: Locale
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    @EnvironmentObject var modelData: CaBotAppModel
+    @EnvironmentObject var modelData: LogListData
 
     @State var langOverride:String
     @State private var isShowingSheet = false
@@ -33,61 +33,27 @@ struct LogFilesView: View {
     var reportTitle = ""
     var reportDetails = ""
     var body: some View {
-        var logFileList:[String] = []
-        // Load log file list from CaBot
-        modelData.getLogCommand(command: .list)
-        for _ in 1...10 {
-            Task {
-                try await Task.sleep(nanoseconds: 1 * 1000 * 1000 * 1000)
-                logFileList = modelData.logList.get_list()
-            }
-            
-            if !logFileList.isEmpty {
-                break
-            }
-        }
-        
-        if logFileList.isEmpty {
-            logFileList = ["cabot_2023-9-1-12-00-00","cabot_2023-9-1-13-00-00","cabot_2023-9-1-14-00-00"]
-        }
-        
-        let jsonDataFromCaBot = """
-        {
-            "status": "OK",
-            "log_files": [
-                {
-                    "file_name": "cabot_2023-9-1-12-00-00",
-                    "is_report_submitted": false,
-                    "is_uploaded_to_box": false,
-                },{
-                    "file_name": "cabot_2023-9-1-13-00-00",
-                    "is_report_submitted": false,
-                    "is_uploaded_to_box": false,
-                },{
-                    "file_name": "cabot_2023-9-1-15-00-00",
-                    "is_report_submitted": false,
-                    "is_uploaded_to_box": false,
-                }
-            ]
-        }
-        """.data(using: .utf8)!
-        var logFiles = try! JSONDecoder().decode(LogFiles.self, from: jsonDataFromCaBot)
-
-        let header = Text("SELECT_LOG")
         return Form{
-            Section(header: header){
-                ForEach(logFiles.log_files, id: \.self) { logFile in
-                    Button(action: {isShowingSheet.toggle()
-                        selectedLogFile = logFile.file_name
+            Section(header: Text("SELECT_LOG")){
+                ForEach($modelData.file_name, id: \.self) { file_name in
+                    Button(action: {
+                        isShowingSheet.toggle()
+                        selectedLogFile = file_name.wrappedValue
                     },
-                           label: {Text(logFile.file_name)})
+                    label: {
+                        Text(file_name.wrappedValue)
+                    })
                     .sheet(isPresented: $isShowingSheet) {
-                        ReportSubmissionForm(langOverride: modelData.resourceLang, logFileName: selectedLogFile)
+                        ReportSubmissionForm(langOverride: locale.identifier, logFileName: selectedLogFile)
                             .environmentObject(modelData)
                     }
                 }
             }
-        }.listStyle(PlainListStyle())
+        }
+        .listStyle(PlainListStyle())
+        .onAppear() {
+            modelData.refresh()
+        }
     }
 }
 

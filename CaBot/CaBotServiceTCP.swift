@@ -91,9 +91,9 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
         return true
     }
     
-    func request(command: CaBotLogRequestCommand) -> Bool {
-        NSLog("manage \(command.rawValue)")
-        self.emit("manage_cabot", command.rawValue)//TODO emitwithack??
+    func log_request(command: CaBotLogRequestCommand) -> Bool {
+        NSLog("log_request \(command.rawValue)")
+        self.emit("log_request", command.rawValue)
         return true
     }
 
@@ -247,6 +247,19 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
             do {
                 let request = try JSONDecoder().decode(NavigationEventRequest.self, from: data)
                 weakself.actions.handle(service: weakself, delegate: delegate, request: request)
+            } catch {
+                print(text)
+                NSLog(error.localizedDescription)
+            }
+        }
+        socket.on("log_response"){[weak self] dt, ack in
+            guard let text = dt[0] as? String else { return }
+            guard let data = String(text).data(using:.utf8) else { return }
+            guard let weakself = self else { return }
+            guard let delegate = weakself.delegate else { return }
+            do {
+                let response = try JSONDecoder().decode(LogListResponse.self, from: data)
+                weakself.actions.handle(service: weakself, delegate: delegate, response: response)
             } catch {
                 print(text)
                 NSLog(error.localizedDescription)

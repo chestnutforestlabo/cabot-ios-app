@@ -457,7 +457,7 @@ struct SettingMenus: View {
             if (modelData.modeType == .Advanced || modelData.modeType == .Debug) {
                 if #available(iOS 15.0, *) {
                     NavigationLink (destination: LogFilesView(langOverride: modelData.resourceLang)
-                        .environmentObject(modelData),
+                        .environmentObject(modelData.logList),
                                     label: {
                         Text("REPORT_BUG")
                     }).disabled(!modelData.suitcaseConnected && !modelData.menuDebug)

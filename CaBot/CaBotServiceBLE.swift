@@ -69,7 +69,6 @@ class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProt
     private var speechChar:CaBotSpeechChar!
     private var manageChar:CaBotNotifyChar!
     private var getLogChar:CaBotNotifyChar!
-    private var logListChar:CaBotLogListChar!
     private var characteristics:[CBCharacteristic] = []
     private var chars:[CaBotChar] = []
     private let peripheralRestoreKey:String = UUID().uuidString
@@ -114,8 +113,7 @@ class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProt
         self.getLogChar = CaBotNotifyChar(service: self, handle:0x0050)
         self.chars.append(self.getLogChar)
         
-        self.logListChar = CaBotLogListChar(service: self, handle:0x0051)
-        self.chars.append(self.getLogChar)
+        self.chars.append(CaBotLogListChar(service: self, handle:0x0051))
 
         self.heartbeatChar = CaBotNotifyChar(service: self, handle:0x9999)
         self.chars.append(self.heartbeatChar)
@@ -193,7 +191,7 @@ class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProt
         return (self.manageChar.notify(value: command.rawValue))
     }
     
-    public func request(command: CaBotLogRequestCommand) -> Bool {
+    public func log_request(command: CaBotLogRequestCommand) -> Bool {
         NSLog("request \(command.rawValue)")
         return (self.getLogChar.notify(value: command.rawValue))
     }
