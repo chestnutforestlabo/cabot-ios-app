@@ -91,10 +91,13 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
         return true
     }
     
-    func log_request(command: CaBotLogRequestCommand) -> Bool {
-        NSLog("log_request \(command.rawValue)")
-        self.emit("log_request", command.rawValue)
-        return true
+    func log_request(request: Dictionary<String, String>) -> Bool {
+        NSLog("log_request \(request)")
+        if let jsonString = try? JSONEncoder().encode(request) {
+            self.emit("log_request", jsonString)
+            return true
+        }
+        return false
     }
 
 
@@ -258,7 +261,7 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
             guard let weakself = self else { return }
             guard let delegate = weakself.delegate else { return }
             do {
-                let response = try JSONDecoder().decode(LogListResponse.self, from: data)
+                let response = try JSONDecoder().decode(LogResponse.self, from: data)
                 weakself.actions.handle(service: weakself, delegate: delegate, response: response)
             } catch {
                 print(text)

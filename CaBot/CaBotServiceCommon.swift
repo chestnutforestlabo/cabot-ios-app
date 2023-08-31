@@ -35,7 +35,7 @@ protocol CaBotServiceProtocol {
     func send(destination: String) -> Bool
     func summon(destination: String) -> Bool
     func manage(command: CaBotManageCommand) -> Bool
-    func log_request(command: CaBotLogRequestCommand) -> Bool
+    func log_request(request: Dictionary<String, String>) -> Bool
     func isConnected() -> Bool
 }
 
@@ -54,7 +54,8 @@ protocol CaBotServiceDelegate {
     func cabot(service:any CaBotTransportProtocol, deviceStatus:DeviceStatus)
     func cabot(service:any CaBotTransportProtocol, systemStatus:SystemStatus)
     func cabot(service:any CaBotTransportProtocol, batteryStatus:BatteryStatus)
-    func cabot(service:any CaBotTransportProtocol, data:[String])
+    func cabot(service:any CaBotTransportProtocol, logList:[LogEntry])
+    func cabot(service:any CaBotTransportProtocol, logDetail:LogEntry)
 }
 
 enum NavigationNotification:String {
@@ -69,11 +70,6 @@ enum CaBotManageCommand:String {
     case poweroff
     case start
     case stop
-}
-
-enum CaBotLogRequestCommand:String {
-    case list
-    case detail
 }
 
 struct DeviceStatus: Decodable {
@@ -319,16 +315,40 @@ struct NavigationEventRequest: Decodable {
     var param: String = ""
 }
 
-struct ReportRequest: Decodable {
-    var request_id: Int64
-    var report_title: String = ""
-    var report_details: String = ""
+enum CaBotLogRequestType:String, Decodable {
+    case list
+    case detail
+    case report
 }
 
-struct LogListResponse: Decodable {
+struct LogEntry: Decodable, Hashable {
+    var name: String
+    var title: String?
+    var detail: String?
+    var is_report_submitted: Bool? = false
+    var is_uploaded_to_box: Bool?
+    = false
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
+    }
+    
+    var canSubmit: Bool {
+        get {
+            if let title = title,
+               let detail = detail {
+                return title.count > 0 && detail.count > 0
+            }
+            return false
+        }
+    }
+}
+
+struct LogResponse: Decodable {
     var response_id: Int64
-    var log_names: [String] = []
-//    var is_report_submitted: Bool = false
+    var type: CaBotLogRequestType
+    var log_list: [LogEntry]?
+    var log: LogEntry?
 }
 
 class CaBotServiceActions {
@@ -394,13 +414,26 @@ class CaBotServiceActions {
         }
     }
     
-    func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, response: LogListResponse) {
+    func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, response: LogResponse) {
         // noop for same request ID from different transport
         guard lastLogResponseID < response.response_id else { return }
         lastLogResponseID = response.response_id
 
         DispatchQueue.main.async {
-            delegate.cabot(service: service, data: response.log_names)
+            switch(response.type) {
+            case .list:
+                let log_list = response.log_list ?? []
+                delegate.cabot(service: service, logList: log_list)
+                break
+            case .detail:
+                if let log_entry = response.log {
+                    delegate.cabot(service: service, logDetail: log_entry)
+                }
+                break
+            case .report:
+                // never happen
+                break
+            }
         }
     }
 }

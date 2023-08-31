@@ -118,9 +118,9 @@ class FallbackService: CaBotServiceProtocol {
         return service.manage(command: command)
     }
     
-    func log_request(command: CaBotLogRequestCommand) -> Bool {
+    func log_request(request: Dictionary<String, String>) -> Bool {
         guard let service = getService() else { return false }
-        return service.log_request(command: command)
+        return service.log_request(request: request)
     }
 }
 
@@ -217,7 +217,7 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
     }
 }
 
-final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, TourManagerDelegate, CLLocationManagerDelegate, CaBotTTSDelegate, LogListDataDelegate{
+final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, TourManagerDelegate, CLLocationManagerDelegate, CaBotTTSDelegate, LogReportModelDelegate{
 
     private let DEFAULT_LANG = "en"
     
@@ -422,7 +422,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private var fallbackService: FallbackService
     private let tts: CaBotTTS
     private var lastUpdated: Int64 = 0
-    let logList: LogListData = LogListData()
+    let logList: LogReportModel = LogReportModel()
     let preview: Bool
     let resourceManager: ResourceManager
     let tourManager: TourManager
@@ -575,10 +575,35 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         _ = self.fallbackService.activityLog(category: category, text: text, memo: memo)
     }
     
-    // MARK: LogListDataDelegate
+    // MARK: LogReportModelDelegate
     
     func refreshLogList() {
-        self.getLogCommand(command: .list)
+        let request = [
+            "type": CaBotLogRequestType.list.rawValue
+        ]
+        _ = self.fallbackService.log_request(request: request)
+    }
+    
+    func isOkayToSubmit() -> Bool {
+        return self.suitcaseConnected
+    }
+    
+    func requestDetail(log_name: String) {
+        let request = [
+            "type": CaBotLogRequestType.detail.rawValue,
+            "log_name": log_name
+        ]
+        _ = self.fallbackService.log_request(request: request)
+    }
+    
+    func submitLogReport(log_name: String, title: String, detail: String) {
+        let request = [
+            "type": CaBotLogRequestType.report.rawValue,
+            "log_name": log_name,
+            "title": title,
+            "detail": detail
+        ]
+        _ = self.fallbackService.log_request(request: request)
     }
 
     // MARK: LocationManagerDelegate
@@ -727,10 +752,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             systemStatus.components.removeAll()
             objectWillChange.send()
         }
-    }
-    
-    func getLogCommand(command: CaBotLogRequestCommand) {
-        self.fallbackService.log_request(command: command)
     }
 
     func debugCabotArrived() {
@@ -939,9 +960,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.batteryStatus = batteryStatus
     }
     
-    func cabot(service: any CaBotTransportProtocol, data: [String]) {
-        NSLog("set log list %@", data)
-        self.logList.set_list(data: data)
+    func cabot(service: any CaBotTransportProtocol, logList: [LogEntry]) {
+        NSLog("set log list %@", logList)
+        self.logList.set(list: logList)
+    }
+    
+    func cabot(service: any CaBotTransportProtocol, logDetail: LogEntry) {
+        NSLog("set log list %@", logList)
+        self.logList.set(detail: logDetail)
     }
 }
 
@@ -1059,28 +1085,62 @@ class SystemStatusData: NSObject, ObservableObject {
     }
 }
 
-protocol LogListDataDelegate {
+protocol LogReportModelDelegate {
     func refreshLogList()
+    func isOkayToSubmit() -> Bool
+    func requestDetail(log_name: String)
+    func submitLogReport(log_name: String, title: String, detail: String)
 }
 
-class LogListData: NSObject, ObservableObject {
-    @Published var file_name: [String]
-    var delegate: LogListDataDelegate? = nil
+class LogReportModel: NSObject, ObservableObject {
+    @Published var log_list: [LogEntry]
+    @Published var selectedLog: LogEntry = LogEntry(name: "dummy")
+    @Published var isDetailReady: Bool = false
+    var delegate: LogReportModelDelegate? = nil
     
     override init() {
-        self.file_name = []
+        self.log_list = []
     }
     
-    func set_list(data: [String]){
-        self.file_name = data
+    func set(list: [LogEntry]){
+        self.log_list = list
+    }
+    
+    func set(detail: LogEntry) {
+        self.selectedLog = detail
+        self.isDetailReady = true
     }
     
     func clear(){
-        self.file_name = []
+        self.log_list = []
     }
     
-    func refresh() {
+    func refreshLogList() {
         self.delegate?.refreshLogList()
+    }
+    
+    func requestDetail(log: LogEntry) {
+        isDetailReady = false
+        self.delegate?.requestDetail(log_name: log.name)
+    }
+    
+    func submit(log: LogEntry) {
+        if let title = log.title,
+           let detail = log.detail {
+            self.delegate?.submitLogReport(log_name: log.name, title: title, detail: detail)
+        }
+    }
+    
+    var isOkayToSubmit: Bool {
+        get {
+            self.delegate?.isOkayToSubmit() ?? false
+        }
+    }
+    
+    var isSubmitDataReady: Bool {
+        get {
+            selectedLog.title?.count ?? 0 > 0 && selectedLog.detail?.count ?? 0 > 0
+        }
     }
 }
     
