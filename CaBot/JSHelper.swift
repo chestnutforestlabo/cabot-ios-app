@@ -43,8 +43,19 @@ class JSBundle: NSObject, JSBundleExport {
 
         do {
             let content = try String(contentsOf: path)
-            let yaml = try Yams.load(yaml: content) as! [[String: String]]
-            return yaml
+            var result: [[String: String]] = []
+            if let temp = try Yams.load(yaml: content) as? [[String: Any?]] {
+                for entry in temp {
+                    var yaml: [String: String] = [:]
+                    for (key, value) in entry {
+                        if let str = value as? String {
+                            yaml[key] = str
+                        }
+                    }
+                    result.append(yaml)
+                }
+            }
+            return result
         } catch {
         }
         NSLog("Cannot load \(name).yaml")

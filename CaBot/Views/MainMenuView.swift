@@ -249,18 +249,16 @@ struct MainMenus: View {
     var body: some View {
         if let cm = modelData.resource {
             Section(header: Text("Navigation")) {
-                if modelData.modeType == .Debug{
-                    if let src = cm.conversationSource{
-                        NavigationLink(
-                            destination: ConversationView(src: src)
-                                .onDisappear(){
-                                    modelData.resetAudioSession()
-                                }
-                                .environmentObject(modelData),
-                            label: {
-                                Text("START_CONVERSATION")
-                            })
-                    }
+                if let src = cm.conversationSource{
+                    NavigationLink(
+                        destination: ConversationView(src: src, dsrc: cm.destinationAllSource)
+                            .onDisappear(){
+                                modelData.resetAudioSession()
+                            }
+                            .environmentObject(modelData),
+                        label: {
+                            Text("START_CONVERSATION")
+                        })
                 }
                 if let src = cm.destinationsSource {
                     NavigationLink(
