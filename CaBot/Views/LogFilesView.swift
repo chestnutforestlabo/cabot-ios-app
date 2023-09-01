@@ -59,6 +59,7 @@ struct LogFilesView: View {
     }
 }
 
+@available(iOS 15.0, *)
 struct LogFilesView_Previews: PreviewProvider {
     static var previews: some View {
         let modelData = LogReportModel()
