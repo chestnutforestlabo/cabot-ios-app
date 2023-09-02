@@ -584,7 +584,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         _ = self.fallbackService.log_request(request: request)
     }
     
-    func isOkayToSubmit() -> Bool {
+    func isSuitcaseConnected() -> Bool {
         return self.suitcaseConnected
     }
     
@@ -960,9 +960,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.batteryStatus = batteryStatus
     }
     
-    func cabot(service: any CaBotTransportProtocol, logList: [LogEntry]) {
+    func cabot(service: any CaBotTransportProtocol, logList: [LogEntry], status: CaBotLogStatus) {
         NSLog("set log list \(logList)")
         self.logList.set(list: logList)
+        self.logList.set(status: status)
     }
     
     func cabot(service: any CaBotTransportProtocol, logDetail: LogEntry) {
@@ -1087,16 +1088,20 @@ class SystemStatusData: NSObject, ObservableObject {
 
 protocol LogReportModelDelegate {
     func refreshLogList()
-    func isOkayToSubmit() -> Bool
+    func isSuitcaseConnected() -> Bool
     func requestDetail(log_name: String)
     func submitLogReport(log_name: String, title: String, detail: String)
 }
 
 class LogReportModel: NSObject, ObservableObject {
     @Published var log_list: [LogEntry]
+    @Published var isListReady: Bool = false
+    @Published var status: CaBotLogStatus = .OK
     @Published var selectedLog: LogEntry = LogEntry(name: "dummy")
+    private var originalLog: LogEntry = LogEntry(name: "dummy")
     @Published var isDetailReady: Bool = false
     var delegate: LogReportModelDelegate? = nil
+    var debug: Bool = false
     
     override init() {
         self.log_list = []
@@ -1104,15 +1109,23 @@ class LogReportModel: NSObject, ObservableObject {
     
     func set(list: [LogEntry]){
         self.log_list = list
+        self.isListReady = true
+    }
+
+    func set(status: CaBotLogStatus) {
+        self.status = status
     }
     
     func set(detail: LogEntry) {
         self.selectedLog = detail
+        self.originalLog.title = detail.title
+        self.originalLog.detail = detail.detail
         self.isDetailReady = true
     }
     
     func clear(){
         self.log_list = []
+        self.isListReady = false
     }
     
     func refreshLogList() {
@@ -1120,7 +1133,7 @@ class LogReportModel: NSObject, ObservableObject {
     }
     
     func requestDetail(log: LogEntry) {
-        isDetailReady = false
+        isDetailReady = false || debug
         self.delegate?.requestDetail(log_name: log.name)
     }
     
@@ -1131,15 +1144,27 @@ class LogReportModel: NSObject, ObservableObject {
         }
     }
     
+    var isSuitcaseConnected: Bool {
+        get {
+            self.delegate?.isSuitcaseConnected() ?? false
+        }
+    }
+    
     var isOkayToSubmit: Bool {
         get {
-            self.delegate?.isOkayToSubmit() ?? false
+            isSuitcaseConnected && status == .OK
         }
     }
     
     var isSubmitDataReady: Bool {
         get {
             selectedLog.title?.count ?? 0 > 0 && selectedLog.detail?.count ?? 0 > 0
+        }
+    }
+    
+    var isDetailModified: Bool {
+        get {
+            originalLog.title != selectedLog.title || originalLog.detail != selectedLog.detail
         }
     }
 }

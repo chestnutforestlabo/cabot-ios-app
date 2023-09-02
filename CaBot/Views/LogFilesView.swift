@@ -21,7 +21,7 @@ struct LogFilesView: View {
     var reportTitle = ""
     var reportDetails = ""
     var body: some View {
-        if modelData.log_list.count > 0 {
+        if modelData.isListReady {
             Form{
                 Section(header: Text("SELECT_LOG")){
                     ForEach($modelData.log_list, id: \.self) { log_entry in
@@ -42,13 +42,18 @@ struct LogFilesView: View {
                             }
                         })
                         .sheet(isPresented: $isShowingSheet) {
-                            ReportSubmissionForm(langOverride: locale.identifier)
-                                .environmentObject(modelData)
+                            NavigationView {
+                                ReportSubmissionForm(langOverride: locale.identifier)
+                                    .environmentObject(modelData)
+                            }
                         }
                     }
                 }
             }
             .listStyle(PlainListStyle())
+            .onDisappear() {
+                modelData.clear()
+            }
         } else {
             ProgressView()
                 .onAppear() {
@@ -76,6 +81,24 @@ struct LogFilesView_Previews: PreviewProvider {
     }
 }
 
+
+struct ReportSubmissionFor_Previews: PreviewProvider {
+    static var previews: some View {
+        let modelData = LogReportModel()
+        modelData.set(list: [LogEntry(name: "cabot_2023-08-30-12-00-00")])
+        modelData.set(detail: LogEntry(name: "cabot_2023-08-30-12-00-00", title: "This is a test title", detail: "This is a test detail text"))
+        modelData.status = .OK
+
+        let appModel = CaBotAppModel()
+        appModel.suitcaseConnected = true
+        modelData.delegate = appModel
+
+        return ReportSubmissionForm(langOverride: "en-US")
+            .environmentObject(modelData)
+            .environment(\.locale, Locale.init(identifier: "en-US"))
+    }
+}
+
 public extension Text {
     func sectionHeaderStyle() -> some View {
         self
@@ -83,6 +106,8 @@ public extension Text {
             .fontWeight(.bold)
             .foregroundColor(.primary)
             .textCase(nil)
+            .frame(maxWidth: .infinity)
+            .multilineTextAlignment(.center)
     }
 }
 
@@ -91,68 +116,111 @@ struct ReportSubmissionForm: View {
     @State var langOverride:String
 
     @Environment(\.dismiss) var dismiss
+    @State private var showingConfirmationAlert = false
     @EnvironmentObject var modelData: LogReportModel
     //@State var inputTitleText: String
     //@State var inputDetailsText: String
     
-    @State private var showingConfirmationAlert = false
     var body: some View {
-        if modelData.isDetailReady {
-            Form {
-                Section(
-                    header: Text(modelData.selectedLog.name).sectionHeaderStyle()){
+        VStack {
+            if modelData.isDetailReady {
+                Form {
+                    Section(header: Text(modelData.selectedLog.name).sectionHeaderStyle()){
                         VStack{
                             HStack {
-                                Text("REPORT_TITLE")
+                                Text("REPORT_TITLE").bold()
                                 Spacer()
                             }
                             TextField("ENTER_REPORT_TITLE", text: .bindOptional($modelData.selectedLog.title, ""))
+                                .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color.gray, lineWidth: 0.25)
+                                )
                         }
-                    }.headerProminence(.increased)
-                Section(){
-                    VStack{
-                        HStack {
-                            Text("REPORT_DETAILS")
-                            Spacer()
+                    }
+                    .headerProminence(.increased)
+                    Section(){
+                        VStack{
+                            HStack {
+                                Text("REPORT_DETAILS").bold()
+                                Spacer()
+                            }
+                            TextEditor(text: .bindOptional($modelData.selectedLog.detail, ""))
+                                .frame(minHeight: 100)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color.gray, lineWidth: 0.25)
+                                )
                         }
-                        if #available(iOS 16.0, *){
-                            TextEditor(text: .bindOptional($modelData.selectedLog.detail, "")).frame(minHeight: 100)
-                        }else{
-                            TextEditor(text: .bindOptional($modelData.selectedLog.detail, "")).frame(minHeight: 100)
+                    }
+                    if !(modelData.selectedLog.is_uploaded_to_box ?? false) {
+                        Section() {
+                            Button {
+                                modelData.submit(log: modelData.selectedLog)
+                                dismiss()
+                            } label: {
+                                if modelData.selectedLog.is_report_submitted ?? false {
+                                    Text("UPDATE_REPORT").bold()
+                                        .frame(maxWidth: .infinity)
+                                        .multilineTextAlignment(.center)
+                                } else {
+                                    Text("SUBMIT_REPORT").bold()
+                                        .frame(maxWidth: .infinity)
+                                        .multilineTextAlignment(.center)
+                                }
+                            }
+                            .disabled(!modelData.isDetailModified || !modelData.isOkayToSubmit)
+                            if !modelData.isOkayToSubmit{
+                                if modelData.isSuitcaseConnected {
+                                    Text("SUITCASE_DOES_NOT_ACCEPT_NEW_REPORT")
+                                        .foregroundColor(.red)
+                                } else {
+                                    Text("PLEASE_CONNECT_TO_SUITCASE")
+                                        .foregroundColor(.red)
+                                }
+                            }
                         }
+                        .listRowSeparator(.hidden)
+                    } else {
+                        Text("REPORT_IS_UPLOADED")
                     }
                 }
-                if !(modelData.selectedLog.is_uploaded_to_box ?? false) {
-                    Button(
-                        action: {
-                            self.showingConfirmationAlert = true
-                        },
-                        label: {
-                            if modelData.isOkayToSubmit{
-                                if modelData.selectedLog.is_report_submitted ?? false {
-                                    Text("UPDATE_REPORT")
-                                } else {
-                                    Text("SUBMIT_REPORT")
-                                }
-                            } else {
-                                Text("PLEASE_CONNECT_TO_SUITCASE")
-                            }
-                        })
-                    .disabled(!modelData.isSubmitDataReady || !modelData.isOkayToSubmit)
-                    .alert(Text("CONFIRM_REPORT_SUBMISSION"), isPresented: $showingConfirmationAlert){
-                        Button(role: .destructive,
-                               action: {
-                            modelData.submit(log: modelData.selectedLog)
-                            dismiss()
-                        },
-                               label: {Text("SUBMIT")})
+                /*
+                 .onTapGesture {
+                 let keyWindow = UIApplication.shared.connectedScenes
+                 .filter({$0.activationState == .foregroundActive})
+                 .map({$0 as? UIWindowScene})
+                 .compactMap({$0})
+                 .first?.windows
+                 .filter({$0.isKeyWindow}).first
+                 keyWindow?.endEditing(true)
+                 }*/
+            } else {
+                ProgressView()
+            }
+        }
+        .interactiveDismissDisabled(true)
+        .toolbar {
+            ToolbarItem(placement: ToolbarItemPlacement.navigationBarTrailing) {
+                Button {
+                    if modelData.isDetailModified {
+                        self.showingConfirmationAlert = true
+                    } else {
+                        dismiss()
                     }
-                } else {
-                    Text("REPORT_IS_UPLOADED")
+                } label: {
+                    Image(systemName: "xmark")
+                }
+                .alert(Text("CONFIRM_DISCARD_SUBMISSION"), isPresented: $showingConfirmationAlert){
+                    Button(role: .destructive,
+                           action: {
+                        dismiss()
+                    }, label: {
+                        Text("Yes")
+                    })
                 }
             }
-        } else {
-            ProgressView()
         }
     }
 }

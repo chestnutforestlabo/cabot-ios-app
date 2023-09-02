@@ -54,7 +54,7 @@ protocol CaBotServiceDelegate {
     func cabot(service:any CaBotTransportProtocol, deviceStatus:DeviceStatus)
     func cabot(service:any CaBotTransportProtocol, systemStatus:SystemStatus)
     func cabot(service:any CaBotTransportProtocol, batteryStatus:BatteryStatus)
-    func cabot(service:any CaBotTransportProtocol, logList:[LogEntry])
+    func cabot(service:any CaBotTransportProtocol, logList:[LogEntry], status: CaBotLogStatus)
     func cabot(service:any CaBotTransportProtocol, logDetail:LogEntry)
 }
 
@@ -315,6 +315,11 @@ struct NavigationEventRequest: Decodable {
     var param: String = ""
 }
 
+enum CaBotLogStatus:String, Decodable {
+    case OK
+    case NG
+}
+
 enum CaBotLogRequestType:String, Decodable {
     case list
     case detail
@@ -344,6 +349,7 @@ struct LogEntry: Decodable, Hashable {
 }
 
 struct LogResponse: Decodable {
+    var status: CaBotLogStatus?
     var response_id: Int64
     var type: CaBotLogRequestType
     var log_list: [LogEntry]?
@@ -422,7 +428,8 @@ class CaBotServiceActions {
             switch(response.type) {
             case .list:
                 let log_list = response.log_list ?? []
-                delegate.cabot(service: service, logList: log_list)
+                let status = response.status ?? .OK
+                delegate.cabot(service: service, logList: log_list, status: status)
                 break
             case .detail:
                 if let log_entry = response.log {
