@@ -181,6 +181,9 @@
 "SOCKET_ADDRESS"="ソケットアドレス";
 "SOCKET_ADDRESS_LABEL"="ソケットアドレス";
 "ROS_SOCKET_ADDRESS_LABEL"="ROSブリッジアドレス";
+"PRIMARY_IP_ADDRESS"="Primary IP Address";
+"SECONDARY_IP_ADDRESS"="Secondary IP Address";
+"PLACEHOLDER_IP_ADDRESS"="xxx.xxx.xxx.xx";
 
 "MODE_TYPE"="モード設定";
 "Normal"="通常";
