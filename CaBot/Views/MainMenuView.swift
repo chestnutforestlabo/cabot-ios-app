@@ -400,7 +400,9 @@ struct MapMenus: View {
             Section(header:Text("Map")) {
                 HStack {
                     NavigationLink(
-                        destination: RosWebView(socketAddr: modelData.rosSocketAddr),
+                        destination: RosWebView(primaryAddr: modelData.primaryAddr,
+                                                secondaryAddr: modelData.secondaryAddr,
+                                                port: modelData.rosPort),
                         label: {
                             Text("ROS Map")
                         })
@@ -463,7 +465,11 @@ struct SettingMenus: View {
                     }).disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
                 }
                 NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
-                                    .environmentObject(modelData)) {
+                    .environmentObject(modelData)
+                    .onDisappear {
+                        modelData.tcpServiceRestart()
+                    }
+                ) {
                     HStack {
                         Label(LocalizedStringKey("Settings"), systemImage: "gearshape")
                     }
