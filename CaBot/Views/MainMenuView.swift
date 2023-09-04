@@ -268,13 +268,15 @@ struct MainMenus: View {
                             Text("SELECT_DESTINATION")
                         })
                 }
-                if let src = cm.toursSource {
-                    NavigationLink(
-                        destination: ToursView(src: src)
-                            .environmentObject(modelData),
-                        label: {
-                            Text("SELECT_TOUR")
-                        })
+                if modelData.modeType == .Debug{
+                    if let src = cm.toursSource {
+                        NavigationLink(
+                            destination: ToursView(src: src)
+                                .environmentObject(modelData),
+                            label: {
+                                Text("SELECT_TOUR")
+                            })
+                    }
                 }
             }
 
