@@ -186,9 +186,15 @@ class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProt
         return (self.summonsChar.notify(value: destination))
     }
 
-    public func manage(command: CaBotManageCommand) -> Bool {
-        NSLog("manage \(command.rawValue)")
-        return (self.manageChar.notify(value: command.rawValue))
+    public func manage(command: CaBotManageCommand, param: String?) -> Bool {
+        if let param = param {
+            NSLog("manage \(command.rawValue)-\(param)")
+            return self.manageChar.notify(value: "\(command.rawValue)-\(param)")
+
+        } else {
+            NSLog("manage \(command.rawValue)")
+            return self.manageChar.notify(value: command.rawValue)
+        }
     }
     
     public func log_request(request: Dictionary<String, String>) -> Bool {

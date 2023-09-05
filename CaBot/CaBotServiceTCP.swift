@@ -97,12 +97,18 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
         return true
     }
     
-    func manage(command: CaBotManageCommand) -> Bool {
-        NSLog("manage \(command.rawValue)")
-        self.emit("manage_cabot", command.rawValue)//TODO emitwithack??
-        return true
+    func manage(command: CaBotManageCommand, param: String?) -> Bool {
+        if let param = param {
+            NSLog("manage \(command.rawValue)-\(param)")
+            self.emit("manage_cabot", "\(command.rawValue)-\(param)")
+            return true
+        } else {
+            NSLog("manage \(command.rawValue)")
+            self.emit("manage_cabot", command.rawValue)
+            return true
+        }
     }
-    
+
     func log_request(request: Dictionary<String, String>) -> Bool {
         NSLog("log_request \(request)")
         if let jsonString = try? JSONEncoder().encode(request) {

@@ -34,7 +34,7 @@ protocol CaBotServiceProtocol {
     func activityLog(category: String, text: String, memo: String) -> Bool
     func send(destination: String) -> Bool
     func summon(destination: String) -> Bool
-    func manage(command: CaBotManageCommand) -> Bool
+    func manage(command: CaBotManageCommand, param: String?) -> Bool
     func log_request(request: Dictionary<String, String>) -> Bool
     func isConnected() -> Bool
 }
@@ -63,6 +63,7 @@ enum NavigationNotification:String {
     case arrived
     case subtour
     case skip
+    case getlanguage
 }
 
 enum CaBotManageCommand:String {
@@ -70,6 +71,7 @@ enum CaBotManageCommand:String {
     case poweroff
     case start
     case stop
+    case lang
 }
 
 struct DeviceStatus: Decodable {
@@ -306,6 +308,7 @@ enum NavigationEventType:String, Decodable {
     case sound
     case subtour
     case skip
+    case getlanguage
     case unknown
 }
 
@@ -400,7 +403,7 @@ class CaBotServiceActions {
 
         DispatchQueue.main.async {
             switch(request.type) {
-            case .next, .arrived, .subtour, .skip:
+            case .next, .arrived, .subtour, .skip, .getlanguage:
                 if let note = NavigationNotification(rawValue: request.type.rawValue) {
                     delegate.cabot(service: service, notification: note)
                 } else {

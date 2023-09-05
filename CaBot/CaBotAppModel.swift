@@ -113,9 +113,9 @@ class FallbackService: CaBotServiceProtocol {
         return service.summon(destination: destination)
     }
 
-    func manage(command: CaBotManageCommand) -> Bool {
+    func manage(command: CaBotManageCommand, param: String? = nil) -> Bool {
         guard let service = getService() else { return false }
-        return service.manage(command: command)
+        return service.manage(command: command, param: param)
     }
     
     func log_request(request: Dictionary<String, String>) -> Bool {
@@ -477,6 +477,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
         if let selectedLang = UserDefaults.standard.value(forKey: selectedResourceLangKey) as? String {
             self.resource?.lang = selectedLang
+            self.fallbackService.manage(command: .lang, param: selectedLang)
             self.updateVoice()
         }
         if let groupID = UserDefaults.standard.value(forKey: teamIDKey) as? String {
@@ -758,6 +759,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             case .stop:
                 systemStatus.level = .Deactivating
                 break
+            case .lang:
+                break
             }
             systemStatus.components.removeAll()
             objectWillChange.send()
@@ -859,8 +862,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if self.suitcaseConnected != saveSuitcaseConnected {
             let text = centralConnected ? CustomLocalizedString("Suitcase has been connected", lang: self.resourceLang) :
                 CustomLocalizedString("Suitcase has been disconnected", lang: self.resourceLang)
-
             self.tts.speak(text, force: true) {_ in }
+            
+            if self.suitcaseConnected {
+                DispatchQueue.main.async {
+                    self.fallbackService.manage(command: .lang, param: self.resourceLang)
+                }
+            }
         }
     }
 
@@ -954,6 +962,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             break
         case .skip:
             self.skipDestination()
+        case .getlanguage:
+            DispatchQueue.main.async {
+                self.fallbackService.manage(command: .lang, param: I18N.shared.langCode)
+            }
             break
         }
     }
