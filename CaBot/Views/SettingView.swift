@@ -94,6 +94,21 @@ struct SettingView: View {
                     Toggle("NO_SUITCASE_DEBUG", isOn: $modelData.noSuitcaseDebug)
                 }
             }
+            
+            if (modelData.modeType == .Advanced) {
+                if let resource = modelData.resource {
+                    Picker("LANGUAGE", selection: $langOverride) {
+                        ForEach(resource.languages, id: \.self) { language in
+                            Text(language).tag(language)
+                        }
+                    }.onChange(of: langOverride) { lang in
+                        modelData.resource?.lang = lang
+                        self.isResourceChanging = true
+                        modelData.resource = modelData.resource
+                        modelData.updateVoice()
+                    }
+                }
+            }
         }
     }
 }
