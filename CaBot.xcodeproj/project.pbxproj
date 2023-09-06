@@ -45,6 +45,7 @@
 		30E99D94266A92EA001ACAAA /* JSHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99D93266A92EA001ACAAA /* JSHelper.swift */; };
 		30E99D96266A993E001ACAAA /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99D95266A993E001ACAAA /* Extension.swift */; };
 		30E99DA4266B2216001ACAAA /* BeaconSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99DA3266B2216001ACAAA /* BeaconSampler.swift */; };
+		458B54392A970B4A00AD9D10 /* LogFilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 458B54382A970B4A00AD9D10 /* LogFilesView.swift */; };
 		7E29F014228B548200CA7DD6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F013228B548200CA7DD6 /* Assets.xcassets */; };
 		7E29F022228B548200CA7DD6 /* CaBotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F021228B548200CA7DD6 /* CaBotTests.swift */; };
 		7E29F02D228B548200CA7DD6 /* CaBotUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F02C228B548200CA7DD6 /* CaBotUITests.swift */; };
@@ -135,6 +136,7 @@
 		30E99D93266A92EA001ACAAA /* JSHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSHelper.swift; sourceTree = "<group>"; };
 		30E99D95266A993E001ACAAA /* Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
 		30E99DA3266B2216001ACAAA /* BeaconSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeaconSampler.swift; sourceTree = "<group>"; };
+		458B54382A970B4A00AD9D10 /* LogFilesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogFilesView.swift; sourceTree = "<group>"; };
 		7E29F009228B548100CA7DD6 /* CaBot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CaBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E29F013228B548200CA7DD6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7E29F018228B548200CA7DD6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -244,6 +246,7 @@
 				3096BF1326A5C29F0066F256 /* SettingView.swift */,
 				7E9690C229EAF25C0062DEBD /* DetailSettingView.swift */,
 				E561455E2A6E02A8005CF82F /* RosWebView.swift */,
+				458B54382A970B4A00AD9D10 /* LogFilesView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -544,6 +547,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				09725B0A24FE4AC300012D42 /* DialogViewControllerCabot.swift in Sources */,
+				458B54392A970B4A00AD9D10 /* LogFilesView.swift in Sources */,
 				30E50DD0269F76F000729ABD /* CaBotAppModel.swift in Sources */,
 				30E50DD7269F784A00729ABD /* OnboardGrantAccess.swift in Sources */,
 				7E9690C329EAF25C0062DEBD /* DetailSettingView.swift in Sources */,

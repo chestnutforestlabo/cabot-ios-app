@@ -181,8 +181,8 @@
 "SOCKET_ADDRESS"="ソケットアドレス";
 "SOCKET_ADDRESS_LABEL"="ソケットアドレス";
 "ROS_SOCKET_ADDRESS_LABEL"="ROSブリッジアドレス";
-"PRIMARY_IP_ADDRESS"="Primary IP Address";
-"SECONDARY_IP_ADDRESS"="Secondary IP Address";
+"PRIMARY_IP_ADDRESS"="プライマリ IP";
+"SECONDARY_IP_ADDRESS"="セカンダリ IP";
 "PLACEHOLDER_IP_ADDRESS"="xxx.xxx.xxx.xx";
 
 "MODE_TYPE"="モード設定";
@@ -214,6 +214,22 @@
 "Delay after closing browser"="ブラウザを閉じた後の待ち時間";
 "%.1f seconds"="%.1f秒";
 "%.1f sec"="%.1f秒";
+
+
+// Report a Bag
+"REPORT_BUG" = "バグを報告";
+"SELECT_LOG" = "ログを選択";
+"REPORT_TITLE" = "件名";
+"REPORT_DETAILS" = "詳細";
+"ENTER_REPORT_TITLE" = "件名を入力";
+"ENTER_REPORT_DETAILS" = "詳細を入力";
+"SUBMIT_REPORT" = "レポートを提出";
+"UPDATE_REPORT" = "レポートを更新";
+"REPORT_IS_UPLOADED" = "レポートは既にアップロードされました";
+"SUBMIT" = "提出";
+"CONFIRM_DISCARD_SUBMISSION" = "レポートを破棄しても良いですか？";
+"SUITCASE_DOES_NOT_ACCEPT_NEW_REPORT" = "スーツケースはレポートの提出を受け付けていません";
+"PLEASE_CONNECT_TO_SUITCASE" = "スーツケースと接続してください";
 
 
 // TTSHelper

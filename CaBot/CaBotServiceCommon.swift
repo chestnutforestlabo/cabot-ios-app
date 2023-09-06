@@ -34,7 +34,8 @@ protocol CaBotServiceProtocol {
     func activityLog(category: String, text: String, memo: String) -> Bool
     func send(destination: String) -> Bool
     func summon(destination: String) -> Bool
-    func manage(command: CaBotManageCommand) -> Bool
+    func manage(command: CaBotManageCommand, param: String?) -> Bool
+    func log_request(request: Dictionary<String, String>) -> Bool
     func isConnected() -> Bool
 }
 
@@ -53,6 +54,8 @@ protocol CaBotServiceDelegate {
     func cabot(service:any CaBotTransportProtocol, deviceStatus:DeviceStatus)
     func cabot(service:any CaBotTransportProtocol, systemStatus:SystemStatus)
     func cabot(service:any CaBotTransportProtocol, batteryStatus:BatteryStatus)
+    func cabot(service:any CaBotTransportProtocol, logList:[LogEntry], status: CaBotLogStatus)
+    func cabot(service:any CaBotTransportProtocol, logDetail:LogEntry)
 }
 
 enum NavigationNotification:String {
@@ -60,6 +63,7 @@ enum NavigationNotification:String {
     case arrived
     case subtour
     case skip
+    case getlanguage
 }
 
 enum CaBotManageCommand:String {
@@ -67,6 +71,7 @@ enum CaBotManageCommand:String {
     case poweroff
     case start
     case stop
+    case lang
 }
 
 struct DeviceStatus: Decodable {
@@ -303,6 +308,7 @@ enum NavigationEventType:String, Decodable {
     case sound
     case subtour
     case skip
+    case getlanguage
     case unknown
 }
 
@@ -312,6 +318,47 @@ struct NavigationEventRequest: Decodable {
     var param: String = ""
 }
 
+enum CaBotLogStatus:String, Decodable {
+    case OK
+    case NG
+}
+
+enum CaBotLogRequestType:String, Decodable {
+    case list
+    case detail
+    case report
+}
+
+struct LogEntry: Decodable, Hashable {
+    var name: String
+    var title: String?
+    var detail: String?
+    var is_report_submitted: Bool? = false
+    var is_uploaded_to_box: Bool? = false
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
+    }
+    
+    var canSubmit: Bool {
+        get {
+            if let title = title,
+               let detail = detail {
+                return title.count > 0 && detail.count > 0
+            }
+            return false
+        }
+    }
+}
+
+struct LogResponse: Decodable {
+    var status: CaBotLogStatus?
+    var response_id: Int64
+    var type: CaBotLogRequestType
+    var log_list: [LogEntry]?
+    var log: LogEntry?
+}
+
 class CaBotServiceActions {
     static let shared = CaBotServiceActions()
     private init() {
@@ -319,6 +366,7 @@ class CaBotServiceActions {
 
     private var lastSpeakRequestID: Int64 = 0
     private var lastNavigationEventRequestID: Int64 = 0
+    private var lastLogResponseID: Int64 = 0
 
     func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, tts: CaBotTTS, request: SpeakRequest) {
         // noop for same request ID from different transport
@@ -355,7 +403,7 @@ class CaBotServiceActions {
 
         DispatchQueue.main.async {
             switch(request.type) {
-            case .next, .arrived, .subtour, .skip:
+            case .next, .arrived, .subtour, .skip, .getlanguage:
                 if let note = NavigationNotification(rawValue: request.type.rawValue) {
                     delegate.cabot(service: service, notification: note)
                 } else {
@@ -369,6 +417,30 @@ class CaBotServiceActions {
             case .sound:
                 delegate.cabot(service: service, soundRequest: request.param)
             case .unknown:
+                break
+            }
+        }
+    }
+    
+    func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, response: LogResponse) {
+        // noop for same request ID from different transport
+        guard lastLogResponseID < response.response_id else { return }
+        lastLogResponseID = response.response_id
+
+        DispatchQueue.main.async {
+            switch(response.type) {
+            case .list:
+                let log_list = response.log_list ?? []
+                let status = response.status ?? .OK
+                delegate.cabot(service: service, logList: log_list, status: status)
+                break
+            case .detail:
+                if let log_entry = response.log {
+                    delegate.cabot(service: service, logDetail: log_entry)
+                }
+                break
+            case .report:
+                // never happen
                 break
             }
         }

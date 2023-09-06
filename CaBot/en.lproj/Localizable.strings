@@ -181,8 +181,8 @@
 "SOCKET_ADDRESS"="Socket Address";
 "SOCKET_ADDRESS_LABEL"="Socket Address";
 "ROS_SOCKET_ADDRESS_LABEL"="ROS Bridge Address";
-"PRIMARY_IP_ADDRESS"="Primary IP Address";
-"SECONDARY_IP_ADDRESS"="Secondary IP Address";
+"PRIMARY_IP_ADDRESS"="Primary IP";
+"SECONDARY_IP_ADDRESS"="Secondary IP";
 "PLACEHOLDER_IP_ADDRESS"="xxx.xxx.xxx.xx";
 
 "MODE_TYPE"="Mode";
@@ -214,6 +214,22 @@
 "Delay after closing browser"="Delay after closing browser";
 "%.1f seconds"="%.1f seconds";
 "%.1f sec"="%.1f sec";
+
+
+// Report a Bag
+"REPORT_BUG" = "Report a bug";
+"SELECT_LOG" = "Select a Log";
+"REPORT_TITLE" = "Title";
+"REPORT_DETAILS" = "Details";
+"ENTER_REPORT_TITLE" = "Enter the report's title";
+"ENTER_REPORT_DETAILS" = "Enter the details of the bug";
+"SUBMIT_REPORT" = "Submit your report";
+"UPDATE_REPORT" = "Update your report";
+"REPORT_IS_UPLOADED" = "Report has already uploaded";
+"SUBMIT" = "Submit";
+"CONFIRM_DISCARD_SUBMISSION" = "Do you want to discard the report?";
+"SUITCASE_DOES_NOT_ACCEPT_NEW_REPORT" = "The suitcase does not accept new report";
+"PLEASE_CONNECT_TO_SUITCASE" = "Please connect the smartphone to the suitcase";
 
 
 // TTSHelper

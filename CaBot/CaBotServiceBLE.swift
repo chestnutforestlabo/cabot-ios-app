@@ -68,6 +68,7 @@ class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProt
     private var heartbeatChar:CaBotNotifyChar!
     private var speechChar:CaBotSpeechChar!
     private var manageChar:CaBotNotifyChar!
+    private var logRequestChar:CaBotNotifyChar!
     private var characteristics:[CBCharacteristic] = []
     private var chars:[CaBotChar] = []
     private let peripheralRestoreKey:String = UUID().uuidString
@@ -108,6 +109,11 @@ class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProt
 
         self.naviChar = CaBotNaviChar(service: self, handle:0x0040)
         self.chars.append(self.naviChar)
+        
+        self.logRequestChar = CaBotNotifyChar(service: self, handle:0x0050)
+        self.chars.append(self.logRequestChar)
+        
+        self.chars.append(CaBotLogResponseChar(service: self, handle:0x0051))
 
         self.heartbeatChar = CaBotNotifyChar(service: self, handle:0x9999)
         self.chars.append(self.heartbeatChar)
@@ -180,9 +186,23 @@ class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProt
         return (self.summonsChar.notify(value: destination))
     }
 
-    public func manage(command: CaBotManageCommand) -> Bool {
-        NSLog("manage \(command.rawValue)")
-        return (self.manageChar.notify(value: command.rawValue))
+    public func manage(command: CaBotManageCommand, param: String?) -> Bool {
+        if let param = param {
+            NSLog("manage \(command.rawValue)-\(param)")
+            return self.manageChar.notify(value: "\(command.rawValue)-\(param)")
+
+        } else {
+            NSLog("manage \(command.rawValue)")
+            return self.manageChar.notify(value: command.rawValue)
+        }
+    }
+    
+    public func log_request(request: Dictionary<String, String>) -> Bool {
+        NSLog("log_request \(request)")
+        if let jsonData = try? JSONEncoder().encode(request) {
+            return self.logRequestChar.notify(data: jsonData)
+        }
+        return false
     }
 
     public func isConnected() -> Bool {
@@ -531,6 +551,13 @@ class CaBotNaviChar: CaBotJSONChar<NavigationEventRequest> {
     override func handle(json: NavigationEventRequest) {
         guard let delegate = self.service.delegate else { return }
         self.service.actions.handle(service: self.service, delegate: delegate, request: json)
+    }
+}
+
+class CaBotLogResponseChar: CaBotJSONChar<LogResponse> {
+    override func handle(json: LogResponse) {
+        guard let delegate = self.service.delegate else { return }
+        self.service.actions.handle(service: self.service, delegate: delegate, response: json)
     }
 }
 

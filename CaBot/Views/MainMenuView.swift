@@ -268,13 +268,15 @@ struct MainMenus: View {
                             Text("SELECT_DESTINATION")
                         })
                 }
-                if let src = cm.toursSource {
-                    NavigationLink(
-                        destination: ToursView(src: src)
-                            .environmentObject(modelData),
-                        label: {
-                            Text("SELECT_TOUR")
-                        })
+                if modelData.modeType == .Debug{
+                    if let src = cm.toursSource {
+                        NavigationLink(
+                            destination: ToursView(src: src)
+                                .environmentObject(modelData),
+                            label: {
+                                Text("SELECT_TOUR")
+                            })
+                    }
                 }
             }
 
@@ -431,7 +433,7 @@ struct SettingMenus: View {
             }.onChange(of: modelData.voice, perform: { value in
                 if let voice = modelData.voice {
                     if !isResourceChanging {
-                        TTSHelper.playSample(of: voice)
+                        TTSHelper.playSample(of: voice, at: modelData.speechRate)
                     }
                 }
             }).onTapGesture {
@@ -457,6 +459,13 @@ struct SettingMenus: View {
                     .accessibility(hidden: true)
             }
             if (modelData.modeType == .Advanced || modelData.modeType == .Debug) {
+                if #available(iOS 15.0, *) {
+                    NavigationLink (destination: LogFilesView(langOverride: modelData.resourceLang)
+                        .environmentObject(modelData.logList),
+                                    label: {
+                        Text("REPORT_BUG")
+                    }).disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
+                }
                 NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
                     .environmentObject(modelData)
                     .onDisappear {

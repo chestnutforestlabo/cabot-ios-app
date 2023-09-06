@@ -97,11 +97,27 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
         return true
     }
     
-    func manage(command: CaBotManageCommand) -> Bool {
-        NSLog("manage \(command.rawValue)")
-        self.emit("manage_cabot", command.rawValue)//TODO emitwithack??
-        return true
+    func manage(command: CaBotManageCommand, param: String?) -> Bool {
+        if let param = param {
+            NSLog("manage \(command.rawValue)-\(param)")
+            self.emit("manage_cabot", "\(command.rawValue)-\(param)")
+            return true
+        } else {
+            NSLog("manage \(command.rawValue)")
+            self.emit("manage_cabot", command.rawValue)
+            return true
+        }
     }
+
+    func log_request(request: Dictionary<String, String>) -> Bool {
+        NSLog("log_request \(request)")
+        if let jsonString = try? JSONEncoder().encode(request) {
+            self.emit("log_request", jsonString)
+            return true
+        }
+        return false
+    }
+
 
     public func isConnected() -> Bool {
         return self.connected
@@ -262,6 +278,19 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
             do {
                 let request = try JSONDecoder().decode(NavigationEventRequest.self, from: data)
                 weakself.actions.handle(service: weakself, delegate: delegate, request: request)
+            } catch {
+                print(text)
+                NSLog(error.localizedDescription)
+            }
+        }
+        socket.on("log_response"){[weak self] dt, ack in
+            guard let text = dt[0] as? String else { return }
+            guard let data = String(text).data(using:.utf8) else { return }
+            guard let weakself = self else { return }
+            guard let delegate = weakself.delegate else { return }
+            do {
+                let response = try JSONDecoder().decode(LogResponse.self, from: data)
+                weakself.actions.handle(service: weakself, delegate: delegate, response: response)
             } catch {
                 print(text)
                 NSLog(error.localizedDescription)

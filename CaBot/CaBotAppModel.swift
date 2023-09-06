@@ -113,9 +113,14 @@ class FallbackService: CaBotServiceProtocol {
         return service.summon(destination: destination)
     }
 
-    func manage(command: CaBotManageCommand) -> Bool {
+    func manage(command: CaBotManageCommand, param: String? = nil) -> Bool {
         guard let service = getService() else { return false }
-        return service.manage(command: command)
+        return service.manage(command: command, param: param)
+    }
+    
+    func log_request(request: Dictionary<String, String>) -> Bool {
+        guard let service = getService() else { return false }
+        return service.log_request(request: request)
     }
 }
 
@@ -212,7 +217,7 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
     }
 }
 
-final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, TourManagerDelegate, CLLocationManagerDelegate, CaBotTTSDelegate {
+final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, TourManagerDelegate, CLLocationManagerDelegate, CaBotTTSDelegate, LogReportModelDelegate{
 
     private let DEFAULT_LANG = "en"
     
@@ -286,6 +291,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     UserDefaults.standard.setValue(langOverride, forKey: selectedResourceLangKey)
                 }
                 UserDefaults.standard.synchronize()
+                
+                self.fallbackService.manage(command: .lang, param: resource.lang)
             }
         }
     }
@@ -409,7 +416,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var contentURL: URL? = nil
     @Published var tourUpdated: Bool = false
 
-
     @Published var deviceStatus: DeviceStatus = DeviceStatus()
     @Published var systemStatus: SystemStatusData = SystemStatusData()
     @Published var batteryStatus: BatteryStatus = BatteryStatus()
@@ -419,6 +425,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private var fallbackService: FallbackService
     private let tts: CaBotTTS
     private var lastUpdated: Int64 = 0
+    let logList: LogReportModel = LogReportModel()
     let preview: Bool
     let resourceManager: ResourceManager
     let tourManager: TourManager
@@ -465,6 +472,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         super.init()
 
         self.tts.delegate = self
+        self.logList.delegate = self
 
         if let selectedIdentifier = UserDefaults.standard.value(forKey: selectedResourceKey) as? String {
             self.resource = resourceManager.resource(by: selectedIdentifier)
@@ -577,6 +585,37 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func activityLog(category: String, text: String, memo: String) {
         _ = self.fallbackService.activityLog(category: category, text: text, memo: memo)
+    }
+    
+    // MARK: LogReportModelDelegate
+    
+    func refreshLogList() {
+        let request = [
+            "type": CaBotLogRequestType.list.rawValue
+        ]
+        _ = self.fallbackService.log_request(request: request)
+    }
+    
+    func isSuitcaseConnected() -> Bool {
+        return self.suitcaseConnected
+    }
+    
+    func requestDetail(log_name: String) {
+        let request = [
+            "type": CaBotLogRequestType.detail.rawValue,
+            "log_name": log_name
+        ]
+        _ = self.fallbackService.log_request(request: request)
+    }
+    
+    func submitLogReport(log_name: String, title: String, detail: String) {
+        let request = [
+            "type": CaBotLogRequestType.report.rawValue,
+            "log_name": log_name,
+            "title": title,
+            "detail": detail
+        ]
+        _ = self.fallbackService.log_request(request: request)
     }
 
     // MARK: LocationManagerDelegate
@@ -721,6 +760,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             case .stop:
                 systemStatus.level = .Deactivating
                 break
+            case .lang:
+                break
             }
             systemStatus.components.removeAll()
             objectWillChange.send()
@@ -822,8 +863,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if self.suitcaseConnected != saveSuitcaseConnected {
             let text = centralConnected ? CustomLocalizedString("Suitcase has been connected", lang: self.resourceLang) :
                 CustomLocalizedString("Suitcase has been disconnected", lang: self.resourceLang)
-
             self.tts.speak(text, force: true) {_ in }
+            
+            if self.suitcaseConnected {
+                DispatchQueue.main.async {
+                    self.fallbackService.manage(command: .lang, param: self.resourceLang)
+                }
+            }
         }
     }
 
@@ -917,6 +963,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             break
         case .skip:
             self.skipDestination()
+        case .getlanguage:
+            DispatchQueue.main.async {
+                self.fallbackService.manage(command: .lang, param: I18N.shared.langCode)
+            }
             break
         }
     }
@@ -931,6 +981,17 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func cabot(service: any CaBotTransportProtocol, batteryStatus: BatteryStatus) -> Void {
         self.batteryStatus = batteryStatus
+    }
+    
+    func cabot(service: any CaBotTransportProtocol, logList: [LogEntry], status: CaBotLogStatus) {
+        NSLog("set log list \(logList)")
+        self.logList.set(list: logList)
+        self.logList.set(status: status)
+    }
+    
+    func cabot(service: any CaBotTransportProtocol, logDetail: LogEntry) {
+        NSLog("set log detail \(logDetail)")
+        self.logList.set(detail: logDetail)
     }
 }
 
@@ -1047,6 +1108,90 @@ class SystemStatusData: NSObject, ObservableObject {
         }
     }
 }
+
+protocol LogReportModelDelegate {
+    func refreshLogList()
+    func isSuitcaseConnected() -> Bool
+    func requestDetail(log_name: String)
+    func submitLogReport(log_name: String, title: String, detail: String)
+}
+
+class LogReportModel: NSObject, ObservableObject {
+    @Published var log_list: [LogEntry]
+    @Published var isListReady: Bool = false
+    @Published var status: CaBotLogStatus = .OK
+    @Published var selectedLog: LogEntry = LogEntry(name: "dummy")
+    private var originalLog: LogEntry = LogEntry(name: "dummy")
+    @Published var isDetailReady: Bool = false
+    var delegate: LogReportModelDelegate? = nil
+    var debug: Bool = false
+    
+    override init() {
+        self.log_list = []
+    }
+    
+    func set(list: [LogEntry]){
+        self.log_list = list
+        self.isListReady = true
+    }
+
+    func set(status: CaBotLogStatus) {
+        self.status = status
+    }
+    
+    func set(detail: LogEntry) {
+        self.selectedLog = detail
+        self.originalLog.title = detail.title
+        self.originalLog.detail = detail.detail
+        self.isDetailReady = true
+    }
+    
+    func clear(){
+        self.log_list = []
+        self.isListReady = false
+    }
+    
+    func refreshLogList() {
+        self.delegate?.refreshLogList()
+    }
+    
+    func requestDetail(log: LogEntry) {
+        isDetailReady = false || debug
+        self.delegate?.requestDetail(log_name: log.name)
+    }
+    
+    func submit(log: LogEntry) {
+        if let title = log.title,
+           let detail = log.detail {
+            self.delegate?.submitLogReport(log_name: log.name, title: title, detail: detail)
+        }
+    }
+    
+    var isSuitcaseConnected: Bool {
+        get {
+            self.delegate?.isSuitcaseConnected() ?? false
+        }
+    }
+    
+    var isOkayToSubmit: Bool {
+        get {
+            isSuitcaseConnected && status == .OK
+        }
+    }
+    
+    var isSubmitDataReady: Bool {
+        get {
+            selectedLog.title?.count ?? 0 > 0 && selectedLog.detail?.count ?? 0 > 0
+        }
+    }
+    
+    var isDetailModified: Bool {
+        get {
+            originalLog.title != selectedLog.title || originalLog.detail != selectedLog.detail
+        }
+    }
+}
+    
 
 struct PersistenceController {
     static let shared = PersistenceController()
