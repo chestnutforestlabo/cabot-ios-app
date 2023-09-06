@@ -433,7 +433,7 @@ struct SettingMenus: View {
             }.onChange(of: modelData.voice, perform: { value in
                 if let voice = modelData.voice {
                     if !isResourceChanging {
-                        TTSHelper.playSample(of: voice)
+                        TTSHelper.playSample(of: voice, at: modelData.speechRate)
                     }
                 }
             }).onTapGesture {
