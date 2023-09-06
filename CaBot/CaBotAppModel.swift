@@ -291,6 +291,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     UserDefaults.standard.setValue(langOverride, forKey: selectedResourceLangKey)
                 }
                 UserDefaults.standard.synchronize()
+                
+                self.fallbackService.manage(command: .lang, param: resource.lang)
             }
         }
     }
@@ -477,7 +479,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
         if let selectedLang = UserDefaults.standard.value(forKey: selectedResourceLangKey) as? String {
             self.resource?.lang = selectedLang
-            self.fallbackService.manage(command: .lang, param: selectedLang)
             self.updateVoice()
         }
         if let groupID = UserDefaults.standard.value(forKey: teamIDKey) as? String {
