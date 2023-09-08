@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021  Carnegie Mellon University
+ * Copyright (c) 2014, 2016  IBM Corporation, Carnegie Mellon University and others
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,47 +20,18 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-import SwiftUI
-import CoreBluetooth
-import CoreLocation
-import HealthKit
-import os.log
+#import <Foundation/Foundation.h>
 
-// override NSLog
-public func NSLog(_ format: String, _ args: CVarArg...) {
-    withVaList(args) { NavNSLogv(format, $0) }
-}
+void NavNSLog(NSString* fmt, ...);
+void NavNSLogv(NSString* fmt, va_list args);
 
-@main
-struct CaBotApp: App {
-    @Environment(\.scenePhase) var scenePhase
-    
-    var modelData: CaBotAppModel = CaBotAppModel(preview: false)
+@interface Logging : NSObject
 
-    var body: some Scene {
-        WindowGroup {
-            RootView()
-                .environmentObject(modelData)
-        }.onChange(of: scenePhase) { newScenePhase in
++ (NSString*)startLog:(BOOL)isSensorLogging;
++ (NSString*)logFilePath;
++ (void)stopLog;
++ (BOOL)isLogging;
++ (BOOL)isSensorLogging;
++ (void)logType:(NSString*)type withParam:(NSDictionary*)param;
 
-            modelData.onChange(of: newScenePhase)
-
-            switch newScenePhase {
-            case .background:
-                break
-            case .inactive:
-                break
-            case .active:
-                let isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
-                if isVoiceOverRunning {
-                    modelData.stopSpeak()
-                }
-                Logging.stopLog()
-                Logging.startLog(true)
-                break
-            @unknown default:
-                break
-            }
-        }
-    }
-}
+@end

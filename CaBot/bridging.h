@@ -23,6 +23,7 @@
 #ifndef bridging_h
 #define bridging_h
 
+#include "Logging.h"
 #include "NavDeviceTTS.h"
 #include "NavUtil.h"
 

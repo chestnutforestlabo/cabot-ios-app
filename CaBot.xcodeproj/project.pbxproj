@@ -51,6 +51,7 @@
 		7E29F02D228B548200CA7DD6 /* CaBotUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F02C228B548200CA7DD6 /* CaBotUITests.swift */; };
 		7E29F06D228B55C000CA7DD6 /* NavDeviceTTS.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F062228B55C000CA7DD6 /* NavDeviceTTS.m */; };
 		7E29F072228B55FC00CA7DD6 /* CaBotServiceBLE.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F070228B55FC00CA7DD6 /* CaBotServiceBLE.swift */; };
+		7E51C3902AABA88C0095945F /* Logging.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E51C38F2AABA88C0095945F /* Logging.m */; };
 		7E557F002581C79B00B1B9CA /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7E557EFE2581C79B00B1B9CA /* Localizable.strings */; };
 		7E9690C329EAF25C0062DEBD /* DetailSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E9690C229EAF25C0062DEBD /* DetailSettingView.swift */; };
 		7EDE7C8629B428BB00A65829 /* data in Resources */ = {isa = PBXBuildFile; fileRef = 7EDE7C8529B428BB00A65829 /* data */; };
@@ -150,6 +151,8 @@
 		7E29F062228B55C000CA7DD6 /* NavDeviceTTS.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NavDeviceTTS.m; sourceTree = "<group>"; };
 		7E29F06F228B55FC00CA7DD6 /* bridging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bridging.h; sourceTree = "<group>"; };
 		7E29F070228B55FC00CA7DD6 /* CaBotServiceBLE.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaBotServiceBLE.swift; sourceTree = "<group>"; };
+		7E51C38E2AABA88C0095945F /* Logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logging.h; sourceTree = "<group>"; };
+		7E51C38F2AABA88C0095945F /* Logging.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Logging.m; sourceTree = "<group>"; };
 		7E557EFF2581C79B00B1B9CA /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		7E557F042581C80E00B1B9CA /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		7E9690C229EAF25C0062DEBD /* DetailSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailSettingView.swift; sourceTree = "<group>"; };
@@ -320,6 +323,8 @@
 		7E29F04B228B55C000CA7DD6 /* FromNavCog */ = {
 			isa = PBXGroup;
 			children = (
+				7E51C38E2AABA88C0095945F /* Logging.h */,
+				7E51C38F2AABA88C0095945F /* Logging.m */,
 				7E29F04C228B55C000CA7DD6 /* NavDeviceTTS.h */,
 				7E29F062228B55C000CA7DD6 /* NavDeviceTTS.m */,
 				7EF5F1E9228DB07100788987 /* NavUtil.h */,
@@ -562,6 +567,7 @@
 				3013614726A1E77B0050CF9E /* WebContentView.swift in Sources */,
 				7E29F06D228B55C000CA7DD6 /* NavDeviceTTS.m in Sources */,
 				3013614326A0F8E10050CF9E /* TourDetailView.swift in Sources */,
+				7E51C3902AABA88C0095945F /* Logging.m in Sources */,
 				30E50DD4269F77CE00729ABD /* RootView.swift in Sources */,
 				7EF5F1EA228DB07100788987 /* NavUtil.m in Sources */,
 				30E50DDF26A0B21200729ABD /* ConversationView.swift in Sources */,
