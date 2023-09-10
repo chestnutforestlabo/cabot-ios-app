@@ -181,6 +181,8 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
             RunLoop.current.run()
         }
     }
+
+    var last_data_received_time: TimeInterval = 0
      
     private func connectToServer() {
         let addr = getAddr()
@@ -225,6 +227,7 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
             guard let weakself = self else { return }
             guard let delegate = weakself.delegate else { return }
             delegate.caBot(service: weakself, versionMatched: text == weakself.version, with: text)
+            weakself.last_data_received_time = Date().timeIntervalSince1970
         }
         socket.on("device_status"){[weak self] dt, ack in
             guard let text = dt[0] as? String else { return }
@@ -362,14 +365,21 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
         }
         return ""
     }
-    
+
     var heartBeatTimer:Timer? = nil
-    
+
     private func startHeartBeat() {
         self.heartBeatTimer?.invalidate()
         DispatchQueue.global(qos: .utility).async {
-            self.heartBeatTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { (timer) in
-                self.emit("heartbeat", "true")
+            self.heartBeatTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] (timer) in
+                guard let weakself = self else { return }
+                weakself.emit("heartbeat", "true")
+                weakself.emit("req_version", true)
+
+                let now = Date().timeIntervalSince1970
+                if now - weakself.last_data_received_time > 5.0 {
+                    weakself.stop()
+                }
             }
             RunLoop.current.run()
         }
