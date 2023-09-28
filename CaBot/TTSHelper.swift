@@ -56,7 +56,7 @@ class CaBotTTS : TTSProtocol{
         let isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
         let selfspeak = forceSelfvoice || !isForeground || !isVoiceOverRunning
 
-        self.delegate?.activityLog(category: "app apeech speaking", text: text ?? "", memo: "force=\(force)")
+        self.delegate?.activityLog(category: "app speech speaking", text: text ?? "", memo: "force=\(force)")
 
         var options:Dictionary<String,Any> = ["rate": rate, "selfspeak": selfspeak, "force": force]
         if let voice = self.voice {
@@ -64,9 +64,9 @@ class CaBotTTS : TTSProtocol{
         }
         self._tts.speak(text == nil ? "" : text, withOptions: options) { code in
             if code > 0 {
-                self.delegate?.activityLog(category: "app apeech completed", text: text ?? "", memo: "force=\(force)")
+                self.delegate?.activityLog(category: "app speech completed", text: text ?? "", memo: "force=\(force)")
             } else {
-                self.delegate?.activityLog(category: "app apeech canceled", text: text ?? "", memo: "force=\(force)")
+                self.delegate?.activityLog(category: "app speech canceled", text: text ?? "", memo: "force=\(force)")
             }
             callback(code)
         }

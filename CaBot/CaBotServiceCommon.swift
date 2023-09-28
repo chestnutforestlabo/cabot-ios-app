@@ -379,9 +379,9 @@ class CaBotServiceActions {
             }
             let line = request.text
             let force = request.force
-            if !tts.isSpeaking {
+            if !tts.isSpeaking || force {
                 _ = service.activityLog(category: "ble speech request speaking", text: String(line), memo: "force=\(force)")
-                tts.speak(String(line)) { code in
+                tts.speak(String(line), force: force) { code in
                     if code > 0 {
                         _ = service.activityLog(category: "ble speech request completed", text: String(line), memo: "force=\(force),return_code=\(code)")
                     } else {

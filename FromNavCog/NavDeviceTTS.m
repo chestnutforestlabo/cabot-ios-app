@@ -89,7 +89,8 @@ static NavDeviceTTS *instance = nil;
     voice = [[AVSpeechSynthesizer alloc] init];
     voice.delegate = self;
     
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_queue_t queue = dispatch_get_global_queue(QOS_CLASS_UTILITY, 0);
+    dispatch_async(queue, ^{
         self->speakTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(processSpeak:) userInfo:nil repeats:YES];
     });
 }
