@@ -34,8 +34,7 @@ heart_beat|0x9999|OUT|text|send heart beat every second
 ## How to build
 
 ```
-$ carthage bootstrap
-$ open CaBot.xcworkspace
+$ open CaBot.xcworkspace and build
 ```
 
 ### Model data structure
@@ -44,7 +43,11 @@ Main Bundle
  | - Resource
      | - Resource_DIR
          | - _metadata.yaml
-	 | - ...
+         | - ...
+     | - <any subdir>
+         | - Resource_DIR
+             | - _metadata.yaml
+             | - ...
 ```
 
 ### Metadata format

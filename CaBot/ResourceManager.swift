@@ -1020,9 +1020,9 @@ class ResourceManager {
 
         let fm = FileManager.default
         do {
-            for dir in try fm.contentsOfDirectory(at: resourceRoot,
-                                                  includingPropertiesForKeys: [.isDirectoryKey],
-                                                  options: []) {
+            let enumerator: FileManager.DirectoryEnumerator? = fm.enumerator(at: resourceRoot, includingPropertiesForKeys: [.isDirectoryKey], options: [], errorHandler: nil)
+
+            while let dir = enumerator?.nextObject() as? URL {
                 if fm.fileExists(atPath: dir.appendingPathComponent(Resource.METADATA_FILE_NAME).path) {
                     do {
                         let model = try Resource(at: dir)
