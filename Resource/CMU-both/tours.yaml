@@ -1,0 +1,11 @@
+-
+  title-ja: NSH4Fツアー
+  title-en: NSH4F Tour
+  id: test_tour
+  destinations:
+    -
+      ref: destinations.yaml/EDITOR_node_1496171294096
+    -
+      ref: destinations.yaml/EDITOR_node_1490194296144
+    -
+      ref: destinations.yaml/EDITOR_node_1498748753059

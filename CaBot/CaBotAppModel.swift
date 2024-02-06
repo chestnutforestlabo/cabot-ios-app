@@ -776,7 +776,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     func tourUpdated(manager: TourManager) {
         tourUpdated = true
         UIApplication.shared.isIdleTimerDisabled = manager.hasDestination
-
+        self.activityLog(category: "tour-text", text: manager.title.text, memo: manager.title.pron)
     }
 
     func tour(manager: TourManager, destinationChanged destination: Destination?) {
@@ -805,6 +805,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                         }
                     }
                 }
+                self.activityLog(category: "destination-text", text: dest.title.text, memo: dest.title.pron)
             }
         } else {
             _ = send(destination: "__cancel__")
