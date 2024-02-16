@@ -30,7 +30,7 @@ struct SystemStatusView: View {
     var body: some View {
         return VStack {
             Form {
-                if (modelData.modeType == .Debug){
+                if (modelData.modeType == .Advanced || modelData.modeType == .Debug) {
                     Section(header:Text("Details")) {
                         List {
                             HStack {
@@ -53,9 +53,7 @@ struct SystemStatusView: View {
                             }
                         }
                     }
-                }
 
-                if (modelData.modeType == .Advanced || modelData.modeType == .Debug) {
                     Section(header:Text("Actions")) {
                         if !modelData.suitcaseConnected {
                             Label(LocalizedStringKey("Suitcase Not Connected"),
@@ -102,6 +100,7 @@ struct SystemStatusView_Previews: PreviewProvider {
     static var previews: some View {
         let modelData = CaBotAppModel()
         modelData.suitcaseConnected = true
+        modelData.modeType = .Debug
         let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
             .appendingPathComponent("system.json")
 

@@ -74,6 +74,16 @@ struct RootView: View {
                                 _ = modelData.summon(destination: destination)
                              })
             }
+            .alert(Text(LocalizedStringKey("DEVICE_ERROR_ALERT\(Text(LocalizedStringKey(modelData.deviceStatus.level.rawValue)))")), isPresented: $modelData.showingDeviceStatusAlert){
+                Button("Okay"){}
+            } message: {
+                Text("CHECK_DEVICE_STATUS")
+            }
+            .alert(Text(LocalizedStringKey("SYSTEM_ERROR_ALERT\(Text(LocalizedStringKey(modelData.systemStatus.summary.text)))")), isPresented: $modelData.showingSystemStatusAlert){
+                Button("Okay"){}
+            } message: {
+                Text("CHECK_SYSTEM_STATUS")
+            }
         }
         .environment(\.locale, modelData.resource?.locale ?? .init(identifier: "base"))
     }
@@ -85,6 +95,7 @@ struct RootView_Previews: PreviewProvider {
         previewContent
         previewSelect
         previewOnboard
+        previewAdvanced
     }
 
     static var previewApp: some View {
@@ -121,6 +132,15 @@ struct RootView_Previews: PreviewProvider {
     static var previewOnboard: some View {
         let modelData = CaBotAppModel()
         modelData.suitcaseConnected = false
+
+        return RootView()
+            .environmentObject(modelData)
+    }
+
+    static var previewAdvanced: some View {
+        let modelData = CaBotAppModel()
+        modelData.suitcaseConnected = true
+        modelData.modeType = .Advanced
 
         return RootView()
             .environmentObject(modelData)

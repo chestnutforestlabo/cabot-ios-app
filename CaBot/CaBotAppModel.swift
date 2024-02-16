@@ -242,6 +242,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var versionMatchedTCP: Bool = false
     @Published var serverTCPVersion: String? = nil
 
+    @Published var debugSystemStatusLevel: CaBotSystemLevel = .Unknown
+    @Published var debugDeviceStatusLevel: DeviceStatusLevel = .Unknown
+
     @Published var locationState: GrantState = .Init {
         didSet {
             self.checkOnboardCondition()
@@ -417,7 +420,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var tourUpdated: Bool = false
 
     @Published var deviceStatus: DeviceStatus = DeviceStatus()
+    @Published var showingDeviceStatusAlert: Bool = false
     @Published var systemStatus: SystemStatusData = SystemStatusData()
+    @Published var showingSystemStatusAlert: Bool = false
     @Published var batteryStatus: BatteryStatus = BatteryStatus()
 
     private var bleService: CaBotServiceBLE
@@ -431,6 +436,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     let tourManager: TourManager
     let dialogViewHelper: DialogViewHelper
     let notificationCenter: UNUserNotificationCenter
+    private let feedbackGenerator = UINotificationFeedbackGenerator()
 
     let locationManager: CLLocationManager
     let locationUpdateTimeLimit: CFAbsoluteTime = 60*15
@@ -772,6 +778,24 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.cabot(service: self.bleService, notification: .arrived)
     }
 
+    func debugCabotSystemStatus(systemStatusFile: String){
+        let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
+                .appendingPathComponent(systemStatusFile)
+        let fm = FileManager.default
+        let data = fm.contents(atPath: path.path)!
+        let status = try! JSONDecoder().decode(SystemStatus.self, from: data)
+        self.cabot(service: self.tcpService, systemStatus: status)
+    }
+
+    func debugCabotDeviceStatus(systemStatusFile: String){
+        let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
+                .appendingPathComponent(systemStatusFile)
+        let fm = FileManager.default
+        let data = fm.contents(atPath: path.path)!
+        let status = try! JSONDecoder().decode(DeviceStatus.self, from: data)
+        self.cabot(service: self.tcpService, deviceStatus: status)
+    }
+
     // MARK: TourManagerDelegate
     func tourUpdated(manager: TourManager) {
         tourUpdated = true
@@ -852,6 +876,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     // MARK: CaBotServiceDelegate
 
     func caBot(service: any CaBotTransportProtocol, centralConnected: Bool) {
+        guard self.preview == false else {return}
         let saveSuitcaseConnected = self.suitcaseConnected
 
         switch(service.connectionType()) {
@@ -973,11 +998,43 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func cabot(service: any CaBotTransportProtocol, deviceStatus: DeviceStatus) -> Void {
+        let prevDeviceStatusLevel = self.deviceStatus.level
         self.deviceStatus = deviceStatus
+        let deviceStatusLevel = deviceStatus.level
+        if (self.modeType == .Advanced || self.modeType == .Debug){
+            if (prevDeviceStatusLevel != deviceStatusLevel){
+                if (deviceStatusLevel == .OK){
+                    self.showingDeviceStatusAlert = false
+                }else{
+                    self.showingDeviceStatusAlert = true
+                    if (deviceStatusLevel == .Error){
+                        self.feedbackGenerator.notificationOccurred(.error)
+                    }else{
+                        self.feedbackGenerator.notificationOccurred(.warning)
+                    }
+                }
+            }
+        }
     }
 
     func cabot(service: any CaBotTransportProtocol, systemStatus: SystemStatus) -> Void {
+        let prevSystemStatus = self.systemStatus.summary
         self.systemStatus.update(with: systemStatus)
+        let systemStatus = self.systemStatus.summary
+        if (self.modeType == .Advanced || self.modeType == .Debug){
+            if (prevSystemStatus != systemStatus){
+                if (systemStatus == .OK){
+                    self.showingSystemStatusAlert = false
+                }else{
+                    self.showingSystemStatusAlert = true
+                    if (systemStatus == .Error){
+                        feedbackGenerator.notificationOccurred(.error)
+                    }else{
+                        feedbackGenerator.notificationOccurred(.warning)
+                    }
+                }
+            }
+        }
     }
 
     func cabot(service: any CaBotTransportProtocol, batteryStatus: BatteryStatus) -> Void {
