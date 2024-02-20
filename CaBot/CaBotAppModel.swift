@@ -421,8 +421,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     @Published var deviceStatus: DeviceStatus = DeviceStatus()
     @Published var showingDeviceStatusAlert: Bool = false
+    @Published var showingDeviceStatusMenu: Bool = false
     @Published var systemStatus: SystemStatusData = SystemStatusData()
     @Published var showingSystemStatusAlert: Bool = false
+    @Published var showingSystemStatusMenu: Bool = false
     @Published var batteryStatus: BatteryStatus = BatteryStatus()
 
     private var bleService: CaBotServiceBLE
