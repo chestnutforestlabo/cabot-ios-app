@@ -1025,7 +1025,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         let systemStatus = self.systemStatus.summary
         if (self.modeType == .Advanced || self.modeType == .Debug){
             if (prevSystemStatus != systemStatus){
-                if (systemStatus == .OK){
+                if (systemStatus == .OK || systemStatus == .Stale){
                     self.showingSystemStatusAlert = false
                 }else{
                     self.showingSystemStatusAlert = true
