@@ -801,7 +801,7 @@
 					"@executable_path/Frameworks",
 				);
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = kayukawa2354CMU.CaBotRemote.CaBot;
+				PRODUCT_BUNDLE_IDENTIFIER = CMU.CaBotRemote.CaBot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = CaBot/bridging.h;
@@ -832,7 +832,7 @@
 					"@executable_path/Frameworks",
 				);
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = kayukawa2354CMU.CaBotRemote.CaBot;
+				PRODUCT_BUNDLE_IDENTIFIER = CMU.CaBotRemote.CaBot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = CaBot/bridging.h;
