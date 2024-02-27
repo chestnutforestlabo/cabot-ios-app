@@ -41,6 +41,18 @@ struct RootView: View {
                     MainMenuView()
                         .environmentObject(modelData)
                 }
+                NavigationLink(
+                    destination: SystemStatusView().environmentObject(modelData),
+                    isActive: $modelData.showingSystemStatusMenu){
+                        EmptyView()
+                    }
+                    .isDetailLink(false)
+                NavigationLink(
+                    destination: DeviceStatusView().environmentObject(modelData),
+                    isActive: $modelData.showingDeviceStatusMenu){
+                        EmptyView()
+                    }
+                    .isDetailLink(false)
             }
             .navigationTitle(modelData.displayedScene.text)
             .sheet(isPresented: $modelData.isContentPresenting, content: {
@@ -81,9 +93,6 @@ struct RootView: View {
             } message: {
                 Text("CHECK_DEVICE_STATUS")
             }
-            .sheet(isPresented: $modelData.showingDeviceStatusMenu, content: {
-                DeviceStatusView().environmentObject(modelData)
-            })
             .alert(Text(LocalizedStringKey("SYSTEM_ERROR_ALERT\(Text(LocalizedStringKey(modelData.systemStatus.summary.text)))")), isPresented: $modelData.showingSystemStatusAlert){
                 Button("Okay"){
                     modelData.showingSystemStatusMenu = true
@@ -91,9 +100,6 @@ struct RootView: View {
             } message: {
                 Text("CHECK_SYSTEM_STATUS")
             }
-            .sheet(isPresented: $modelData.showingSystemStatusMenu, content: {
-                SystemStatusView().environmentObject(modelData)
-            })
         }
         .environment(\.locale, modelData.resource?.locale ?? .init(identifier: "base"))
     }
