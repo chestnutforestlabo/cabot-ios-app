@@ -87,14 +87,20 @@ struct RootView: View {
                              })
             }
             .alert(Text(LocalizedStringKey("DEVICE_ERROR_ALERT\(Text(LocalizedStringKey(modelData.deviceStatus.level.rawValue)))")), isPresented: $modelData.showingDeviceStatusAlert){
-                Button("Okay"){
+                Button("DO_NOT_CHECK_MENU"){
+                    modelData.showingDeviceStatusAlert = false
+                }
+                Button("CHECK_MENU"){
                     modelData.showingDeviceStatusMenu = true
                 }
             } message: {
                 Text("CHECK_DEVICE_STATUS")
             }
             .alert(Text(LocalizedStringKey("SYSTEM_ERROR_ALERT\(Text(LocalizedStringKey(modelData.systemStatus.summary.text)))")), isPresented: $modelData.showingSystemStatusAlert){
-                Button("Okay"){
+                Button("DO_NOT_CHECK_MENU"){
+                    modelData.showingSystemStatusAlert = false
+                }
+                Button("CHECK_MENU"){
                     modelData.showingSystemStatusMenu = true
                 }
             } message: {

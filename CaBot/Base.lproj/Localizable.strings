@@ -147,6 +147,8 @@
 "SYSTEM_ERROR" = "Error";
 "SYSTEM_ERROR_ALERT%@" = "System - %@";
 "CHECK_SYSTEM_STATUS" = "Please Check System Status Menu";
+"CHECK_MENU" = "Check Menu";
+"DO_NOT_CHECK_MENU" = "Cancel";
 
 
 // DestinationsView

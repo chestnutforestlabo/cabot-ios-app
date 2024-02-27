@@ -145,6 +145,8 @@
 "System Status"="システム状態";
 "SYSTEM_ERROR_ALERT%@" = "システム - %@";
 "CHECK_SYSTEM_STATUS" = "システムメニューを確認してください";
+"CHECK_MENU" = "確認する";
+"DO_NOT_CHECK_MENU" = "戻る";
 
 
 // DestinationsView
