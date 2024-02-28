@@ -217,8 +217,7 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
     }
 }
 
-final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, TourManagerDelegate, CLLocationManagerDelegate, CaBotTTSDelegate, LogReportModelDelegate{
-
+final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, TourManagerDelegate, CLLocationManagerDelegate, CaBotTTSDelegate, LogReportModelDelegate, UNUserNotificationCenterDelegate{
     private let DEFAULT_LANG = "en"
     
     private let selectedResourceKey = "SelectedResourceKey"
@@ -437,8 +436,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     let resourceManager: ResourceManager
     let tourManager: TourManager
     let dialogViewHelper: DialogViewHelper
-    let notificationCenter: UNUserNotificationCenter
     private let feedbackGenerator = UINotificationFeedbackGenerator()
+    let notificationCenter = UNUserNotificationCenter.current()
 
     let locationManager: CLLocationManager
     let locationUpdateTimeLimit: CFAbsoluteTime = 60*15
@@ -447,6 +446,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     convenience override init() {
         self.init(preview: true)
+        notificationCenter.delegate = self
+    }
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        // ここで通知の表示オプションを指定する
+        completionHandler([.sound, .banner])
     }
 
     init(preview: Bool) {
@@ -463,7 +468,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.tourManager = TourManager(setting: self.detailSettingModel)
         self.dialogViewHelper = DialogViewHelper()
         self.locationManager =  CLLocationManager()
-        self.notificationCenter = UNUserNotificationCenter.current()
 
         // initialize connection type
         var connectionType: ConnectionType = .BLE
@@ -555,6 +559,78 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                                                      intentIdentifiers: [],
                                                      options: [.allowAnnouncement])
         notificationCenter.setNotificationCategories([generalCategory])
+    }
+
+    private func removeNotification() -> Void {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: ["YourNotificationID"])
+        }
+    }
+    private func pushWarning() -> Void {
+        removeNotification()
+        print("call pushWarning()")
+        let content = UNMutableNotificationContent()
+        // 通知の内容を設定
+        content.title = NSString.localizedUserNotificationString(forKey: "Warning", arguments: nil)
+        content.body = NSString.localizedUserNotificationString(forKey: "Message Body", arguments: nil)
+
+        // 通知を今すぐトリガー
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: (0.1), repeats: false)
+
+        // 通知リクエストの作成
+        let request = UNNotificationRequest(identifier: "YourNotificationID", content: content, trigger: trigger)
+
+        // UNUserNotificationCenterにリクエストを追加
+        notificationCenter.add(request) { (error : Error?) in
+            if let theError = error {
+                print(theError.localizedDescription)
+            }
+        }
+
+    }
+    private func pushError() -> Void {
+        removeNotification()
+        print("call pushError()")
+        let content = UNMutableNotificationContent()
+        // 通知の内容を設定
+        content.title = NSString.localizedUserNotificationString(forKey: "Error", arguments: nil)
+        content.body = NSString.localizedUserNotificationString(forKey: "Message Body", arguments: nil)
+        content.sound = UNNotificationSound.defaultCritical
+
+        // 通知を今すぐトリガー
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: (0.1), repeats: false)
+
+        // 通知リクエストの作成
+        let request = UNNotificationRequest(identifier: "YourNotificationID", content: content, trigger: trigger)
+
+        // UNUserNotificationCenterにリクエストを追加
+        notificationCenter.add(request) { (error : Error?) in
+            if let theError = error {
+                print(theError.localizedDescription)
+            }
+        }
+    }
+
+    // ひとまず佐藤さんの実装に沿って通知を出すために導入した関数
+    // 中身は後ほどfunc cabot(service: any CaBotTransportProtocol, deviceStatus: DeviceStatus)や
+    //func cabot(service: any CaBotTransportProtocol, systemStatus: SystemStatus)へ
+    func error() -> Void {
+        notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            if granted {
+                self.pushError()
+            } else {
+                print("通知の許可が得られませんでした。")
+            }
+        }
+    }
+    func warning() -> Void {
+        notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            if granted {
+                self.pushWarning()
+            } else {
+                print("通知の許可が得られませんでした。")
+            }
+        }
     }
 
     // MARK: onboading
