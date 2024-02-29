@@ -505,11 +505,9 @@ struct SettingMenus: View {
                         Text("ERROR").tag(CaBotSystemLevel.Error)
                     }.onChange(of: modelData.debugSystemStatusLevel, perform: { systemStatusLevel in
                         if (systemStatusLevel == .Active){
-//                            modelData.debugCabotSystemStatus(systemStatusFile: "system_ok.json")
+                            modelData.debugCabotSystemStatus(systemStatusFile: "system_ok.json")
                         }else{
-                            // warning通知テスト用（後ほど削除）
-                            modelData.warning()
-//                            modelData.debugCabotSystemStatus(systemStatusFile: "system_error.json")
+                            modelData.debugCabotSystemStatus(systemStatusFile: "system_error.json")
                         }
                     }).pickerStyle(SegmentedPickerStyle())
                     HStack{
@@ -521,11 +519,9 @@ struct SettingMenus: View {
                         Text("ERROR").tag(DeviceStatusLevel.Error)
                     }.onChange(of: modelData.debugDeviceStatusLevel, perform: { deviceStatusLevel in
                         if (deviceStatusLevel == .OK){
-//                            modelData.debugCabotDeviceStatus(systemStatusFile: "device_ok.json")
+                            modelData.debugCabotDeviceStatus(systemStatusFile: "device_ok.json")
                         }else{
-                            // error通知テスト用（後ほど削除）
-                            modelData.error()
-//                            modelData.debugCabotDeviceStatus(systemStatusFile: "device_error.json")
+                            modelData.debugCabotDeviceStatus(systemStatusFile: "device_error.json")
                         }
                     }).pickerStyle(SegmentedPickerStyle())
                 }

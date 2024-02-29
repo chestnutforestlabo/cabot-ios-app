@@ -233,6 +233,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private let menuDebugKey = "menu_debug"
     private let noSuitcaseDebugKey = "noSuitcaseDebugKey"
     private let modeTypeKey = "modeTypeKey"
+    private let notificationCenterID = "cabot_state_notification"
     
     let detailSettingModel: DetailSettingModel
 
@@ -419,10 +420,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var tourUpdated: Bool = false
 
     @Published var deviceStatus: DeviceStatus = DeviceStatus()
-    @Published var showingDeviceStatusAlert: Bool = false
+    @Published var showingDeviceStatusNotification: Bool = false
     @Published var showingDeviceStatusMenu: Bool = false
     @Published var systemStatus: SystemStatusData = SystemStatusData()
-    @Published var showingSystemStatusAlert: Bool = false
+    @Published var showingSystemStatusNotification: Bool = false
     @Published var showingSystemStatusMenu: Bool = false
     @Published var batteryStatus: BatteryStatus = BatteryStatus()
 
@@ -446,12 +447,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     convenience override init() {
         self.init(preview: true)
-        notificationCenter.delegate = self
-    }
-
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        // ここで通知の表示オプションを指定する
-        completionHandler([.sound, .banner])
     }
 
     init(preview: Bool) {
@@ -531,6 +526,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
         // tour manager
         self.tourManager.delegate = self
+
+        // Error/Warning Notification
+        self.notificationCenter.delegate = self
     }
 
     func onChange(of newScenePhase: ScenePhase) {
@@ -561,76 +559,77 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         notificationCenter.setNotificationCategories([generalCategory])
     }
 
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.sound, .banner])
+    }
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        print("tapped!!!!!")
+        print(self.showingSystemStatusNotification)
+        if self.showingDeviceStatusNotification{
+            self.showingDeviceStatusMenu = true
+        } else if self.showingSystemStatusNotification{
+            self.showingSystemStatusMenu = true
+        }
+        completionHandler()
+    }
+
     private func removeNotification() -> Void {
+        self.showingDeviceStatusNotification = false
+        self.showingSystemStatusNotification = false
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: ["YourNotificationID"])
+            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [self.notificationCenterID])
         }
     }
-    private func pushWarning() -> Void {
+
+    private func pushSystemState() -> Void {
         removeNotification()
-        print("call pushWarning()")
+        let systemStatusString = CustomLocalizedString(self.systemStatus.summary.text, lang: self.resourceLang)
+        let notificationTitle = CustomLocalizedString("SYSTEM_ERROR_ALERT%@", lang: self.resourceLang, systemStatusString)
+        let notificationMessage = "CHECK_SYSTEM_STATUS"
         let content = UNMutableNotificationContent()
-        // 通知の内容を設定
-        content.title = NSString.localizedUserNotificationString(forKey: "Warning", arguments: nil)
-        content.body = NSString.localizedUserNotificationString(forKey: "Message Body", arguments: nil)
+        content.title = NSString.localizedUserNotificationString(forKey: notificationTitle, arguments: nil)
+        content.body = NSString.localizedUserNotificationString(forKey: notificationMessage, arguments: nil)
+        if (self.systemStatus.summary == .Error){
+            content.sound = UNNotificationSound.defaultCritical
+            self.feedbackGenerator.notificationOccurred(.error)
+        } else {
+            self.feedbackGenerator.notificationOccurred(.warning)
+        }
 
-        // 通知を今すぐトリガー
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: (0.1), repeats: false)
+        let request = UNNotificationRequest(identifier: self.notificationCenterID, content: content, trigger: trigger)
 
-        // 通知リクエストの作成
-        let request = UNNotificationRequest(identifier: "YourNotificationID", content: content, trigger: trigger)
-
-        // UNUserNotificationCenterにリクエストを追加
         notificationCenter.add(request) { (error : Error?) in
             if let theError = error {
                 print(theError.localizedDescription)
             }
         }
-
+        self.showingSystemStatusNotification = true
     }
-    private func pushError() -> Void {
+
+    private func pushDeviceState() -> Void {
         removeNotification()
-        print("call pushError()")
+        let deviceStatusString = CustomLocalizedString(self.deviceStatus.level.rawValue, lang: self.resourceLang)
+        let notificationTitle = CustomLocalizedString("DEVICE_ERROR_ALERT%@", lang: self.resourceLang, deviceStatusString)
+        let notificationMessage = "CHECK_DEVICE_STATUS"
         let content = UNMutableNotificationContent()
-        // 通知の内容を設定
-        content.title = NSString.localizedUserNotificationString(forKey: "Error", arguments: nil)
-        content.body = NSString.localizedUserNotificationString(forKey: "Message Body", arguments: nil)
-        content.sound = UNNotificationSound.defaultCritical
-
-        // 通知を今すぐトリガー
+        content.title = NSString.localizedUserNotificationString(forKey: notificationTitle, arguments: nil)
+        content.body = NSString.localizedUserNotificationString(forKey: notificationMessage, arguments: nil)
+        if self.deviceStatus.level == .Error {
+            content.sound = UNNotificationSound.defaultCritical
+            self.feedbackGenerator.notificationOccurred(.error)
+        } else {
+            self.feedbackGenerator.notificationOccurred(.warning)
+        }
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: (0.1), repeats: false)
+        let request = UNNotificationRequest(identifier: self.notificationCenterID, content: content, trigger: trigger)
 
-        // 通知リクエストの作成
-        let request = UNNotificationRequest(identifier: "YourNotificationID", content: content, trigger: trigger)
-
-        // UNUserNotificationCenterにリクエストを追加
         notificationCenter.add(request) { (error : Error?) in
             if let theError = error {
                 print(theError.localizedDescription)
             }
         }
-    }
-
-    // ひとまず佐藤さんの実装に沿って通知を出すために導入した関数
-    // 中身は後ほどfunc cabot(service: any CaBotTransportProtocol, deviceStatus: DeviceStatus)や
-    //func cabot(service: any CaBotTransportProtocol, systemStatus: SystemStatus)へ
-    func error() -> Void {
-        notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            if granted {
-                self.pushError()
-            } else {
-                print("通知の許可が得られませんでした。")
-            }
-        }
-    }
-    func warning() -> Void {
-        notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            if granted {
-                self.pushWarning()
-            } else {
-                print("通知の許可が得られませんでした。")
-            }
-        }
+        self.showingDeviceStatusNotification = true
     }
 
     // MARK: onboading
@@ -1080,15 +1079,16 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.deviceStatus = deviceStatus
         let deviceStatusLevel = deviceStatus.level
         if (self.modeType == .Advanced || self.modeType == .Debug){
-            if (prevDeviceStatusLevel != deviceStatusLevel){
+            if (prevDeviceStatusLevel != deviceStatusLevel) {
                 if (deviceStatusLevel == .OK){
-                    self.showingDeviceStatusAlert = false
-                }else{
-                    self.showingDeviceStatusAlert = true
-                    if (deviceStatusLevel == .Error){
-                        self.feedbackGenerator.notificationOccurred(.error)
-                    }else{
-                        self.feedbackGenerator.notificationOccurred(.warning)
+                    self.removeNotification()
+                } else {
+                    notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+                        if granted {
+                            self.pushDeviceState()
+                        } else {
+                            print("Permission for notification not granted.")
+                        }
                     }
                 }
             }
@@ -1102,13 +1102,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if (self.modeType == .Advanced || self.modeType == .Debug){
             if (prevSystemStatus != systemStatus){
                 if (systemStatus == .OK){
-                    self.showingSystemStatusAlert = false
-                }else{
-                    self.showingSystemStatusAlert = true
-                    if (systemStatus == .Error){
-                        feedbackGenerator.notificationOccurred(.error)
-                    }else{
-                        feedbackGenerator.notificationOccurred(.warning)
+                    self.removeNotification()
+                } else {
+                    notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+                        if granted {
+                            self.pushSystemState()
+                        } else {
+                            print("Permission for notification not granted.")
+                        }
                     }
                 }
             }
