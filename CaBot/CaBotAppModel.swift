@@ -63,6 +63,11 @@ enum ModeType: String, CaseIterable{
     case Debug  = "Debug"
 }
 
+enum SpeechPriority: String, CaseIterable {
+    case Robot = "Robot"
+    case App = "App"
+}
+
 class FallbackService: CaBotServiceProtocol {
     private let services: [CaBotServiceProtocol]
     private var selectedService: CaBotServiceProtocol?
@@ -234,6 +239,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private let noSuitcaseDebugKey = "noSuitcaseDebugKey"
     private let modeTypeKey = "modeTypeKey"
     private let notificationCenterID = "cabot_state_notification"
+    private let speechPriorityKey = "speechPriorityKey"
     
     let detailSettingModel: DetailSettingModel
 
@@ -410,6 +416,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var modeType:ModeType = .Normal{
         didSet {
             UserDefaults.standard.setValue(modeType.rawValue, forKey: modeTypeKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
+    @Published var speechPriority:SpeechPriority = .Robot {
+        didSet {
+            UserDefaults.standard.setValue(speechPriority.rawValue, forKey: speechPriorityKey)
             UserDefaults.standard.synchronize()
         }
     }
@@ -1129,6 +1141,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     func cabot(service: any CaBotTransportProtocol, logDetail: LogEntry) {
         NSLog("set log detail \(logDetail)")
         self.logList.set(detail: logDetail)
+    }
+
+    func getSpeechPriority() -> SpeechPriority {
+        return speechPriority
     }
 }
 

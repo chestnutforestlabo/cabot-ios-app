@@ -458,6 +458,16 @@ struct SettingMenus: View {
                 Text(String(format:"%.0f %%", arguments:[modelData.speechRate*100.0]))
                     .accessibility(hidden: true)
             }
+
+            VStack {
+                Text("Speech Priority")
+                    .accessibility(hidden: true)
+                Picker("", selection: $modelData.speechPriority){
+                    Text(LocalizedStringKey(SpeechPriority.Robot.rawValue)).tag(SpeechPriority.Robot)
+                    Text(LocalizedStringKey(SpeechPriority.App.rawValue)).tag(SpeechPriority.App)
+                }.pickerStyle(SegmentedPickerStyle())
+            }
+
             if (modelData.modeType == .Advanced || modelData.modeType == .Debug) {
                 if #available(iOS 15.0, *) {
                     NavigationLink (destination: LogFilesView(langOverride: modelData.resourceLang)
@@ -534,6 +544,7 @@ struct SettingMenus: View {
 struct ContentView_Previews: PreviewProvider {
     
     static var previews: some View {
+        preview_normal
         preview_connected
         preview_debug_mode
         //preview_tour
@@ -542,6 +553,29 @@ struct ContentView_Previews: PreviewProvider {
         //preview_tour4
         //preview
         //preview_ja
+    }
+
+    static var preview_normal: some View {
+        let modelData = CaBotAppModel()
+        modelData.suitcaseConnectedBLE = true
+        modelData.suitcaseConnectedTCP = true
+        modelData.deviceStatus.level = .OK
+        modelData.systemStatus.level = .Inactive
+        modelData.systemStatus.summary = .Stale
+        modelData.versionMatchedBLE = true
+        modelData.versionMatchedTCP = true
+        modelData.serverBLEVersion = CaBotServiceBLE.CABOT_BLE_VERSION
+        modelData.serverTCPVersion = CaBotServiceBLE.CABOT_BLE_VERSION
+        modelData.modeType = .Normal
+
+        if let r = modelData.resourceManager.resource(by: "Test data") {
+            modelData.resource = r
+        }
+
+        return MainMenuView()
+            .environmentObject(modelData)
+            .environment(\.locale, .init(identifier: "en"))
+            .previewDisplayName("suitcase connected")
     }
 
     static var preview_connected: some View {
