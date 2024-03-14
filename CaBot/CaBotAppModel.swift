@@ -575,8 +575,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         completionHandler([.sound, .banner])
     }
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        print("tapped!!!!!")
-        print(self.showingSystemStatusNotification)
         if self.showingDeviceStatusNotification{
             self.showingDeviceStatusMenu = true
         } else if self.showingSystemStatusNotification{
@@ -601,8 +599,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         let content = UNMutableNotificationContent()
         content.title = NSString.localizedUserNotificationString(forKey: notificationTitle, arguments: nil)
         content.body = NSString.localizedUserNotificationString(forKey: notificationMessage, arguments: nil)
+        content.sound = UNNotificationSound.defaultCritical
         if (self.systemStatus.summary == .Error){
-            content.sound = UNNotificationSound.defaultCritical
             self.feedbackGenerator.notificationOccurred(.error)
         } else {
             self.feedbackGenerator.notificationOccurred(.warning)
@@ -627,8 +625,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         let content = UNMutableNotificationContent()
         content.title = NSString.localizedUserNotificationString(forKey: notificationTitle, arguments: nil)
         content.body = NSString.localizedUserNotificationString(forKey: notificationMessage, arguments: nil)
+        content.sound = UNNotificationSound.defaultCritical
         if self.deviceStatus.level == .Error {
-            content.sound = UNNotificationSound.defaultCritical
             self.feedbackGenerator.notificationOccurred(.error)
         } else {
             self.feedbackGenerator.notificationOccurred(.warning)
