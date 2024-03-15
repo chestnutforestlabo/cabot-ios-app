@@ -265,3 +265,9 @@
 "SEND_TOUR"="Send Tour";
 "SEND_DESTINATION_MESSAGE %@"="Send Destination: %@\nThis will override user's destination";
 "SEND_DESTINATION"="Send Destination";
+
+"TTS Enabled (Advanced only)"="TTS Enabled (Advanced only)";
+"Speech Priority"="Speech Priority";
+"Robot"="Robot";
+"App"="App";
+
