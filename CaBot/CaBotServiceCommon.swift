@@ -42,8 +42,14 @@ struct SharedInfo: Codable {
         case OverrideTour
         case OverrideDestination
     }
+    init(type: InfoType, value: String, flag1: Bool = false) {
+        self.type = type
+        self.value = value
+        self.flag1 = flag1
+    }
     let type: InfoType
     let value: String
+    let flag1: Bool
 }
 
 protocol CaBotServiceProtocol {

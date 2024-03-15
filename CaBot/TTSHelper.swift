@@ -60,7 +60,7 @@ class CaBotTTS : TTSProtocol{
         let selfspeak = forceSelfvoice || !isForeground || !isVoiceOverRunning
 
         self.delegate?.activityLog(category: "app speech speaking", text: text ?? "", memo: "force=\(force)")
-        self.delegate?.share(user_info: SharedInfo(type: .Speak, value: text ?? ""))
+        self.delegate?.share(user_info: SharedInfo(type: .Speak, value: text ?? "", flag1: force))
 
         var options:Dictionary<String,Any> = ["rate": rate, "selfspeak": selfspeak, "force": force]
         if let voice = self.voice {
@@ -76,8 +76,8 @@ class CaBotTTS : TTSProtocol{
         }
     }
 
-    func speakForAdvanced(_ text:String?, callback: @escaping (Int32) -> Void) {
-        var options:Dictionary<String,Any> = ["rate": rate, "selfspeak": true, "force": true]
+    func speakForAdvanced(_ text:String?, force: Bool, callback: @escaping (Int32) -> Void) {
+        var options:Dictionary<String,Any> = ["rate": rate, "selfspeak": true, "force": force]
         if let voice = self.voice {
             options["voice"] = voice
         }

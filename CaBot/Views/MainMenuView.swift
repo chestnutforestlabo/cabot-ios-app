@@ -83,7 +83,23 @@ struct UserInfoView: View {
             } else {
                 Label(modelData.userInfo.nextDestination, systemImage: "mappin.and.ellipse")
             }
-            Label(modelData.userInfo.speakingText, systemImage: "text.bubble")
+            if modelData.userInfo.speakingText.count > 1 {
+                ForEach(modelData.userInfo.speakingText[..<2], id: \.self) { text in
+                    Label(text, systemImage: "text.bubble")
+                }
+                if modelData.userInfo.speakingText.count > 2 {
+                    NavigationLink(destination: SpokenTextView().environmentObject(modelData), label: {
+                        HStack {
+                            Spacer()
+                            Text("See history")
+                        }
+                    })
+                }
+            } else {
+                ForEach(modelData.userInfo.speakingText, id: \.self) { text in
+                    Label(text, systemImage: "text.bubble")
+                }
+            }
         }
     }
 }

@@ -1186,7 +1186,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             NSLog("\(self.userInfo)")
             if userInfo.type == .Speak {
                 if isTTSEnabledForAdvanced {
-                    tts.speakForAdvanced(userInfo.value) { _ in
+                    tts.speakForAdvanced(userInfo.value, force: userInfo.flag1) { _ in
                     }
                 }
             }
@@ -1478,7 +1478,7 @@ class UserInfoBuffer {
     var selectedTour: String = ""
     var currentDestination: String = ""
     var nextDestination: String = ""
-    var speakingText: String = ""
+    var speakingText: [String] = []
 
     init() {
     }
@@ -1487,7 +1487,7 @@ class UserInfoBuffer {
         selectedTour = ""
         currentDestination = ""
         nextDestination = ""
-        speakingText = ""
+        speakingText = []
     }
 
     func update(userInfo: SharedInfo) {
@@ -1495,7 +1495,7 @@ class UserInfoBuffer {
         case .None:
             break
         case .Speak:
-            speakingText = userInfo.value
+            speakingText.insert(userInfo.value, at: 0)
             break
         case .Tour:
             selectedTour = userInfo.value
