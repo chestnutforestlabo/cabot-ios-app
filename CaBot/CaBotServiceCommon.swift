@@ -30,6 +30,18 @@ enum ConnectionType:String, CaseIterable{
     case TCP = "tcp"
 }
 
+struct UserInfo: Codable {
+    enum InfoType: String, Codable {
+        case None
+        case Speak
+        case Tour
+        case CurrentDestination
+        case NextDestination
+    }
+    let type: InfoType
+    let value: String
+}
+
 protocol CaBotServiceProtocol {
     func activityLog(category: String, text: String, memo: String) -> Bool
     func send(destination: String) -> Bool
@@ -37,6 +49,7 @@ protocol CaBotServiceProtocol {
     func manage(command: CaBotManageCommand, param: String?) -> Bool
     func log_request(request: Dictionary<String, String>) -> Bool
     func isConnected() -> Bool
+    func share(user_info: UserInfo) -> Bool
 }
 
 protocol CaBotTransportProtocol: CaBotServiceProtocol {
@@ -56,7 +69,9 @@ protocol CaBotServiceDelegate {
     func cabot(service:any CaBotTransportProtocol, batteryStatus:BatteryStatus)
     func cabot(service:any CaBotTransportProtocol, logList:[LogEntry], status: CaBotLogStatus)
     func cabot(service:any CaBotTransportProtocol, logDetail:LogEntry)
+    func cabot(service:any CaBotTransportProtocol, userInfo:UserInfo)
     func getSpeechPriority() -> SpeechPriority
+    func getModeType() -> ModeType
 }
 
 enum NavigationNotification:String {
@@ -370,6 +385,7 @@ class CaBotServiceActions {
     private var lastLogResponseID: Int64 = 0
 
     func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, tts: CaBotTTS, request: SpeakRequest) {
+        guard delegate.getModeType() == .Normal else { return } // only for Normal mode
         // noop for same request ID from different transport
         guard lastSpeakRequestID < request.request_id else { return }
         lastSpeakRequestID = request.request_id
@@ -398,6 +414,7 @@ class CaBotServiceActions {
     }
 
     func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, request: NavigationEventRequest) {
+        guard delegate.getModeType() == .Normal else { return } // only for Normal mode
         // noop for same request ID from different transport
         guard lastNavigationEventRequestID < request.request_id else { return }
         lastNavigationEventRequestID = request.request_id
@@ -444,6 +461,15 @@ class CaBotServiceActions {
                 // never happen
                 break
             }
+        }
+    }
+
+    func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, user_info: UserInfo) {
+        guard delegate.getModeType() != .Normal else { return } // only for not Normal mode
+
+        NSLog("share handle")
+        DispatchQueue.main.async {
+            delegate.cabot(service: service, userInfo: user_info)
         }
     }
 }

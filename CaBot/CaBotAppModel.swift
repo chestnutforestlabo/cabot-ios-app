@@ -127,6 +127,11 @@ class FallbackService: CaBotServiceProtocol {
         guard let service = getService() else { return false }
         return service.log_request(request: request)
     }
+
+    func share(user_info: UserInfo) -> Bool {
+        guard let service = getService() else { return false }
+        return service.share(user_info: user_info)
+    }
 }
 
 final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
@@ -438,6 +443,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var showingSystemStatusNotification: Bool = false
     @Published var showingSystemStatusMenu: Bool = false
     @Published var batteryStatus: BatteryStatus = BatteryStatus()
+    @Published var userInfo: UserInfoBuffer = UserInfoBuffer()
 
     private var bleService: CaBotServiceBLE
     private var tcpService: CaBotServiceTCP
@@ -514,6 +520,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
         if let speechRate = UserDefaults.standard.value(forKey: speechRateKey) as? Double {
             self.speechRate = speechRate
+        }
+        if let modeType = UserDefaults.standard.value(forKey: modeTypeKey) as? String {
+            self.modeType = ModeType(rawValue: modeType)!
         }
 
         // services
@@ -678,6 +687,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func activityLog(category: String, text: String, memo: String) {
         _ = self.fallbackService.activityLog(category: category, text: text, memo: memo)
+    }
+
+    func share(user_info: UserInfo) {
+        _ = self.fallbackService.share(user_info: user_info)
     }
     
     // MARK: LogReportModelDelegate
@@ -888,6 +901,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         tourUpdated = true
         UIApplication.shared.isIdleTimerDisabled = manager.hasDestination
         self.activityLog(category: "tour-text", text: manager.title.text, memo: manager.title.pron)
+        self.share(user_info: UserInfo(type: .Tour, value: manager.title.text))
+        self.share(user_info: UserInfo(type: .CurrentDestination, value: manager.currentDestination?.title.text ?? ""))
+        self.share(user_info: UserInfo(type: .NextDestination, value: manager.nextDestination?.title.text ?? ""))
     }
 
     func tour(manager: TourManager, destinationChanged destination: Destination?) {
@@ -1135,14 +1151,23 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.logList.set(list: logList)
         self.logList.set(status: status)
     }
-    
+
     func cabot(service: any CaBotTransportProtocol, logDetail: LogEntry) {
         NSLog("set log detail \(logDetail)")
         self.logList.set(detail: logDetail)
     }
 
+    func cabot(service: CaBotTransportProtocol, userInfo: UserInfo) {
+        self.userInfo.update(userInfo: userInfo)
+        NSLog("\(self.userInfo)")
+    }
+
     func getSpeechPriority() -> SpeechPriority {
         return speechPriority
+    }
+
+    func getModeType() -> ModeType {
+        return modeType
     }
 }
 
@@ -1383,5 +1408,34 @@ struct PersistenceController {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
         })
+    }
+}
+
+class UserInfoBuffer {
+    var selectedTour: String = ""
+    var currentDestination: String = ""
+    var nextDestination: String = ""
+    var speakingText: String = ""
+
+    init() {
+    }
+
+    func update(userInfo: UserInfo) {
+        switch(userInfo.type) {
+        case .None:
+            break
+        case .Speak:
+            speakingText = userInfo.value
+            break
+        case .Tour:
+            selectedTour = userInfo.value
+            break
+        case .CurrentDestination:
+            currentDestination = userInfo.value
+            break
+        case .NextDestination:
+            nextDestination = userInfo.value
+            break
+        }
     }
 }

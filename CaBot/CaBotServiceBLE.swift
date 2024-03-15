@@ -33,7 +33,7 @@ protocol CaBotServiceDelegateBLE : CaBotServiceDelegate{
     func cabot(service:any CaBotTransportProtocol, bluetoothStateUpdated: CBManagerState)
 }
 
-class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProtocol {
+class CaBotServiceBLE: NSObject {
     static let CABOT_BLE_VERSION = "20230222"
     static let UUID_FORMAT = "35CE%04X-5E89-4C0D-A3F6-8A6A507C1BF1"
     static let CABOT_SPEED_CONFIG = "cabot_speed"
@@ -155,6 +155,47 @@ class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProt
         }
     }
 
+    // MARK: private functions
+
+    internal func add(characteristic:CBCharacteristic) {
+        self.characteristics.append(characteristic)
+    }
+    private func addService()
+    {
+        if serviceAdded {
+            startAdvertising()
+            return
+        }
+        let service:CBMutableService = CBMutableService(type: self.uuid, primary: true)
+        service.characteristics = self.characteristics
+
+        NSLog("adding a service")
+        peripheralManager?.add(service)
+    }
+    private var checkCount:Int = 0
+    private func checkAdvertisement() -> Bool
+    {
+        if (self.heartbeatChar.characteristic_read.subscribedCentrals?.count ?? 0 > 0) {
+            self.checkCount = 0
+            self.stopAdvertising()
+            return true
+        } else {
+            self.checkCount += 1
+            if self.checkCount > 15 {
+                self.stopAdvertising()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    self.startAdvertising()
+                }
+                self.checkCount = 0
+            } else {
+                self.startAdvertising()
+            }
+        }
+        return false
+    }
+}
+
+extension CaBotServiceBLE: CaBotServiceProtocol {
     // MARK: CaBotServiceProtocol
 
     public func activityLog(category: String = "", text: String = "", memo: String = "") -> Bool{
@@ -209,6 +250,15 @@ class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProt
         return self.connected
     }
 
+    func share(user_info: UserInfo) -> Bool {
+        NSLog("BLE share is not implemented")
+        return false
+    }
+}
+
+
+extension CaBotServiceBLE: CaBotTransportProtocol {
+
     // MARK: CaBotTransportProtocol
     public func connectionType() -> ConnectionType {
         return .BLE
@@ -239,46 +289,11 @@ class CaBotServiceBLE: NSObject, CBPeripheralManagerDelegate, CaBotTransportProt
         }
     }
 
-    // MARK: private functions
+}
 
-    internal func add(characteristic:CBCharacteristic) {
-        self.characteristics.append(characteristic)
-    }
-    private func addService()
-    {
-        if serviceAdded {
-            startAdvertising()
-            return
-        }
-        let service:CBMutableService = CBMutableService(type: self.uuid, primary: true)
-        service.characteristics = self.characteristics
 
-        NSLog("adding a service")
-        peripheralManager?.add(service)
-    }
-    private var checkCount:Int = 0
-    private func checkAdvertisement() -> Bool
-    {
-        if (self.heartbeatChar.characteristic_read.subscribedCentrals?.count ?? 0 > 0) {
-            self.checkCount = 0
-            self.stopAdvertising()
-            return true
-        } else {
-            self.checkCount += 1
-            if self.checkCount > 15 {
-                self.stopAdvertising()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    self.startAdvertising()
-                }
-                self.checkCount = 0
-            } else {
-                self.startAdvertising()
-            }
-        }
-        return false
-    }
-
-    // MARK: CBPeripheralManagerDelegate
+// MARK: CBPeripheralManagerDelegate
+extension CaBotServiceBLE: CBPeripheralManagerDelegate {
 
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager)
     {

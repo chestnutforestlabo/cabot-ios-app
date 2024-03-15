@@ -992,9 +992,9 @@ class ResourceManager {
     }
 
     public func resource(by identifier: String) -> Resource? {
-        NSLog("identifier=\(identifier)")
+        NSLog("resource by identifier=\(identifier)")
         for resource in resources {
-            NSLog("resource.identifier = \(resource.identifier)")
+            NSLog("iterating resource.identifier = \(resource.identifier)")
             if resource.identifier == identifier {
                 return resource
             }

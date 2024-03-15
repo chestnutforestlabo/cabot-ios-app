@@ -27,7 +27,9 @@ import SwiftUI
 
 
 protocol CaBotTTSDelegate {
+    func getModeType() -> ModeType
     func activityLog(category:String, text:String, memo:String)
+    func share(user_info:UserInfo)
 }
 
 class CaBotTTS : TTSProtocol{
@@ -52,11 +54,13 @@ class CaBotTTS : TTSProtocol{
     }
 
     func speak(_ text: String?, forceSelfvoice: Bool, force: Bool, callback: @escaping (Int32) -> Void) {
+        guard self.delegate?.getModeType() == .Normal else { return }
         let isForeground = UIApplication.shared.applicationState == .active
         let isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
         let selfspeak = forceSelfvoice || !isForeground || !isVoiceOverRunning
 
         self.delegate?.activityLog(category: "app speech speaking", text: text ?? "", memo: "force=\(force)")
+        self.delegate?.share(user_info: UserInfo(type: .Speak, value: text ?? ""))
 
         var options:Dictionary<String,Any> = ["rate": rate, "selfspeak": selfspeak, "force": force]
         if let voice = self.voice {

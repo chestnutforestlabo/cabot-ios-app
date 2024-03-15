@@ -28,6 +28,10 @@ struct MainMenuView: View {
 
     var body: some View {
         Form {
+            if modelData.modeType != .Normal {
+                UserInfoView()
+                    .environmentObject(modelData)
+            }
             if modelData.noSuitcaseDebug {
                 Label("No Suitcase Debug mode", systemImage: "exclamationmark.triangle")
                     .foregroundColor(.red)
@@ -65,6 +69,22 @@ struct MainMenuView: View {
             }
         }
         return false
+    }
+}
+
+struct UserInfoView: View {
+    @EnvironmentObject var modelData: CaBotAppModel
+
+    var body: some View {
+        Section(header: Text("User Info")) {
+            Label(modelData.userInfo.selectedTour, systemImage: "list.bullet.rectangle.portrait")
+            if modelData.userInfo.currentDestination != "" {
+                Label(modelData.userInfo.currentDestination, systemImage: "arrow.triangle.turn.up.right.diamond")
+            } else {
+                Label(modelData.userInfo.nextDestination, systemImage: "mappin.and.ellipse")
+            }
+            Label(modelData.userInfo.speakingText, systemImage: "text.bubble")
+        }
     }
 }
 
@@ -268,7 +288,7 @@ struct MainMenus: View {
                             Text("SELECT_DESTINATION")
                         })
                 }
-                if modelData.modeType == .Debug{
+                //if modelData.modeType == .Debug{
                     if let src = cm.toursSource {
                         NavigationLink(
                             destination: ToursView(src: src)
@@ -277,7 +297,7 @@ struct MainMenus: View {
                                 Text("SELECT_TOUR")
                             })
                     }
-                }
+                //}
             }
 
 
