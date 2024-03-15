@@ -66,14 +66,23 @@ class CaBotTTS : TTSProtocol{
         if let voice = self.voice {
             options["voice"] = voice
         }
-        self._tts.speak(text == nil ? "" : text, withOptions: options) { code in
+        self._tts.speak(text == nil ? "" : text, withOptions: options, completionHandler: { code in
             if code > 0 {
                 self.delegate?.activityLog(category: "app speech completed", text: text ?? "", memo: "force=\(force)")
             } else {
                 self.delegate?.activityLog(category: "app speech canceled", text: text ?? "", memo: "force=\(force)")
             }
             callback(code)
-        }
+            //print("code=\(code), text=\(text)")
+            if code >= 0, let text = text {
+                self.delegate?.share(user_info: SharedInfo(type: .SpeakProgress, value: text, flag1: true))
+            }
+        }, progressHandler: { range in
+            if let text = text {
+                //print(range)
+                self.delegate?.share(user_info: SharedInfo(type: .SpeakProgress, value: text, location: range.location, length: range.length))
+            }
+        })
     }
 
     func speakForAdvanced(_ text:String?, force: Bool, callback: @escaping (Int32) -> Void) {
@@ -81,9 +90,10 @@ class CaBotTTS : TTSProtocol{
         if let voice = self.voice {
             options["voice"] = voice
         }
-        self._tts.speak(text == nil ? "" : text, withOptions: options) { code in
+        self._tts.speak(text == nil ? "" : text, withOptions: options, completionHandler: { code in
             callback(code)
-        }
+        }, progressHandler: { range in
+        })
     }
 
     func speak(_ text: String?, force: Bool, callback: @escaping (Int32) -> Void) {

@@ -944,6 +944,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                         self.isContentPresenting = false
                         delay = self.detailSettingModel.browserCloseDelay
                     }
+                    if UIAccessibility.isVoiceOverRunning {
+                        delay = 3
+                    }
                     // wait at least 1.0 seconds if tts was speaking
                     // wait 1.0 ~ 2.0 seconds if browser was open.
                     // hopefully closing browser and reading the content by voice over will be ended by then
@@ -1183,7 +1186,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     func cabot(service: any CaBotTransportProtocol, userInfo: SharedInfo) {
         if modeType != .Normal {
             self.userInfo.update(userInfo: userInfo)
-            NSLog("\(self.userInfo)")
             if userInfo.type == .Speak {
                 if isTTSEnabledForAdvanced {
                     tts.speakForAdvanced(userInfo.value, force: userInfo.flag1) { _ in
@@ -1474,11 +1476,35 @@ struct PersistenceController {
     }
 }
 
+class SpeakingText: Hashable {
+    static func == (lhs: SpeakingText, rhs: SpeakingText) -> Bool {
+        lhs.text == rhs.text && lhs.date == rhs.date
+    }
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(text)
+        hasher.combine(date)
+    }
+    var text: String = ""
+    var date: Date
+    var location = 0
+    var length = 0
+    init(text: String) {
+        self.text = text
+        self.date = Date()
+    }
+    func subTexts() -> (String, String, String) {
+        let i1 = text.index(text.startIndex, offsetBy: location)
+        let i2 = text.index(i1, offsetBy: length)
+        return (String(text[..<i1]), String(text[i1..<i2]), String(text[i2...]))
+    }
+}
+
 class UserInfoBuffer {
     var selectedTour: String = ""
     var currentDestination: String = ""
     var nextDestination: String = ""
-    var speakingText: [String] = []
+    var speakingText: [SpeakingText] = []
+    var speakingIndex = -1
 
     init() {
     }
@@ -1495,7 +1521,21 @@ class UserInfoBuffer {
         case .None:
             break
         case .Speak:
-            speakingText.insert(userInfo.value, at: 0)
+            speakingText.insert(SpeakingText(text: userInfo.value), at: 0)
+            break
+        case .SpeakProgress:
+            for i in 0..<speakingText.count {
+                if speakingText[i].text == userInfo.value {
+                    if userInfo.flag1 {
+                        speakingText[i].location += speakingText[i].length
+                        speakingText[i].length = 0
+                    } else {
+                        speakingText[i].location = userInfo.location
+                        speakingText[i].length = userInfo.length
+                    }
+                    break
+                }
+            }
             break
         case .Tour:
             selectedTour = userInfo.value

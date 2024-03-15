@@ -85,7 +85,7 @@ struct UserInfoView: View {
             }
             if modelData.userInfo.speakingText.count > 1 {
                 ForEach(modelData.userInfo.speakingText[..<2], id: \.self) { text in
-                    Label(text, systemImage: "text.bubble")
+                    showText(text: text)
                 }
                 if modelData.userInfo.speakingText.count > 2 {
                     NavigationLink(destination: SpokenTextView().environmentObject(modelData), label: {
@@ -97,9 +97,25 @@ struct UserInfoView: View {
                 }
             } else {
                 ForEach(modelData.userInfo.speakingText, id: \.self) { text in
-                    Label(text, systemImage: "text.bubble")
+                    showText(text: text)
                 }
             }
+        }
+    }
+
+    func showText(text: SpeakingText) -> some View {
+        let texts = text.subTexts()
+        return Label {
+            HStack {
+                Text(texts.0)
+                    .bold() +
+                Text(texts.1)
+                    .foregroundColor(.blue) +
+                Text(texts.2)
+                    .foregroundColor(.gray)
+            }
+        } icon: {
+            Image(systemName: "text.bubble")
         }
     }
 }

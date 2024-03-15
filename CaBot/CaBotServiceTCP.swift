@@ -240,7 +240,6 @@ class CaBotServiceTCP: NSObject {
         }
         socket.on("share"){[weak self] dt, ack in
             guard let text = dt[0] as? String else { return }
-            NSLog("share text <- \(text)")
             guard let data = String(text).data(using:.utf8) else { return }
             guard let weakself = self else { return }
             guard let delegate = weakself.delegate else { return }
@@ -411,7 +410,6 @@ extension CaBotServiceTCP: CaBotServiceProtocol {
         do {
             let jsonData = try JSONEncoder().encode(user_info)
             if let jsonString = String(data: jsonData, encoding: .utf8) {
-                NSLog("share -> \(jsonString)")
                 self.emit("share", jsonString)
                 return true
             }

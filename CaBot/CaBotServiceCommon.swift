@@ -35,6 +35,7 @@ struct SharedInfo: Codable {
         case None
         // Normal -> Advanced / Debug
         case Speak
+        case SpeakProgress
         case Tour
         case CurrentDestination
         case NextDestination
@@ -42,14 +43,18 @@ struct SharedInfo: Codable {
         case OverrideTour
         case OverrideDestination
     }
-    init(type: InfoType, value: String, flag1: Bool = false) {
+    init(type: InfoType, value: String, flag1: Bool = false, location: Int = 0, length: Int = 0) {
         self.type = type
         self.value = value
         self.flag1 = flag1
+        self.location = location
+        self.length = length
     }
     let type: InfoType
     let value: String
     let flag1: Bool
+    let location: Int
+    let length: Int
 }
 
 protocol CaBotServiceProtocol {
@@ -475,7 +480,6 @@ class CaBotServiceActions {
     }
 
     func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, user_info: SharedInfo) {
-        NSLog("share handle")
         DispatchQueue.main.async {
             delegate.cabot(service: service, userInfo: user_info)
         }
