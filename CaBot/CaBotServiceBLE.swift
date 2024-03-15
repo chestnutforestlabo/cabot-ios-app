@@ -250,7 +250,7 @@ extension CaBotServiceBLE: CaBotServiceProtocol {
         return self.connected
     }
 
-    func share(user_info: UserInfo) -> Bool {
+    func share(user_info: SharedInfo) -> Bool {
         NSLog("BLE share is not implemented")
         return false
     }

@@ -35,40 +35,70 @@ struct StaticTourDetailView: View {
 
         Form {
             Section(header: Text("Actions")) {
-                Button(action: {
-                    if tourManager.hasDestination {
+                if modelData.modeType == .Normal {
+                    Button(action: {
+                        if tourManager.hasDestination {
+                            targetTour = tour
+                            isConfirming = true
+                        } else {
+                            tourManager.set(tour: tour)
+                            modelData.needToStartAnnounce(wait: true)
+                            NavigationUtil.popToRootView()
+                        }
+                    }) {
+                        Label{
+                            Text("SET_TOUR")
+                        } icon: {
+                            Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                        }
+                    }
+                    .disabled(hasError)
+                    .actionSheet(isPresented: $isConfirming) {
+                        let message = LocalizedStringKey("ADD_TOUR_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
+                        return ActionSheet(title: Text("ADD_TOUR"),
+                                           message: Text(message),
+                                           buttons: [
+                                            .cancel(),
+                                            .destructive(
+                                                Text("OVERWRITE_TOUR"),
+                                                action: {
+                                                    if let tour = targetTour {
+                                                        tourManager.set(tour: tour)
+                                                        NavigationUtil.popToRootView()
+                                                        targetTour = nil
+                                                    }
+                                                }
+                                            )
+                                           ])
+                    }
+                } else {
+                    Button(action: {
                         targetTour = tour
                         isConfirming = true
-                    } else {
-                        tourManager.set(tour: tour)
-                        modelData.needToStartAnnounce(wait: true)
-                        NavigationUtil.popToRootView()
+                    }) {
+                        Label{
+                            Text("SEND_TOUR")
+                        } icon: {
+                            Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                        }
                     }
-                }) {
-                    Label{
-                        Text("SET_TOUR")
-                    } icon: {
-                        Image(systemName: "arrow.triangle.turn.up.right.diamond")
-                    }
-                }
-                .disabled(hasError)
-                .actionSheet(isPresented: $isConfirming) {
-                    let message = LocalizedStringKey("ADD_TOUR_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
-                    return ActionSheet(title: Text("ADD_TOUR"),
-                                       message: Text(message),
-                                       buttons: [
-                                        .cancel(),
-                                        .destructive(
-                                            Text("OVERWRITE_TOUR"),
-                                            action: {
-                                                if let tour = targetTour {
-                                                    tourManager.set(tour: tour)
+                    .disabled(hasError)
+                    .actionSheet(isPresented: $isConfirming) {
+                        let message = LocalizedStringKey("SEND_TOUR_MESSAGE \(targetTour!.title.text)")
+                        return ActionSheet(title: Text("SEND_TOUR"),
+                                           message: Text(message),
+                                           buttons: [
+                                            .cancel(),
+                                            .destructive(
+                                                Text("SEND_TOUR"),
+                                                action: {
+                                                    modelData.share(tour: targetTour!)
                                                     NavigationUtil.popToRootView()
                                                     targetTour = nil
                                                 }
-                                            }
-                                        )
-                                       ])
+                                            )
+                                           ])
+                    }
                 }
             }
             Section(header: Text(tour.title.text)) {

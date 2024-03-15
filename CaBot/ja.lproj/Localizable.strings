@@ -258,3 +258,10 @@
 "Active"="起動";
 "Activating"="起動中";
 "Deactivating"="停止中";
+
+
+// Send tour/destination
+"SEND_TOUR_MESSAGE %@"="ツアーを送信: %@\nユーザーのツアーが上書きされます";
+"SEND_TOUR"="ツアーを送信";
+"SEND_DESTINATION_MESSAGE %@"="目的地を送信: %@\nユーザーの目的地が上書きされます";
+"SEND_DESTINATION"="目的地を送信";

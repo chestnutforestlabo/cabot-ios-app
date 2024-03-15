@@ -30,13 +30,17 @@ enum ConnectionType:String, CaseIterable{
     case TCP = "tcp"
 }
 
-struct UserInfo: Codable {
+struct SharedInfo: Codable {
     enum InfoType: String, Codable {
         case None
+        // Normal -> Advanced / Debug
         case Speak
         case Tour
         case CurrentDestination
         case NextDestination
+        // Advanced / Debug -> Normal
+        case OverrideTour
+        case OverrideDestination
     }
     let type: InfoType
     let value: String
@@ -49,7 +53,7 @@ protocol CaBotServiceProtocol {
     func manage(command: CaBotManageCommand, param: String?) -> Bool
     func log_request(request: Dictionary<String, String>) -> Bool
     func isConnected() -> Bool
-    func share(user_info: UserInfo) -> Bool
+    func share(user_info: SharedInfo) -> Bool
 }
 
 protocol CaBotTransportProtocol: CaBotServiceProtocol {
@@ -69,7 +73,7 @@ protocol CaBotServiceDelegate {
     func cabot(service:any CaBotTransportProtocol, batteryStatus:BatteryStatus)
     func cabot(service:any CaBotTransportProtocol, logList:[LogEntry], status: CaBotLogStatus)
     func cabot(service:any CaBotTransportProtocol, logDetail:LogEntry)
-    func cabot(service:any CaBotTransportProtocol, userInfo:UserInfo)
+    func cabot(service:any CaBotTransportProtocol, userInfo:SharedInfo)
     func getSpeechPriority() -> SpeechPriority
     func getModeType() -> ModeType
 }
@@ -464,9 +468,7 @@ class CaBotServiceActions {
         }
     }
 
-    func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, user_info: UserInfo) {
-        guard delegate.getModeType() != .Normal else { return } // only for not Normal mode
-
+    func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, user_info: SharedInfo) {
         NSLog("share handle")
         DispatchQueue.main.async {
             delegate.cabot(service: service, userInfo: user_info)

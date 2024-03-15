@@ -128,7 +128,7 @@ class FallbackService: CaBotServiceProtocol {
         return service.log_request(request: request)
     }
 
-    func share(user_info: UserInfo) -> Bool {
+    func share(user_info: SharedInfo) -> Bool {
         guard let service = getService() else { return false }
         return service.share(user_info: user_info)
     }
@@ -689,7 +689,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         _ = self.fallbackService.activityLog(category: category, text: text, memo: memo)
     }
 
-    func share(user_info: UserInfo) {
+    func share(user_info: SharedInfo) {
         _ = self.fallbackService.share(user_info: user_info)
     }
     
@@ -896,14 +896,26 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.cabot(service: self.tcpService, deviceStatus: status)
     }
 
+    func share(tour: Tour) {
+        self.share(user_info: SharedInfo(type: .OverrideTour, value: tour.id))
+        userInfo.clear()
+    }
+
+    func share(destination: Destination) {
+        if let value = destination.value {
+            self.share(user_info: SharedInfo(type: .OverrideDestination, value: value))
+            userInfo.clear()
+        }
+    }
+
     // MARK: TourManagerDelegate
     func tourUpdated(manager: TourManager) {
         tourUpdated = true
         UIApplication.shared.isIdleTimerDisabled = manager.hasDestination
         self.activityLog(category: "tour-text", text: manager.title.text, memo: manager.title.pron)
-        self.share(user_info: UserInfo(type: .Tour, value: manager.title.text))
-        self.share(user_info: UserInfo(type: .CurrentDestination, value: manager.currentDestination?.title.text ?? ""))
-        self.share(user_info: UserInfo(type: .NextDestination, value: manager.nextDestination?.title.text ?? ""))
+        self.share(user_info: SharedInfo(type: .Tour, value: manager.title.text))
+        self.share(user_info: SharedInfo(type: .CurrentDestination, value: manager.currentDestination?.title.text ?? ""))
+        self.share(user_info: SharedInfo(type: .NextDestination, value: manager.nextDestination?.title.text ?? ""))
     }
 
     func tour(manager: TourManager, destinationChanged destination: Destination?) {
@@ -1157,9 +1169,43 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.logList.set(detail: logDetail)
     }
 
-    func cabot(service: CaBotTransportProtocol, userInfo: UserInfo) {
-        self.userInfo.update(userInfo: userInfo)
-        NSLog("\(self.userInfo)")
+    func cabot(service: any CaBotTransportProtocol, userInfo: SharedInfo) {
+        if modeType != .Normal {
+            self.userInfo.update(userInfo: userInfo)
+            NSLog("\(self.userInfo)")
+            return
+        }
+        if userInfo.type == .OverrideTour {
+            if let src = resource?.toursSource {
+                let tours = try! Tour.load(at: src)
+                for tour in tours {
+                    if tour.id == userInfo.value {
+                        tourManager.set(tour: tour)
+                        needToStartAnnounce(wait: true)
+                    }
+                }
+            }
+        }
+        if userInfo.type == .OverrideDestination {
+            func traverseDest(src: Source) {
+                let dests = try! Destination.load(at: src)
+                for dest in dests {
+                    if let value = dest.value {
+                        if value == userInfo.value {
+                            tourManager.clearAll()
+                            tourManager.addToLast(destination: dest)
+                            needToStartAnnounce(wait: true)
+                            return
+                        }
+                    } else if let src = dest.file {
+                        traverseDest(src: src)
+                    }
+                }
+            }
+            if let src = resource?.destinationsSource {
+                traverseDest(src: src)
+            }
+        }
     }
 
     func getSpeechPriority() -> SpeechPriority {
@@ -1420,7 +1466,14 @@ class UserInfoBuffer {
     init() {
     }
 
-    func update(userInfo: UserInfo) {
+    func clear() {
+        selectedTour = ""
+        currentDestination = ""
+        nextDestination = ""
+        speakingText = ""
+    }
+
+    func update(userInfo: SharedInfo) {
         switch(userInfo.type) {
         case .None:
             break
@@ -1435,6 +1488,12 @@ class UserInfoBuffer {
             break
         case .NextDestination:
             nextDestination = userInfo.value
+            break
+        case .OverrideTour:
+            // do nothing
+            break
+        case .OverrideDestination:
+            // do nothing
             break
         }
     }

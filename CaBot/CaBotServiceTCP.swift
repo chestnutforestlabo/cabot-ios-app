@@ -245,7 +245,7 @@ class CaBotServiceTCP: NSObject {
             guard let weakself = self else { return }
             guard let delegate = weakself.delegate else { return }
             do {
-                let decodedData = try JSONDecoder().decode(UserInfo.self, from: data)
+                let decodedData = try JSONDecoder().decode(SharedInfo.self, from: data)
                 weakself.actions.handle(service: weakself, delegate: delegate, user_info: decodedData)
             } catch {
                 print(text)
@@ -407,7 +407,7 @@ extension CaBotServiceTCP: CaBotServiceProtocol {
         self.socket != nil
     }
 
-    func share(user_info: UserInfo) -> Bool {
+    func share(user_info: SharedInfo) -> Bool {
         do {
             let jsonData = try JSONEncoder().encode(user_info)
             if let jsonString = String(data: jsonData, encoding: .utf8) {

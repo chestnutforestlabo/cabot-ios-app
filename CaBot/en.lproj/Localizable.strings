@@ -258,3 +258,10 @@
 "Active"="Active";
 "Activating"="Activating";
 "Deactivating"="Deactivating";
+
+
+// Send tour/destination
+"SEND_TOUR_MESSAGE %@"="Send Tour: %@\nThis will override user's tour";
+"SEND_TOUR"="Send Tour";
+"SEND_DESTINATION_MESSAGE %@"="Send Destination: %@\nThis will override user's destination";
+"SEND_DESTINATION"="Send Destination";
