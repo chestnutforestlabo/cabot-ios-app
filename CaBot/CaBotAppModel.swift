@@ -233,6 +233,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private let selectedResourceKey = "SelectedResourceKey"
     private let selectedResourceLangKey = "selectedResourceLangKey"
     private let selectedVoiceKey = "SelectedVoiceKey"
+    private let isTTSEnabledKey = "isTTSEnabledKey"
     private let speechRateKey = "speechRateKey"
     private let connectionTypeKey = "connection_type"
     private let teamIDKey = "team_id"
@@ -314,6 +315,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     var resourceLang: String {
         get {
             resource?.lang ?? DEFAULT_LANG
+        }
+    }
+
+    @Published var isTTSEnabledForAdvanced: Bool = true {
+        didSet {
+            UserDefaults.standard.setValue(isTTSEnabledForAdvanced, forKey: isTTSEnabledKey)
+            UserDefaults.standard.synchronize()
         }
     }
 
@@ -523,6 +531,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
         if let modeType = UserDefaults.standard.value(forKey: modeTypeKey) as? String {
             self.modeType = ModeType(rawValue: modeType)!
+        }
+        if let isTTSEnabled = UserDefaults.standard.value(forKey: isTTSEnabledKey) as? Bool {
+            self.isTTSEnabledForAdvanced = isTTSEnabled
         }
 
         // services
@@ -1173,6 +1184,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if modeType != .Normal {
             self.userInfo.update(userInfo: userInfo)
             NSLog("\(self.userInfo)")
+            if userInfo.type == .Speak {
+                if isTTSEnabledForAdvanced {
+                    tts.speakForAdvanced(userInfo.value) { _ in
+                    }
+                }
+            }
             return
         }
         if userInfo.type == .OverrideTour {

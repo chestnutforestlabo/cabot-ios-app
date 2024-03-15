@@ -76,6 +76,16 @@ class CaBotTTS : TTSProtocol{
         }
     }
 
+    func speakForAdvanced(_ text:String?, callback: @escaping (Int32) -> Void) {
+        var options:Dictionary<String,Any> = ["rate": rate, "selfspeak": true, "force": true]
+        if let voice = self.voice {
+            options["voice"] = voice
+        }
+        self._tts.speak(text == nil ? "" : text, withOptions: options) { code in
+            callback(code)
+        }
+    }
+
     func speak(_ text: String?, force: Bool, callback: @escaping (Int32) -> Void) {
         self.speak(text, forceSelfvoice: false, force: force, callback: callback)
     }

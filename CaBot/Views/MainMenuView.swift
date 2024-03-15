@@ -446,6 +446,11 @@ struct SettingMenus: View {
         let buildNo = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
 
         Section(header:Text("System")) {
+            if modelData.modeType != .Normal {
+                Toggle(isOn: $modelData.isTTSEnabledForAdvanced) {
+                    Text("TTS Enabled (Advanced only)")
+                }
+            }
             Picker(LocalizedStringKey("Voice"), selection: $modelData.voice) {
                 ForEach(TTSHelper.getVoices(by: locale), id: \.self) { voice in
                     Text(voice.AVvoice.name).tag(voice as Voice?)
