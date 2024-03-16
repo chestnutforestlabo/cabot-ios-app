@@ -43,16 +43,18 @@ struct SharedInfo: Codable {
         case OverrideTour
         case OverrideDestination
     }
-    init(type: InfoType, value: String, flag1: Bool = false, location: Int = 0, length: Int = 0) {
+    init(type: InfoType, value: String, flag1: Bool = false, flag2: Bool = false, location: Int = 0, length: Int = 0) {
         self.type = type
         self.value = value
         self.flag1 = flag1
+        self.flag2 = flag2
         self.location = location
         self.length = length
     }
     let type: InfoType
     let value: String
     let flag1: Bool
+    let flag2: Bool
     let location: Int
     let length: Int
 }

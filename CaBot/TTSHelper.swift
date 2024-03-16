@@ -59,8 +59,12 @@ class CaBotTTS : TTSProtocol{
         let isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
         let selfspeak = forceSelfvoice || !isForeground || !isVoiceOverRunning
 
+        var voiceover = false
+        if UIAccessibility.isVoiceOverRunning {
+            voiceover = true
+        }
         self.delegate?.activityLog(category: "app speech speaking", text: text ?? "", memo: "force=\(force)")
-        self.delegate?.share(user_info: SharedInfo(type: .Speak, value: text ?? "", flag1: force))
+        self.delegate?.share(user_info: SharedInfo(type: .Speak, value: text ?? "", flag1: force, flag2: voiceover))
 
         var options:Dictionary<String,Any> = ["rate": rate, "selfspeak": selfspeak, "force": force]
         if let voice = self.voice {
@@ -75,7 +79,7 @@ class CaBotTTS : TTSProtocol{
             callback(code)
             //print("code=\(code), text=\(text)")
             if code >= 0, let text = text {
-                self.delegate?.share(user_info: SharedInfo(type: .SpeakProgress, value: text, flag1: true))
+                self.delegate?.share(user_info: SharedInfo(type: .SpeakProgress, value: text, flag1: true, flag2: voiceover, length: Int(code)))
             }
         }, progressHandler: { range in
             if let text = text {

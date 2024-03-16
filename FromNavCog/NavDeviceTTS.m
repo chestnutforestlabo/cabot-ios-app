@@ -373,7 +373,13 @@ static NavDeviceTTS *instance = nil;
     double duration = estimatedDuration(se);
     expire = now + duration;
 
-    if (!se.selfvoicing && [self speakWithVoiceOver:se.ut.speechString]) {
+    if (!se.selfvoicing) {
+        se.voWatchTimer = [NSTimer scheduledTimerWithTimeInterval:0.5
+                                                           target:self
+                                                         selector:@selector(voiceOverWatchCallback:)
+                                                         userInfo:se
+                                                          repeats:YES];
+        [self speakWithVoiceOver:se.ut.speechString];
         return;
     }
     NSLog(@"speak,%@,%f,%f", se.ut.speechString, duration, NSDate.date.timeIntervalSince1970);
@@ -458,14 +464,55 @@ static NavDeviceTTS *instance = nil;
     }
 }
 
+int min(int a, int b) {
+    return (a < b) ? a : b;
+}
+
+- (void)voiceOverWatchCallback:(NSTimer*)timer
+{
+    HLPSpeechEntry *se = (HLPSpeechEntry*)timer.userInfo;
+    NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
+    float duration = now - se.speakStart;
+    if (se.progressHandler != nil) {
+        float rate = readTextCount / readDuration;
+        int start = lastVOEstimatedLocation;
+        int end = min((int)(duration * rate), (int)se.ut.speechString.length);
+        lastVOEstimatedLocation = end;
+        se.progressHandler(NSMakeRange(start, end-start));
+    }
+}
+
+static int lastVOEstimatedLocation = 0;
+static float readDuration = 1;
+static float readTextCount = 10; // default estimated chars per sec (ja)
+
 - (void)voiceOverDidFinishAnnouncing:(NSNotification*)note
 {
     NSDictionary *userInfo = [note userInfo];
     NSString *speechString = userInfo[UIAccessibilityAnnouncementKeyStringValue];
-    
+    NSNumber *success = userInfo[UIAccessibilityAnnouncementKeyWasSuccessful];
+
     HLPSpeechEntry *se = [processing objectForKey:speechString];
     se.speakFinish = [[NSDate date] timeIntervalSince1970];
     NSLog(@"speak_finish_vo,%.2f,%.2f,%f", se.speakStart - se.issued, se.speakFinish - se.speakStart, NSDate.date.timeIntervalSince1970);
+    // reset voiceover watch timer
+    lastVOEstimatedLocation = 0;
+    [se.voWatchTimer invalidate];
+
+    int count = (int)speechString.length;
+    if (success != nil && [success intValue] == 1) {
+        float duration = fmax(0.1, se.speakFinish - se.speakStart);
+        readDuration += duration;
+        readTextCount += speechString.length;
+        float rate = readTextCount / readDuration;
+        NSLog(@"Speech rate = %.2f, (%.2f / %.2f)", rate, readTextCount, readDuration);
+    } else {
+        float duration = fmax(0.1, se.speakFinish - se.speakStart);
+        float rate = readTextCount / readDuration;
+        count = (int) (duration * rate);
+        NSLog(@"Estimated Spoken text length = %d, (%.2f * %.2f)", count, duration, rate);
+        NSLog(@"Estimated Spoken text: %@", [speechString substringToIndex:count]);
+    }
     [processing removeObjectForKey:speechString];
     
     if (se) {
@@ -473,7 +520,7 @@ static NavDeviceTTS *instance = nil;
         isProcessing = NO;
         expire = NAN;
         if (se.completionHandler) {
-            se.completionHandler((int)speechString.length);
+            se.completionHandler(count);
         }
     }    
 }

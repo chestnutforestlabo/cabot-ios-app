@@ -74,18 +74,42 @@ struct MainMenuView: View {
 
 struct UserInfoView: View {
     @EnvironmentObject var modelData: CaBotAppModel
-
+    
     var body: some View {
         Section(header: Text("User Info")) {
-            Label(modelData.userInfo.selectedTour, systemImage: "list.bullet.rectangle.portrait")
-            if modelData.userInfo.currentDestination != "" {
-                Label(modelData.userInfo.currentDestination, systemImage: "arrow.triangle.turn.up.right.diamond")
-            } else {
-                Label(modelData.userInfo.nextDestination, systemImage: "mappin.and.ellipse")
+            Label {
+                if (modelData.userInfo.selectedTour.isEmpty) {
+                    Text("PLACEHOLDER_TOUR_TITLE").foregroundColor(.gray)
+                } else {
+                    Text(modelData.userInfo.selectedTour)
+                }
+            } icon: {
+                Image(systemName: "list.bullet.rectangle.portrait")
             }
-            if modelData.userInfo.speakingText.count > 1 {
+            Label {
+                if modelData.userInfo.currentDestination != "" {
+                    Text(modelData.userInfo.currentDestination)
+                } else if modelData.userInfo.nextDestination != "" {
+                    Text(modelData.userInfo.nextDestination)
+                } else {
+                    Text("PLACEHOLDER_DESTINATION_TITLE").foregroundColor(.gray)
+                }
+            } icon: {
+                if modelData.userInfo.currentDestination != "" {
+                    Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                } else {
+                    Image(systemName: "mappin.and.ellipse")
+                }
+            }
+            if modelData.userInfo.speakingText.count == 0 {
+                Label {
+                    Text("PLACEHOLDER_SPEAKING_TEXT").foregroundColor(.gray)
+                } icon: {
+                    Image(systemName: "text.bubble")
+                }
+            } else if modelData.userInfo.speakingText.count > 1 {
                 ForEach(modelData.userInfo.speakingText[..<2], id: \.self) { text in
-                    showText(text: text)
+                    SpokenTextView.showText(text: text)
                 }
                 if modelData.userInfo.speakingText.count > 2 {
                     NavigationLink(destination: SpokenTextView().environmentObject(modelData), label: {
@@ -97,25 +121,9 @@ struct UserInfoView: View {
                 }
             } else {
                 ForEach(modelData.userInfo.speakingText, id: \.self) { text in
-                    showText(text: text)
+                    SpokenTextView.showText(text: text)
                 }
             }
-        }
-    }
-
-    func showText(text: SpeakingText) -> some View {
-        let texts = text.subTexts()
-        return Label {
-            HStack {
-                Text(texts.0)
-                    .bold() +
-                Text(texts.1)
-                    .foregroundColor(.blue) +
-                Text(texts.2)
-                    .foregroundColor(.gray)
-            }
-        } icon: {
-            Image(systemName: "text.bubble")
         }
     }
 }

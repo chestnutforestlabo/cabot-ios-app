@@ -51,6 +51,7 @@ typedef enum {
 @property NSTimeInterval issued;
 @property NSTimeInterval speakStart;
 @property NSTimeInterval speakFinish;
+@property NSTimer *voWatchTimer;
 @property BOOL selfvoicing;
 @property BOOL quickAnswer;
 @end

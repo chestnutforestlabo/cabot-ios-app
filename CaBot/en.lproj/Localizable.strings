@@ -272,3 +272,7 @@
 "App"="App";
 
 "See history"="See history";
+
+"PLACEHOLDER_TOUR_TITLE"="Tour Title";
+"PLACEHOLDER_DESTINATION_TITLE"="Destination Title";
+"PLACEHOLDER_SPEAKING_TEXT"="Speaking Text";

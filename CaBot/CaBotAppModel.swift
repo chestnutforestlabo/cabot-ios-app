@@ -1104,13 +1104,18 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                         announce += CustomLocalizedString("Press the center button to proceed a subtour %@.", lang: self.resourceLang, subtour.introduction.pron)
                     }
                 }
-
-                self.speak(announce) {
-                    // if user pressed the next button while reading announce, skip open content
-                    if self.tourManager.currentDestination == nil {
-                        if let contentURL = cd.content?.url,
-                           self.tourManager.setting.showContentWhenArrive {
-                            self.open(content: contentURL)
+                var delay = 0.0
+                if UIAccessibility.isVoiceOverRunning {
+                    delay = 3.0
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                    self.speak(announce) {
+                        // if user pressed the next button while reading announce, skip open content
+                        if self.tourManager.currentDestination == nil {
+                            if let contentURL = cd.content?.url,
+                               self.tourManager.setting.showContentWhenArrive {
+                                self.open(content: contentURL)
+                            }
                         }
                     }
                 }
@@ -1486,16 +1491,19 @@ class SpeakingText: Hashable {
     }
     var text: String = ""
     var date: Date
+    var voiceover: Bool
     var location = 0
     var length = 0
-    init(text: String) {
+    init(text: String, voiceover: Bool) {
         self.text = text
         self.date = Date()
+        self.voiceover = voiceover
     }
-    func subTexts() -> (String, String, String) {
+    func subTexts() -> (String, String, String, String) {
+        let prefix = self.voiceover ? "VO:" : ""
         let i1 = text.index(text.startIndex, offsetBy: location)
         let i2 = text.index(i1, offsetBy: length)
-        return (String(text[..<i1]), String(text[i1..<i2]), String(text[i2...]))
+        return (prefix, String(text[..<i1]), String(text[i1..<i2]), String(text[i2...]))
     }
 }
 
@@ -1521,14 +1529,19 @@ class UserInfoBuffer {
         case .None:
             break
         case .Speak:
-            speakingText.insert(SpeakingText(text: userInfo.value), at: 0)
+            speakingText.insert(SpeakingText(text: userInfo.value, voiceover: userInfo.flag2), at: 0)
             break
         case .SpeakProgress:
             for i in 0..<speakingText.count {
                 if speakingText[i].text == userInfo.value {
-                    if userInfo.flag1 {
-                        speakingText[i].location += speakingText[i].length
-                        speakingText[i].length = 0
+                    if userInfo.flag1 { // speech done
+                        if userInfo.flag2 { // voiceover
+                            speakingText[i].location = userInfo.length
+                            speakingText[i].length = 0
+                        } else {
+                            speakingText[i].location += speakingText[i].length
+                            speakingText[i].length = 0
+                        }
                     } else {
                         speakingText[i].location = userInfo.location
                         speakingText[i].length = userInfo.length
