@@ -100,6 +100,10 @@ class CaBotTTS : TTSProtocol{
         })
     }
 
+    func stopSpeakForAdvanced() {
+        self._tts.stop(false)
+    }
+
     func speak(_ text: String?, force: Bool, callback: @escaping (Int32) -> Void) {
         self.speak(text, forceSelfvoice: false, force: force, callback: callback)
     }
@@ -116,10 +120,12 @@ class CaBotTTS : TTSProtocol{
     }
 
     func stop() {
+        self.delegate?.share(user_info: SharedInfo(type: .Speak, value: "", flag1: true))
         self._tts.stop(true)
     }
 
     func stop(_ immediate: Bool) {
+        self.delegate?.share(user_info: SharedInfo(type: .Speak, value: "", flag1: true))
         self._tts.stop(immediate)
     }
 

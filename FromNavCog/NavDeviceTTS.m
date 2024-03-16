@@ -310,6 +310,7 @@ static NavDeviceTTS *instance = nil;
     se.progressHandler = phandler;
     
     if (flag) {
+        NSLog(@"force stop");
         [voice stopSpeakingAtBoundary:AVSpeechBoundaryImmediate];
         @synchronized(speaking) {
             speaking = [[speaking objectsAtIndexes:[speaking indexesOfObjectsPassingTest:^BOOL(HLPSpeechEntry *se, NSUInteger idx, BOOL * _Nonnull stop) {

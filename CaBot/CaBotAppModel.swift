@@ -833,8 +833,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func skipDestination() -> Void {
         let skip = tourManager.skipDestination()
-        self.tts.stop()
-        self.tts.speak("ー"){}
+        self.stopSpeak()
         var announce = CustomLocalizedString("Skip Message %@", lang: self.resourceLang, skip.title.pron)
         self.tts.speak(announce){
         }
@@ -849,7 +848,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func stopSpeak() {
-        self.tts.stop()
+        self.tts.stop(false)
     }
 
     func playAudio(file: String) {
@@ -938,7 +937,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     // cancel all announcement
                     var delay = self.tts.isSpeaking ? 1.0 : 0
 
-                    self.tts.stop(true)
+                    self.stopSpeak()
 
                     if self.isContentPresenting {
                         self.isContentPresenting = false
@@ -1193,7 +1192,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.userInfo.update(userInfo: userInfo)
             if userInfo.type == .Speak {
                 if isTTSEnabledForAdvanced {
-                    tts.speakForAdvanced(userInfo.value, force: userInfo.flag1) { _ in
+                    if userInfo.value.isEmpty && userInfo.flag1 { // stop
+                        tts.stopSpeakForAdvanced()
+                    } else {
+                        tts.speakForAdvanced(userInfo.value, force: userInfo.flag1) { _ in
+                        }
                     }
                 }
             }
@@ -1529,7 +1532,9 @@ class UserInfoBuffer {
         case .None:
             break
         case .Speak:
-            speakingText.insert(SpeakingText(text: userInfo.value, voiceover: userInfo.flag2), at: 0)
+            if !userInfo.value.isEmpty {
+                speakingText.insert(SpeakingText(text: userInfo.value, voiceover: userInfo.flag2), at: 0)
+            }
             break
         case .SpeakProgress:
             for i in 0..<speakingText.count {
