@@ -76,7 +76,7 @@ struct UserInfoView: View {
     @EnvironmentObject var modelData: CaBotAppModel
     
     var body: some View {
-        Section(header: Text("User Info")) {
+        Section(header: Text("User App Info")) {
             Label {
                 if (modelData.userInfo.selectedTour.isEmpty) {
                     Text("PLACEHOLDER_TOUR_TITLE").foregroundColor(.gray)
