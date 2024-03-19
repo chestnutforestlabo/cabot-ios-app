@@ -66,9 +66,20 @@ struct DestinationsView: View {
                                 destination: DestinationDetailView(destination: destination)
                                     .environmentObject(modelData),
                                 label: {
-                                    Text(destination.title.text)
-                                        .accessibilityLabel(destination.title.pron)
-                                })
+                                    if let summaryMessage = destination.summaryMessage?.content{
+                                        VStack(alignment: .leading) {
+                                            Text(destination.title.text)
+                                                .font(.body)
+                                                .accessibilityLabel(destination.title.pron)
+                                            Text(summaryMessage).font(.caption)
+                                        }
+                                    } else{
+                                        Text(destination.title.text)
+                                                .accessibilityLabel(destination.title.pron)
+                                                .font(.body)
+                                        }
+                                    }
+                                )
                         } else {
                             if modelData.modeType == .Normal {
                                 Button(action: {
