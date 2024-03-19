@@ -30,7 +30,7 @@ struct DeviceStatusView: View {
     var body: some View {
         return VStack {
             Form {
-                if (modelData.modeType == .Debug){
+                if (modelData.modeType == .Advanced || modelData.modeType == .Debug) {
                     Section(header:Text("Details")) {
                         List {
                             Label(modelData.deviceStatus.level.rawValue, systemImage: modelData.deviceStatus.level.icon)
@@ -47,9 +47,7 @@ struct DeviceStatusView: View {
                             }
                         }
                     }
-                }
 
-                if (modelData.modeType == .Advanced || modelData.modeType == .Debug) {
                     Section(header:Text("Actions")) {
                         if !modelData.suitcaseConnected {
                             Label(LocalizedStringKey("Suitcase Not Connected"),

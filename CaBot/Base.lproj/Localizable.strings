@@ -130,6 +130,8 @@
 "The app will be disconnected."="The app will be disconnected.";
 "Power off"="Power off";
 "Device Status"="Device Status";
+"DEVICE_ERROR_ALERT%@" = "Device - %@";
+"CHECK_DEVICE_STATUS" = "Please Check Device Status Menu";
 
 
 // BatteryStatusView
@@ -141,6 +143,12 @@
 "Stop System"="Stop System";
 "Are you sure to stop the suitcase system?"="Are you sure to stop the suitcase system?";
 "System Status"="System Status";
+"SYSTEM_OK" = "OK";
+"SYSTEM_ERROR" = "Error";
+"SYSTEM_ERROR_ALERT%@" = "System - %@";
+"CHECK_SYSTEM_STATUS" = "Please Check System Status Menu";
+"CHECK_MENU" = "Check Menu";
+"DO_NOT_CHECK_MENU" = "Cancel";
 
 
 // DestinationsView

@@ -63,6 +63,11 @@ enum ModeType: String, CaseIterable{
     case Debug  = "Debug"
 }
 
+enum SpeechPriority: String, CaseIterable {
+    case Robot = "Robot"
+    case App = "App"
+}
+
 class FallbackService: CaBotServiceProtocol {
     private let services: [CaBotServiceProtocol]
     private var selectedService: CaBotServiceProtocol?
@@ -217,8 +222,7 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
     }
 }
 
-final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, TourManagerDelegate, CLLocationManagerDelegate, CaBotTTSDelegate, LogReportModelDelegate{
-
+final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, TourManagerDelegate, CLLocationManagerDelegate, CaBotTTSDelegate, LogReportModelDelegate, UNUserNotificationCenterDelegate{
     private let DEFAULT_LANG = "en"
     
     private let selectedResourceKey = "SelectedResourceKey"
@@ -234,6 +238,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private let menuDebugKey = "menu_debug"
     private let noSuitcaseDebugKey = "noSuitcaseDebugKey"
     private let modeTypeKey = "modeTypeKey"
+    private let notificationCenterID = "cabot_state_notification"
+    private let speechPriorityKey = "speechPriorityKey"
     
     let detailSettingModel: DetailSettingModel
 
@@ -241,6 +247,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var serverBLEVersion: String? = nil
     @Published var versionMatchedTCP: Bool = false
     @Published var serverTCPVersion: String? = nil
+
+    @Published var debugSystemStatusLevel: CaBotSystemLevel = .Unknown
+    @Published var debugDeviceStatusLevel: DeviceStatusLevel = .Unknown
 
     @Published var locationState: GrantState = .Init {
         didSet {
@@ -410,6 +419,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             UserDefaults.standard.synchronize()
         }
     }
+    @Published var speechPriority:SpeechPriority = .Robot {
+        didSet {
+            UserDefaults.standard.setValue(speechPriority.rawValue, forKey: speechPriorityKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
 
     @Published var isContentPresenting: Bool = false
     @Published var isConfirmingSummons: Bool = false
@@ -417,7 +432,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var tourUpdated: Bool = false
 
     @Published var deviceStatus: DeviceStatus = DeviceStatus()
+    @Published var showingDeviceStatusNotification: Bool = false
+    @Published var showingDeviceStatusMenu: Bool = false
     @Published var systemStatus: SystemStatusData = SystemStatusData()
+    @Published var showingSystemStatusNotification: Bool = false
+    @Published var showingSystemStatusMenu: Bool = false
     @Published var batteryStatus: BatteryStatus = BatteryStatus()
 
     private var bleService: CaBotServiceBLE
@@ -430,7 +449,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     let resourceManager: ResourceManager
     let tourManager: TourManager
     let dialogViewHelper: DialogViewHelper
-    let notificationCenter: UNUserNotificationCenter
+    private let feedbackGenerator = UINotificationFeedbackGenerator()
+    let notificationCenter = UNUserNotificationCenter.current()
 
     let locationManager: CLLocationManager
     let locationUpdateTimeLimit: CFAbsoluteTime = 60*15
@@ -455,7 +475,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.tourManager = TourManager(setting: self.detailSettingModel)
         self.dialogViewHelper = DialogViewHelper()
         self.locationManager =  CLLocationManager()
-        self.notificationCenter = UNUserNotificationCenter.current()
 
         // initialize connection type
         var connectionType: ConnectionType = .BLE
@@ -519,6 +538,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
         // tour manager
         self.tourManager.delegate = self
+
+        // Error/Warning Notification
+        self.notificationCenter.delegate = self
     }
 
     func onChange(of newScenePhase: ScenePhase) {
@@ -547,6 +569,79 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                                                      intentIdentifiers: [],
                                                      options: [.allowAnnouncement])
         notificationCenter.setNotificationCategories([generalCategory])
+    }
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.sound, .banner])
+    }
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        print("tapped!!!!!")
+        print(self.showingSystemStatusNotification)
+        if self.showingDeviceStatusNotification{
+            self.showingDeviceStatusMenu = true
+        } else if self.showingSystemStatusNotification{
+            self.showingSystemStatusMenu = true
+        }
+        completionHandler()
+    }
+
+    private func removeNotification() -> Void {
+        self.showingDeviceStatusNotification = false
+        self.showingSystemStatusNotification = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [self.notificationCenterID])
+        }
+    }
+
+    private func pushSystemState() -> Void {
+        removeNotification()
+        let systemStatusString = CustomLocalizedString(self.systemStatus.summary.text, lang: self.resourceLang)
+        let notificationTitle = CustomLocalizedString("SYSTEM_ERROR_ALERT%@", lang: self.resourceLang, systemStatusString)
+        let notificationMessage = "CHECK_SYSTEM_STATUS"
+        let content = UNMutableNotificationContent()
+        content.title = NSString.localizedUserNotificationString(forKey: notificationTitle, arguments: nil)
+        content.body = NSString.localizedUserNotificationString(forKey: notificationMessage, arguments: nil)
+        if (self.systemStatus.summary == .Error){
+            content.sound = UNNotificationSound.defaultCritical
+            self.feedbackGenerator.notificationOccurred(.error)
+        } else {
+            self.feedbackGenerator.notificationOccurred(.warning)
+        }
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: (0.1), repeats: false)
+        let request = UNNotificationRequest(identifier: self.notificationCenterID, content: content, trigger: trigger)
+
+        notificationCenter.add(request) { (error : Error?) in
+            if let theError = error {
+                print(theError.localizedDescription)
+            }
+        }
+        self.showingSystemStatusNotification = true
+    }
+
+    private func pushDeviceState() -> Void {
+        removeNotification()
+        let deviceStatusString = CustomLocalizedString(self.deviceStatus.level.rawValue, lang: self.resourceLang)
+        let notificationTitle = CustomLocalizedString("DEVICE_ERROR_ALERT%@", lang: self.resourceLang, deviceStatusString)
+        let notificationMessage = "CHECK_DEVICE_STATUS"
+        let content = UNMutableNotificationContent()
+        content.title = NSString.localizedUserNotificationString(forKey: notificationTitle, arguments: nil)
+        content.body = NSString.localizedUserNotificationString(forKey: notificationMessage, arguments: nil)
+        if self.deviceStatus.level == .Error {
+            content.sound = UNNotificationSound.defaultCritical
+            self.feedbackGenerator.notificationOccurred(.error)
+        } else {
+            self.feedbackGenerator.notificationOccurred(.warning)
+        }
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: (0.1), repeats: false)
+        let request = UNNotificationRequest(identifier: self.notificationCenterID, content: content, trigger: trigger)
+
+        notificationCenter.add(request) { (error : Error?) in
+            if let theError = error {
+                print(theError.localizedDescription)
+            }
+        }
+        self.showingDeviceStatusNotification = true
     }
 
     // MARK: onboading
@@ -772,6 +867,24 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.cabot(service: self.bleService, notification: .arrived)
     }
 
+    func debugCabotSystemStatus(systemStatusFile: String){
+        let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
+                .appendingPathComponent(systemStatusFile)
+        let fm = FileManager.default
+        let data = fm.contents(atPath: path.path)!
+        let status = try! JSONDecoder().decode(SystemStatus.self, from: data)
+        self.cabot(service: self.tcpService, systemStatus: status)
+    }
+
+    func debugCabotDeviceStatus(systemStatusFile: String){
+        let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
+                .appendingPathComponent(systemStatusFile)
+        let fm = FileManager.default
+        let data = fm.contents(atPath: path.path)!
+        let status = try! JSONDecoder().decode(DeviceStatus.self, from: data)
+        self.cabot(service: self.tcpService, deviceStatus: status)
+    }
+
     // MARK: TourManagerDelegate
     func tourUpdated(manager: TourManager) {
         tourUpdated = true
@@ -852,6 +965,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     // MARK: CaBotServiceDelegate
 
     func caBot(service: any CaBotTransportProtocol, centralConnected: Bool) {
+        guard self.preview == false else {return}
         let saveSuitcaseConnected = self.suitcaseConnected
 
         switch(service.connectionType()) {
@@ -973,11 +1087,45 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func cabot(service: any CaBotTransportProtocol, deviceStatus: DeviceStatus) -> Void {
+        let prevDeviceStatusLevel = self.deviceStatus.level
         self.deviceStatus = deviceStatus
+        let deviceStatusLevel = deviceStatus.level
+        if (self.modeType == .Advanced || self.modeType == .Debug){
+            if (prevDeviceStatusLevel != deviceStatusLevel) {
+                if (deviceStatusLevel == .OK){
+                    self.removeNotification()
+                } else {
+                    notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+                        if granted {
+                            self.pushDeviceState()
+                        } else {
+                            print("Permission for notification not granted.")
+                        }
+                    }
+                }
+            }
+        }
     }
 
     func cabot(service: any CaBotTransportProtocol, systemStatus: SystemStatus) -> Void {
+        let prevSystemStatus = self.systemStatus.summary
         self.systemStatus.update(with: systemStatus)
+        let systemStatus = self.systemStatus.summary
+        if (self.modeType == .Advanced || self.modeType == .Debug){
+            if (prevSystemStatus != systemStatus){
+                if (systemStatus == .OK){
+                    self.removeNotification()
+                } else {
+                    notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+                        if granted {
+                            self.pushSystemState()
+                        } else {
+                            print("Permission for notification not granted.")
+                        }
+                    }
+                }
+            }
+        }
     }
 
     func cabot(service: any CaBotTransportProtocol, batteryStatus: BatteryStatus) -> Void {
@@ -993,6 +1141,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     func cabot(service: any CaBotTransportProtocol, logDetail: LogEntry) {
         NSLog("set log detail \(logDetail)")
         self.logList.set(detail: logDetail)
+    }
+
+    func getSpeechPriority() -> SpeechPriority {
+        return speechPriority
     }
 }
 

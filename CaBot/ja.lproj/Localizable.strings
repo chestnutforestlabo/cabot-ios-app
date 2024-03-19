@@ -130,6 +130,8 @@
 "The app will be disconnected."="スーツケースとの接続が解除されます";
 "Power off"="電源オフ";
 "Device Status"="デバイス状態";
+"DEVICE_ERROR_ALERT%@" = "デバイス - %@";
+"CHECK_DEVICE_STATUS" = "デバイスメニューを確認してください";
 
 
 // BatteryStatusView
@@ -141,6 +143,10 @@
 "Stop System"="システム停止";
 "Are you sure to stop the suitcase system?"="スーツケースのシステム停止しますが、よろしいですか？";
 "System Status"="システム状態";
+"SYSTEM_ERROR_ALERT%@" = "システム - %@";
+"CHECK_SYSTEM_STATUS" = "システムメニューを確認してください";
+"CHECK_MENU" = "確認する";
+"DO_NOT_CHECK_MENU" = "戻る";
 
 
 // DestinationsView

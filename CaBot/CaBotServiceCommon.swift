@@ -56,6 +56,7 @@ protocol CaBotServiceDelegate {
     func cabot(service:any CaBotTransportProtocol, batteryStatus:BatteryStatus)
     func cabot(service:any CaBotTransportProtocol, logList:[LogEntry], status: CaBotLogStatus)
     func cabot(service:any CaBotTransportProtocol, logDetail:LogEntry)
+    func getSpeechPriority() -> SpeechPriority
 }
 
 enum NavigationNotification:String {
@@ -374,12 +375,12 @@ class CaBotServiceActions {
         lastSpeakRequestID = request.request_id
 
         DispatchQueue.main.async {
-            if request.force {
+            if delegate.getSpeechPriority() == .Robot && request.force {
                 tts.stop()
             }
             let line = request.text
             let force = request.force
-            if !tts.isSpeaking || force {
+            if !tts.isSpeaking || (delegate.getSpeechPriority() == .Robot && force) {
                 _ = service.activityLog(category: "ble speech request speaking", text: String(line), memo: "force=\(force)")
                 tts.speak(String(line), force: force) { code in
                     if code > 0 {

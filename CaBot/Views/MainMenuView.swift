@@ -70,7 +70,7 @@ struct MainMenuView: View {
 
 struct ActionMenus: View {
     @EnvironmentObject var modelData: CaBotAppModel
-    
+
     var body: some View {
         Section(header: Text("Actions")) {
             if modelData.tourManager.hasDestination && modelData.menuDebug {
@@ -458,6 +458,16 @@ struct SettingMenus: View {
                 Text(String(format:"%.0f %%", arguments:[modelData.speechRate*100.0]))
                     .accessibility(hidden: true)
             }
+
+            VStack {
+                Text("Speech Priority")
+                    .accessibility(hidden: true)
+                Picker("", selection: $modelData.speechPriority){
+                    Text(LocalizedStringKey(SpeechPriority.Robot.rawValue)).tag(SpeechPriority.Robot)
+                    Text(LocalizedStringKey(SpeechPriority.App.rawValue)).tag(SpeechPriority.App)
+                }.pickerStyle(SegmentedPickerStyle())
+            }
+
             if (modelData.modeType == .Advanced || modelData.modeType == .Debug) {
                 if #available(iOS 15.0, *) {
                     NavigationLink (destination: LogFilesView(langOverride: modelData.resourceLang)
@@ -494,6 +504,38 @@ struct SettingMenus: View {
                     }
                 }.pickerStyle(SegmentedPickerStyle())
             }
+            if (modelData.menuDebug && modelData.noSuitcaseDebug){
+                VStack{
+                    HStack{
+                        Text("System Status")
+                        Spacer()
+                    }
+                    Picker("", selection: $modelData.debugSystemStatusLevel){
+                        Text("Okay").tag(CaBotSystemLevel.Active)
+                        Text("ERROR").tag(CaBotSystemLevel.Error)
+                    }.onChange(of: modelData.debugSystemStatusLevel, perform: { systemStatusLevel in
+                        if (systemStatusLevel == .Active){
+                            modelData.debugCabotSystemStatus(systemStatusFile: "system_ok.json")
+                        }else{
+                            modelData.debugCabotSystemStatus(systemStatusFile: "system_error.json")
+                        }
+                    }).pickerStyle(SegmentedPickerStyle())
+                    HStack{
+                        Text("Device Status")
+                        Spacer()
+                    }
+                    Picker("", selection: $modelData.debugDeviceStatusLevel){
+                        Text("Okay").tag(DeviceStatusLevel.OK)
+                        Text("ERROR").tag(DeviceStatusLevel.Error)
+                    }.onChange(of: modelData.debugDeviceStatusLevel, perform: { deviceStatusLevel in
+                        if (deviceStatusLevel == .OK){
+                            modelData.debugCabotDeviceStatus(systemStatusFile: "device_ok.json")
+                        }else{
+                            modelData.debugCabotDeviceStatus(systemStatusFile: "device_error.json")
+                        }
+                    }).pickerStyle(SegmentedPickerStyle())
+                }
+            }
             Text("Version: \(versionNo) (\(buildNo)) - \(CaBotServiceBLE.CABOT_BLE_VERSION)")
         }
     }
@@ -502,13 +544,38 @@ struct SettingMenus: View {
 struct ContentView_Previews: PreviewProvider {
     
     static var previews: some View {
+        preview_normal
         preview_connected
+        preview_debug_mode
         //preview_tour
         //preview_tour2
         //preview_tour3
         //preview_tour4
         //preview
         //preview_ja
+    }
+
+    static var preview_normal: some View {
+        let modelData = CaBotAppModel()
+        modelData.suitcaseConnectedBLE = true
+        modelData.suitcaseConnectedTCP = true
+        modelData.deviceStatus.level = .OK
+        modelData.systemStatus.level = .Inactive
+        modelData.systemStatus.summary = .Stale
+        modelData.versionMatchedBLE = true
+        modelData.versionMatchedTCP = true
+        modelData.serverBLEVersion = CaBotServiceBLE.CABOT_BLE_VERSION
+        modelData.serverTCPVersion = CaBotServiceBLE.CABOT_BLE_VERSION
+        modelData.modeType = .Normal
+
+        if let r = modelData.resourceManager.resource(by: "Test data") {
+            modelData.resource = r
+        }
+
+        return MainMenuView()
+            .environmentObject(modelData)
+            .environment(\.locale, .init(identifier: "en"))
+            .previewDisplayName("suitcase connected")
     }
 
     static var preview_connected: some View {
@@ -530,6 +597,35 @@ struct ContentView_Previews: PreviewProvider {
         return MainMenuView()
             .environmentObject(modelData)
             .environment(\.locale, .init(identifier: "en"))
+            .previewDisplayName("suitcase connected")
+    }
+
+    static var preview_debug_mode: some View {
+        let modelData = CaBotAppModel(preview: true)
+        modelData.suitcaseConnected = true
+        modelData.suitcaseConnectedBLE = true
+        modelData.suitcaseConnectedTCP = true
+        modelData.deviceStatus.level = .OK
+        modelData.systemStatus.level = .Inactive
+        modelData.systemStatus.summary = .Stale
+        modelData.versionMatchedBLE = true
+        modelData.versionMatchedTCP = true
+        modelData.serverBLEVersion = CaBotServiceBLE.CABOT_BLE_VERSION
+        modelData.serverTCPVersion = CaBotServiceBLE.CABOT_BLE_VERSION
+        modelData.modeType = .Debug
+        modelData.menuDebug = true
+
+        let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
+            .appendingPathComponent("system_ok.json")
+        let fm = FileManager.default
+        let data = fm.contents(atPath: path.path)!
+        let status = try! JSONDecoder().decode(SystemStatus.self, from: data)
+        modelData.systemStatus.update(with: status)
+
+        return MainMenuView()
+            .environmentObject(modelData)
+            .previewDisplayName("debug mode")
+
     }
 
     static var preview_tour: some View {
@@ -549,6 +645,7 @@ struct ContentView_Previews: PreviewProvider {
 
         return MainMenuView()
             .environmentObject(modelData)
+            .previewDisplayName("tour")
     }
 
     static var preview_tour2: some View {
@@ -565,6 +662,7 @@ struct ContentView_Previews: PreviewProvider {
 
         return MainMenuView()
             .environmentObject(modelData)
+            .previewDisplayName("tour2")
     }
 
     static var preview_tour3: some View {
@@ -581,6 +679,7 @@ struct ContentView_Previews: PreviewProvider {
 
         return MainMenuView()
             .environmentObject(modelData)
+            .previewDisplayName("tour3")
     }
 
     static var preview_tour4: some View {
@@ -597,6 +696,7 @@ struct ContentView_Previews: PreviewProvider {
 
         return MainMenuView()
             .environmentObject(modelData)
+            .previewDisplayName("tour4")
     }
 
     static var preview: some View {
@@ -606,6 +706,7 @@ struct ContentView_Previews: PreviewProvider {
 
         return MainMenuView()
             .environmentObject(modelData)
+            .previewDisplayName("preview")
     }
 
 
@@ -617,5 +718,6 @@ struct ContentView_Previews: PreviewProvider {
         return MainMenuView()
             .environment(\.locale, .init(identifier: "ja"))
             .environmentObject(modelData)
+            .previewDisplayName("preview ja")
     }
 }

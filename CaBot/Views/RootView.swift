@@ -41,6 +41,18 @@ struct RootView: View {
                     MainMenuView()
                         .environmentObject(modelData)
                 }
+                NavigationLink(
+                    destination: SystemStatusView().environmentObject(modelData),
+                    isActive: $modelData.showingSystemStatusMenu){
+                        EmptyView()
+                    }
+                    .isDetailLink(false)
+                NavigationLink(
+                    destination: DeviceStatusView().environmentObject(modelData),
+                    isActive: $modelData.showingDeviceStatusMenu){
+                        EmptyView()
+                    }
+                    .isDetailLink(false)
             }
             .navigationTitle(modelData.displayedScene.text)
             .sheet(isPresented: $modelData.isContentPresenting, content: {
@@ -85,6 +97,7 @@ struct RootView_Previews: PreviewProvider {
         previewContent
         previewSelect
         previewOnboard
+        previewAdvanced
     }
 
     static var previewApp: some View {
@@ -121,6 +134,15 @@ struct RootView_Previews: PreviewProvider {
     static var previewOnboard: some View {
         let modelData = CaBotAppModel()
         modelData.suitcaseConnected = false
+
+        return RootView()
+            .environmentObject(modelData)
+    }
+
+    static var previewAdvanced: some View {
+        let modelData = CaBotAppModel()
+        modelData.suitcaseConnected = true
+        modelData.modeType = .Advanced
 
         return RootView()
             .environmentObject(modelData)
