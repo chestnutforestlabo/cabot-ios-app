@@ -153,10 +153,20 @@ struct DestinationsView: View {
                                                        buttons: [
                                                         .cancel(),
                                                         .destructive(
-                                                            Text("SEND_DESTINATION"),
+                                                            Text("CLEAR_AND_ADD_DESTINATION"),
                                                             action: {
                                                                 if let destination = targetDestination {
                                                                     modelData.share(destination: destination)
+                                                                    NavigationUtil.popToRootView()
+                                                                    targetDestination = nil
+                                                                }
+                                                            }
+                                                        ),
+                                                        .destructive(
+                                                            Text("ADD_DESTINATION"),
+                                                            action: {
+                                                                if let destination = targetDestination {
+                                                                    modelData.share(destination: destination, clear: false)
                                                                     NavigationUtil.popToRootView()
                                                                     targetDestination = nil
                                                                 }
