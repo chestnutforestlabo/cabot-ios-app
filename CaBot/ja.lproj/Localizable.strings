@@ -265,6 +265,9 @@
 "SEND_TOUR"="ツアーを送信";
 "SEND_DESTINATION_MESSAGE %@"="目的地を送信: %@\nユーザーの目的地が上書きされます";
 "SEND_DESTINATION"="目的地を送信";
+"CLEAR_AND_ADD_DESTINATION"="クリアして目的地を追加";
+"ADD_DESTINATION"="目的地を追加";
+
 
 "TTS Enabled (Advanced only)"="音声読み上げ有り (詳細モード用)";
 "Speech Priority"="音声の優先順位";
