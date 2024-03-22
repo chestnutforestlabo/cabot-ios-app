@@ -72,6 +72,24 @@ struct MainMenuView: View {
     }
 }
 
+struct UserInfoDestinations: View {
+    @EnvironmentObject var modelData: CaBotAppModel
+
+    var body: some View {
+        Form {
+            Section(header: Text("Tour")) {
+                ForEach(modelData.userInfo.destinations, id: \.self) { destination in
+                    Label {
+                        Text(destination)
+                    } icon: {
+                        Image(systemName: "mappin.and.ellipse")
+                    }
+                }
+            }
+        }
+    }
+}
+
 struct UserInfoView: View {
     @EnvironmentObject var modelData: CaBotAppModel
     
@@ -79,7 +97,11 @@ struct UserInfoView: View {
         Section(header: Text("User App Info")) {
             Label {
                 if (modelData.userInfo.selectedTour.isEmpty) {
-                    Text("PLACEHOLDER_TOUR_TITLE").foregroundColor(.gray)
+                    if (modelData.userInfo.destinations.count == 0) {
+                        Text("PLACEHOLDER_TOUR_TITLE").foregroundColor(.gray)
+                    } else {
+                        Text("CUSTOMIZED_TOUR")
+                    }
                 } else {
                     Text(modelData.userInfo.selectedTour)
                 }
@@ -100,6 +122,14 @@ struct UserInfoView: View {
                 } else {
                     Image(systemName: "mappin.and.ellipse")
                 }
+            }
+            if (modelData.userInfo.destinations.count > 1) {
+                NavigationLink(destination: UserInfoDestinations().environmentObject(modelData), label: {
+                    HStack {
+                        Spacer()
+                        Text("See detail")
+                    }
+                })
             }
             if modelData.userInfo.speakingText.count == 0 {
                 Label {

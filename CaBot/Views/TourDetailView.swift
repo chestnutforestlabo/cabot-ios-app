@@ -179,27 +179,57 @@ struct DynamicTourDetailView: View {
 
 struct TourDetailView_Previews: PreviewProvider {
     static var previews: some View {
+        preview4
+        preview3
         preview2
         preview1
+    }
+    
+    static var preview4: some View {
+        let modelData = CaBotAppModel()
+        modelData.modeType = .Advanced
+
+        let resource = modelData.resourceManager.resource(by: "Test data")!
+        let tours = try! Tour.load(at: resource.toursSource!)
+
+        return DynamicTourDetailView(tour: tours[0])
+            .environmentObject(modelData)
+            .previewDisplayName("Dynamic Advanced")
+    }
+
+    static var preview3: some View {
+        let modelData = CaBotAppModel()
+        modelData.modeType = .Normal
+
+        let resource = modelData.resourceManager.resource(by: "Test data")!
+        let tours = try! Tour.load(at: resource.toursSource!)
+
+        return DynamicTourDetailView(tour: tours[0])
+            .environmentObject(modelData)
+            .previewDisplayName("Dynamic Normal")
     }
 
     static var preview2: some View {
         let modelData = CaBotAppModel()
+        modelData.modeType = .Advanced
 
         let resource = modelData.resourceManager.resource(by: "Test data")!
         let tours = try! Tour.load(at: resource.toursSource!)
 
         return StaticTourDetailView(tour: tours[0])
             .environmentObject(modelData)
+            .previewDisplayName("Advanced")
     }
 
     static var preview1: some View {
         let modelData = CaBotAppModel()
+        modelData.modeType = .Normal
 
         let resource = modelData.resourceManager.resource(by: "Test data")!
         let tours = try! Tour.load(at: resource.toursSource!)
 
         return StaticTourDetailView(tour: tours[1])
             .environmentObject(modelData)
+            .previewDisplayName("Normal")
     }
 }

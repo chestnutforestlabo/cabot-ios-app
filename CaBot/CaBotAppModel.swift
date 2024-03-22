@@ -926,6 +926,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.share(user_info: SharedInfo(type: .Tour, value: manager.title.text))
         self.share(user_info: SharedInfo(type: .CurrentDestination, value: manager.currentDestination?.title.text ?? ""))
         self.share(user_info: SharedInfo(type: .NextDestination, value: manager.nextDestination?.title.text ?? ""))
+        self.share(user_info: SharedInfo(type: .Destinations, value: manager.destinations.map { $0.title.text }.joined(separator: ",")))
     }
 
     func tour(manager: TourManager, destinationChanged destination: Destination?) {
@@ -1516,6 +1517,7 @@ class UserInfoBuffer {
     var selectedTour: String = ""
     var currentDestination: String = ""
     var nextDestination: String = ""
+    var destinations: [String] = []
     var speakingText: [SpeakingText] = []
     var speakingIndex = -1
 
@@ -1566,6 +1568,8 @@ class UserInfoBuffer {
         case .NextDestination:
             nextDestination = userInfo.value
             break
+        case .Destinations:
+            destinations = userInfo.value.split(separator: ",").map(String.init)
         case .OverrideTour:
             // do nothing
             break
