@@ -87,6 +87,7 @@ struct DestinationsView: View {
                                         }
                                     }
                                 }
+                                .buttonStyle(.borderless)
                                 // deprecated
                                 .actionSheet(isPresented: $isConfirming) {
                                     let message = LocalizedStringKey("ADD_A_DESTINATION_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
