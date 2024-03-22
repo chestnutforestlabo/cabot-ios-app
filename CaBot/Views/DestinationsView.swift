@@ -61,27 +61,8 @@ struct DestinationsView: View {
                                     .accessibilityLabel(destination.title.pron)
                             })
                     } else {
-                        if let _ = destination.startMessage {
-                            NavigationLink(
-                                destination: DestinationDetailView(destination: destination)
-                                    .environmentObject(modelData),
-                                label: {
-                                    if let summaryMessage = destination.summaryMessage?.content{
-                                        VStack(alignment: .leading) {
-                                            Text(destination.title.text)
-                                                .font(.body)
-                                                .accessibilityLabel(destination.title.pron)
-                                            Text(summaryMessage).font(.caption)
-                                        }
-                                    } else{
-                                        Text(destination.title.text)
-                                                .accessibilityLabel(destination.title.pron)
-                                                .font(.body)
-                                        }
-                                    }
-                                )
-                        } else {
-                            if modelData.modeType == .Normal {
+                        if modelData.modeType == .Normal {
+                            HStack {
                                 Button(action: {
                                     if modelData.tourManager.hasDestination {
                                         targetDestination = destination
@@ -93,8 +74,18 @@ struct DestinationsView: View {
                                         NavigationUtil.popToRootView()
                                     }
                                 }){
-                                    Text(destination.title.text)
-                                        .accessibilityLabel(destination.title.pron)
+                                    VStack(alignment: .leading) {
+                                        Text(destination.title.text)
+                                            .font(.body)
+                                            .accessibilityLabel(destination.title.pron)
+                                            .multilineTextAlignment(.leading)
+                                            .accessibilityHint(Text("DOUBLETAP_TO_ADD_A_DESTINATION"))
+                                        if let summaryMessage = destination.summaryMessage?.content{
+                                            Text(summaryMessage)
+                                                .font(.caption)
+                                                .multilineTextAlignment(.leading)
+                                        }
+                                    }
                                 }
                                 // deprecated
                                 .actionSheet(isPresented: $isConfirming) {
@@ -138,14 +129,43 @@ struct DestinationsView: View {
                                                        ]
                                     )
                                 }
-                            } else {
+                                Spacer()
+                                if let _ = destination.startMessage {
+                                    ZStack{
+                                        Image(systemName: "info.circle")
+                                            .accessibilityLabel(Text("Details"))
+                                            .accessibilityRemoveTraits(.isImage)
+                                            .accessibilityAddTraits(.isButton)
+                                            .accessibilityHint(Text("DOUBLETAP_TO_VIEW_DETAILS"))
+                                            .foregroundColor(.blue)
+                                        NavigationLink(
+                                            destination: DestinationDetailView(destination: destination).environmentObject(modelData)
+                                        ){EmptyView()}
+                                        .frame(width: 0, height: 0)
+                                        .opacity(0)
+                                    }
+                                }
+                            }
+                        } else {
+                            HStack {
                                 Button(action: {
                                     targetDestination = destination
                                     isConfirming = true
                                 }){
-                                    Text(destination.title.text)
-                                        .accessibilityLabel(destination.title.pron)
+                                    VStack(alignment: .leading) {
+                                        Text(destination.title.text)
+                                            .font(.body)
+                                            .accessibilityLabel(destination.title.pron)
+                                            .multilineTextAlignment(.leading)
+                                            .accessibilityHint(Text("DOUBLETAP_TO_ADD_A_DESTINATION"))
+                                        if let summaryMessage = destination.summaryMessage?.content{
+                                            Text(summaryMessage)
+                                                .font(.caption)
+                                                .multilineTextAlignment(.leading)
+                                        }
+                                    }
                                 }
+                                .buttonStyle(.borderless)
                                 .actionSheet(isPresented: $isConfirming) {
                                     let message = LocalizedStringKey("SEND_DESTINATION_MESSAGE \(targetDestination!.title.text)")
                                     return ActionSheet(title: Text("SEND_DESTINATION"),
@@ -173,6 +193,22 @@ struct DestinationsView: View {
                                                             }
                                                         )
                                                        ])
+                                }
+                                Spacer()
+                                if let _ = destination.startMessage {
+                                    ZStack{
+                                        Image(systemName: "info.circle")
+                                            .accessibilityLabel(Text("Details"))
+                                            .accessibilityRemoveTraits(.isImage)
+                                            .accessibilityAddTraits(.isButton)
+                                            .accessibilityHint(Text("DOUBLETAP_TO_VIEW_DETAILS"))
+                                            .foregroundColor(.blue)
+                                        NavigationLink(
+                                            destination: DestinationDetailView(destination: destination).environmentObject(modelData)
+                                        ){EmptyView()}
+                                        .frame(width: 0, height: 0)
+                                        .opacity(0)
+                                    }
                                 }
                             }
                         }

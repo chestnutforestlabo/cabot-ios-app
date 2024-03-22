@@ -3,6 +3,9 @@
   title-ja: 行き先 1
   title-ja-pron : いきさき、いち
   value : destination1_node_value
+  summaryMessage:
+    type: local
+    src: destination1_summaryMessage.txt
   startMessage:
     type: local
     src: destination1_message.txt

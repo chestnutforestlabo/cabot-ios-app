@@ -157,6 +157,8 @@
 "CLEAR_ALL_THEN_ADD"="Clear All then Add";
 "ADD_TO_FIRST"="Add to first";
 "ADD_TO_LAST"="Add to last";
+"DOUBLETAP_TO_ADD_A_DESTINATION"="Double tap to add a destination";
+"DOUBLETAP_TO_VIEW_DETAILS"="Double tap to view details";
 
 
 // DestinationDetailView
