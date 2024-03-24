@@ -33,8 +33,13 @@ struct DestinationDetailView: View {
         let tourManager = modelData.tourManager
         Form {
             Section(header: Text(destination.title.text)) {
-                if let content =  destination.startMessage?.content {
-                    Text(content)
+                if let startMessage =  destination.startMessage?.content {
+                    Text(startMessage)
+                }
+                if let arriveMessages = destination.arriveMessages{
+                    ForEach(arriveMessages, id: \.self) { arriveMessage in
+                        Text(arriveMessage.content!)
+                    }
                 }
                 if let url = destination.content?.url {
                     Button("Show more detail") {
