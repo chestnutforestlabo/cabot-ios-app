@@ -81,7 +81,7 @@ struct StaticTourDetailView: View {
                         }
                     }
                     .disabled(hasError)
-                    .confirmationDialog(Text("SEND_TOUR"), isPresented: $isConfirming) {
+                    .confirmationDialog(Text("SEND_TOUR"), isPresented: $isConfirming, presenting: targetTour) { detail in
                         Button {
                             modelData.share(tour: targetTour!)
                             NavigationUtil.popToRootView()
@@ -91,8 +91,8 @@ struct StaticTourDetailView: View {
                         }
                         Button("Cancel", role: .cancel) {
                         }
-                    } message: {
-                        let message = LocalizedStringKey("SEND_TOUR_MESSAGE \(targetTour!.title.text)")
+                    } message: { detail in
+                        let message = LocalizedStringKey("SEND_TOUR_MESSAGE \(detail.title.text)")
                         Text(message)
                     }
                 }
