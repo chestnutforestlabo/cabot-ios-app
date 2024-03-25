@@ -128,7 +128,7 @@ struct DestinationDetailView: View {
                             targetDestination = nil
                         }
                     } message: { detail in
-                        let message = LocalizedStringKey("SEND_DESTINATION_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
+                        let message = LocalizedStringKey("SEND_DESTINATION_MESSAGE \(detail.title.text)")
                         Text(message)
                     }
                 }
