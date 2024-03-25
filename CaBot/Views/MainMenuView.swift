@@ -573,23 +573,6 @@ struct SettingMenus: View {
                     Label(LocalizedStringKey("Settings"), systemImage: "gearshape")
                 }
             }
-            VStack {
-                HStack{
-                    Text("MODE_TYPE").onTapGesture(count: 5) {
-                        if (modelData.modeType != .Debug){
-                            modelData.modeType = .Debug
-                        }
-                    }
-                    Spacer()
-                }
-                Picker("", selection: $modelData.modeType){
-                    Text(LocalizedStringKey(ModeType.Normal.rawValue)).tag(ModeType.Normal)
-                    Text(LocalizedStringKey(ModeType.Advanced.rawValue)).tag(ModeType.Advanced)
-                    if(modelData.modeType == .Debug){
-                        Text(LocalizedStringKey(ModeType.Debug.rawValue)).tag(ModeType.Debug)
-                    }
-                }.pickerStyle(SegmentedPickerStyle())
-            }
             if (modelData.menuDebug && modelData.noSuitcaseDebug){
                 VStack{
                     HStack{

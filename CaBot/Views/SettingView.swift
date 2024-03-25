@@ -33,6 +33,54 @@ struct SettingView: View {
 
     var body: some View {
         return Form {
+            Section{
+                VStack {
+                    HStack{
+                        Text("MODE_TYPE").onTapGesture(count: 5) {
+                            if (modelData.modeType != .Debug){
+                                modelData.modeType = .Debug
+                            }
+                        }
+                        Spacer()
+                    }
+                    Picker("", selection: $modelData.modeType){
+                        Text(LocalizedStringKey(ModeType.Normal.rawValue)).tag(ModeType.Normal)
+                        Text(LocalizedStringKey(ModeType.Advanced.rawValue)).tag(ModeType.Advanced)
+                        if(modelData.modeType == .Debug){
+                            Text(LocalizedStringKey(ModeType.Debug.rawValue)).tag(ModeType.Debug)
+                        }
+                    }.pickerStyle(SegmentedPickerStyle())
+                }
+            }
+
+            Section(header: Text("Settings")){
+                Button(action: {
+                    UserDefaults.standard.setValue(false, forKey: ResourceSelectView.resourceSelectedKey)
+                    UserDefaults.standard.synchronize()
+                    modelData.displayedScene = .ResourceSelect
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    Text("SELECT_RESOURCE")
+                }
+
+                if let resource = modelData.resource {
+                    Picker("LANGUAGE", selection: $langOverride) {
+                        ForEach(resource.languages, id: \.self) { language in
+                            Text(language).tag(language)
+                        }
+                    }.onChange(of: langOverride) { lang in
+                        modelData.resource?.lang = lang
+                        self.isResourceChanging = true
+                        modelData.resource = modelData.resource
+                        modelData.updateVoice()
+                    }
+                }
+
+                NavigationLink(destination: DetailSettingView().environmentObject(modelData.detailSettingModel), label: {
+                    Text("DETAIL_SETTING")
+                })
+            }
+
             Section(header: Text("Connection")) {
                 VStack {
                     HStack{
@@ -63,20 +111,7 @@ struct SettingView: View {
             }
 
             if (modelData.modeType == .Debug){
-                NavigationLink(destination: DetailSettingView().environmentObject(modelData.detailSettingModel), label: {
-                    Text("DETAIL_SETTING")
-                })
-
                 Section(header: Text("DEBUG")) {
-                    Button(action: {
-                        UserDefaults.standard.setValue(false, forKey: ResourceSelectView.resourceSelectedKey)
-                        UserDefaults.standard.synchronize()
-                        modelData.displayedScene = .ResourceSelect
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
-                        Text("SELECT_RESOURCE")
-                    }
-
                     VStack {
                         HStack{
                             Text("Speech Priority")
@@ -88,37 +123,8 @@ struct SettingView: View {
                             Text(LocalizedStringKey(SpeechPriority.App.rawValue)).tag(SpeechPriority.App)
                         }.pickerStyle(SegmentedPickerStyle())
                     }
-
-                    if let resource = modelData.resource {
-                        Picker("LANGUAGE", selection: $langOverride) {
-                            ForEach(resource.languages, id: \.self) { language in
-                                Text(language).tag(language)
-                            }
-                        }.onChange(of: langOverride) { lang in
-                            modelData.resource?.lang = lang
-                            self.isResourceChanging = true
-                            modelData.resource = modelData.resource
-                            modelData.updateVoice()
-                        }
-                    }
-
                     Toggle("MENU_DEBUG", isOn: $modelData.menuDebug)
                     Toggle("NO_SUITCASE_DEBUG", isOn: $modelData.noSuitcaseDebug)
-                }
-            }
-            
-            if (modelData.modeType == .Advanced) {
-                if let resource = modelData.resource {
-                    Picker("LANGUAGE", selection: $langOverride) {
-                        ForEach(resource.languages, id: \.self) { language in
-                            Text(language).tag(language)
-                        }
-                    }.onChange(of: langOverride) { lang in
-                        modelData.resource?.lang = lang
-                        self.isResourceChanging = true
-                        modelData.resource = modelData.resource
-                        modelData.updateVoice()
-                    }
                 }
             }
         }
