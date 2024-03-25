@@ -60,18 +60,16 @@ struct DeviceStatusView: View {
                             Text("Reboot")
                                 .frame(width: nil, alignment: .topLeading)
                         }
-                        .actionSheet(isPresented: $isConfirmingReboot) {
-                            return ActionSheet(title: Text("Reboot Computer"),
-                                               message: Text("The app will be disconnected."),
-                                               buttons: [
-                                                .cancel(),
-                                                .destructive(
-                                                    Text("Reboot"),
-                                                    action: {
-                                                        modelData.systemManageCommand(command: .reboot)
-                                                    }
-                                                )
-                                               ])
+                        .confirmationDialog(Text("Reboot Computer"), isPresented: $isConfirmingReboot) {
+                            Button {
+                                modelData.systemManageCommand(command: .reboot)
+                            } label: {
+                                Text("Reboot")
+                            }
+                            Button("Cancel", role: .cancel) {
+                            }
+                        } message: {
+                            Text("The app will be disconnected.")
                         }
                         .disabled(!modelData.suitcaseConnected)
 
@@ -81,18 +79,16 @@ struct DeviceStatusView: View {
                             Text("Power off")
                                 .frame(width: nil, alignment: .topLeading)
                         }
-                        .actionSheet(isPresented: $isConfirmingPoweroff) {
-                            return ActionSheet(title: Text("Power off"),
-                                               message: Text("The app will be disconnected."),
-                                               buttons: [
-                                                .cancel(),
-                                                .destructive(
-                                                    Text("Power off"),
-                                                    action: {
-                                                        modelData.systemManageCommand(command: .poweroff)
-                                                    }
-                                                )
-                                               ])
+                        .confirmationDialog(Text("Power off"), isPresented: $isConfirmingPoweroff) {
+                            Button {
+                                modelData.systemManageCommand(command: .poweroff)
+                            } label: {
+                                Text("Power off")
+                            }
+                            Button("Cancel", role: .cancel) {
+                            }
+                        } message: {
+                            Text("The app will be disconnected.")
                         }
                         .disabled(!modelData.suitcaseConnected)
 

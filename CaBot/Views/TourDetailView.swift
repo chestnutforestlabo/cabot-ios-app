@@ -53,23 +53,21 @@ struct StaticTourDetailView: View {
                         }
                     }
                     .disabled(hasError)
-                    .actionSheet(isPresented: $isConfirming) {
+                    .confirmationDialog(Text("ADD_TOUR"), isPresented: $isConfirming) {
+                        Button {
+                            if let tour = targetTour {
+                                tourManager.set(tour: tour)
+                                NavigationUtil.popToRootView()
+                                targetTour = nil
+                            }
+                        } label: {
+                            Text("OVERWRITE_TOUR")
+                        }
+                        Button("Cancel", role: .cancel) {
+                        }
+                    } message: {
                         let message = LocalizedStringKey("ADD_TOUR_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
-                        return ActionSheet(title: Text("ADD_TOUR"),
-                                           message: Text(message),
-                                           buttons: [
-                                            .cancel(),
-                                            .destructive(
-                                                Text("OVERWRITE_TOUR"),
-                                                action: {
-                                                    if let tour = targetTour {
-                                                        tourManager.set(tour: tour)
-                                                        NavigationUtil.popToRootView()
-                                                        targetTour = nil
-                                                    }
-                                                }
-                                            )
-                                           ])
+                        Text(message)
                     }
                 } else {
                     Button(action: {
@@ -83,21 +81,19 @@ struct StaticTourDetailView: View {
                         }
                     }
                     .disabled(hasError)
-                    .actionSheet(isPresented: $isConfirming) {
+                    .confirmationDialog(Text("SEND_TOUR"), isPresented: $isConfirming) {
+                        Button {
+                            modelData.share(tour: targetTour!)
+                            NavigationUtil.popToRootView()
+                            targetTour = nil
+                        } label: {
+                            Text("SEND_TOUR")
+                        }
+                        Button("Cancel", role: .cancel) {
+                        }
+                    } message: {
                         let message = LocalizedStringKey("SEND_TOUR_MESSAGE \(targetTour!.title.text)")
-                        return ActionSheet(title: Text("SEND_TOUR"),
-                                           message: Text(message),
-                                           buttons: [
-                                            .cancel(),
-                                            .destructive(
-                                                Text("SEND_TOUR"),
-                                                action: {
-                                                    modelData.share(tour: targetTour!)
-                                                    NavigationUtil.popToRootView()
-                                                    targetTour = nil
-                                                }
-                                            )
-                                           ])
+                        Text(message)
                     }
                 }
             }
@@ -139,21 +135,18 @@ struct DynamicTourDetailView: View {
                         Image(systemName: "xmark.circle")
                     }
                 }
-                .actionSheet(isPresented: $isConfirming) {
+                .confirmationDialog(Text("CANCEL_NAVIGATION"), isPresented: $isConfirming) {
+                    Button {
+                        modelData.tourManager.clearAll()
+                        NavigationUtil.popToRootView()
+                    } label: {
+                        Text("CANCEL_ALL")
+                    }
+                    Button("Cancel", role: .cancel) {
+                    }
+                } message: {
                     let message = LocalizedStringKey("CANCEL_NAVIGATION_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
-                    return ActionSheet(title: Text("CANCEL_NAVIGATION"),
-                                       message: Text(message),
-                                       buttons: [
-                                        .cancel(),
-                                        .destructive(
-                                            Text("CANCEL_ALL"),
-                                            action: {
-                                                modelData.tourManager.clearAll()
-                                                NavigationUtil.popToRootView()
-                                            }
-                                        )
-                                       ]
-                    )
+                    Text(message)
                 }
             }
             Section(header: Text(tour.title.text)) {

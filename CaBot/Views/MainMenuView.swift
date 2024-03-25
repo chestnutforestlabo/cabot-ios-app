@@ -299,18 +299,16 @@ struct DestinationMenus: View {
                             }) {
                                 Image(systemName: "checkmark.seal")
                             }
-                            .actionSheet(isPresented: $isConfirming) {
-                                return ActionSheet(title: Text("Complete Destination"),
-                                                   message: Text("Complete Destination Message"),
-                                                   buttons: [
-                                                    .cancel(),
-                                                    .destructive(
-                                                        Text("Complete Destination"),
-                                                        action: {
-                                                            modelData.debugCabotArrived()
-                                                        }
-                                                    )
-                                                   ])
+                            .confirmationDialog(Text("Complete Destination"), isPresented: $isConfirming) {
+                                Button {
+                                    modelData.debugCabotArrived()
+                                } label: {
+                                    Text("Complete Destination")
+                                }
+                                Button("Cancel", role: .cancel) {
+                                }
+                            } message: {
+                                Text("Complete Destination Message")
                             }
                         }
                     }
