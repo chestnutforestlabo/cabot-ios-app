@@ -1205,31 +1205,39 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
         if userInfo.type == .OverrideTour {
             if let src = resource?.toursSource {
-                let tours = try! Tour.load(at: src)
-                for tour in tours {
-                    if tour.id == userInfo.value {
-                        tourManager.set(tour: tour)
-                        needToStartAnnounce(wait: true)
+                do {
+                    let tours = try Tour.load(at: src)
+                    for tour in tours {
+                        if tour.id == userInfo.value {
+                            tourManager.set(tour: tour)
+                            needToStartAnnounce(wait: true)
+                        }
                     }
+                } catch {
+                    NSLog("\(src) cannot be loaded")
                 }
             }
         }
         if userInfo.type == .OverrideDestination {
             func traverseDest(src: Source) {
-                let dests = try! Destination.load(at: src)
-                for dest in dests {
-                    if let value = dest.value {
-                        if value == userInfo.value {
-                            if userInfo.flag1 { // clear and add
-                                tourManager.clearAll()
+                do {
+                    let dests = try Destination.load(at: src)
+                    for dest in dests {
+                        if let value = dest.value {
+                            if value == userInfo.value {
+                                if userInfo.flag1 { // clear and add
+                                    tourManager.clearAll()
+                                }
+                                tourManager.addToLast(destination: dest)
+                                needToStartAnnounce(wait: true)
+                                return
                             }
-                            tourManager.addToLast(destination: dest)
-                            needToStartAnnounce(wait: true)
-                            return
+                        } else if let src = dest.file {
+                            traverseDest(src: src)
                         }
-                    } else if let src = dest.file {
-                        traverseDest(src: src)
                     }
+                } catch {
+                    NSLog("\(src) cannot be loaded")
                 }
             }
             if let src = resource?.destinationsSource {
