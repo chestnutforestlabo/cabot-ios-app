@@ -554,18 +554,6 @@ struct SettingMenus: View {
                     .accessibility(hidden: true)
             }
 
-            VStack {
-                HStack{
-                    Text("Speech Priority")
-                        .accessibility(hidden: true)
-                    Spacer()
-                }
-                Picker("", selection: $modelData.speechPriority){
-                    Text(LocalizedStringKey(SpeechPriority.Robot.rawValue)).tag(SpeechPriority.Robot)
-                    Text(LocalizedStringKey(SpeechPriority.App.rawValue)).tag(SpeechPriority.App)
-                }.pickerStyle(SegmentedPickerStyle())
-            }
-
             if (modelData.modeType == .Advanced || modelData.modeType == .Debug) {
                 if #available(iOS 15.0, *) {
                     NavigationLink (destination: LogFilesView(langOverride: modelData.resourceLang)
@@ -574,15 +562,15 @@ struct SettingMenus: View {
                         Text("REPORT_BUG")
                     }).disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
                 }
-                NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
-                    .environmentObject(modelData)
-                    .onDisappear {
-                        modelData.tcpServiceRestart()
-                    }
-                ) {
-                    HStack {
-                        Label(LocalizedStringKey("Settings"), systemImage: "gearshape")
-                    }
+            }
+            NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
+                .environmentObject(modelData)
+                .onDisappear {
+                    modelData.tcpServiceRestart()
+                }
+            ) {
+                HStack {
+                    Label(LocalizedStringKey("Settings"), systemImage: "gearshape")
                 }
             }
             VStack {

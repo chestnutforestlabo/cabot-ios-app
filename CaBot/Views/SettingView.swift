@@ -77,6 +77,18 @@ struct SettingView: View {
                         Text("SELECT_RESOURCE")
                     }
 
+                    VStack {
+                        HStack{
+                            Text("Speech Priority")
+                                .accessibility(hidden: true)
+                            Spacer()
+                        }
+                        Picker("", selection: $modelData.speechPriority){
+                            Text(LocalizedStringKey(SpeechPriority.Robot.rawValue)).tag(SpeechPriority.Robot)
+                            Text(LocalizedStringKey(SpeechPriority.App.rawValue)).tag(SpeechPriority.App)
+                        }.pickerStyle(SegmentedPickerStyle())
+                    }
+
                     if let resource = modelData.resource {
                         Picker("LANGUAGE", selection: $langOverride) {
                             ForEach(resource.languages, id: \.self) { language in
