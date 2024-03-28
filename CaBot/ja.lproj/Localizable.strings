@@ -265,7 +265,7 @@
 // Send tour/destination
 "SEND_TOUR_MESSAGE %@"="ツアーを送信: %@\nユーザーのツアーが上書きされます";
 "SEND_TOUR"="ツアーを送信";
-"SEND_DESTINATION_MESSAGE %@"="目的地を送信: %@\nユーザーの目的地が上書きされます";
+"SEND_DESTINATION_MESSAGE %@"="%@を目的地に追加しますか？";
 "SEND_DESTINATION"="目的地を送信";
 "CLEAR_AND_ADD_DESTINATION"="クリアして目的地を追加";
 "ADD_DESTINATION"="目的地を追加";

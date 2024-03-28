@@ -163,17 +163,8 @@ struct DestinationsView: View {
                                     }
                                 }
                                 .buttonStyle(.borderless)
-                                .confirmationDialog(Text("SEND_DESTINATION"), isPresented: $isConfirming, presenting: targetDestination) {
+                                .confirmationDialog(Text("ADD_A_DESTINATION"), isPresented: $isConfirming, presenting: targetDestination) {
                                 detail in
-                                    Button {
-                                        if let destination = targetDestination {
-                                            modelData.share(destination: destination)
-                                            NavigationUtil.popToRootView()
-                                            targetDestination = nil
-                                        }
-                                    } label: {
-                                        Text("CLEAR_AND_ADD_DESTINATION")
-                                    }
                                     Button {
                                         if let destination = targetDestination {
                                             modelData.share(destination: destination, clear: false)
@@ -182,6 +173,15 @@ struct DestinationsView: View {
                                         }
                                     } label: {
                                         Text("ADD_DESTINATION")
+                                    }
+                                    Button {
+                                        if let destination = targetDestination {
+                                            modelData.share(destination: destination)
+                                            NavigationUtil.popToRootView()
+                                            targetDestination = nil
+                                        }
+                                    } label: {
+                                        Text("CLEAR_AND_ADD_DESTINATION")
                                     }
                                     Button("Cancel", role: .cancel) {
                                         targetDestination = nil
