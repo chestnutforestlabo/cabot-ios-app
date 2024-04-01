@@ -565,6 +565,7 @@ struct Reference: CustomStringConvertible {
 /// - pron: <String> Reading text for the destination if required other wise title is used for reading
 ///    - the text can be localizable
 /// - file: <Source> file including a list of destinations
+/// - summaryMessage: <Source> file inculding a message text
 /// - startMessage: <Source> file including a message text
 /// - content: <Source> file including a web content to show in the browser
 /// - waitingDestination: <WaitingDestination>
@@ -596,6 +597,7 @@ class Destination: Decodable, Hashable {
     let title: I18NText
     let value:String?
     let file:Source?
+    let summaryMessage: Source?
     let startMessage:Source?
     let arriveMessages: [Source]?
     let content:Source?
@@ -614,6 +616,7 @@ class Destination: Decodable, Hashable {
         case value
         case pron
         case file
+        case summaryMessage
         case startMessage
         case arriveMessages
         case content
@@ -726,8 +729,13 @@ class Destination: Decodable, Hashable {
             self.file = try? container.decode(Source.self, forKey: .file)
             warning.add(info: CustomLocalizedString("file specified by Source(type, src) is deprecated, use just 'src' string instead", lang: i18n.langCode))
         }
-        if let message = try? container.decode(Source.self, forKey: .startMessage) {
-            self.startMessage = message
+        if let summaryMessage = try? container.decode(Source.self, forKey: .summaryMessage) {
+            self.summaryMessage = summaryMessage
+        } else {
+            self.summaryMessage = refDest?.summaryMessage
+        }
+        if let startMessage = try? container.decode(Source.self, forKey: .startMessage) {
+            self.startMessage = startMessage
         } else {
             self.startMessage = refDest?.startMessage
         }
@@ -800,12 +808,13 @@ class Destination: Decodable, Hashable {
         self.warning = warning.summary()
     }
     
-    init(title: String, value: String?, pron: String?, file: Source?, message: Source?, content: Source?, waitingDestination: WaitingDestination?, subtour: Tour?) {
+    init(title: String, value: String?, pron: String?, file: Source?, summaryMessage: Source?, startMessage: Source?, content: Source?, waitingDestination: WaitingDestination?, subtour: Tour?) {
         self.i18n = I18N.shared
         self.title = I18NText(text: [:], pron: [:])
         self.value = value
         self.file = file
-        self.startMessage = message
+        self.summaryMessage = summaryMessage
+        self.startMessage = startMessage
         self.arriveMessages = nil
         self.content = content
         self.waitingDestination = waitingDestination
@@ -992,9 +1001,9 @@ class ResourceManager {
     }
 
     public func resource(by identifier: String) -> Resource? {
-        NSLog("identifier=\(identifier)")
+        NSLog("resource by identifier=\(identifier)")
         for resource in resources {
-            NSLog("resource.identifier = \(resource.identifier)")
+            NSLog("iterating resource.identifier = \(resource.identifier)")
             if resource.identifier == identifier {
                 return resource
             }

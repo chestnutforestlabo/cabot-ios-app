@@ -155,6 +155,8 @@
 "CLEAR_ALL_THEN_ADD"="全部消してから追加する";
 "ADD_TO_FIRST"="最初に追加する";
 "ADD_TO_LAST"="最後に追加する";
+"DOUBLETAP_TO_ADD_A_DESTINATION"="ダブルタップで目的地を追加";
+"DOUBLETAP_TO_VIEW_DETAILS"="ダブルタップで詳細を表示";
 
 
 // DestinationDetailView
@@ -258,3 +260,27 @@
 "Active"="起動";
 "Activating"="起動中";
 "Deactivating"="停止中";
+
+
+// Send tour/destination
+"SEND_TOUR_MESSAGE %@"="ツアーを送信: %@\nユーザーのツアーが上書きされます";
+"SEND_TOUR"="ツアーを送信";
+"SEND_DESTINATION_MESSAGE %@"="%@を目的地に追加しますか？";
+"SEND_DESTINATION"="目的地を送信";
+"CLEAR_AND_ADD_DESTINATION"="クリアして目的地を追加";
+"ADD_DESTINATION"="目的地を追加";
+
+
+"TTS Enabled (Advanced only)"="音声読み上げ有り (詳細モード用)";
+"Speech Priority"="音声の優先順位";
+"Robot"="ロボット";
+"App"="アプリ";
+
+"See history"="履歴を見る";
+
+"PLACEHOLDER_TOUR_TITLE"="ツアー名";
+"PLACEHOLDER_DESTINATION_TITLE"="目的地名";
+"PLACEHOLDER_SPEAKING_TEXT"="読み上げテキスト";
+
+"User App Info"="ユーザーアプリ情報";
+"CUSTOMIZED_TOUR"="カスタムツアー";

@@ -27,7 +27,9 @@ import SwiftUI
 
 
 protocol CaBotTTSDelegate {
+    func getModeType() -> ModeType
     func activityLog(category:String, text:String, memo:String)
+    func share(user_info:SharedInfo)
 }
 
 class CaBotTTS : TTSProtocol{
@@ -52,24 +54,54 @@ class CaBotTTS : TTSProtocol{
     }
 
     func speak(_ text: String?, forceSelfvoice: Bool, force: Bool, callback: @escaping (Int32) -> Void) {
+        guard self.delegate?.getModeType() == .Normal else { return }
         let isForeground = UIApplication.shared.applicationState == .active
         let isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
         let selfspeak = forceSelfvoice || !isForeground || !isVoiceOverRunning
 
+        var voiceover = false
+        if UIAccessibility.isVoiceOverRunning {
+            voiceover = true
+        }
         self.delegate?.activityLog(category: "app speech speaking", text: text ?? "", memo: "force=\(force)")
+        self.delegate?.share(user_info: SharedInfo(type: .Speak, value: text ?? "", flag1: force, flag2: voiceover))
 
         var options:Dictionary<String,Any> = ["rate": rate, "selfspeak": selfspeak, "force": force]
         if let voice = self.voice {
             options["voice"] = voice
         }
-        self._tts.speak(text == nil ? "" : text, withOptions: options) { code in
+        self._tts.speak(text == nil ? "" : text, withOptions: options, completionHandler: { code in
             if code > 0 {
                 self.delegate?.activityLog(category: "app speech completed", text: text ?? "", memo: "force=\(force)")
             } else {
                 self.delegate?.activityLog(category: "app speech canceled", text: text ?? "", memo: "force=\(force)")
             }
             callback(code)
+            //print("code=\(code), text=\(text)")
+            if code >= 0, let text = text {
+                self.delegate?.share(user_info: SharedInfo(type: .SpeakProgress, value: text, flag1: true, flag2: voiceover, length: Int(code)))
+            }
+        }, progressHandler: { range in
+            if let text = text {
+                //print(range)
+                self.delegate?.share(user_info: SharedInfo(type: .SpeakProgress, value: text, location: range.location, length: range.length))
+            }
+        })
+    }
+
+    func speakForAdvanced(_ text:String?, force: Bool, callback: @escaping (Int32) -> Void) {
+        var options:Dictionary<String,Any> = ["rate": rate, "selfspeak": true, "force": force]
+        if let voice = self.voice {
+            options["voice"] = voice
         }
+        self._tts.speak(text == nil ? "" : text, withOptions: options, completionHandler: { code in
+            callback(code)
+        }, progressHandler: { range in
+        })
+    }
+
+    func stopSpeakForAdvanced() {
+        self._tts.stop(false)
     }
 
     func speak(_ text: String?, force: Bool, callback: @escaping (Int32) -> Void) {
@@ -88,10 +120,12 @@ class CaBotTTS : TTSProtocol{
     }
 
     func stop() {
+        self.delegate?.share(user_info: SharedInfo(type: .Speak, value: "", flag1: true))
         self._tts.stop(true)
     }
 
     func stop(_ immediate: Bool) {
+        self.delegate?.share(user_info: SharedInfo(type: .Speak, value: "", flag1: true))
         self._tts.stop(immediate)
     }
 

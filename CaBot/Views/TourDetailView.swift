@@ -35,40 +35,66 @@ struct StaticTourDetailView: View {
 
         Form {
             Section(header: Text("Actions")) {
-                Button(action: {
-                    if tourManager.hasDestination {
+                if modelData.modeType == .Normal {
+                    Button(action: {
+                        if tourManager.hasDestination {
+                            targetTour = tour
+                            isConfirming = true
+                        } else {
+                            tourManager.set(tour: tour)
+                            modelData.needToStartAnnounce(wait: true)
+                            NavigationUtil.popToRootView()
+                        }
+                    }) {
+                        Label{
+                            Text("SET_TOUR")
+                        } icon: {
+                            Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                        }
+                    }
+                    .disabled(hasError)
+                    .confirmationDialog(Text("ADD_TOUR"), isPresented: $isConfirming) {
+                        Button {
+                            if let tour = targetTour {
+                                tourManager.set(tour: tour)
+                                NavigationUtil.popToRootView()
+                                targetTour = nil
+                            }
+                        } label: {
+                            Text("OVERWRITE_TOUR")
+                        }
+                        Button("Cancel", role: .cancel) {
+                        }
+                    } message: {
+                        let message = LocalizedStringKey("ADD_TOUR_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
+                        Text(message)
+                    }
+                } else {
+                    Button(action: {
                         targetTour = tour
                         isConfirming = true
-                    } else {
-                        tourManager.set(tour: tour)
-                        modelData.needToStartAnnounce(wait: true)
-                        NavigationUtil.popToRootView()
+                    }) {
+                        Label{
+                            Text("SEND_TOUR")
+                        } icon: {
+                            Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                        }
                     }
-                }) {
-                    Label{
-                        Text("SET_TOUR")
-                    } icon: {
-                        Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                    .disabled(hasError)
+                    .confirmationDialog(Text("SEND_TOUR"), isPresented: $isConfirming, presenting: targetTour) { detail in
+                        Button {
+                            modelData.share(tour: targetTour!)
+                            NavigationUtil.popToRootView()
+                            targetTour = nil
+                        } label: {
+                            Text("SEND_TOUR")
+                        }
+                        Button("Cancel", role: .cancel) {
+                        }
+                    } message: { detail in
+                        let message = LocalizedStringKey("SEND_TOUR_MESSAGE \(detail.title.text)")
+                        Text(message)
                     }
-                }
-                .disabled(hasError)
-                .actionSheet(isPresented: $isConfirming) {
-                    let message = LocalizedStringKey("ADD_TOUR_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
-                    return ActionSheet(title: Text("ADD_TOUR"),
-                                       message: Text(message),
-                                       buttons: [
-                                        .cancel(),
-                                        .destructive(
-                                            Text("OVERWRITE_TOUR"),
-                                            action: {
-                                                if let tour = targetTour {
-                                                    tourManager.set(tour: tour)
-                                                    NavigationUtil.popToRootView()
-                                                    targetTour = nil
-                                                }
-                                            }
-                                        )
-                                       ])
                 }
             }
             Section(header: Text(tour.title.text)) {
@@ -109,21 +135,18 @@ struct DynamicTourDetailView: View {
                         Image(systemName: "xmark.circle")
                     }
                 }
-                .actionSheet(isPresented: $isConfirming) {
+                .confirmationDialog(Text("CANCEL_NAVIGATION"), isPresented: $isConfirming) {
+                    Button {
+                        modelData.tourManager.clearAll()
+                        NavigationUtil.popToRootView()
+                    } label: {
+                        Text("CANCEL_ALL")
+                    }
+                    Button("Cancel", role: .cancel) {
+                    }
+                } message: {
                     let message = LocalizedStringKey("CANCEL_NAVIGATION_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
-                    return ActionSheet(title: Text("CANCEL_NAVIGATION"),
-                                       message: Text(message),
-                                       buttons: [
-                                        .cancel(),
-                                        .destructive(
-                                            Text("CANCEL_ALL"),
-                                            action: {
-                                                modelData.tourManager.clearAll()
-                                                NavigationUtil.popToRootView()
-                                            }
-                                        )
-                                       ]
-                    )
+                    Text(message)
                 }
             }
             Section(header: Text(tour.title.text)) {
@@ -149,27 +172,57 @@ struct DynamicTourDetailView: View {
 
 struct TourDetailView_Previews: PreviewProvider {
     static var previews: some View {
+        preview4
+        preview3
         preview2
         preview1
+    }
+    
+    static var preview4: some View {
+        let modelData = CaBotAppModel()
+        modelData.modeType = .Advanced
+
+        let resource = modelData.resourceManager.resource(by: "Test data")!
+        let tours = try! Tour.load(at: resource.toursSource!)
+
+        return DynamicTourDetailView(tour: tours[0])
+            .environmentObject(modelData)
+            .previewDisplayName("Dynamic Advanced")
+    }
+
+    static var preview3: some View {
+        let modelData = CaBotAppModel()
+        modelData.modeType = .Normal
+
+        let resource = modelData.resourceManager.resource(by: "Test data")!
+        let tours = try! Tour.load(at: resource.toursSource!)
+
+        return DynamicTourDetailView(tour: tours[0])
+            .environmentObject(modelData)
+            .previewDisplayName("Dynamic Normal")
     }
 
     static var preview2: some View {
         let modelData = CaBotAppModel()
+        modelData.modeType = .Advanced
 
         let resource = modelData.resourceManager.resource(by: "Test data")!
         let tours = try! Tour.load(at: resource.toursSource!)
 
         return StaticTourDetailView(tour: tours[0])
             .environmentObject(modelData)
+            .previewDisplayName("Advanced")
     }
 
     static var preview1: some View {
         let modelData = CaBotAppModel()
+        modelData.modeType = .Normal
 
         let resource = modelData.resourceManager.resource(by: "Test data")!
         let tours = try! Tour.load(at: resource.toursSource!)
 
         return StaticTourDetailView(tour: tours[1])
             .environmentObject(modelData)
+            .previewDisplayName("Normal")
     }
 }

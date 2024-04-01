@@ -28,6 +28,10 @@ struct MainMenuView: View {
 
     var body: some View {
         Form {
+            if modelData.modeType != .Normal {
+                UserInfoView()
+                    .environmentObject(modelData)
+            }
             if modelData.noSuitcaseDebug {
                 Label("No Suitcase Debug mode", systemImage: "exclamationmark.triangle")
                     .foregroundColor(.red)
@@ -65,6 +69,92 @@ struct MainMenuView: View {
             }
         }
         return false
+    }
+}
+
+struct UserInfoDestinations: View {
+    @EnvironmentObject var modelData: CaBotAppModel
+
+    var body: some View {
+        Form {
+            Section(header: Text("Tour")) {
+                ForEach(modelData.userInfo.destinations, id: \.self) { destination in
+                    Label {
+                        Text(destination)
+                    } icon: {
+                        Image(systemName: "mappin.and.ellipse")
+                    }
+                }
+            }
+        }
+    }
+}
+
+struct UserInfoView: View {
+    @EnvironmentObject var modelData: CaBotAppModel
+    
+    var body: some View {
+        Section(header: Text("User App Info")) {
+            Label {
+                if (modelData.userInfo.selectedTour.isEmpty) {
+                    if (modelData.userInfo.destinations.count == 0) {
+                        Text("PLACEHOLDER_TOUR_TITLE").foregroundColor(.gray)
+                    } else {
+                        Text("CUSTOMIZED_TOUR")
+                    }
+                } else {
+                    Text(modelData.userInfo.selectedTour)
+                }
+            } icon: {
+                Image(systemName: "list.bullet.rectangle.portrait")
+            }
+            Label {
+                if modelData.userInfo.currentDestination != "" {
+                    Text(modelData.userInfo.currentDestination)
+                } else if modelData.userInfo.nextDestination != "" {
+                    Text(modelData.userInfo.nextDestination)
+                } else {
+                    Text("PLACEHOLDER_DESTINATION_TITLE").foregroundColor(.gray)
+                }
+            } icon: {
+                if modelData.userInfo.currentDestination != "" {
+                    Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                } else {
+                    Image(systemName: "mappin.and.ellipse")
+                }
+            }
+            if (modelData.userInfo.destinations.count > 1) {
+                NavigationLink(destination: UserInfoDestinations().environmentObject(modelData), label: {
+                    HStack {
+                        Spacer()
+                        Text("See detail")
+                    }
+                })
+            }
+            if modelData.userInfo.speakingText.count == 0 {
+                Label {
+                    Text("PLACEHOLDER_SPEAKING_TEXT").foregroundColor(.gray)
+                } icon: {
+                    Image(systemName: "text.bubble")
+                }
+            } else if modelData.userInfo.speakingText.count > 1 {
+                ForEach(modelData.userInfo.speakingText[..<2], id: \.self) { text in
+                    SpokenTextView.showText(text: text)
+                }
+                if modelData.userInfo.speakingText.count > 2 {
+                    NavigationLink(destination: SpokenTextView().environmentObject(modelData), label: {
+                        HStack {
+                            Spacer()
+                            Text("See history")
+                        }
+                    })
+                }
+            } else {
+                ForEach(modelData.userInfo.speakingText, id: \.self) { text in
+                    SpokenTextView.showText(text: text)
+                }
+            }
+        }
     }
 }
 
@@ -209,18 +299,16 @@ struct DestinationMenus: View {
                             }) {
                                 Image(systemName: "checkmark.seal")
                             }
-                            .actionSheet(isPresented: $isConfirming) {
-                                return ActionSheet(title: Text("Complete Destination"),
-                                                   message: Text("Complete Destination Message"),
-                                                   buttons: [
-                                                    .cancel(),
-                                                    .destructive(
-                                                        Text("Complete Destination"),
-                                                        action: {
-                                                            modelData.debugCabotArrived()
-                                                        }
-                                                    )
-                                                   ])
+                            .confirmationDialog(Text("Complete Destination"), isPresented: $isConfirming) {
+                                Button {
+                                    modelData.debugCabotArrived()
+                                } label: {
+                                    Text("Complete Destination")
+                                }
+                                Button("Cancel", role: .cancel) {
+                                }
+                            } message: {
+                                Text("Complete Destination Message")
                             }
                         }
                     }
@@ -249,16 +337,18 @@ struct MainMenus: View {
     var body: some View {
         if let cm = modelData.resource {
             Section(header: Text("Navigation")) {
-                if let src = cm.conversationSource{
-                    NavigationLink(
-                        destination: ConversationView(src: src, dsrc: cm.destinationAllSource)
-                            .onDisappear(){
-                                modelData.resetAudioSession()
-                            }
-                            .environmentObject(modelData),
-                        label: {
-                            Text("START_CONVERSATION")
-                        })
+                if modelData.modeType == .Debug{
+                    if let src = cm.conversationSource{
+                        NavigationLink(
+                            destination: ConversationView(src: src, dsrc: cm.destinationAllSource)
+                                .onDisappear(){
+                                    modelData.resetAudioSession()
+                                }
+                                .environmentObject(modelData),
+                            label: {
+                                Text("START_CONVERSATION")
+                            })
+                    }
                 }
                 if let src = cm.destinationsSource {
                     NavigationLink(
@@ -268,7 +358,7 @@ struct MainMenus: View {
                             Text("SELECT_DESTINATION")
                         })
                 }
-                if modelData.modeType == .Debug{
+                //if modelData.modeType == .Debug{
                     if let src = cm.toursSource {
                         NavigationLink(
                             destination: ToursView(src: src)
@@ -277,7 +367,7 @@ struct MainMenus: View {
                                 Text("SELECT_TOUR")
                             })
                     }
-                }
+                //}
             }
 
 
@@ -426,6 +516,11 @@ struct SettingMenus: View {
         let buildNo = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
 
         Section(header:Text("System")) {
+            if modelData.modeType != .Normal {
+                Toggle(isOn: $modelData.isTTSEnabledForAdvanced) {
+                    Text("TTS Enabled (Advanced only)")
+                }
+            }
             Picker(LocalizedStringKey("Voice"), selection: $modelData.voice) {
                 ForEach(TTSHelper.getVoices(by: locale), id: \.self) { voice in
                     Text(voice.AVvoice.name).tag(voice as Voice?)
@@ -459,15 +554,6 @@ struct SettingMenus: View {
                     .accessibility(hidden: true)
             }
 
-            VStack {
-                Text("Speech Priority")
-                    .accessibility(hidden: true)
-                Picker("", selection: $modelData.speechPriority){
-                    Text(LocalizedStringKey(SpeechPriority.Robot.rawValue)).tag(SpeechPriority.Robot)
-                    Text(LocalizedStringKey(SpeechPriority.App.rawValue)).tag(SpeechPriority.App)
-                }.pickerStyle(SegmentedPickerStyle())
-            }
-
             if (modelData.modeType == .Advanced || modelData.modeType == .Debug) {
                 if #available(iOS 15.0, *) {
                     NavigationLink (destination: LogFilesView(langOverride: modelData.resourceLang)
@@ -476,33 +562,16 @@ struct SettingMenus: View {
                         Text("REPORT_BUG")
                     }).disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
                 }
-                NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
-                    .environmentObject(modelData)
-                    .onDisappear {
-                        modelData.tcpServiceRestart()
-                    }
-                ) {
-                    HStack {
-                        Label(LocalizedStringKey("Settings"), systemImage: "gearshape")
-                    }
-                }
             }
-            VStack {
-                HStack{
-                    Text("MODE_TYPE").onTapGesture(count: 5) {
-                        if (modelData.modeType != .Debug){
-                            modelData.modeType = .Debug
-                        }
-                    }
-                    Spacer()
+            NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
+                .environmentObject(modelData)
+                .onDisappear {
+                    modelData.tcpServiceRestart()
                 }
-                Picker("", selection: $modelData.modeType){
-                    Text(LocalizedStringKey(ModeType.Normal.rawValue)).tag(ModeType.Normal)
-                    Text(LocalizedStringKey(ModeType.Advanced.rawValue)).tag(ModeType.Advanced)
-                    if(modelData.modeType == .Debug){
-                        Text(LocalizedStringKey(ModeType.Debug.rawValue)).tag(ModeType.Debug)
-                    }
-                }.pickerStyle(SegmentedPickerStyle())
+            ) {
+                HStack {
+                    Label(LocalizedStringKey("Settings"), systemImage: "gearshape")
+                }
             }
             if (modelData.menuDebug && modelData.noSuitcaseDebug){
                 VStack{

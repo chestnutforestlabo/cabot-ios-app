@@ -127,6 +127,11 @@ class FallbackService: CaBotServiceProtocol {
         guard let service = getService() else { return false }
         return service.log_request(request: request)
     }
+
+    func share(user_info: SharedInfo) -> Bool {
+        guard let service = getService() else { return false }
+        return service.share(user_info: user_info)
+    }
 }
 
 final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
@@ -228,6 +233,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private let selectedResourceKey = "SelectedResourceKey"
     private let selectedResourceLangKey = "selectedResourceLangKey"
     private let selectedVoiceKey = "SelectedVoiceKey"
+    private let isTTSEnabledKey = "isTTSEnabledKey"
     private let speechRateKey = "speechRateKey"
     private let connectionTypeKey = "connection_type"
     private let teamIDKey = "team_id"
@@ -309,6 +315,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     var resourceLang: String {
         get {
             resource?.lang ?? DEFAULT_LANG
+        }
+    }
+
+    @Published var isTTSEnabledForAdvanced: Bool = true {
+        didSet {
+            UserDefaults.standard.setValue(isTTSEnabledForAdvanced, forKey: isTTSEnabledKey)
+            UserDefaults.standard.synchronize()
         }
     }
 
@@ -438,6 +451,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var showingSystemStatusNotification: Bool = false
     @Published var showingSystemStatusMenu: Bool = false
     @Published var batteryStatus: BatteryStatus = BatteryStatus()
+    @Published var userInfo: UserInfoBuffer = UserInfoBuffer()
 
     private var bleService: CaBotServiceBLE
     private var tcpService: CaBotServiceTCP
@@ -515,6 +529,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if let speechRate = UserDefaults.standard.value(forKey: speechRateKey) as? Double {
             self.speechRate = speechRate
         }
+        if let modeType = UserDefaults.standard.value(forKey: modeTypeKey) as? String {
+            self.modeType = ModeType(rawValue: modeType)!
+        }
+        if let isTTSEnabled = UserDefaults.standard.value(forKey: isTTSEnabledKey) as? Bool {
+            self.isTTSEnabledForAdvanced = isTTSEnabled
+        }
 
         // services
         self.locationManager.delegate = self
@@ -575,8 +595,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         completionHandler([.sound, .banner])
     }
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        print("tapped!!!!!")
-        print(self.showingSystemStatusNotification)
         if self.showingDeviceStatusNotification{
             self.showingDeviceStatusMenu = true
         } else if self.showingSystemStatusNotification{
@@ -601,8 +619,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         let content = UNMutableNotificationContent()
         content.title = NSString.localizedUserNotificationString(forKey: notificationTitle, arguments: nil)
         content.body = NSString.localizedUserNotificationString(forKey: notificationMessage, arguments: nil)
+        content.sound = UNNotificationSound.defaultCritical
         if (self.systemStatus.summary == .Error){
-            content.sound = UNNotificationSound.defaultCritical
             self.feedbackGenerator.notificationOccurred(.error)
         } else {
             self.feedbackGenerator.notificationOccurred(.warning)
@@ -627,8 +645,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         let content = UNMutableNotificationContent()
         content.title = NSString.localizedUserNotificationString(forKey: notificationTitle, arguments: nil)
         content.body = NSString.localizedUserNotificationString(forKey: notificationMessage, arguments: nil)
+        content.sound = UNNotificationSound.defaultCritical
         if self.deviceStatus.level == .Error {
-            content.sound = UNNotificationSound.defaultCritical
             self.feedbackGenerator.notificationOccurred(.error)
         } else {
             self.feedbackGenerator.notificationOccurred(.warning)
@@ -680,6 +698,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func activityLog(category: String, text: String, memo: String) {
         _ = self.fallbackService.activityLog(category: category, text: text, memo: memo)
+    }
+
+    func share(user_info: SharedInfo) {
+        _ = self.fallbackService.share(user_info: user_info)
     }
     
     // MARK: LogReportModelDelegate
@@ -811,8 +833,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func skipDestination() -> Void {
         let skip = tourManager.skipDestination()
-        self.tts.stop()
-        self.tts.speak("ー"){}
+        self.stopSpeak()
         var announce = CustomLocalizedString("Skip Message %@", lang: self.resourceLang, skip.title.pron)
         self.tts.speak(announce){
         }
@@ -827,7 +848,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func stopSpeak() {
-        self.tts.stop()
+        self.tts.stop(false)
     }
 
     func playAudio(file: String) {
@@ -885,11 +906,27 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.cabot(service: self.tcpService, deviceStatus: status)
     }
 
+    func share(tour: Tour) {
+        self.share(user_info: SharedInfo(type: .OverrideTour, value: tour.id))
+        userInfo.clear()
+    }
+
+    func share(destination: Destination, clear: Bool = true) {
+        if let value = destination.value {
+            self.share(user_info: SharedInfo(type: .OverrideDestination, value: value, flag1: clear))
+            userInfo.clear()
+        }
+    }
+
     // MARK: TourManagerDelegate
     func tourUpdated(manager: TourManager) {
         tourUpdated = true
         UIApplication.shared.isIdleTimerDisabled = manager.hasDestination
         self.activityLog(category: "tour-text", text: manager.title.text, memo: manager.title.pron)
+        self.share(user_info: SharedInfo(type: .Tour, value: manager.title.text))
+        self.share(user_info: SharedInfo(type: .CurrentDestination, value: manager.currentDestination?.title.text ?? ""))
+        self.share(user_info: SharedInfo(type: .NextDestination, value: manager.nextDestination?.title.text ?? ""))
+        self.share(user_info: SharedInfo(type: .Destinations, value: manager.destinations.map { $0.title.text }.joined(separator: ",")))
     }
 
     func tour(manager: TourManager, destinationChanged destination: Destination?) {
@@ -901,11 +938,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     // cancel all announcement
                     var delay = self.tts.isSpeaking ? 1.0 : 0
 
-                    self.tts.stop(true)
+                    self.stopSpeak()
 
                     if self.isContentPresenting {
                         self.isContentPresenting = false
                         delay = self.detailSettingModel.browserCloseDelay
+                    }
+                    if UIAccessibility.isVoiceOverRunning {
+                        delay = 3
                     }
                     // wait at least 1.0 seconds if tts was speaking
                     // wait 1.0 ~ 2.0 seconds if browser was open.
@@ -1064,13 +1104,18 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                         announce += CustomLocalizedString("Press the center button to proceed a subtour %@.", lang: self.resourceLang, subtour.introduction.pron)
                     }
                 }
-
-                self.speak(announce) {
-                    // if user pressed the next button while reading announce, skip open content
-                    if self.tourManager.currentDestination == nil {
-                        if let contentURL = cd.content?.url,
-                           self.tourManager.setting.showContentWhenArrive {
-                            self.open(content: contentURL)
+                var delay = 0.0
+                if UIAccessibility.isVoiceOverRunning {
+                    delay = 3.0
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                    self.speak(announce) {
+                        // if user pressed the next button while reading announce, skip open content
+                        if self.tourManager.currentDestination == nil {
+                            if let contentURL = cd.content?.url,
+                               self.tourManager.setting.showContentWhenArrive {
+                                self.open(content: contentURL)
+                            }
                         }
                     }
                 }
@@ -1137,14 +1182,76 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.logList.set(list: logList)
         self.logList.set(status: status)
     }
-    
+
     func cabot(service: any CaBotTransportProtocol, logDetail: LogEntry) {
         NSLog("set log detail \(logDetail)")
         self.logList.set(detail: logDetail)
     }
 
+    func cabot(service: any CaBotTransportProtocol, userInfo: SharedInfo) {
+        if modeType != .Normal {
+            self.userInfo.update(userInfo: userInfo)
+            if userInfo.type == .Speak {
+                if isTTSEnabledForAdvanced {
+                    if userInfo.value.isEmpty && userInfo.flag1 { // stop
+                        tts.stopSpeakForAdvanced()
+                    } else {
+                        tts.speakForAdvanced(userInfo.value, force: userInfo.flag1) { _ in
+                        }
+                    }
+                }
+            }
+            return
+        }
+        if userInfo.type == .OverrideTour {
+            if let src = resource?.toursSource {
+                do {
+                    let tours = try Tour.load(at: src)
+                    for tour in tours {
+                        if tour.id == userInfo.value {
+                            tourManager.set(tour: tour)
+                            needToStartAnnounce(wait: true)
+                        }
+                    }
+                } catch {
+                    NSLog("\(src) cannot be loaded")
+                }
+            }
+        }
+        if userInfo.type == .OverrideDestination {
+            func traverseDest(src: Source) {
+                do {
+                    let dests = try Destination.load(at: src)
+                    for dest in dests {
+                        if let value = dest.value {
+                            if value == userInfo.value {
+                                if userInfo.flag1 { // clear and add
+                                    tourManager.clearAll()
+                                }
+                                tourManager.addToLast(destination: dest)
+                                needToStartAnnounce(wait: true)
+                                return
+                            }
+                        } else if let src = dest.file {
+                            traverseDest(src: src)
+                        }
+                    }
+                } catch {
+                    NSLog("\(src) cannot be loaded")
+                }
+            }
+            if let src = resource?.destinationsSource {
+                traverseDest(src: src)
+            }
+        }
+    }
+
     func getSpeechPriority() -> SpeechPriority {
         return speechPriority
+    }
+
+    func getModeType() -> ModeType {
+        return modeType
     }
 }
 
@@ -1385,5 +1492,98 @@ struct PersistenceController {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
         })
+    }
+}
+
+class SpeakingText: Hashable {
+    static func == (lhs: SpeakingText, rhs: SpeakingText) -> Bool {
+        lhs.text == rhs.text && lhs.date == rhs.date
+    }
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(text)
+        hasher.combine(date)
+    }
+    var text: String = ""
+    var date: Date
+    var voiceover: Bool
+    var location = 0
+    var length = 0
+    init(text: String, voiceover: Bool) {
+        self.text = text
+        self.date = Date()
+        self.voiceover = voiceover
+    }
+    func subTexts() -> (String, String, String, String) {
+        let prefix = self.voiceover ? "VO:" : ""
+        let i1 = text.index(text.startIndex, offsetBy: location)
+        let i2 = text.index(i1, offsetBy: length)
+        return (prefix, String(text[..<i1]), String(text[i1..<i2]), String(text[i2...]))
+    }
+}
+
+class UserInfoBuffer {
+    var selectedTour: String = ""
+    var currentDestination: String = ""
+    var nextDestination: String = ""
+    var destinations: [String] = []
+    var speakingText: [SpeakingText] = []
+    var speakingIndex = -1
+
+    init() {
+    }
+
+    func clear() {
+        selectedTour = ""
+        currentDestination = ""
+        nextDestination = ""
+        speakingText = []
+    }
+
+    func update(userInfo: SharedInfo) {
+        switch(userInfo.type) {
+        case .None:
+            break
+        case .Speak:
+            if !userInfo.value.isEmpty {
+                speakingText.insert(SpeakingText(text: userInfo.value, voiceover: userInfo.flag2), at: 0)
+            }
+            break
+        case .SpeakProgress:
+            for i in 0..<speakingText.count {
+                if speakingText[i].text == userInfo.value {
+                    if userInfo.flag1 { // speech done
+                        if userInfo.flag2 { // voiceover
+                            speakingText[i].location = userInfo.length
+                            speakingText[i].length = 0
+                        } else {
+                            speakingText[i].location += speakingText[i].length
+                            speakingText[i].length = 0
+                        }
+                    } else {
+                        speakingText[i].location = userInfo.location
+                        speakingText[i].length = userInfo.length
+                    }
+                    break
+                }
+            }
+            break
+        case .Tour:
+            selectedTour = userInfo.value
+            break
+        case .CurrentDestination:
+            currentDestination = userInfo.value
+            break
+        case .NextDestination:
+            nextDestination = userInfo.value
+            break
+        case .Destinations:
+            destinations = userInfo.value.split(separator: ",").map(String.init)
+        case .OverrideTour:
+            // do nothing
+            break
+        case .OverrideDestination:
+            // do nothing
+            break
+        }
     }
 }

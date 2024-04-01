@@ -53,6 +53,7 @@
 		7E29F072228B55FC00CA7DD6 /* CaBotServiceBLE.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F070228B55FC00CA7DD6 /* CaBotServiceBLE.swift */; };
 		7E51C3902AABA88C0095945F /* Logging.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E51C38F2AABA88C0095945F /* Logging.m */; };
 		7E557F002581C79B00B1B9CA /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7E557EFE2581C79B00B1B9CA /* Localizable.strings */; };
+		7E8F5A202BA4D33800E5D547 /* SpokenTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E8F5A1F2BA4D33800E5D547 /* SpokenTextView.swift */; };
 		7E9690C329EAF25C0062DEBD /* DetailSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E9690C229EAF25C0062DEBD /* DetailSettingView.swift */; };
 		7EDE7C8629B428BB00A65829 /* data in Resources */ = {isa = PBXBuildFile; fileRef = 7EDE7C8529B428BB00A65829 /* data */; };
 		7EDE7C8E29B5715800A65829 /* ResourceChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EDE7C8D29B5715800A65829 /* ResourceChecker.swift */; };
@@ -138,6 +139,7 @@
 		30E99D95266A993E001ACAAA /* Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
 		30E99DA3266B2216001ACAAA /* BeaconSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeaconSampler.swift; sourceTree = "<group>"; };
 		458B54382A970B4A00AD9D10 /* LogFilesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogFilesView.swift; sourceTree = "<group>"; };
+		7E0995842BA510F500365136 /* NavCog3.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NavCog3.pch; sourceTree = "<group>"; };
 		7E29F009228B548100CA7DD6 /* CaBot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CaBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E29F013228B548200CA7DD6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7E29F018228B548200CA7DD6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -155,6 +157,7 @@
 		7E51C38F2AABA88C0095945F /* Logging.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Logging.m; sourceTree = "<group>"; };
 		7E557EFF2581C79B00B1B9CA /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		7E557F042581C80E00B1B9CA /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
+		7E8F5A1F2BA4D33800E5D547 /* SpokenTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpokenTextView.swift; sourceTree = "<group>"; };
 		7E9690C229EAF25C0062DEBD /* DetailSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailSettingView.swift; sourceTree = "<group>"; };
 		7EDE7C8529B428BB00A65829 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = data; sourceTree = "<group>"; };
 		7EDE7C8B29B5715800A65829 /* CaBotTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CaBotTool; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -250,6 +253,7 @@
 				7E9690C229EAF25C0062DEBD /* DetailSettingView.swift */,
 				E561455E2A6E02A8005CF82F /* RosWebView.swift */,
 				458B54382A970B4A00AD9D10 /* LogFilesView.swift */,
+				7E8F5A1F2BA4D33800E5D547 /* SpokenTextView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -323,6 +327,7 @@
 		7E29F04B228B55C000CA7DD6 /* FromNavCog */ = {
 			isa = PBXGroup;
 			children = (
+				7E0995842BA510F500365136 /* NavCog3.pch */,
 				7E51C38E2AABA88C0095945F /* Logging.h */,
 				7E51C38F2AABA88C0095945F /* Logging.m */,
 				7E29F04C228B55C000CA7DD6 /* NavDeviceTTS.h */,
@@ -580,6 +585,7 @@
 				30E50DDB269F7E3800729ABD /* CaBot.xcdatamodeld in Sources */,
 				306069B629A686D9001FB5DB /* CaBotServiceCommon.swift in Sources */,
 				308FCE2C27E42B7B009FCC7B /* SystemStatusDetailView.swift in Sources */,
+				7E8F5A202BA4D33800E5D547 /* SpokenTextView.swift in Sources */,
 				30E50DDD269FCBC200729ABD /* ResourceSelectView.swift in Sources */,
 				7E29F072228B55FC00CA7DD6 /* CaBotServiceBLE.swift in Sources */,
 				30E50DCC269F672800729ABD /* TourManager.swift in Sources */,
@@ -794,6 +800,8 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = $PROJECT_DIR/FromNavCog/NavCog3.pch;
 				INFOPLIST_FILE = CaBot/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -825,6 +833,8 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = $PROJECT_DIR/FromNavCog/NavCog3.pch;
 				INFOPLIST_FILE = CaBot/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (

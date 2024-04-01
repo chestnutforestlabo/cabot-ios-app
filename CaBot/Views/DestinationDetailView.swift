@@ -33,8 +33,13 @@ struct DestinationDetailView: View {
         let tourManager = modelData.tourManager
         Form {
             Section(header: Text(destination.title.text)) {
-                if let content =  destination.startMessage?.content {
-                    Text(content)
+                if let startMessage =  destination.startMessage?.content {
+                    Text(startMessage)
+                }
+                if let arriveMessages = destination.arriveMessages{
+                    ForEach(arriveMessages, id: \.self) { arriveMessage in
+                        Text(arriveMessage.content!)
+                    }
                 }
                 if let url = destination.content?.url {
                     Button("Show more detail") {
@@ -42,57 +47,90 @@ struct DestinationDetailView: View {
                         modelData.isContentPresenting = true
                     }
                 }
-                Button("Add to destinations") {
-                    if modelData.tourManager.hasDestination {
+                if modelData.modeType == .Normal {
+                    Button("Add to destinations") {
+                        if modelData.tourManager.hasDestination {
+                            targetDestination = destination
+                            isConfirming = true
+                        } else {
+                            // if there is no destination, start immediately
+                            tourManager.addToLast(destination: destination)
+                            modelData.needToStartAnnounce(wait: true)
+                            NavigationUtil.popToRootView()
+                        }
+                    }
+                    .confirmationDialog(Text("ADD_A_DESTINATION"), isPresented: $isConfirming, presenting: targetDestination) {
+                    detail in
+                        Button {
+                            if let dest = targetDestination {
+                                tourManager.clearAll()
+                                tourManager.addToLast(destination: dest)
+                                targetDestination = nil
+                                NavigationUtil.popToRootView()
+                            }
+                        } label: {
+                            Text("CLEAR_ALL_THEN_ADD")
+                        }
+                        Button {
+                            if let dest = targetDestination {
+                                tourManager.stopCurrent()
+                                tourManager.addToFirst(destination: dest)
+                                targetDestination = nil
+                                NavigationUtil.popToRootView()
+                            }
+                        } label: {
+                            Text("ADD_TO_FIRST")
+                        }
+                        Button {
+                            if let dest = targetDestination {
+                                tourManager.addToLast(destination: dest)
+                                targetDestination = nil
+                                NavigationUtil.popToRootView()
+                            }
+                        } label: {
+                            Text("ADD_TO_LAST")
+                        }
+                        Button("Cancel", role: .cancel) {
+                            targetDestination = nil
+                        }
+                    } message: { detail in
+                        let message = LocalizedStringKey("ADD_A_DESTINATION_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
+                        Text(message)
+                    }
+                } else {
+                    Button(action: {
                         targetDestination = destination
                         isConfirming = true
-                    } else {
-                        // if there is no destination, start immediately
-                        tourManager.addToLast(destination: destination)
-                        modelData.needToStartAnnounce(wait: true)
-                        NavigationUtil.popToRootView()
+                    }){
+                        Text("SEND_DESTINATION")
                     }
-                }
-                .actionSheet(isPresented: $isConfirming) {
-                    let message = LocalizedStringKey("ADD_A_DESTINATION_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
-                    return ActionSheet(title: Text("ADD_A_DESTINATION"),
-                                message: Text(message),
-                                buttons: [
-                                    .cancel(),
-                                    .destructive(
-                                        Text("CLEAR_ALL_THEN_ADD"),
-                                        action: {
-                                            if let dest = targetDestination {
-                                                tourManager.clearAll()
-                                                tourManager.addToLast(destination: dest)
-                                                targetDestination = nil
-                                                NavigationUtil.popToRootView()
-                                            }
-                                        }
-                                    ),
-                                    .default(
-                                        Text("ADD_TO_FIRST"),
-                                        action: {
-                                            if let dest = targetDestination {
-                                                tourManager.stopCurrent()
-                                                tourManager.addToFirst(destination: dest)
-                                                targetDestination = nil
-                                                NavigationUtil.popToRootView()
-                                            }
-                                        }
-                                    ),
-                                    .default(
-                                        Text("ADD_TO_LAST"),
-                                        action: {
-                                            if let dest = targetDestination {
-                                                tourManager.addToLast(destination: dest)
-                                                targetDestination = nil
-                                                NavigationUtil.popToRootView()
-                                            }
-                                        }
-                                    )
-                                ]
-                    )
+                    .confirmationDialog(Text("SEND_DESTINATION"), isPresented: $isConfirming, presenting: targetDestination) {
+                    detail in
+                        Button {
+                            if let destination = targetDestination {
+                                modelData.share(destination: destination)
+                                NavigationUtil.popToRootView()
+                                targetDestination = nil
+                            }
+                        } label: {
+                            Text("CLEAR_AND_ADD_DESTINATION")
+                        }
+                        Button {
+                            if let destination = targetDestination {
+                                modelData.share(destination: destination, clear: false)
+                                NavigationUtil.popToRootView()
+                                targetDestination = nil
+                            }
+                        } label: {
+                            Text("ADD_DESTINATION")
+                        }
+                        Button("Cancel", role: .cancel) {
+                            targetDestination = nil
+                        }
+                    } message: { detail in
+                        let message = LocalizedStringKey("SEND_DESTINATION_MESSAGE \(detail.title.text)")
+                        Text(message)
+                    }
                 }
             }
         }

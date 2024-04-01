@@ -24,7 +24,7 @@ import Foundation
 import SocketIO
 
 
-class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
+class CaBotServiceTCP: NSObject {
     fileprivate var tts:CaBotTTS
     fileprivate var primaryAddr: String?
     fileprivate var secondaryAddr: String?
@@ -47,6 +47,7 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
     init(with tts:CaBotTTS) {
         self.tts = tts
     }
+
     func emit(_ event: String, _ items: SocketData..., completion: (() -> ())? = nil)  {
         guard let socket = self.socket else { return }
         guard socket.status == .connected else { return }
@@ -70,83 +71,7 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
         }
         self.port = port
     }
-
-    // MARK: CaBotServiceProtocol
-
-    func activityLog(category: String, text: String, memo: String) -> Bool {
-        let json: Dictionary<String, String> = [
-            "category": category,
-            "text": text,
-            "memo": memo
-        ]
-        do {
-            NSLog("activityLog \(category), \(text), \(memo)")
-            let data = try JSONSerialization.data(withJSONObject: json, options: [])
-            let text = String(data:data, encoding: .utf8)
-            self.emit("log", text!)
-            return true
-        } catch {
-            NSLog("activityLog \(category), \(text), \(memo)")
-        }
-        return false
-    }
     
-    func send(destination: String) -> Bool {
-        NSLog("destination \(destination)")
-        self.emit("destination", destination)
-        return true
-    }
-    
-    func summon(destination: String) -> Bool {
-        NSLog("summons \(destination)")
-        self.emit("summon", destination)
-        return true
-    }
-    
-    func manage(command: CaBotManageCommand, param: String?) -> Bool {
-        if let param = param {
-            NSLog("manage \(command.rawValue)-\(param)")
-            self.emit("manage_cabot", "\(command.rawValue)-\(param)")
-            return true
-        } else {
-            NSLog("manage \(command.rawValue)")
-            self.emit("manage_cabot", command.rawValue)
-            return true
-        }
-    }
-
-    func log_request(request: Dictionary<String, String>) -> Bool {
-        NSLog("log_request \(request)")
-        if let jsonString = try? JSONEncoder().encode(request) {
-            self.emit("log_request", jsonString)
-            return true
-        }
-        return false
-    }
-
-
-    public func isConnected() -> Bool {
-        return self.connected
-    }
-    
-    public func isSocket() -> Bool {
-        self.socket != nil
-    }
-
-    // MARK: CaBotTransportProtocol
-
-    func connectionType() -> ConnectionType {
-        return .TCP
-    }
-
-    func startAdvertising() {
-        //assuming nothing to do
-    }
-    
-    func stopAdvertising() {
-        //assuming nothing to do
-    }
-
     func stop(){
         NSLog("stopping TCP \(getAddr())")
         self.connected = false
@@ -313,6 +238,19 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
                 NSLog(error.localizedDescription)
             }
         }
+        socket.on("share"){[weak self] dt, ack in
+            guard let text = dt[0] as? String else { return }
+            guard let data = String(text).data(using:.utf8) else { return }
+            guard let weakself = self else { return }
+            guard let delegate = weakself.delegate else { return }
+            do {
+                let decodedData = try JSONDecoder().decode(SharedInfo.self, from: data)
+                weakself.actions.handle(service: weakself, delegate: delegate, user_info: decodedData)
+            } catch {
+                print(text)
+                NSLog(error.localizedDescription)
+            }
+        }
         socket.connect(timeoutAfter: 2.0) { [weak self] in
             guard let weakself = self else { return }
             guard let delegate = weakself.delegate else { return }
@@ -387,5 +325,96 @@ class CaBotServiceTCP: NSObject, CaBotTransportProtocol{
 
     private func stopHeartBeat() {
         self.heartBeatTimer?.invalidate()
+    }
+}
+
+// MARK: CaBotTransportProtocol
+
+extension CaBotServiceTCP: CaBotTransportProtocol {
+    func connectionType() -> ConnectionType {
+        return .TCP
+    }
+
+    func startAdvertising() {
+        //assuming nothing to do
+    }
+
+    func stopAdvertising() {
+        //assuming nothing to do
+    }
+}
+
+// MARK: CaBotServiceProtocol
+
+extension CaBotServiceTCP: CaBotServiceProtocol {
+    func activityLog(category: String, text: String, memo: String) -> Bool {
+        let json: Dictionary<String, String> = [
+            "category": category,
+            "text": text,
+            "memo": memo
+        ]
+        do {
+            NSLog("activityLog \(category), \(text), \(memo)")
+            let data = try JSONSerialization.data(withJSONObject: json, options: [])
+            let text = String(data:data, encoding: .utf8)
+            self.emit("log", text!)
+            return true
+        } catch {
+            NSLog("activityLog \(category), \(text), \(memo)")
+        }
+        return false
+    }
+
+    func send(destination: String) -> Bool {
+        NSLog("destination \(destination)")
+        self.emit("destination", destination)
+        return true
+    }
+
+    func summon(destination: String) -> Bool {
+        NSLog("summons \(destination)")
+        self.emit("summon", destination)
+        return true
+    }
+
+    func manage(command: CaBotManageCommand, param: String?) -> Bool {
+        if let param = param {
+            NSLog("manage \(command.rawValue)-\(param)")
+            self.emit("manage_cabot", "\(command.rawValue)-\(param)")
+            return true
+        } else {
+            NSLog("manage \(command.rawValue)")
+            self.emit("manage_cabot", command.rawValue)
+            return true
+        }
+    }
+
+    func log_request(request: Dictionary<String, String>) -> Bool {
+        NSLog("log_request \(request)")
+        if let jsonString = try? JSONEncoder().encode(request) {
+            self.emit("log_request", jsonString)
+            return true
+        }
+        return false
+    }
+
+    public func isConnected() -> Bool {
+        return self.connected
+    }
+
+    public func isSocket() -> Bool {
+        self.socket != nil
+    }
+
+    func share(user_info: SharedInfo) -> Bool {
+        do {
+            let jsonData = try JSONEncoder().encode(user_info)
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                self.emit("share", jsonString)
+                return true
+            }
+        } catch {
+        }
+        return false
     }
 }

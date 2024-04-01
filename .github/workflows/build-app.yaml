@@ -1,0 +1,17 @@
+name: iOS Build
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: 15.1
+
+    - name: Build Xcode Project
+      run: xcodebuild -scheme CaBot -sdk iphonesimulator -configuration Debug build

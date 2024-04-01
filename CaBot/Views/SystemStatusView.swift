@@ -74,18 +74,16 @@ struct SystemStatusView: View {
                             Text("Stop System")
                                 .frame(width: nil, alignment: .topLeading)
                         }
-                        .actionSheet(isPresented: $isConfirmingStop) {
-                            return ActionSheet(title: Text("Stop System"),
-                                               message: Text("Are you sure to stop the suitcase system?"),
-                                               buttons: [
-                                                .cancel(),
-                                                .destructive(
-                                                    Text("Stop"),
-                                                    action: {
-                                                        modelData.systemManageCommand(command: .stop)
-                                                    }
-                                                )
-                                               ])
+                        .confirmationDialog(Text("Stop System"), isPresented: $isConfirmingStop) {
+                            Button {
+                                modelData.systemManageCommand(command: .stop)
+                            } label: {
+                                Text("Stop")
+                            }
+                            Button("Cancel", role: .cancel) {
+                            }
+                        } message: {
+                            Text("Are you sure to stop the suitcase system?")
                         }
                         .disabled(!modelData.systemStatus.canStop || !modelData.suitcaseConnected)
                     }

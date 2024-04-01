@@ -61,88 +61,153 @@ struct DestinationsView: View {
                                     .accessibilityLabel(destination.title.pron)
                             })
                     } else {
-                        if let _ = destination.startMessage {
-                            NavigationLink(
-                                destination: DestinationDetailView(destination: destination)
-                                    .environmentObject(modelData),
-                                label: {
-                                    Text(destination.title.text)
-                                        .accessibilityLabel(destination.title.pron)
-                                })
+                        if modelData.modeType == .Normal {
+                            HStack {
+                                Button(action: {
+                                    if modelData.tourManager.hasDestination {
+                                        targetDestination = destination
+                                        isConfirming = true
+                                    } else {
+                                        // if there is no destination, start immediately
+                                        tourManager.addToLast(destination: destination)
+                                        modelData.needToStartAnnounce(wait: true)
+                                        NavigationUtil.popToRootView()
+                                    }
+                                }){
+                                    VStack(alignment: .leading) {
+                                        Text(destination.title.text)
+                                            .font(.body)
+                                            .accessibilityLabel(destination.title.pron)
+                                            .multilineTextAlignment(.leading)
+                                            .accessibilityHint(Text("DOUBLETAP_TO_ADD_A_DESTINATION"))
+                                        if let summaryMessage = destination.summaryMessage?.content{
+                                            Text(summaryMessage)
+                                                .font(.caption)
+                                                .multilineTextAlignment(.leading)
+                                        }
+                                    }
+                                }
+                                .buttonStyle(.borderless)
+                                .confirmationDialog(Text("ADD_A_DESTINATION"), isPresented: $isConfirming, presenting: targetDestination) {
+                                detail in
+                                    Button {
+                                        if let dest = targetDestination {
+                                            tourManager.clearAll()
+                                            tourManager.addToLast(destination: dest)
+                                            targetDestination = nil
+                                            NavigationUtil.popToRootView()
+                                        }
+                                    } label: {
+                                        Text("CLEAR_ALL_THEN_ADD")
+                                    }
+                                    Button {
+                                        if let dest = targetDestination {
+                                            tourManager.stopCurrent()
+                                            tourManager.addToFirst(destination: dest)
+                                            targetDestination = nil
+                                            NavigationUtil.popToRootView()
+                                        }
+                                    } label: {
+                                        Text("ADD_TO_FIRST")
+                                    }
+                                    Button {
+                                        if let dest = targetDestination {
+                                            tourManager.addToLast(destination: dest)
+                                            targetDestination = nil
+                                            NavigationUtil.popToRootView()
+                                        }
+                                    } label: {
+                                        Text("ADD_TO_LAST")
+                                    }
+                                    Button("Cancel", role: .cancel) {
+                                        targetDestination = nil
+                                    }
+                                } message: { detail in
+                                    let message = LocalizedStringKey("ADD_A_DESTINATION_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
+                                    Text(message)
+                                }
+                                Spacer()
+                                if let _ = destination.startMessage {
+                                    ZStack{
+                                        Image(systemName: "info.circle")
+                                            .accessibilityLabel(Text("Details"))
+                                            .accessibilityRemoveTraits(.isImage)
+                                            .accessibilityAddTraits(.isButton)
+                                            .accessibilityHint(Text("DOUBLETAP_TO_VIEW_DETAILS"))
+                                            .foregroundColor(.blue)
+                                        NavigationLink(
+                                            destination: DestinationDetailView(destination: destination).environmentObject(modelData)
+                                        ){EmptyView()}
+                                        .frame(width: 0, height: 0)
+                                        .opacity(0)
+                                    }
+                                }
+                            }
                         } else {
-                            Button(action: {
-                                if modelData.tourManager.hasDestination {
+                            HStack {
+                                Button(action: {
                                     targetDestination = destination
                                     isConfirming = true
-                                } else {
-                                    // if there is no destination, start immediately
-                                    tourManager.addToLast(destination: destination)
-                                    modelData.needToStartAnnounce(wait: true)
-                                    NavigationUtil.popToRootView()
+                                }){
+                                    VStack(alignment: .leading) {
+                                        Text(destination.title.text)
+                                            .font(.body)
+                                            .accessibilityLabel(destination.title.pron)
+                                            .multilineTextAlignment(.leading)
+                                            .accessibilityHint(Text("DOUBLETAP_TO_ADD_A_DESTINATION"))
+                                        if let summaryMessage = destination.summaryMessage?.content{
+                                            Text(summaryMessage)
+                                                .font(.caption)
+                                                .multilineTextAlignment(.leading)
+                                        }
+                                    }
                                 }
-                            }){
-                                Text(destination.title.text)
-                                    .accessibilityLabel(destination.title.pron)
-                            }
-                            // deprecated
-                            .actionSheet(isPresented: $isConfirming) {
-                                let message = LocalizedStringKey("ADD_A_DESTINATION_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
-                                return ActionSheet(title: Text("ADD_A_DESTINATION"),
-                                            message: Text(message),
-                                            buttons: [
-                                                .cancel(),
-                                                .destructive(
-                                                    Text("CLEAR_ALL_THEN_ADD"),
-                                                    action: {
-                                                        if let dest = targetDestination {
-                                                            tourManager.clearAll()
-                                                            tourManager.addToLast(destination: dest)
-                                                            targetDestination = nil
-                                                            NavigationUtil.popToRootView()
-                                                        }
-                                                    }
-                                                ),
-                                                .default(
-                                                    Text("ADD_TO_FIRST"),
-                                                    action: {
-                                                        if let dest = targetDestination {
-                                                            tourManager.stopCurrent()
-                                                            tourManager.addToFirst(destination: dest)
-                                                            targetDestination = nil
-                                                            NavigationUtil.popToRootView()
-                                                        }
-                                                    }
-                                                ),
-                                                .default(
-                                                    Text("ADD_TO_LAST"),
-                                                    action: {
-                                                        if let dest = targetDestination {
-                                                            tourManager.addToLast(destination: dest)
-                                                            targetDestination = nil
-                                                            NavigationUtil.popToRootView()
-                                                        }
-                                                    }
-                                                )
-                                            ]
-                                )
+                                .buttonStyle(.borderless)
+                                .confirmationDialog(Text("ADD_A_DESTINATION"), isPresented: $isConfirming, presenting: targetDestination) {
+                                detail in
+                                    Button {
+                                        if let destination = targetDestination {
+                                            modelData.share(destination: destination, clear: false)
+                                            NavigationUtil.popToRootView()
+                                            targetDestination = nil
+                                        }
+                                    } label: {
+                                        Text("ADD_DESTINATION")
+                                    }
+                                    Button {
+                                        if let destination = targetDestination {
+                                            modelData.share(destination: destination)
+                                            NavigationUtil.popToRootView()
+                                            targetDestination = nil
+                                        }
+                                    } label: {
+                                        Text("CLEAR_AND_ADD_DESTINATION")
+                                    }
+                                    Button("Cancel", role: .cancel) {
+                                        targetDestination = nil
+                                    }
+                                } message: { detail in
+                                    let message = LocalizedStringKey("SEND_DESTINATION_MESSAGE \(detail.title.text)")
+                                    Text(message)
+                                }
+                                Spacer()
+                                if let _ = destination.startMessage {
+                                    ZStack{
+                                        Image(systemName: "info.circle")
+                                            .accessibilityLabel(Text("Details"))
+                                            .accessibilityRemoveTraits(.isImage)
+                                            .accessibilityAddTraits(.isButton)
+                                            .accessibilityHint(Text("DOUBLETAP_TO_VIEW_DETAILS"))
+                                            .foregroundColor(.blue)
+                                        NavigationLink(
+                                            destination: DestinationDetailView(destination: destination).environmentObject(modelData)
+                                        ){EmptyView()}
+                                        .frame(width: 0, height: 0)
+                                        .opacity(0)
+                                    }
+                                }
                             }
                         }
-
-                        /* for iOS 15
-                             .confirmationDialog("ADD_DESTINATION", isPresented: , presenting: targetDestination) {
-                             detail in
-                            Button {
-
-                            } label: {
-                                Text("Cancel Current")
-                            }
-                            Button("Cancel", role: .cancel) {
-                                targetDestination = nil
-                            }
-                        } message: { detail in
-
-                        }
-                        */
                     }
                 }
             }

@@ -157,6 +157,8 @@
 "CLEAR_ALL_THEN_ADD"="Clear All then Add";
 "ADD_TO_FIRST"="Add to first";
 "ADD_TO_LAST"="Add to last";
+"DOUBLETAP_TO_ADD_A_DESTINATION"="Double tap to add a destination";
+"DOUBLETAP_TO_VIEW_DETAILS"="Double tap to view details";
 
 
 // DestinationDetailView
@@ -261,3 +263,26 @@
 "Active"="Active";
 "Activating"="Activating";
 "Deactivating"="Deactivating";
+
+
+// Send tour/destination
+"SEND_TOUR_MESSAGE %@"="Send Tour: %@\nThis will override user's tour";
+"SEND_TOUR"="Send Tour";
+"SEND_DESTINATION_MESSAGE %@"="Would you like to add %@ as a destination?";
+"SEND_DESTINATION"="Send Destination";
+"CLEAR_AND_ADD_DESTINATION"="Clear and Add Destination";
+"ADD_DESTINATION"="Add Destination";
+
+"TTS Enabled (Advanced only)"="TTS Enabled (Advanced only)";
+"Speech Priority"="Speech Priority";
+"Robot"="Robot";
+"App"="App";
+
+"See history"="See history";
+
+"PLACEHOLDER_TOUR_TITLE"="Tour Title";
+"PLACEHOLDER_DESTINATION_TITLE"="Destination Title";
+"PLACEHOLDER_SPEAKING_TEXT"="Speaking Text";
+
+"User App Info"="User App Info";
+"CUSTOMIZED_TOUR"="Customized Tour";

@@ -46,9 +46,12 @@ typedef enum {
 @property NSTimeInterval validBy;
 @property double validRadius; // in meter
 @property (strong, nonatomic) void (^completionHandler)(int);
+@property (strong, nonatomic) void (^progressHandler)(NSRange);
+@property NSMutableArray<NSValue *> *ranges;
 @property NSTimeInterval issued;
 @property NSTimeInterval speakStart;
 @property NSTimeInterval speakFinish;
+@property NSTimer *voWatchTimer;
 @property BOOL selfvoicing;
 @property BOOL quickAnswer;
 @end
@@ -65,7 +68,7 @@ typedef enum {
 + (instancetype) sharedTTS;
 + (NSString *)removeDots:(NSString *)str;
 
-- (AVSpeechUtterance*) speak:(NSString*)text withOptions:(NSDictionary*)options completionHandler:(void(^)(int))handler;
+- (AVSpeechUtterance*) speak:(NSString*)text withOptions:(NSDictionary*)options completionHandler:(void(^)(int))handler progressHandler:(void (^)(NSRange))phandler;
 
 - (AVSpeechUtterance*) speak:(NSString*)text completionHandler:(void(^)(int))handler __attribute__ ((deprecated));
 - (AVSpeechUtterance*) speak:(NSString*)text force:(BOOL)flag completionHandler:(void(^)(int))handler __attribute__ ((deprecated));
