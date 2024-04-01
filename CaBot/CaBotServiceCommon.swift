@@ -98,6 +98,7 @@ enum NavigationNotification:String {
     case subtour
     case skip
     case getlanguage
+    case pushbutton
 }
 
 enum CaBotManageCommand:String {
@@ -343,6 +344,7 @@ enum NavigationEventType:String, Decodable {
     case subtour
     case skip
     case getlanguage
+    case pushbutton
     case unknown
 }
 
@@ -439,7 +441,7 @@ class CaBotServiceActions {
 
         DispatchQueue.main.async {
             switch(request.type) {
-            case .next, .arrived, .subtour, .skip, .getlanguage:
+            case .next, .arrived, .subtour, .skip, .getlanguage, .pushbutton:
                 if let note = NavigationNotification(rawValue: request.type.rawValue) {
                     delegate.cabot(service: service, notification: note)
                 } else {

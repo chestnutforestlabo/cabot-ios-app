@@ -1128,6 +1128,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 self.fallbackService.manage(command: .lang, param: I18N.shared.langCode)
             }
             break
+        case .pushbutton:
+            self.speak("test"){}
+            break
         }
     }
 
