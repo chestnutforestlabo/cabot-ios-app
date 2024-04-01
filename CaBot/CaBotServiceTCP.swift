@@ -199,6 +199,21 @@ class CaBotServiceTCP: NSObject {
                 NSLog(error.localizedDescription)
             }
         }
+        socket.on("touch"){[weak self] dt, ack in
+            guard let text = dt[0] as? String else { return }
+            guard let data = String(text).data(using:.utf8) else { return }
+            guard let weakself = self else { return }
+            guard let delegate = weakself.delegate else { return }
+            do {
+                let status = try JSONDecoder().decode(TouchStatus.self, from: data)
+                DispatchQueue.main.async {
+                    delegate.cabot(service: weakself, touchStatus: status)
+                }
+            } catch {
+                print(text)
+                NSLog(error.localizedDescription)
+            }
+        }
         socket.on("speak"){[weak self] dt, ack in
             guard let text = dt[0] as? String else { return }
             guard let data = String(text).data(using:.utf8) else { return }

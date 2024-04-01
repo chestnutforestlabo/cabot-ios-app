@@ -374,6 +374,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 self.deviceStatus = DeviceStatus()
                 self.systemStatus.clear()
                 self.batteryStatus = BatteryStatus()
+                self.touchStatus = TouchStatus()
             }
         }
     }
@@ -451,6 +452,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var showingSystemStatusNotification: Bool = false
     @Published var showingSystemStatusMenu: Bool = false
     @Published var batteryStatus: BatteryStatus = BatteryStatus()
+    @Published var touchStatus: TouchStatus = TouchStatus()
     @Published var userInfo: UserInfoBuffer = UserInfoBuffer()
 
     private var bleService: CaBotServiceBLE
@@ -1178,6 +1180,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func cabot(service: any CaBotTransportProtocol, batteryStatus: BatteryStatus) -> Void {
         self.batteryStatus = batteryStatus
+    }
+    
+    func cabot(service: any CaBotTransportProtocol, touchStatus: TouchStatus) -> Void {
+        self.touchStatus = touchStatus
     }
     
     func cabot(service: any CaBotTransportProtocol, logList: [LogEntry], status: CaBotLogStatus) {
