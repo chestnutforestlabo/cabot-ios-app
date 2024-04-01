@@ -99,12 +99,14 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
         })
 
         // Setup the marker client.
-        var gridClient = new ROS3D.OccupancyGridClient({
-            ros : ros,
-            rootObject : viewer.scene,
-            cntinuous: true,
-            compression : ' '
-        });
+        window.setTimeout(() => {
+            var gridClient = new ROS3D.OccupancyGridClient({
+                ros : ros,
+                rootObject : viewer.scene,
+                cntinuous: false,
+                compression : 'png'
+            });
+        }, 3000);
 
         // Setup a client to listen to TFs.
         var tfClient = new ROSLIB.TFClient({
@@ -121,11 +123,18 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
             ros : ros,
             topic : '/scan',
             tfClient : tfClient,
-            compression : ' ',
+            compression : 'png',
             rootObject : viewer.scene,
             material : { size : 1, color : 0xff00ff }
         });
 
+        old = ROS3D.Path.prototype.processMessage;
+        ROS3D.Path.prototype.processMessage = (message) => {
+            message.poses.forEach((pose) => {
+                pose.pose.position.z = 1.0;
+            })
+            old.call(path, message);
+        }
         // Setup the marker client.
         var path = new ROS3D.Path({
             ros : ros,
