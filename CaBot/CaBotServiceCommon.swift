@@ -370,11 +370,22 @@ enum TouchLevel: Int, Decodable {
     var icon: String {
         switch (self) {
         case .Stale:
-            return "none"
+            return "xmark.circle"
         case .NoTouch:
-            return "no_touch_image"
+            return "hand.raised.slash"
         case .Touching:
-            return "touch_image"
+            return "hand.raised"
+        }
+    }
+
+    var color: Color? {
+        switch (self) {
+        case .Stale:
+            return Color.red
+        case .NoTouch:
+            return Color.gray
+        case .Touching:
+            return Color.green
         }
     }
 }

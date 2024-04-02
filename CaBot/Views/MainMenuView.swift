@@ -118,32 +118,13 @@ struct UserInfoView: View {
                 }
                 if modelData.systemStatus.level == .Active{
                     Spacer()
-                    switch (modelData.touchStatus.level){
-                    case .Stale:
-                        HStack {
-                            Image(systemName: "xmark.circle")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 24, height: 24)
-                        }
-                        .foregroundColor(.red)
-                    case .NoTouch:
-                        HStack {
-                            Image(systemName: "hand.raised.slash")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 24, height: 24)
-                        }
-                        .foregroundColor(.gray)
-                    case .Touching:
-                        HStack {
-                            Image(systemName: "hand.raised")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 24, height: 24)
-                        }
-                        .foregroundColor(.green)
+                    HStack {
+                        Image(systemName: modelData.touchStatus.level.icon)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 24, height: 24)
                     }
+                    .foregroundColor(modelData.touchStatus.level.color)
                 }
             } icon: {
                 if modelData.userInfo.currentDestination != "" {
@@ -614,6 +595,7 @@ struct SettingMenus: View {
                     }.onChange(of: modelData.debugSystemStatusLevel, perform: { systemStatusLevel in
                         if (systemStatusLevel == .Active){
                             modelData.debugCabotSystemStatus(systemStatusFile: "system_ok.json")
+                            modelData.touchStatus.level = .Touching
                         }else{
                             modelData.debugCabotSystemStatus(systemStatusFile: "system_error.json")
                         }
@@ -628,6 +610,7 @@ struct SettingMenus: View {
                     }.onChange(of: modelData.debugDeviceStatusLevel, perform: { deviceStatusLevel in
                         if (deviceStatusLevel == .OK){
                             modelData.debugCabotDeviceStatus(systemStatusFile: "device_ok.json")
+                            modelData.touchStatus.level = .NoTouch
                         }else{
                             modelData.debugCabotDeviceStatus(systemStatusFile: "device_error.json")
                         }
