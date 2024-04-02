@@ -139,6 +139,7 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
     private let arrivedSoundKey = "arrivedSoundKey"
     private let speedUpSoundKey = "speedUpSoundKey"
     private let speedDownSoundKey = "speedDownSoundKey"
+    private let obstacleAheadSoundKey = "obstacleAheadSoundKey"
     private let browserCloseDelayKey = "browserCloseDelayKey"
     private let enableSubtourOnHandleKey = "enableSubtourOnHandleKey"
     private let showContentWhenArriveKey = "showContentWhenArriveKey"
@@ -188,6 +189,12 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
     @Published var speedDownSound: String = "/System/Library/Audio/UISounds/nano/ET_RemoteTap_Receive_Haptic.caf" {
         didSet {
             UserDefaults.standard.setValue(speedDownSound, forKey: speedDownSoundKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
+    @Published var obstacleAheadSound: String = "/System/Library/Audio/UISounds/nano/Alert_SpartanConnected_LowLatency_Haptic.caf" {
+        didSet {
+            UserDefaults.standard.setValue(obstacleAheadSound, forKey: obstacleAheadSoundKey)
             UserDefaults.standard.synchronize()
         }
     }
@@ -1045,12 +1052,16 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func cabot(service: any CaBotTransportProtocol, soundRequest: String) {
+        NSLog("\"\(soundRequest)\" is received")
         switch(soundRequest) {
         case "SpeedUp":
             playAudio(file: detailSettingModel.speedUpSound)
             break
         case "SpeedDown":
             playAudio(file: detailSettingModel.speedDownSound)
+            break
+        case "OBSTACLE_AHEAD":
+            playAudio(file: detailSettingModel.obstacleAheadSound)
             break
         default:
             NSLog("\"\(soundRequest)\" is unknown sound")
