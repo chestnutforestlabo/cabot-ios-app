@@ -535,6 +535,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if let isTTSEnabled = UserDefaults.standard.value(forKey: isTTSEnabledKey) as? Bool {
             self.isTTSEnabledForAdvanced = isTTSEnabled
         }
+        if let speechPriorityString = UserDefaults.standard.value(forKey: speechPriorityKey) as? String {
+            if let speechPriority = SpeechPriority(rawValue: speechPriorityString) {
+                self.speechPriority = speechPriority
+            }
+        }
 
         // services
         self.locationManager.delegate = self
