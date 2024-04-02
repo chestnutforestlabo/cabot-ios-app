@@ -58,6 +58,7 @@
 "You can proceed to %@ by pressing the right button of the suitcase handle. "="You can proceed to %@ by pressing the right button of the suitcase handle. ";
 "Or by pressing the center button to proceed a subtour %@."="Or by pressing the center button to proceed a subtour %@.";
 "Press the center button to proceed a subtour %@."="Press the center button to proceed a subtour %@.";
+"PRESS_RIGHT_BUTTON"="Please press the right button to go to the next destination.";
 
 
 // RootView

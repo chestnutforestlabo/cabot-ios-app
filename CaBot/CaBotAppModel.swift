@@ -1131,7 +1131,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             }
             break
         case .pushbutton:
-            self.speak("test"){}
+            var announce = CustomLocalizedString("PRESS_RIGHT_BUTTON", lang: self.resourceLang)
+            self.speak(announce){}
             break
         }
     }
