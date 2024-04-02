@@ -273,7 +273,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
     }
     func checkOnboardCondition() {
-        if self.bluetoothState == .poweredOn || self.bluetoothState == .poweredOff &&
+        if (self.bluetoothState == .poweredOn || self.bluetoothState == .poweredOff) &&
             self.notificationState != .Init &&
             self.locationState != .Init
             {
