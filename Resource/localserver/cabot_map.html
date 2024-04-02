@@ -43,7 +43,13 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
 </body>
 
 <script>
-
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const ip = urlParams.get('ip');
+        const url = `ws://${ip}:9091`;
+        msg.innerText = "connecting to "+url;
+        connection(url)
+    }
     /**
     * Setup all visualization elements when the page is loaded.
     */
@@ -89,13 +95,13 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
     function topicInit(ros) {
 
         // Create the main viewer.
-        var viewer = new ROS3D.Viewer({
+        viewer = new ROS3D.Viewer({
             divID : 'map',
             width : window.innerWidth,
             height : window.innerHeight,
             background : '#808080',
             antialias : true,
-            cameraPose : {x: 0, y: -1, z: 150}
+            cameraPose : {x: 0, y: 1, z: 150}
         })
 
         // Setup the marker client.
@@ -156,6 +162,9 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
             shaftDiameter : 0.5,
             headDiameter : 1.5
         });
+        pose.onMessage = function(message) {
+            //console.log(message.pose.position.x, message.pose.position.y)
+        }
 
         // Setup the marker client.
         var people = new ROS3D.People({

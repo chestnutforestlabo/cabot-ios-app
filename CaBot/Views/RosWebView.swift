@@ -64,16 +64,21 @@ struct LocalWebView: UIViewRepresentable {
     var port: String
     @State var primaryIP = true
     @Binding var reload: Bool
-
-    private let webView = WKWebView()
     
     fileprivate func loadRequest(in webView: WKWebView) {
         
-        if let htmlPath = Bundle.main.path(forResource: "Resource/localserver/cabot_map", ofType: "html"),
-           let baseUrl = Bundle.main.resourceURL?.appendingPathComponent("Resource/localserver") {
+        if let htmlPath = Bundle.main.url(forResource: "Resource/localserver/cabot_map", withExtension: "html"),
+           let baseUrl = Bundle.main.resourceURL?.appendingPathComponent("Resource/localserver"),
+           let primaryAddr = primaryAddr {
             do {
-                let htmlString = try NSString(contentsOfFile: htmlPath, encoding: String.Encoding.utf8.rawValue)
-                webView.loadHTMLString(htmlString as String, baseURL: baseUrl)
+                var components = URLComponents(url: htmlPath, resolvingAgainstBaseURL: false)
+                components?.query = "ip="+primaryAddr
+                if let queryURL = components?.url {
+                    webView.loadFileURL(queryURL, allowingReadAccessTo: baseUrl)
+                }
+
+                //let htmlString = try NSString(contentsOfFile: htmlPath, encoding: String.Encoding.utf8.rawValue)
+                //webView.loadHTMLString(htmlString as String, baseURL: baseUrl)
             } catch {
             }
             webView.isOpaque = false
@@ -82,6 +87,7 @@ struct LocalWebView: UIViewRepresentable {
     }
     
     func makeUIView(context: UIViewRepresentableContext<LocalWebView>) -> WKWebView {
+        let webView = WKWebView()
         UIApplication.shared.isIdleTimerDisabled = true
         webView.navigationDelegate = context.coordinator
         webView.configuration.userContentController.add(context.coordinator, name: "callbackHandler")
@@ -161,6 +167,7 @@ struct LocalWebView: UIViewRepresentable {
 
         let jsString = String(format: "connection(\'ws://%@:%@\');", addr, self.port)
         NSLog(jsString)
+        /*
         self.webView.evaluateJavaScript(jsString) { value, error in
             if let value = value as? String {
                 NSLog("value: " + value)
@@ -168,7 +175,7 @@ struct LocalWebView: UIViewRepresentable {
             if let error = error?.localizedDescription as? String {
                 NSLog("error: " + error)
             }
-        }
+        }*/
     }
 }
 

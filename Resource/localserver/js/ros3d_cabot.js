@@ -106,7 +106,10 @@ ROS3D.PoseLog.prototype.processMessage = function(message){
 
   this.rootObject.position.x =  -(message.pose.position.x + correction.x);
   this.rootObject.position.y =  -(message.pose.position.y + correction.y);
-
+    
+  if (this.onMessage) {
+     this.onMessage(message);
+  }
 };
 
 
