@@ -459,6 +459,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private var tcpService: CaBotServiceTCP
     private var fallbackService: FallbackService
     private let tts: CaBotTTS
+    private var willSpeakingArrivemessage: Bool = false
+    private var touchStartTime: CFAbsoluteTime = 0
+    private var annoucneToPushRightButtonTime: CFAbsoluteTime = 0
+    private var isFirstAnnounceToPushRightButton: Bool = false
     private var lastUpdated: Int64 = 0
     let logList: LogReportModel = LogReportModel()
     let preview: Bool
@@ -864,7 +868,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func needToStartAnnounce(wait: Bool) {
         let delay = wait ? self.detailSettingModel.browserCloseDelay : 0
-
+        self.annoucneToPushRightButtonTime = CFAbsoluteTimeGetCurrent()
+        self.isFirstAnnounceToPushRightButton = true
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             self.speak(CustomLocalizedString("You can proceed by pressing the right button of the suitcase handle", lang: self.resourceLang)) {
             }
@@ -1080,6 +1085,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         case .next:
             if tourManager.proceedToNextDestination() {
                 self.playAudio(file: self.detailSettingModel.startSound)
+                self.willSpeakingArrivemessage = true
             }else {
                 self.speak(CustomLocalizedString("No destination is selected", lang: self.resourceLang)) {
                 }
@@ -1102,6 +1108,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     }
                     if let next = tourManager.nextDestination {
                         announce += CustomLocalizedString("You can proceed to %@ by pressing the right button of the suitcase handle. ", lang: self.resourceLang, next.title.pron)
+                        self.annoucneToPushRightButtonTime = CFAbsoluteTimeGetCurrent()
+                        self.isFirstAnnounceToPushRightButton = true
                         if let subtour = cd.subtour,
                            tourManager.setting.enableSubtourOnHandle {
                             announce += CustomLocalizedString("Or by pressing the center button to proceed a subtour %@.", lang: self.resourceLang, subtour.introduction.pron)
@@ -1124,6 +1132,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                                 self.open(content: contentURL)
                             }
                         }
+                        self.willSpeakingArrivemessage = false
                     }
                 }
             }
@@ -1185,7 +1194,25 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
     
     func cabot(service: any CaBotTransportProtocol, touchStatus: TouchStatus) -> Void {
+        let prevTouchStatus = self.touchStatus
         self.touchStatus = touchStatus
+        if CFAbsoluteTimeGetCurrent() - self.annoucneToPushRightButtonTime > 30{
+            self.isFirstAnnounceToPushRightButton = false
+        }
+        if self.touchStatus.level == .Touching {
+            if prevTouchStatus.level != .Touching {
+                touchStartTime = CFAbsoluteTimeGetCurrent()
+            } else if CFAbsoluteTimeGetCurrent() - self.touchStartTime > 3{
+                if self.isFirstAnnounceToPushRightButton == false && self.willSpeakingArrivemessage == false{
+                    if tourManager.hasDestination {
+                        var announce = CustomLocalizedString("PRESS_RIGHT_BUTTON", lang: self.resourceLang)
+                        self.speak(announce){}
+                        self.annoucneToPushRightButtonTime = CFAbsoluteTimeGetCurrent()
+                        self.isFirstAnnounceToPushRightButton = true
+                    }
+                }
+            }
+        }
     }
     
     func cabot(service: any CaBotTransportProtocol, logList: [LogEntry], status: CaBotLogStatus) {
