@@ -227,6 +227,21 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
     }
 }
 
+class AddressCandidate {
+    let addresses: [String]
+    private var index:Int = 1
+    init(addresses: [String]) {
+        self.addresses = addresses
+    }
+    func getCurrent() -> String {
+        addresses[index % addresses.count]
+    }
+    func getNext() -> String {
+        index += 1
+        return getCurrent()
+    }
+}
+
 final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, TourManagerDelegate, CLLocationManagerDelegate, CaBotTTSDelegate, LogReportModelDelegate, UNUserNotificationCenterDelegate{
     private let DEFAULT_LANG = "en"
     
@@ -403,12 +418,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         didSet {
             UserDefaults.standard.setValue(primaryAddr, forKey: primaryAddrKey)
             UserDefaults.standard.synchronize()
+            updateNetworkConfig()
         }
     }
     @Published var secondaryAddr: String = "" {
         didSet {
             UserDefaults.standard.setValue(secondaryAddr, forKey: secondaryAddrKey)
             UserDefaults.standard.synchronize()
+            updateNetworkConfig()
         }
     }
     let socketPort: String = "5000"
@@ -453,6 +470,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var batteryStatus: BatteryStatus = BatteryStatus()
     @Published var userInfo: UserInfoBuffer = UserInfoBuffer()
 
+    private var addressCandidate: AddressCandidate
     private var bleService: CaBotServiceBLE
     private var tcpService: CaBotServiceTCP
     private var fallbackService: FallbackService
@@ -502,6 +520,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             fallbackService.select(service: tcpService)
         }
         self.connectionType = connectionType
+        self.addressCandidate = AddressCandidate(addresses: [""])  // dummy
         super.init()
 
         self.tts.delegate = self
@@ -523,6 +542,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if let secondaryAddr = UserDefaults.standard.value(forKey: secondaryAddrKey) as? String{
             self.secondaryAddr = secondaryAddr
         }
+        updateNetworkConfig()
         if let menuDebug = UserDefaults.standard.value(forKey: menuDebugKey) as? Bool {
             self.menuDebug = menuDebug
         }
@@ -548,10 +568,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.bleService.delegate = self
         self.bleService.startIfAuthorized()
 
-        self.tcpService.updateAddr(addr: self.primaryAddr, port: socketPort)
-        self.tcpService.updateAddr(addr: self.secondaryAddr, port: socketPort, secondary: true)
         self.tcpService.delegate = self
-        self.tcpService.start()
+        self.tcpService.start(addressCandidate: addressCandidate, port: socketPort)
 
         self.notificationCenter.getNotificationSettings { settings in
             if settings.alertSetting == .enabled &&
@@ -566,6 +584,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
         // Error/Warning Notification
         self.notificationCenter.delegate = self
+    }
+
+    func updateNetworkConfig() {
+        self.addressCandidate = AddressCandidate(addresses: [primaryAddr, secondaryAddr])
+    }
+
+    func getCurrentAddress() -> String {
+        self.addressCandidate.getCurrent()
     }
 
     func onChange(of newScenePhase: ScenePhase) {
@@ -692,10 +718,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func tcpServiceRestart() {
-        self.tcpService.updateAddr(addr: self.primaryAddr, port: socketPort)
-        self.tcpService.updateAddr(addr: self.secondaryAddr, port: socketPort, secondary: true)
         if !self.tcpService.isSocket() {
-            self.tcpService.start()
+           self.tcpService.start(addressCandidate: addressCandidate, port: socketPort)
         }
     }
  

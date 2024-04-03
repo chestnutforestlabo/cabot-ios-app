@@ -26,8 +26,7 @@ import SocketIO
 
 class CaBotServiceTCP: NSObject {
     fileprivate var tts:CaBotTTS
-    fileprivate var primaryAddr: String?
-    fileprivate var secondaryAddr: String?
+    fileprivate var address: String?
     fileprivate var port: String?
     fileprivate var manager: SocketManager?
     fileprivate var socket: SocketIOClient?
@@ -60,20 +59,9 @@ class CaBotServiceTCP: NSObject {
             timeoutTimer.invalidate()
         }
     }
-
-    func updateAddr(addr: String, port: String, secondary: Bool = false) {
-        if secondary {
-            guard self.secondaryAddr != addr else { return }
-            self.secondaryAddr = addr
-        } else {
-            guard self.primaryAddr != addr else { return }
-            self.primaryAddr = addr
-        }
-        self.port = port
-    }
     
     func stop(){
-        NSLog("stopping TCP \(getAddr())")
+        NSLog("stopping TCP \(address)")
         self.connected = false
         DispatchQueue.main.async {
             self.delegate?.caBot(service: self, centralConnected: self.connected)
@@ -92,14 +80,16 @@ class CaBotServiceTCP: NSObject {
         }
         self.socket = nil
         self.stopHeartBeat()
-        self.changeURL()
     }
 
-    func start() {
+    func start(addressCandidate: AddressCandidate, port:String) {
+        self.address = addressCandidate.getCurrent()
+        self.port = port
         DispatchQueue.global(qos: .utility).async {
             let timeoutTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] (timer) in
                 guard let weakself = self else { return }
                 if weakself.socket == nil {
+                    weakself.address = addressCandidate.getNext()
                     weakself.connectToServer()
                 }
             }
@@ -110,13 +100,14 @@ class CaBotServiceTCP: NSObject {
     var last_data_received_time: TimeInterval = 0
      
     private func connectToServer() {
-        let addr = getAddr()
-        NSLog("connecting to TCP \(addr)")
-        guard !addr.isEmpty else { return }
-        guard let port = self.port else { return }
+        guard let address = address else { return }
+        guard !address.isEmpty else { return }
+        guard let port = port else { return }
+        guard !port.isEmpty else { return }
 
-        let socketURL = "ws://" + addr + ":" + port + "/cabot"
+        let socketURL = "ws://" + address + ":" + port + "/cabot"
         guard let url = URL(string: socketURL) else { return }
+        NSLog("connecting to TCP \(url)")
 
         let manager = SocketManager(socketURL: url, config: [.log(false), .compress, .reconnects(true), .reconnectWait(1), .reconnectAttempts(-1)])
         self.manager = manager
@@ -256,52 +247,6 @@ class CaBotServiceTCP: NSObject {
             guard let delegate = weakself.delegate else { return }
             weakself.stop()
         }
-    }
-
-    private func changeURL() {
-        if let primaryAddr = self.primaryAddr,
-           !primaryAddr.isEmpty,
-           let secondaryAddr = self.secondaryAddr,
-           !secondaryAddr.isEmpty {
-            self.primaryIP = !self.primaryIP
-        }
-    }
-
-    private func getAddr() -> String {
-        let primaryAddr = self.getPrimaryAddr()
-        let secondaryAddr = self.getSecondaryAddr()
-
-        let addr = self.primaryIP ? primaryAddr : secondaryAddr
-        if !addr.isEmpty {
-            return addr
-        }
-
-        if !primaryAddr.isEmpty {
-            self.primaryIP = true
-            return primaryAddr
-        } else if !secondaryAddr.isEmpty {
-            self.primaryIP = false
-            return secondaryAddr
-        }
-
-        self.stop()
-        return ""
-    }
-
-    private func getPrimaryAddr() -> String {
-        if let primaryAddr = self.primaryAddr,
-           !primaryAddr.isEmpty {
-            return primaryAddr
-        }
-        return ""
-    }
-
-    private func getSecondaryAddr() -> String {
-        if let secondaryAddr = self.secondaryAddr,
-           !secondaryAddr.isEmpty {
-            return secondaryAddr
-        }
-        return ""
     }
 
     var heartBeatTimer:Timer? = nil

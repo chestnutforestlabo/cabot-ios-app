@@ -25,14 +25,13 @@ import WebKit
 
 struct RosWebView: View {
 
-    var primaryAddr: String?
-    var secondaryAddr: String?
+    var address: String
     var port: String
     @State private var shouldRefresh = false
 
     var body: some View {
         VStack {
-            LocalWebView(primaryAddr: primaryAddr, secondaryAddr: secondaryAddr, port: port, reload: $shouldRefresh)
+            LocalWebView(address: address, port: port, reload: $shouldRefresh)
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -53,32 +52,26 @@ struct RosWebView: View {
 
 struct RosWebView_Previews: PreviewProvider {
     static var previews: some View {
-        RosWebView(primaryAddr: "", secondaryAddr: "", port: "")
+        RosWebView(address: "", port: "")
     }
 }
 
 struct LocalWebView: UIViewRepresentable {
     
-    var primaryAddr: String?
-    var secondaryAddr: String?
+    var address: String
     var port: String
-    @State var primaryIP = true
     @Binding var reload: Bool
     
     fileprivate func loadRequest(in webView: WKWebView) {
         
         if let htmlPath = Bundle.main.url(forResource: "Resource/localserver/cabot_map", withExtension: "html"),
-           let baseUrl = Bundle.main.resourceURL?.appendingPathComponent("Resource/localserver"),
-           let primaryAddr = primaryAddr {
+           let baseUrl = Bundle.main.resourceURL?.appendingPathComponent("Resource/localserver") {
             do {
                 var components = URLComponents(url: htmlPath, resolvingAgainstBaseURL: false)
-                components?.query = "ip="+primaryAddr
+                components?.query = "ip=" + address + "&port=" + port
                 if let queryURL = components?.url {
                     webView.loadFileURL(queryURL, allowingReadAccessTo: baseUrl)
                 }
-
-                //let htmlString = try NSString(contentsOfFile: htmlPath, encoding: String.Encoding.utf8.rawValue)
-                //webView.loadHTMLString(htmlString as String, baseURL: baseUrl)
             } catch {
             }
             webView.isOpaque = false
@@ -107,76 +100,7 @@ struct LocalWebView: UIViewRepresentable {
     func makeCoordinator() -> Coordinator {
         return Coordinator(self)
     }
-    
-    func setTimer() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0,
-                                      execute: {
-            changeURL()
-        })
-    }
-    
-    func changeURL() {
-        if let primaryAddr = self.primaryAddr,
-           !primaryAddr.isEmpty,
-           let secondaryAddr = self.secondaryAddr,
-           !secondaryAddr.isEmpty {
-            self.primaryIP = !self.primaryIP
-        }
-        connection()
-    }
 
-    private func getAddr() -> String {
-        let primaryAddr = self.getPrimaryAddr()
-        let secondaryAddr = self.getSecondaryAddr()
-
-        let addr = self.primaryIP ? primaryAddr : secondaryAddr
-        if !addr.isEmpty {
-            return addr
-        }
-
-        if !primaryAddr.isEmpty {
-            self.primaryIP = true
-            return primaryAddr
-        } else if !secondaryAddr.isEmpty {
-            self.primaryIP = false
-            return secondaryAddr
-        }
-
-        return ""
-    }
-
-    private func getPrimaryAddr() -> String {
-        if let primaryAddr = self.primaryAddr,
-           !primaryAddr.isEmpty {
-            return primaryAddr
-        }
-        return ""
-    }
-
-    private func getSecondaryAddr() -> String {
-        if let secondaryAddr = self.secondaryAddr,
-           !secondaryAddr.isEmpty {
-            return secondaryAddr
-        }
-        return ""
-    }
-
-    func connection() {
-        let addr = getAddr()
-        guard !addr.isEmpty else { return }
-
-        let jsString = String(format: "connection(\'ws://%@:%@\');", addr, self.port)
-        NSLog(jsString)
-        /*
-        self.webView.evaluateJavaScript(jsString) { value, error in
-            if let value = value as? String {
-                NSLog("value: " + value)
-            }
-            if let error = error?.localizedDescription as? String {
-                NSLog("error: " + error)
-            }
-        }*/
-    }
 }
 
 extension LocalWebView {
@@ -188,7 +112,6 @@ extension LocalWebView {
         }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            parent.connection()
         }
 
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -196,7 +119,6 @@ extension LocalWebView {
                 NSLog("\(message.body)")
                 if let body = message.body as? String {
                     if body.contains("connection closed") {
-                        parent.setTimer()
                     }
                 }
             }

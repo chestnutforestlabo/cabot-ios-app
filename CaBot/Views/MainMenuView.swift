@@ -488,13 +488,11 @@ struct MapMenus: View {
     @EnvironmentObject var modelData: CaBotAppModel
 
     var body: some View {
-        if modelData.modeType == .Advanced || modelData.modeType == .Debug{
+        if modelData.suitcaseConnected && (modelData.modeType == .Advanced || modelData.modeType == .Debug) {
             Section(header:Text("Map")) {
                 HStack {
                     NavigationLink(
-                        destination: RosWebView(primaryAddr: modelData.primaryAddr,
-                                                secondaryAddr: modelData.secondaryAddr,
-                                                port: modelData.rosPort),
+                        destination: RosWebView(address: modelData.getCurrentAddress(), port: modelData.rosPort),
                         label: {
                             Text("ROS Map")
                         })
