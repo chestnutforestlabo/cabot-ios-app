@@ -1135,10 +1135,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 self.fallbackService.manage(command: .lang, param: I18N.shared.langCode)
             }
             break
-        case .pushbutton:
-            var announce = CustomLocalizedString("PRESS_RIGHT_BUTTON", lang: self.resourceLang)
-            self.speak(announce){}
-            break
         }
     }
 
