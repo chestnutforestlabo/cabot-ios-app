@@ -98,15 +98,9 @@ ROS3D.PoseLog.prototype.processMessage = function(message){
   this.poses.push(node);
   this.rootObject.add(node);
 
-  var correction = new THREE.Vector3();
-  const sceneNode = this.rootObject.children.find(sceneNode => sceneNode.frameID == 'map_global');
-  if (sceneNode) {
-    correction =  sceneNode.position;
+  if (this.onMessage) {
+     this.onMessage(message.pose);
   }
-
-  this.rootObject.position.x =  -(message.pose.position.x + correction.x);
-  this.rootObject.position.y =  -(message.pose.position.y + correction.y);
-
 };
 
 

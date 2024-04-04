@@ -43,7 +43,13 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
 </body>
 
 <script>
-
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const ip = urlParams.get('ip');
+        const url = `ws://${ip}:9091`;
+        msg.innerText = "connecting to "+url;
+        connection(url)
+    }
     /**
     * Setup all visualization elements when the page is loaded.
     */
@@ -87,24 +93,29 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
     }
 
     function topicInit(ros) {
+        var firstTime = true;
 
         // Create the main viewer.
-        var viewer = new ROS3D.Viewer({
+        viewer = new ROS3D.Viewer({
             divID : 'map',
             width : window.innerWidth,
             height : window.innerHeight,
             background : '#808080',
             antialias : true,
-            cameraPose : {x: 0, y: -1, z: 150}
+            cameraPose : {x: 0, y: 1, z: 50}
         })
 
-        // Setup the marker client.
-        var gridClient = new ROS3D.OccupancyGridClient({
-            ros : ros,
-            rootObject : viewer.scene,
-            cntinuous: true,
-            compression : ' '
-        });
+        // setTimeout decrease issue other elements are not shown
+        setTimeout(function() {
+            // Setup the marker client.
+            var gridClient = new ROS3D.OccupancyGridClient({
+                ros : ros,
+                tfClient : tfClient,
+                rootObject : viewer.scene,
+                cntinuous: false,
+                compression : 'png'
+            });
+        }, 0);
 
         // Setup a client to listen to TFs.
         var tfClient = new ROSLIB.TFClient({
@@ -121,11 +132,18 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
             ros : ros,
             topic : '/scan',
             tfClient : tfClient,
-            compression : ' ',
+            compression : 'png',
             rootObject : viewer.scene,
             material : { size : 1, color : 0xff00ff }
         });
 
+        old = ROS3D.Path.prototype.processMessage;
+        ROS3D.Path.prototype.processMessage = (message) => {
+            message.poses.forEach((pose) => {
+                pose.pose.position.z = 1.0;
+            })
+            old.call(path, message);
+        }
         // Setup the marker client.
         var path = new ROS3D.Path({
             ros : ros,
@@ -147,6 +165,25 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
             shaftDiameter : 0.5,
             headDiameter : 1.5
         });
+
+        var map_global_map = null;
+        tfClient.subscribe("map_global", (tf) => {
+            map_global_map = tf;
+        })
+        pose.onMessage = function(msg) {
+            if (map_global_map) {
+                var tf = new ROSLIB.Transform(map_global_map);
+                var poseTransformed = new ROSLIB.Pose(msg);
+                poseTransformed.applyTransform(tf);
+                viewer.cameraControls.center.set(poseTransformed.position.x, poseTransformed.position.y, poseTransformed.position.z);
+                if (firstTime) {
+                    // set camera above the robot position
+                    // y - 5 stabilize camera orientation
+                    firstTime = false;
+                    viewer.camera.position.set(poseTransformed.position.x, poseTransformed.position.y - 5, 50);
+                }
+            }
+        }
 
         // Setup the marker client.
         var people = new ROS3D.People({
