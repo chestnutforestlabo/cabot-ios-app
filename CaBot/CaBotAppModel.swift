@@ -1306,6 +1306,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 traverseDest(src: src)
             }
         }
+        if userInfo.type == .Skip {
+            skipDestination()
+        }
     }
 
     func getSpeechPriority() -> SpeechPriority {
@@ -1644,6 +1647,9 @@ class UserInfoBuffer {
             // do nothing
             break
         case .OverrideDestination:
+            // do nothing
+            break
+        case .Skip:
             // do nothing
             break
         }

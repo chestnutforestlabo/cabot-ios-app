@@ -133,6 +133,17 @@ struct UserInfoView: View {
                     Image(systemName: "mappin.and.ellipse")
                 }
             }
+            if modelData.userInfo.nextDestination != "" {
+                Button(action: {
+                    modelData.share(user_info: SharedInfo(type: .Skip, value: ""))
+                }) {
+                    Label{
+                        Text("Skip Label \(modelData.userInfo.nextDestination)")
+                    } icon: {
+                        Image(systemName: "arrow.right.to.line")
+                    }
+                }
+            }
             if (modelData.userInfo.destinations.count > 1) {
                 NavigationLink(destination: UserInfoDestinations().environmentObject(modelData), label: {
                     HStack {
