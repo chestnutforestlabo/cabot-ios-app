@@ -192,7 +192,7 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
             UserDefaults.standard.synchronize()
         }
     }
-    @Published var obstacleAheadSound: String = "/System/Library/Audio/UISounds/nano/Alert_SpartanConnected_LowLatency_Haptic.caf" {
+    @Published var obstacleAheadSound: String = "/System/Library/Audio/UISounds/nano/MediaPaused.caf" {
         didSet {
             UserDefaults.standard.setValue(obstacleAheadSound, forKey: obstacleAheadSoundKey)
             UserDefaults.standard.synchronize()
