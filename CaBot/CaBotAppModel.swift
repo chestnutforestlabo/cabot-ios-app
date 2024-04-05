@@ -1088,7 +1088,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func cabot(service: any CaBotTransportProtocol, soundRequest: String) {
-        NSLog("\"\(soundRequest)\" is received")
         switch(soundRequest) {
         case "SpeedUp":
             playAudio(file: detailSettingModel.speedUpSound)
