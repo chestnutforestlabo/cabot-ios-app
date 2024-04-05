@@ -1219,7 +1219,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     
     func cabot(service: any CaBotTransportProtocol, touchStatus: TouchStatus) -> Void {
         let prevTouchStatus = self.touchStatus
-        self.touchStatus = touchStatus
+        if prevTouchStatus.level != touchStatus.level{
+            DispatchQueue.main.async {
+                self.touchStatus = touchStatus
+            }
+        }
         if CFAbsoluteTimeGetCurrent() - self.announceToPushRightButtonTime > 30{
             self.isFirstAnnounceToPushRightButton = false
         }

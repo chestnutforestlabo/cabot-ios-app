@@ -197,9 +197,7 @@ class CaBotServiceTCP: NSObject {
             guard let delegate = weakself.delegate else { return }
             do {
                 let status = try JSONDecoder().decode(TouchStatus.self, from: data)
-                DispatchQueue.main.async {
-                    delegate.cabot(service: weakself, touchStatus: status)
-                }
+                delegate.cabot(service: weakself, touchStatus: status)
             } catch {
                 print(text)
                 NSLog(error.localizedDescription)
