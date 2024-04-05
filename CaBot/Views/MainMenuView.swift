@@ -116,11 +116,32 @@ struct UserInfoView: View {
                 } else {
                     Text("PLACEHOLDER_DESTINATION_TITLE").foregroundColor(.gray)
                 }
+                if modelData.systemStatus.level == .Active{
+                    Spacer()
+                    HStack {
+                        Image(systemName: modelData.touchStatus.level.icon)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 24, height: 24)
+                    }
+                    .foregroundColor(modelData.touchStatus.level.color)
+                }
             } icon: {
                 if modelData.userInfo.currentDestination != "" {
                     Image(systemName: "arrow.triangle.turn.up.right.diamond")
                 } else {
                     Image(systemName: "mappin.and.ellipse")
+                }
+            }
+            if modelData.userInfo.nextDestination != "" {
+                Button(action: {
+                    modelData.share(user_info: SharedInfo(type: .Skip, value: ""))
+                }) {
+                    Label{
+                        Text("Skip Label \(modelData.userInfo.nextDestination)")
+                    } icon: {
+                        Image(systemName: "arrow.right.to.line")
+                    }
                 }
             }
             if (modelData.userInfo.destinations.count > 1) {
@@ -488,13 +509,11 @@ struct MapMenus: View {
     @EnvironmentObject var modelData: CaBotAppModel
 
     var body: some View {
-        if modelData.modeType == .Advanced || modelData.modeType == .Debug{
+        if modelData.suitcaseConnected && (modelData.modeType == .Advanced || modelData.modeType == .Debug) {
             Section(header:Text("Map")) {
                 HStack {
                     NavigationLink(
-                        destination: RosWebView(primaryAddr: modelData.primaryAddr,
-                                                secondaryAddr: modelData.secondaryAddr,
-                                                port: modelData.rosPort),
+                        destination: RosWebView(address: modelData.getCurrentAddress(), port: modelData.rosPort),
                         label: {
                             Text("ROS Map")
                         })
@@ -585,6 +604,7 @@ struct SettingMenus: View {
                     }.onChange(of: modelData.debugSystemStatusLevel, perform: { systemStatusLevel in
                         if (systemStatusLevel == .Active){
                             modelData.debugCabotSystemStatus(systemStatusFile: "system_ok.json")
+                            modelData.touchStatus.level = .Touching
                         }else{
                             modelData.debugCabotSystemStatus(systemStatusFile: "system_error.json")
                         }
@@ -599,6 +619,7 @@ struct SettingMenus: View {
                     }.onChange(of: modelData.debugDeviceStatusLevel, perform: { deviceStatusLevel in
                         if (deviceStatusLevel == .OK){
                             modelData.debugCabotDeviceStatus(systemStatusFile: "device_ok.json")
+                            modelData.touchStatus.level = .NoTouch
                         }else{
                             modelData.debugCabotDeviceStatus(systemStatusFile: "device_error.json")
                         }
@@ -613,8 +634,10 @@ struct SettingMenus: View {
 struct ContentView_Previews: PreviewProvider {
     
     static var previews: some View {
-        preview_normal
         preview_connected
+        preview_advanced_mode_stale
+        preview_advanced_mode_touch
+        preview_advanced_mode_no_touch
         preview_debug_mode
         //preview_tour
         //preview_tour2
@@ -622,29 +645,6 @@ struct ContentView_Previews: PreviewProvider {
         //preview_tour4
         //preview
         //preview_ja
-    }
-
-    static var preview_normal: some View {
-        let modelData = CaBotAppModel()
-        modelData.suitcaseConnectedBLE = true
-        modelData.suitcaseConnectedTCP = true
-        modelData.deviceStatus.level = .OK
-        modelData.systemStatus.level = .Inactive
-        modelData.systemStatus.summary = .Stale
-        modelData.versionMatchedBLE = true
-        modelData.versionMatchedTCP = true
-        modelData.serverBLEVersion = CaBotServiceBLE.CABOT_BLE_VERSION
-        modelData.serverTCPVersion = CaBotServiceBLE.CABOT_BLE_VERSION
-        modelData.modeType = .Normal
-
-        if let r = modelData.resourceManager.resource(by: "Test data") {
-            modelData.resource = r
-        }
-
-        return MainMenuView()
-            .environmentObject(modelData)
-            .environment(\.locale, .init(identifier: "en"))
-            .previewDisplayName("suitcase connected")
     }
 
     static var preview_connected: some View {
@@ -658,6 +658,7 @@ struct ContentView_Previews: PreviewProvider {
         modelData.versionMatchedTCP = true
         modelData.serverBLEVersion = CaBotServiceBLE.CABOT_BLE_VERSION
         modelData.serverTCPVersion = CaBotServiceBLE.CABOT_BLE_VERSION
+        modelData.modeType = .Normal
 
         if let r = modelData.resourceManager.resource(by: "Test data") {
             modelData.resource = r
@@ -694,6 +695,93 @@ struct ContentView_Previews: PreviewProvider {
         return MainMenuView()
             .environmentObject(modelData)
             .previewDisplayName("debug mode")
+
+    }
+
+    static var preview_advanced_mode_no_touch: some View {
+        let modelData = CaBotAppModel(preview: true)
+        modelData.suitcaseConnected = true
+        modelData.suitcaseConnectedBLE = true
+        modelData.suitcaseConnectedTCP = true
+        modelData.deviceStatus.level = .OK
+        modelData.systemStatus.level = .Active
+        modelData.systemStatus.summary = .Stale
+        modelData.versionMatchedBLE = true
+        modelData.versionMatchedTCP = true
+        modelData.serverBLEVersion = CaBotServiceBLE.CABOT_BLE_VERSION
+        modelData.serverTCPVersion = CaBotServiceBLE.CABOT_BLE_VERSION
+        modelData.modeType = .Advanced
+        modelData.menuDebug = true
+        modelData.touchStatus.level = .NoTouch
+
+        let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
+            .appendingPathComponent("system_ok.json")
+        let fm = FileManager.default
+        let data = fm.contents(atPath: path.path)!
+        let status = try! JSONDecoder().decode(SystemStatus.self, from: data)
+        modelData.systemStatus.update(with: status)
+
+        return MainMenuView()
+            .environmentObject(modelData)
+            .previewDisplayName("advanced - no touch")
+
+    }
+
+    static var preview_advanced_mode_stale: some View {
+        let modelData = CaBotAppModel(preview: true)
+        modelData.suitcaseConnected = true
+        modelData.suitcaseConnectedBLE = true
+        modelData.suitcaseConnectedTCP = true
+        modelData.deviceStatus.level = .OK
+        modelData.systemStatus.level = .Inactive
+        modelData.systemStatus.summary = .Stale
+        modelData.versionMatchedBLE = true
+        modelData.versionMatchedTCP = true
+        modelData.serverBLEVersion = CaBotServiceBLE.CABOT_BLE_VERSION
+        modelData.serverTCPVersion = CaBotServiceBLE.CABOT_BLE_VERSION
+        modelData.modeType = .Advanced
+        modelData.menuDebug = true
+        modelData.touchStatus.level = .Stale
+
+        let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
+            .appendingPathComponent("system_ok.json")
+        let fm = FileManager.default
+        let data = fm.contents(atPath: path.path)!
+        let status = try! JSONDecoder().decode(SystemStatus.self, from: data)
+        modelData.systemStatus.update(with: status)
+
+        return MainMenuView()
+            .environmentObject(modelData)
+            .previewDisplayName("advanced - stale")
+
+    }
+
+    static var preview_advanced_mode_touch: some View {
+        let modelData = CaBotAppModel(preview: true)
+        modelData.suitcaseConnected = true
+        modelData.suitcaseConnectedBLE = true
+        modelData.suitcaseConnectedTCP = true
+        modelData.deviceStatus.level = .OK
+        modelData.systemStatus.level = .Active
+        modelData.systemStatus.summary = .Stale
+        modelData.versionMatchedBLE = true
+        modelData.versionMatchedTCP = true
+        modelData.serverBLEVersion = CaBotServiceBLE.CABOT_BLE_VERSION
+        modelData.serverTCPVersion = CaBotServiceBLE.CABOT_BLE_VERSION
+        modelData.modeType = .Advanced
+        modelData.menuDebug = true
+        modelData.touchStatus.level = .Touching
+
+        let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
+            .appendingPathComponent("system_ok.json")
+        let fm = FileManager.default
+        let data = fm.contents(atPath: path.path)!
+        let status = try! JSONDecoder().decode(SystemStatus.self, from: data)
+        modelData.systemStatus.update(with: status)
+
+        return MainMenuView()
+            .environmentObject(modelData)
+            .previewDisplayName("advanced - touch")
 
     }
 

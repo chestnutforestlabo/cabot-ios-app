@@ -112,6 +112,7 @@ class TourManager: TourProtocol {
             _destinations.append(d)
         }
         delegate?.tourUpdated(manager: self)
+        delegate?.tour(manager: self, destinationChanged: nil)
     }
 
     func cannotStartCurrent() {

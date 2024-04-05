@@ -43,6 +43,7 @@ struct SharedInfo: Codable {
         // Advanced / Debug -> Normal
         case OverrideTour
         case OverrideDestination
+        case Skip
     }
     init(type: InfoType, value: String, flag1: Bool = false, flag2: Bool = false, location: Int = 0, length: Int = 0) {
         self.type = type
@@ -85,6 +86,7 @@ protocol CaBotServiceDelegate {
     func cabot(service:any CaBotTransportProtocol, deviceStatus:DeviceStatus)
     func cabot(service:any CaBotTransportProtocol, systemStatus:SystemStatus)
     func cabot(service:any CaBotTransportProtocol, batteryStatus:BatteryStatus)
+    func cabot(service:any CaBotTransportProtocol, touchStatus:TouchStatus)
     func cabot(service:any CaBotTransportProtocol, logList:[LogEntry], status: CaBotLogStatus)
     func cabot(service:any CaBotTransportProtocol, logDetail:LogEntry)
     func cabot(service:any CaBotTransportProtocol, userInfo:SharedInfo)
@@ -350,6 +352,41 @@ struct NavigationEventRequest: Decodable {
     var request_id: Int64
     var type: NavigationEventType = .unknown
     var param: String = ""
+}
+
+struct TouchStatus: Decodable {
+    init(){
+        level = .Stale
+    }
+    var level: TouchLevel
+}
+
+enum TouchLevel: Int, Decodable {
+    case Stale = -1
+    case NoTouch = 0
+    case Touching = 1
+    
+    var icon: String {
+        switch (self) {
+        case .Stale:
+            return "xmark.circle"
+        case .NoTouch:
+            return "hand.raised.slash"
+        case .Touching:
+            return "hand.raised"
+        }
+    }
+
+    var color: Color? {
+        switch (self) {
+        case .Stale:
+            return Color.red
+        case .NoTouch:
+            return Color.gray
+        case .Touching:
+            return Color.green
+        }
+    }
 }
 
 enum CaBotLogStatus:String, Decodable {
