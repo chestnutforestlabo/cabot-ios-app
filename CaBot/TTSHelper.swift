@@ -53,7 +53,7 @@ class CaBotTTS : TTSProtocol{
         self._tts.reset()
     }
 
-    func speak(_ text: String?, forceSelfvoice: Bool, force: Bool, callback: @escaping (Int32) -> Void) {
+    func speak(_ text: String?, forceSelfvoice: Bool, force: Bool, callback: @escaping (Int32) -> Void, progress: ((NSRange) -> Void)? = nil) {
         guard self.delegate?.getModeType() == .Normal else { return }
         let isForeground = UIApplication.shared.applicationState == .active
         let isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
@@ -82,6 +82,9 @@ class CaBotTTS : TTSProtocol{
                 self.delegate?.share(user_info: SharedInfo(type: .SpeakProgress, value: text, flag1: true, flag2: voiceover, length: Int(code)))
             }
         }, progressHandler: { range in
+            if let progress = progress{
+                progress(range)
+            }
             if let text = text {
                 //print(range)
                 self.delegate?.share(user_info: SharedInfo(type: .SpeakProgress, value: text, location: range.location, length: range.length))

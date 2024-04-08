@@ -484,10 +484,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private var tcpService: CaBotServiceTCP
     private var fallbackService: FallbackService
     private let tts: CaBotTTS
-    private var willSpeakingArriveMessage: Bool = false
+    private var willSpeakArriveMessage: Bool = false
     private var touchStartTime: CFAbsoluteTime = 0
     private var announceToPushRightButtonTime: CFAbsoluteTime = 0
-    private var isFirstAnnounceToPushRightButton: Bool = false
+    private var shouldNoAnnounceToPushRightButton: Bool = false
     private var lastUpdated: Int64 = 0
     let logList: LogReportModel = LogReportModel()
     let preview: Bool
@@ -745,7 +745,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     func share(user_info: SharedInfo) {
         _ = self.fallbackService.share(user_info: user_info)
     }
-    
+
     // MARK: LogReportModelDelegate
     
     func refreshLogList() {
@@ -900,7 +900,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     func needToStartAnnounce(wait: Bool) {
         let delay = wait ? self.detailSettingModel.browserCloseDelay : 0
         self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent()
-        self.isFirstAnnounceToPushRightButton = true
+        self.shouldNoAnnounceToPushRightButton = true
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             self.speak(CustomLocalizedString("You can proceed by pressing the right button of the suitcase handle", lang: self.resourceLang)) {
             }
@@ -982,7 +982,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     var delay = self.tts.isSpeaking ? 1.0 : 0
 
                     self.stopSpeak()
-
                     if self.isContentPresenting {
                         self.isContentPresenting = false
                         delay = self.detailSettingModel.browserCloseDelay
@@ -994,11 +993,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     // wait 1.0 ~ 2.0 seconds if browser was open.
                     // hopefully closing browser and reading the content by voice over will be ended by then
                     DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                        self.willSpeakArriveMessage = true
                         let announce = CustomLocalizedString("Going to %@", lang: self.resourceLang, dest.title.pron)
                             + (dest.startMessage?.content ?? "")
-
-                        self.speak(announce){
-                        }
+                        self.tts.speak(announce, forceSelfvoice: false, force: false, callback: {code in }, progress: {range in
+                            if range.location == 0{
+                                self.willSpeakArriveMessage = true
+                            }
+                        })
                     }
                 }
                 self.activityLog(category: "destination-text", text: dest.title.text, memo: dest.title.pron)
@@ -1106,6 +1108,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     func cabot(service: any CaBotTransportProtocol, notification: NavigationNotification) {
         switch(notification){
         case .subtour:
+            self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent() - 20
+            self.shouldNoAnnounceToPushRightButton = true
             if tourManager.setting.enableSubtourOnHandle {
                 if let ad = tourManager.arrivedDestination,
                    let subtour = ad.subtour {
@@ -1117,9 +1121,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             }
             break
         case .next:
+            self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent() - 20
+            self.shouldNoAnnounceToPushRightButton = true
             if tourManager.proceedToNextDestination() {
                 self.playAudio(file: self.detailSettingModel.startSound)
-                self.willSpeakingArriveMessage = true
             }else {
                 self.speak(CustomLocalizedString("No destination is selected", lang: self.resourceLang)) {
                 }
@@ -1143,7 +1148,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     if let next = tourManager.nextDestination {
                         announce += CustomLocalizedString("You can proceed to %@ by pressing the right button of the suitcase handle. ", lang: self.resourceLang, next.title.pron)
                         self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent()
-                        self.isFirstAnnounceToPushRightButton = true
+                        self.shouldNoAnnounceToPushRightButton = true
                         if let subtour = cd.subtour,
                            tourManager.setting.enableSubtourOnHandle {
                             announce += CustomLocalizedString("Or by pressing the center button to proceed a subtour %@.", lang: self.resourceLang, subtour.introduction.pron)
@@ -1166,7 +1171,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                                 self.open(content: contentURL)
                             }
                         }
-                        self.willSpeakingArriveMessage = false
+                        self.willSpeakArriveMessage = false
                     }
                 }
             }
@@ -1235,18 +1240,18 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             }
         }
         if CFAbsoluteTimeGetCurrent() - self.announceToPushRightButtonTime > 30{
-            self.isFirstAnnounceToPushRightButton = false
+            self.shouldNoAnnounceToPushRightButton = false
         }
         if self.touchStatus.level == .Touching {
             if prevTouchStatus.level != .Touching {
                 touchStartTime = CFAbsoluteTimeGetCurrent()
             } else if CFAbsoluteTimeGetCurrent() - self.touchStartTime > 3{
-                if self.isFirstAnnounceToPushRightButton == false && self.willSpeakingArriveMessage == false{
+                if self.shouldNoAnnounceToPushRightButton == false && self.willSpeakArriveMessage == false{
                     if tourManager.hasDestination {
-                        var announce = CustomLocalizedString("PRESS_RIGHT_BUTTON", lang: self.resourceLang)
+                        let announce = CustomLocalizedString("PRESS_RIGHT_BUTTON", lang: self.resourceLang)
                         self.speak(announce){}
                         self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent()
-                        self.isFirstAnnounceToPushRightButton = true
+                        self.shouldNoAnnounceToPushRightButton = true
                     }
                 }
             }
