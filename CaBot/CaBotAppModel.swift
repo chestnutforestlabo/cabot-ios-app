@@ -139,6 +139,7 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
     private let arrivedSoundKey = "arrivedSoundKey"
     private let speedUpSoundKey = "speedUpSoundKey"
     private let speedDownSoundKey = "speedDownSoundKey"
+    private let obstacleAheadSoundKey = "obstacleAheadSoundKey"
     private let browserCloseDelayKey = "browserCloseDelayKey"
     private let enableSubtourOnHandleKey = "enableSubtourOnHandleKey"
     private let showContentWhenArriveKey = "showContentWhenArriveKey"
@@ -191,6 +192,12 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
             UserDefaults.standard.synchronize()
         }
     }
+    @Published var obstacleAheadSound: String = "/System/Library/Audio/UISounds/nano/MediaPaused.caf" {
+        didSet {
+            UserDefaults.standard.setValue(obstacleAheadSound, forKey: obstacleAheadSoundKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
     
     @Published var browserCloseDelay: Double = 1.2 {
         didSet {
@@ -224,6 +231,21 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
                 print("\(error)")
             }
         }
+    }
+}
+
+class AddressCandidate {
+    let addresses: [String]
+    private var index:Int = 1
+    init(addresses: [String]) {
+        self.addresses = addresses
+    }
+    func getCurrent() -> String {
+        addresses[index % addresses.count]
+    }
+    func getNext() -> String {
+        index += 1
+        return getCurrent()
     }
 }
 
@@ -374,6 +396,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 self.deviceStatus = DeviceStatus()
                 self.systemStatus.clear()
                 self.batteryStatus = BatteryStatus()
+                self.touchStatus = TouchStatus()
             }
         }
     }
@@ -403,12 +426,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         didSet {
             UserDefaults.standard.setValue(primaryAddr, forKey: primaryAddrKey)
             UserDefaults.standard.synchronize()
+            updateNetworkConfig()
         }
     }
     @Published var secondaryAddr: String = "" {
         didSet {
             UserDefaults.standard.setValue(secondaryAddr, forKey: secondaryAddrKey)
             UserDefaults.standard.synchronize()
+            updateNetworkConfig()
         }
     }
     let socketPort: String = "5000"
@@ -451,12 +476,18 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var showingSystemStatusNotification: Bool = false
     @Published var showingSystemStatusMenu: Bool = false
     @Published var batteryStatus: BatteryStatus = BatteryStatus()
+    @Published var touchStatus: TouchStatus = TouchStatus()
     @Published var userInfo: UserInfoBuffer = UserInfoBuffer()
 
+    private var addressCandidate: AddressCandidate
     private var bleService: CaBotServiceBLE
     private var tcpService: CaBotServiceTCP
     private var fallbackService: FallbackService
     private let tts: CaBotTTS
+    private var willSpeakArriveMessage: Bool = false
+    private var touchStartTime: CFAbsoluteTime = 0
+    private var announceToPushRightButtonTime: CFAbsoluteTime = 0
+    private var shouldNoAnnounceToPushRightButton: Bool = false
     private var lastUpdated: Int64 = 0
     let logList: LogReportModel = LogReportModel()
     let preview: Bool
@@ -502,6 +533,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             fallbackService.select(service: tcpService)
         }
         self.connectionType = connectionType
+        self.addressCandidate = AddressCandidate(addresses: [""])  // dummy
         super.init()
 
         self.tts.delegate = self
@@ -523,6 +555,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if let secondaryAddr = UserDefaults.standard.value(forKey: secondaryAddrKey) as? String{
             self.secondaryAddr = secondaryAddr
         }
+        updateNetworkConfig()
         if let menuDebug = UserDefaults.standard.value(forKey: menuDebugKey) as? Bool {
             self.menuDebug = menuDebug
         }
@@ -548,10 +581,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.bleService.delegate = self
         self.bleService.startIfAuthorized()
 
-        self.tcpService.updateAddr(addr: self.primaryAddr, port: socketPort)
-        self.tcpService.updateAddr(addr: self.secondaryAddr, port: socketPort, secondary: true)
         self.tcpService.delegate = self
-        self.tcpService.start()
+        self.tcpService.start(addressCandidate: addressCandidate, port: socketPort)
 
         self.notificationCenter.getNotificationSettings { settings in
             if settings.alertSetting == .enabled &&
@@ -566,6 +597,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
         // Error/Warning Notification
         self.notificationCenter.delegate = self
+    }
+
+    func updateNetworkConfig() {
+        self.addressCandidate = AddressCandidate(addresses: [primaryAddr, secondaryAddr])
+    }
+
+    func getCurrentAddress() -> String {
+        self.addressCandidate.getCurrent()
     }
 
     func onChange(of newScenePhase: ScenePhase) {
@@ -692,10 +731,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func tcpServiceRestart() {
-        self.tcpService.updateAddr(addr: self.primaryAddr, port: socketPort)
-        self.tcpService.updateAddr(addr: self.secondaryAddr, port: socketPort, secondary: true)
         if !self.tcpService.isSocket() {
-            self.tcpService.start()
+           self.tcpService.start(addressCandidate: addressCandidate, port: socketPort)
         }
     }
  
@@ -708,7 +745,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     func share(user_info: SharedInfo) {
         _ = self.fallbackService.share(user_info: user_info)
     }
-    
+
     // MARK: LogReportModelDelegate
     
     func refreshLogList() {
@@ -862,7 +899,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func needToStartAnnounce(wait: Bool) {
         let delay = wait ? self.detailSettingModel.browserCloseDelay : 0
-
+        self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent()
+        self.shouldNoAnnounceToPushRightButton = true
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             self.speak(CustomLocalizedString("You can proceed by pressing the right button of the suitcase handle", lang: self.resourceLang)) {
             }
@@ -944,7 +982,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     var delay = self.tts.isSpeaking ? 1.0 : 0
 
                     self.stopSpeak()
-
                     if self.isContentPresenting {
                         self.isContentPresenting = false
                         delay = self.detailSettingModel.browserCloseDelay
@@ -956,11 +993,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     // wait 1.0 ~ 2.0 seconds if browser was open.
                     // hopefully closing browser and reading the content by voice over will be ended by then
                     DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                        self.willSpeakArriveMessage = true
                         let announce = CustomLocalizedString("Going to %@", lang: self.resourceLang, dest.title.pron)
                             + (dest.startMessage?.content ?? "")
-
-                        self.speak(announce){
-                        }
+                        self.tts.speak(announce, forceSelfvoice: false, force: false, callback: {code in }, progress: {range in
+                            if range.location == 0{
+                                self.willSpeakArriveMessage = true
+                            }
+                        })
                     }
                 }
                 self.activityLog(category: "destination-text", text: dest.title.text, memo: dest.title.pron)
@@ -1057,6 +1097,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         case "SpeedDown":
             playAudio(file: detailSettingModel.speedDownSound)
             break
+        case "OBSTACLE_AHEAD":
+            playAudio(file: detailSettingModel.obstacleAheadSound)
+            break
         default:
             NSLog("\"\(soundRequest)\" is unknown sound")
         }
@@ -1065,6 +1108,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     func cabot(service: any CaBotTransportProtocol, notification: NavigationNotification) {
         switch(notification){
         case .subtour:
+            self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent() - 20
+            self.shouldNoAnnounceToPushRightButton = true
             if tourManager.setting.enableSubtourOnHandle {
                 if let ad = tourManager.arrivedDestination,
                    let subtour = ad.subtour {
@@ -1076,6 +1121,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             }
             break
         case .next:
+            self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent() - 20
+            self.shouldNoAnnounceToPushRightButton = true
             if tourManager.proceedToNextDestination() {
                 self.playAudio(file: self.detailSettingModel.startSound)
             }else {
@@ -1100,6 +1147,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     }
                     if let next = tourManager.nextDestination {
                         announce += CustomLocalizedString("You can proceed to %@ by pressing the right button of the suitcase handle. ", lang: self.resourceLang, next.title.pron)
+                        self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent()
+                        self.shouldNoAnnounceToPushRightButton = true
                         if let subtour = cd.subtour,
                            tourManager.setting.enableSubtourOnHandle {
                             announce += CustomLocalizedString("Or by pressing the center button to proceed a subtour %@.", lang: self.resourceLang, subtour.introduction.pron)
@@ -1122,6 +1171,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                                 self.open(content: contentURL)
                             }
                         }
+                        self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent() - 27
+                        self.shouldNoAnnounceToPushRightButton = true
+                        self.willSpeakArriveMessage = false
                     }
                 }
             }
@@ -1180,6 +1232,32 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func cabot(service: any CaBotTransportProtocol, batteryStatus: BatteryStatus) -> Void {
         self.batteryStatus = batteryStatus
+    }
+    
+    func cabot(service: any CaBotTransportProtocol, touchStatus: TouchStatus) -> Void {
+        let prevTouchStatus = self.touchStatus
+        if prevTouchStatus.level != touchStatus.level{
+            DispatchQueue.main.async {
+                self.touchStatus = touchStatus
+            }
+        }
+        if CFAbsoluteTimeGetCurrent() - self.announceToPushRightButtonTime > 30{
+            self.shouldNoAnnounceToPushRightButton = false
+        }
+        if self.touchStatus.level == .Touching {
+            if prevTouchStatus.level != .Touching {
+                touchStartTime = CFAbsoluteTimeGetCurrent()
+            } else if CFAbsoluteTimeGetCurrent() - self.touchStartTime > 3{
+                if self.shouldNoAnnounceToPushRightButton == false && self.willSpeakArriveMessage == false{
+                    if tourManager.hasDestination {
+                        let announce = CustomLocalizedString("PRESS_RIGHT_BUTTON", lang: self.resourceLang)
+                        self.speak(announce){}
+                        self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent()
+                        self.shouldNoAnnounceToPushRightButton = true
+                    }
+                }
+            }
+        }
     }
     
     func cabot(service: any CaBotTransportProtocol, logList: [LogEntry], status: CaBotLogStatus) {
@@ -1248,6 +1326,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             if let src = resource?.destinationsSource {
                 traverseDest(src: src)
             }
+        }
+        if userInfo.type == .Skip {
+            skipDestination()
         }
     }
 
@@ -1587,6 +1668,9 @@ class UserInfoBuffer {
             // do nothing
             break
         case .OverrideDestination:
+            // do nothing
+            break
+        case .Skip:
             // do nothing
             break
         }
