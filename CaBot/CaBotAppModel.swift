@@ -1171,6 +1171,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                                 self.open(content: contentURL)
                             }
                         }
+                        self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent() - 27
+                        self.shouldNoAnnounceToPushRightButton = true
                         self.willSpeakArriveMessage = false
                     }
                 }
