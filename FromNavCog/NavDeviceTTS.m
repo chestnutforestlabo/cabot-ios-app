@@ -287,7 +287,7 @@ static NavDeviceTTS *instance = nil;
         } else if ([[text substringWithRange:NSMakeRange(i, 1)] isEqualToString:@" "]) {
         } else {
             if (keep >= 3) {
-                [self _speak:[text substringWithRange:NSMakeRange(start, i-keep)] force:flag && isFirst selfvoicing:selfvoicing nohistory:nohistory quickAnswer:quickAnswer rate:speechRate voice:nil completionHandler:nil prgoressHandler:nil];
+                [self _speak:[text substringWithRange:NSMakeRange(start, i-keep)] force:flag && isFirst selfvoicing:selfvoicing nohistory:nohistory quickAnswer:quickAnswer rate:speechRate voice:voice_ completionHandler:nil prgoressHandler:nil];
                 [self pause:0.1*keep];
                 text = [text substringFromIndex:i];
                 flag = NO;
