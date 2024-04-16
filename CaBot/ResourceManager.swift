@@ -284,10 +284,9 @@ struct Source: Decodable, Hashable, CustomStringConvertible {
 
     var content: String? {
         get {
-            if let url = url {
-                return try? String(contentsOf: url)
-            }
-            return nil
+            guard let url = url  else { return nil }
+            guard var text = try? String(contentsOf: url) else { return nil }
+            return text.replacingOccurrences(of: "\r\n", with: "\n")
         }
     }
 
