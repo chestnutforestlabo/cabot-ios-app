@@ -996,7 +996,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                         self.willSpeakArriveMessage = true
                         let announce = CustomLocalizedString("Going to %@", lang: self.resourceLang, dest.title.pron)
                             + (dest.startMessage?.content ?? "")
-                        self.tts.speak(announce, forceSelfvoice: false, force: false, callback: {code in }, progress: {range in
+                        self.tts.speak(announce, forceSelfvoice: false, force: true, callback: {code in }, progress: {range in
                             if range.location == 0{
                                 self.willSpeakArriveMessage = true
                             }
