@@ -597,6 +597,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
         // Error/Warning Notification
         self.notificationCenter.delegate = self
+        NSSetUncaughtExceptionHandler { exception in
+                    NSLog("\(exception)")
+                    NSLog("\(exception.reason ?? "")")
+                    NSLog("\(exception.callStackSymbols)")
+                }
     }
 
     func updateNetworkConfig() {
