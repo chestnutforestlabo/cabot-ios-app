@@ -1606,8 +1606,8 @@ class SpeakingText: Hashable {
     }
     func subTexts() -> (String, String, String, String) {
         let prefix = self.voiceover ? "VO:" : ""
-        let i1 = text.index(text.startIndex, offsetBy: location)
-        let i2 = text.index(i1, offsetBy: length)
+        let i1 = text.index(text.startIndex, offsetBy: min(text.count, location))
+        let i2 = text.index(i1, offsetBy: min((text.count - min(text.count, location)), length))
         return (prefix, String(text[..<i1]), String(text[i1..<i2]), String(text[i2...]))
     }
 }
