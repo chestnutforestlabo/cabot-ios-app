@@ -64,7 +64,6 @@ class CaBotTTS : TTSProtocol{
             voiceover = true
         }
         self.delegate?.activityLog(category: "app speech speaking", text: text ?? "", memo: "force=\(force)")
-        self.delegate?.share(user_info: SharedInfo(type: .Speak, value: text ?? "", flag1: force, flag2: voiceover))
 
         var options:Dictionary<String,Any> = ["rate": rate, "selfspeak": selfspeak, "force": force]
         if let voice = self.voice {
@@ -81,12 +80,16 @@ class CaBotTTS : TTSProtocol{
             if code >= 0, let text = text {
                 self.delegate?.share(user_info: SharedInfo(type: .SpeakProgress, value: text, flag1: true, flag2: voiceover, length: Int(code)))
             }
-        }, progressHandler: { range in
+        }, progressHandler: { text, count, range in
             if let progress = progress{
                 progress(range)
             }
             if let text = text {
-                //print(range)
+                //print(count, range, text)
+                if count == 1 {
+                    self.delegate?.share(user_info: SharedInfo(type: .Speak, value: text, flag1: force, flag2: voiceover))
+                }
+
                 self.delegate?.share(user_info: SharedInfo(type: .SpeakProgress, value: text, location: range.location, length: range.length))
             }
         })
@@ -99,7 +102,7 @@ class CaBotTTS : TTSProtocol{
         }
         self._tts.speak(text == nil ? "" : text, withOptions: options, completionHandler: { code in
             callback(code)
-        }, progressHandler: { range in
+        }, progressHandler: { text, count, range in
         })
     }
 

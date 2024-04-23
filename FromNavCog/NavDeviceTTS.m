@@ -179,7 +179,7 @@ static NavDeviceTTS *instance = nil;
 - (AVSpeechUtterance *)speak:(NSString *)text
                  withOptions:(NSDictionary *)options
            completionHandler:(void (^)(int))handler
-             progressHandler:(void (^)(NSRange))phandler
+             progressHandler:(void (^)(NSString*, int, NSRange))phandler
 {
     BOOL force = [options[@"force"] boolValue];
     BOOL selfspeak = [options[@"selfspeak"] boolValue];
@@ -217,7 +217,7 @@ static NavDeviceTTS *instance = nil;
 - (AVSpeechUtterance *)selfspeak:(NSString *)text
                            force:(BOOL)flag
                completionHandler:(void (^)(int))handler
-                 prgoressHandler:(void (^)(NSRange))phandler
+                 prgoressHandler:(void (^)(NSString*, int, NSRange))phandler
 {
     return [self _speak:text
                   force:flag
@@ -241,7 +241,7 @@ static NavDeviceTTS *instance = nil;
 - (AVSpeechUtterance*) speak:(NSString*)text
                        force:(BOOL)flag
            completionHandler:(void (^)(int))handler
-             prgoressHandler:(void (^)(NSRange))phandler
+             prgoressHandler:(void (^)(NSString*, int, NSRange))phandler
 {
     return [self _speak:text
                   force:flag
@@ -262,7 +262,7 @@ static NavDeviceTTS *instance = nil;
                          rate:(double)speechRate
                         voice:(AVSpeechSynthesisVoice*)voice_
             completionHandler:(void (^)(int))handler
-              prgoressHandler:(void (^)(NSRange))phandler
+              prgoressHandler:(void (^)(NSString*, int, NSRange))phandler
 {
     if (text == nil) {
         handler(0);
@@ -287,7 +287,7 @@ static NavDeviceTTS *instance = nil;
         } else if ([[text substringWithRange:NSMakeRange(i, 1)] isEqualToString:@" "]) {
         } else {
             if (keep >= 3) {
-                [self _speak:[text substringWithRange:NSMakeRange(start, i-keep)] force:flag && isFirst selfvoicing:selfvoicing nohistory:nohistory quickAnswer:quickAnswer rate:speechRate voice:nil completionHandler:nil prgoressHandler:nil];
+                [self _speak:[text substringWithRange:NSMakeRange(start, i-keep)] force:flag && isFirst selfvoicing:selfvoicing nohistory:nohistory quickAnswer:quickAnswer rate:speechRate voice:voice_ completionHandler:nil prgoressHandler:phandler];
                 [self pause:0.1*keep];
                 text = [text substringFromIndex:i];
                 flag = NO;
@@ -308,6 +308,7 @@ static NavDeviceTTS *instance = nil;
     se.quickAnswer = quickAnswer;
     se.completionHandler = handler;
     se.progressHandler = phandler;
+    se.progressCount = 0;
     
     if (flag) {
         NSLog(@"force stop");
@@ -418,12 +419,13 @@ static NavDeviceTTS *instance = nil;
         if (se.ranges == nil ) {
             se.ranges = [[NSMutableArray alloc] init];
         }
+        se.progressCount += 1;
         [se.ranges addObject: [NSValue valueWithRange:characterRange]];
         int total = 0;
         for (int i = 0; i < se.ranges.count; i++) {
             total += se.ranges[i].rangeValue.length;
         }
-        se.progressHandler(NSMakeRange(se.ranges[0].rangeValue.location, total));
+        se.progressHandler(utterance.speechString, se.progressCount, NSMakeRange(se.ranges[0].rangeValue.location, total));
         while(total > 5) {
             total -= se.ranges[0].rangeValue.length;
             [se.ranges removeObjectAtIndex:0];
@@ -479,7 +481,7 @@ int min(int a, int b) {
         int start = lastVOEstimatedLocation;
         int end = min((int)(duration * rate), (int)se.ut.speechString.length);
         lastVOEstimatedLocation = end;
-        se.progressHandler(NSMakeRange(start, end-start));
+        se.progressHandler(se.ut.speechString, se.progressCount, NSMakeRange(start, end-start));
     }
 }
 

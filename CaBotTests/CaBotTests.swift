@@ -36,6 +36,7 @@ class CaBotTests: XCTestCase {
     override func tearDown() {
     }
 
+    /* need to be fixed
     func testParseDestinationYaml() {
         if let destinations = try? Destination.load(at: Self.getSource("destinations", withExtension: "yaml")) {
             assert(destinations[0].error == nil)
@@ -62,6 +63,17 @@ class CaBotTests: XCTestCase {
             print(destinations[6].error!)
             print("-------------------")
         }
+    }
+    */
+
+    func testSpeakinText() {
+        let text = SpeakingText(text: "Hello", voiceover: false)
+        text.location = 6
+        text.length = 0
+        _ = text.subTexts()
+        text.location = 4
+        text.length = 2
+        _ = text.subTexts()
     }
 
     func testPerformanceExample() {

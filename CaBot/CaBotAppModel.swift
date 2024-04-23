@@ -143,6 +143,7 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
     private let browserCloseDelayKey = "browserCloseDelayKey"
     private let enableSubtourOnHandleKey = "enableSubtourOnHandleKey"
     private let showContentWhenArriveKey = "showContentWhenArriveKey"
+    private let speechPriorityKey = "speechPriorityKey"
     
     init() {
         if let startSound = UserDefaults.standard.value(forKey: startSoundKey) as? String {
@@ -165,6 +166,11 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
         }
         if let showContentWhenArrive = UserDefaults.standard.value(forKey: showContentWhenArriveKey) as? Bool {
             self.showContentWhenArrive = showContentWhenArrive
+        }
+        if let speechPriorityString = UserDefaults.standard.value(forKey: speechPriorityKey) as? String {
+            if let speechPriority = SpeechPriority(rawValue: speechPriorityString) {
+                self.speechPriority = speechPriority
+            }
         }
     }
         
@@ -220,6 +226,13 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
         }
     }
     
+    @Published var speechPriority:SpeechPriority = .App {
+        didSet {
+            UserDefaults.standard.setValue(speechPriority.rawValue, forKey: speechPriorityKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
+
     var audioPlayer: AVAudioPlayer = AVAudioPlayer()
     func playAudio(file: String) {
         DispatchQueue.main.async {
@@ -267,7 +280,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private let noSuitcaseDebugKey = "noSuitcaseDebugKey"
     private let modeTypeKey = "modeTypeKey"
     private let notificationCenterID = "cabot_state_notification"
-    private let speechPriorityKey = "speechPriorityKey"
     
     let detailSettingModel: DetailSettingModel
 
@@ -401,7 +413,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
     }
 
-    @Published var connectionType:ConnectionType = .BLE{
+    @Published var connectionType:ConnectionType = .TCP{
         didSet{
             UserDefaults.standard.setValue(connectionType.rawValue, forKey: connectionTypeKey)
             UserDefaults.standard.synchronize()
@@ -454,12 +466,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var modeType:ModeType = .Normal{
         didSet {
             UserDefaults.standard.setValue(modeType.rawValue, forKey: modeTypeKey)
-            UserDefaults.standard.synchronize()
-        }
-    }
-    @Published var speechPriority:SpeechPriority = .Robot {
-        didSet {
-            UserDefaults.standard.setValue(speechPriority.rawValue, forKey: speechPriorityKey)
             UserDefaults.standard.synchronize()
         }
     }
@@ -568,11 +574,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if let isTTSEnabled = UserDefaults.standard.value(forKey: isTTSEnabledKey) as? Bool {
             self.isTTSEnabledForAdvanced = isTTSEnabled
         }
-        if let speechPriorityString = UserDefaults.standard.value(forKey: speechPriorityKey) as? String {
-            if let speechPriority = SpeechPriority(rawValue: speechPriorityString) {
-                self.speechPriority = speechPriority
-            }
-        }
 
         // services
         self.locationManager.delegate = self
@@ -597,6 +598,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
         // Error/Warning Notification
         self.notificationCenter.delegate = self
+
+        NSSetUncaughtExceptionHandler { exception in
+            NSLog("\(exception)")
+            NSLog("\(exception.reason ?? "")")
+            NSLog("\(exception.callStackSymbols)")
+        }
     }
 
     func updateNetworkConfig() {
@@ -996,7 +1003,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                         self.willSpeakArriveMessage = true
                         let announce = CustomLocalizedString("Going to %@", lang: self.resourceLang, dest.title.pron)
                             + (dest.startMessage?.content ?? "")
-                        self.tts.speak(announce, forceSelfvoice: false, force: false, callback: {code in }, progress: {range in
+                        self.tts.speak(announce, forceSelfvoice: false, force: true, callback: {code in }, progress: {range in
                             if range.location == 0{
                                 self.willSpeakArriveMessage = true
                             }
@@ -1333,7 +1340,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func getSpeechPriority() -> SpeechPriority {
-        return speechPriority
+        return self.detailSettingModel.speechPriority
     }
 
     func getModeType() -> ModeType {
@@ -1601,8 +1608,8 @@ class SpeakingText: Hashable {
     }
     func subTexts() -> (String, String, String, String) {
         let prefix = self.voiceover ? "VO:" : ""
-        let i1 = text.index(text.startIndex, offsetBy: location)
-        let i2 = text.index(i1, offsetBy: length)
+        let i1 = text.index(text.startIndex, offsetBy: min(text.count, location))
+        let i2 = text.index(i1, offsetBy: min((text.count - min(text.count, location)), length))
         return (prefix, String(text[..<i1]), String(text[i1..<i2]), String(text[i2...]))
     }
 }

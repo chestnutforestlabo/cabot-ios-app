@@ -112,17 +112,6 @@ struct SettingView: View {
 
             if (modelData.modeType == .Debug){
                 Section(header: Text("DEBUG")) {
-                    VStack {
-                        HStack{
-                            Text("Speech Priority")
-                                .accessibility(hidden: true)
-                            Spacer()
-                        }
-                        Picker("", selection: $modelData.speechPriority){
-                            Text(LocalizedStringKey(SpeechPriority.Robot.rawValue)).tag(SpeechPriority.Robot)
-                            Text(LocalizedStringKey(SpeechPriority.App.rawValue)).tag(SpeechPriority.App)
-                        }.pickerStyle(SegmentedPickerStyle())
-                    }
                     Toggle("MENU_DEBUG", isOn: $modelData.menuDebug)
                     Toggle("NO_SUITCASE_DEBUG", isOn: $modelData.noSuitcaseDebug)
                 }
