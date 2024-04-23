@@ -413,7 +413,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
     }
 
-    @Published var connectionType:ConnectionType = .BLE{
+    @Published var connectionType:ConnectionType = .TCP{
         didSet{
             UserDefaults.standard.setValue(connectionType.rawValue, forKey: connectionTypeKey)
             UserDefaults.standard.synchronize()
