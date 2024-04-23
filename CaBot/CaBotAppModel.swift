@@ -143,6 +143,7 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
     private let browserCloseDelayKey = "browserCloseDelayKey"
     private let enableSubtourOnHandleKey = "enableSubtourOnHandleKey"
     private let showContentWhenArriveKey = "showContentWhenArriveKey"
+    private let speechPriorityKey = "speechPriorityKey"
     
     init() {
         if let startSound = UserDefaults.standard.value(forKey: startSoundKey) as? String {
@@ -165,6 +166,11 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
         }
         if let showContentWhenArrive = UserDefaults.standard.value(forKey: showContentWhenArriveKey) as? Bool {
             self.showContentWhenArrive = showContentWhenArrive
+        }
+        if let speechPriorityString = UserDefaults.standard.value(forKey: speechPriorityKey) as? String {
+            if let speechPriority = SpeechPriority(rawValue: speechPriorityString) {
+                self.speechPriority = speechPriority
+            }
         }
     }
         
@@ -220,6 +226,13 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
         }
     }
     
+    @Published var speechPriority:SpeechPriority = .App {
+        didSet {
+            UserDefaults.standard.setValue(speechPriority.rawValue, forKey: speechPriorityKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
+
     var audioPlayer: AVAudioPlayer = AVAudioPlayer()
     func playAudio(file: String) {
         DispatchQueue.main.async {
@@ -267,7 +280,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private let noSuitcaseDebugKey = "noSuitcaseDebugKey"
     private let modeTypeKey = "modeTypeKey"
     private let notificationCenterID = "cabot_state_notification"
-    private let speechPriorityKey = "speechPriorityKey"
     
     let detailSettingModel: DetailSettingModel
 
@@ -457,12 +469,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             UserDefaults.standard.synchronize()
         }
     }
-    @Published var speechPriority:SpeechPriority = .Robot {
-        didSet {
-            UserDefaults.standard.setValue(speechPriority.rawValue, forKey: speechPriorityKey)
-            UserDefaults.standard.synchronize()
-        }
-    }
 
     @Published var isContentPresenting: Bool = false
     @Published var isConfirmingSummons: Bool = false
@@ -567,11 +573,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
         if let isTTSEnabled = UserDefaults.standard.value(forKey: isTTSEnabledKey) as? Bool {
             self.isTTSEnabledForAdvanced = isTTSEnabled
-        }
-        if let speechPriorityString = UserDefaults.standard.value(forKey: speechPriorityKey) as? String {
-            if let speechPriority = SpeechPriority(rawValue: speechPriorityString) {
-                self.speechPriority = speechPriority
-            }
         }
 
         // services
@@ -1338,7 +1339,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func getSpeechPriority() -> SpeechPriority {
-        return speechPriority
+        return self.detailSettingModel.speechPriority
     }
 
     func getModeType() -> ModeType {
