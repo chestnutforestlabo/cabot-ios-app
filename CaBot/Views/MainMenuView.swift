@@ -138,7 +138,11 @@ struct UserInfoView: View {
                     modelData.share(user_info: SharedInfo(type: .Skip, value: ""))
                 }) {
                     Label{
-                        Text("Skip Label \(modelData.userInfo.nextDestination)")
+                        if modelData.userInfo.currentDestination != ""{
+                            Text("Skip Label \(modelData.userInfo.currentDestination)")
+                        }else{
+                            Text("Skip Label \(modelData.userInfo.nextDestination)")
+                        }
                     } icon: {
                         Image(systemName: "arrow.right.to.line")
                     }
