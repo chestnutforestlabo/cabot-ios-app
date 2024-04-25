@@ -900,6 +900,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.tts.stop(false)
     }
 
+    func playSample(){
+        self.tts.rate = self.speechRate
+        self.tts.speak(CustomLocalizedString("Hello Suitcase!", lang: self.resourceLang), forceSelfvoice:true, force:true) {_ in
+        }
+    }
+
     func playAudio(file: String) {
         detailSettingModel.playAudio(file: file)
     }
