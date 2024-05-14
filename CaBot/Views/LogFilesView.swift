@@ -158,8 +158,8 @@ struct ReportSubmissionForm: View {
                     if !(modelData.selectedLog.is_uploaded_to_box ?? false) {
                         Section() {
                             Button {
-                                modelData.submit(log: modelData.selectedLog)
                                 dismiss()
+                                modelData.submit(log: modelData.selectedLog)
                             } label: {
                                 if modelData.selectedLog.is_report_submitted ?? false {
                                     Text("UPDATE_REPORT").bold()
