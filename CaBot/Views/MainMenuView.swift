@@ -551,7 +551,7 @@ struct SettingMenus: View {
             }.onChange(of: modelData.voice, perform: { value in
                 if let voice = modelData.voice {
                     if !isResourceChanging {
-                        TTSHelper.playSample(of: voice, at: modelData.speechRate)
+                        modelData.playSample()
                     }
                 }
             }).onTapGesture {
@@ -568,7 +568,7 @@ struct SettingMenus: View {
                        onEditingChanged: { editing in
                         timer?.invalidate()
                         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
-                            TTSHelper.playSample(of: modelData.voice!, at: modelData.speechRate)
+                            modelData.playSample()
                         }
                 })
                     .accessibility(label: Text("Speech Speed"))
