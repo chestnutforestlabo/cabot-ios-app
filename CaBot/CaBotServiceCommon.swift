@@ -402,6 +402,7 @@ enum CaBotLogRequestType:String, Decodable {
 
 struct LogEntry: Decodable, Hashable {
     var name: String
+    var nanoseconds: String?
     var title: String?
     var detail: String?
     var is_report_submitted: Bool? = false
@@ -418,6 +419,38 @@ struct LogEntry: Decodable, Hashable {
                 return title.count > 0 && detail.count > 0
             }
             return false
+        }
+    }
+    
+    func logDate(for language: String) -> String {
+        if let str_nanoseconds = nanoseconds {
+            let inputFormatter = DateFormatter()
+            inputFormatter.dateFormat = "'cabot_'yyyy'-'MM'-'dd'-'HH'-'mm'-'ss"
+            
+            let outputFormatter = DateFormatter()
+            outputFormatter.dateFormat = CustomLocalizedString("OUTPUT_FORMAT", lang: language)
+            
+            let timeOnlyFormatter = DateFormatter()
+            timeOnlyFormatter.dateFormat = CustomLocalizedString("TIME_ONLY_FORMAT", lang: language)
+            
+            guard let date = inputFormatter.date(from: name) else {
+                return CustomLocalizedString("INVALID_DATE_STRING", lang: language)
+            }
+            
+            let formattedStartTime = outputFormatter.string(from: date)
+            
+            let formattedEndTime: String
+            if let int_nanoseconds = Int(str_nanoseconds) {
+                let seconds = Double(int_nanoseconds) / 1_000_000_000
+                let newDate = date.addingTimeInterval(seconds)
+                formattedEndTime = timeOnlyFormatter.string(from: newDate)
+            } else {
+                formattedEndTime = CustomLocalizedString("SYSTEM_RUNNING", lang: language)
+            }
+            
+            return "\(formattedStartTime) ~ \(formattedEndTime)"
+        } else {
+            return name
         }
     }
 }
