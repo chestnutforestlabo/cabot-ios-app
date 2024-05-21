@@ -427,28 +427,33 @@ struct LogEntry: Decodable, Hashable {
             let inputFormatter = DateFormatter()
             inputFormatter.dateFormat = "'cabot_'yyyy'-'MM'-'dd'-'HH'-'mm'-'ss"
             
-            let outputFormatter = DateFormatter()
-            outputFormatter.dateFormat = CustomLocalizedString("OUTPUT_FORMAT", lang: language)
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateStyle = .medium
+            dateFormatter.timeStyle = .none
+            dateFormatter.locale = Locale(identifier: language)
             
-            let timeOnlyFormatter = DateFormatter()
-            timeOnlyFormatter.dateFormat = CustomLocalizedString("TIME_ONLY_FORMAT", lang: language)
+            let timeFormatter = DateIntervalFormatter()
+            timeFormatter.dateStyle = .none
+            timeFormatter.timeStyle = .short
+            timeFormatter.locale = Locale(identifier: language)
             
             guard let date = inputFormatter.date(from: name) else {
                 return CustomLocalizedString("INVALID_DATE_STRING", lang: language)
             }
             
-            let formattedStartTime = outputFormatter.string(from: date)
+            let formattedDate = dateFormatter.string(from: date)
             
-            let formattedEndTime: String
+            let formattedTime: String
             if let int_nanoseconds = Int(str_nanoseconds) {
                 let seconds = Double(int_nanoseconds) / 1_000_000_000
-                let newDate = date.addingTimeInterval(seconds)
-                formattedEndTime = timeOnlyFormatter.string(from: newDate)
+                let endDate = Date(timeInterval: seconds, since: date)
+                formattedTime = timeFormatter.string(from: date, to: endDate)
             } else {
-                formattedEndTime = CustomLocalizedString("SYSTEM_RUNNING", lang: language)
+                let endDate = Date() // now
+                formattedTime = timeFormatter.string(from: date, to: endDate)
             }
             
-            return "\(formattedStartTime) ~ \(formattedEndTime)"
+            return "\(formattedDate)  \(formattedTime)"
         } else {
             return name
         }
