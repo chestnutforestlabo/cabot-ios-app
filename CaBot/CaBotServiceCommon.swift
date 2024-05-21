@@ -445,7 +445,8 @@ struct LogEntry: Decodable, Hashable {
             
             let formattedTime: String
             if let int_nanoseconds = Int(str_nanoseconds) {
-                let seconds = Double(int_nanoseconds) / 1_000_000_000
+                var seconds = Double(int_nanoseconds) / 1_000_000_000
+                seconds = max(seconds, 60)
                 let endDate = Date(timeInterval: seconds, since: date)
                 formattedTime = timeFormatter.string(from: date, to: endDate)
             } else {
