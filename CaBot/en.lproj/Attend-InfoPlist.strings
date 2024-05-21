@@ -20,55 +20,12 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-import SwiftUI
-import CoreBluetooth
-import CoreLocation
-import HealthKit
-import os.log
+CFBundleDisplayName = "AIS Attend";
 
-// override NSLog
-public func NSLog(_ format: String, _ args: CVarArg...) {
-    withVaList(args) { NavNSLogv(format, $0) }
-}
-
-@main
-struct CaBotApp: App {
-    @Environment(\.scenePhase) var scenePhase
-    
-    var modelData: CaBotAppModel = CaBotAppModel(preview: false)
-
-    init() {
-        #if ATTEND
-            modelData.modeType = .Advanced
-        #elseif USER
-            modelData.modeType = .Normal
-        #endif
-    }
-
-    var body: some Scene {
-        WindowGroup {
-            RootView()
-                .environmentObject(modelData)
-        }.onChange(of: scenePhase) { newScenePhase in
-
-            modelData.onChange(of: newScenePhase)
-
-            switch newScenePhase {
-            case .background:
-                break
-            case .inactive:
-                break
-            case .active:
-                let isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
-                if isVoiceOverRunning {
-                    modelData.stopSpeak()
-                }
-                Logging.stopLog()
-                Logging.startLog(true)
-                break
-            @unknown default:
-                break
-            }
-        }
-    }
-}
+NSBluetoothAlwaysUsageDescription = "This app works as an peripheral device of your robot.";
+NSBluetoothPeripheralUsageDescription = "This app works as an peripheral device of your robot.";
+NSLocationAlwaysAndWhenInUseUsageDescription = "This app uses your location always and When in use";
+NSLocationAlwaysUsageDescription = "This app uses your location always";
+NSLocationWhenInUseUsageDescription = "This app uses your location when in use";
+NSMicrophoneUsageDescription = "This app uses your microphone";
+NSSpeechRecognitionUsageDescription = "This app uses speech recognition";

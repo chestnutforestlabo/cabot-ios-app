@@ -20,55 +20,12 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-import SwiftUI
-import CoreBluetooth
-import CoreLocation
-import HealthKit
-import os.log
+CFBundleDisplayName = "AIS ユーザー";
 
-// override NSLog
-public func NSLog(_ format: String, _ args: CVarArg...) {
-    withVaList(args) { NavNSLogv(format, $0) }
-}
-
-@main
-struct CaBotApp: App {
-    @Environment(\.scenePhase) var scenePhase
-    
-    var modelData: CaBotAppModel = CaBotAppModel(preview: false)
-
-    init() {
-        #if ATTEND
-            modelData.modeType = .Advanced
-        #elseif USER
-            modelData.modeType = .Normal
-        #endif
-    }
-
-    var body: some Scene {
-        WindowGroup {
-            RootView()
-                .environmentObject(modelData)
-        }.onChange(of: scenePhase) { newScenePhase in
-
-            modelData.onChange(of: newScenePhase)
-
-            switch newScenePhase {
-            case .background:
-                break
-            case .inactive:
-                break
-            case .active:
-                let isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
-                if isVoiceOverRunning {
-                    modelData.stopSpeak()
-                }
-                Logging.stopLog()
-                Logging.startLog(true)
-                break
-            @unknown default:
-                break
-            }
-        }
-    }
-}
+NSBluetoothAlwaysUsageDescription = "このアプリはロボットの周辺機器として動作します";
+NSBluetoothPeripheralUsageDescription = "このアプリはロボットの周辺機器として動作します";
+NSLocationAlwaysAndWhenInUseUsageDescription = "このアプリはあなたの位置を常に利用します";
+NSLocationAlwaysUsageDescription = "このアプリはあなたの位置を利用します";
+NSLocationWhenInUseUsageDescription = "このアプリは使用中のみあなたの位置を利用します";
+NSMicrophoneUsageDescription = "このアプリはマイクを使用します";
+NSSpeechRecognitionUsageDescription = "このアプリは音声認識を使用します";
