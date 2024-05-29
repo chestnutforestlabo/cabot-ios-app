@@ -28,21 +28,40 @@ struct RosWebView: View {
     var address: String
     var port: String
     @State private var shouldRefresh = false
+    @State private var isConfirming = false
+    @EnvironmentObject var modelData: CaBotAppModel
 
     var body: some View {
         VStack {
+            Button(action: {
+                isConfirming = true
+            }, label: {
+                Label(LocalizedStringKey("Restart Localization"), systemImage: "arrow.clockwise")
+            })
+            .confirmationDialog(Text("Restart Localization"), isPresented: $isConfirming) {
+                Button {
+                    modelData.systemManageCommand(command: .restart_localization)
+                } label: {
+                    Text("Restart Localization")
+                }
+                Button("Cancel", role: .cancel) {
+                }
+            } message: {
+                Text("RESTART_LOCALIZATION_MESSAGE")
+            }
             LocalWebView(address: address, port: port, reload: $shouldRefresh)
         }
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            Button {
-                reload()
-            } label: {
-                Image(systemName: "arrow.clockwise")
-                Text("Reload")
-            }
-            .accessibilityLabel("Reload")
-        }
+// do not show reload button because it is confusing
+//        .toolbar {
+//            Button {
+//                reload()
+//            } label: {
+//                Image(systemName: "arrow.clockwise")
+//                Text("Reload")
+//            }
+//            .accessibilityLabel("Reload")
+//        }
     }
 
     func reload() {

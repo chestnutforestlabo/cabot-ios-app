@@ -287,3 +287,8 @@
 
 "User App Info"="User App Info";
 "CUSTOMIZED_TOUR"="Customized Tour";
+
+
+// ROS Web View
+"Restart Localization"="Restart Localization";
+"RESTART_LOCALIZATION_MESSAGE"="The localization will be restarted. This should be used when the robot is stopped.";
