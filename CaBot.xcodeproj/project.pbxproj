@@ -74,22 +74,18 @@
 		D7CC04FB2BFB352700C0B10A /* ToursView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DE726A0BBE900729ABD /* ToursView.swift */; };
 		D7CC04FC2BFB352700C0B10A /* JSHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99D93266A92EA001ACAAA /* JSHelper.swift */; };
 		D7CC04FD2BFB352700C0B10A /* CaBotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DCD269F75DB00729ABD /* CaBotApp.swift */; };
-		D7CC04FE2BFB352700C0B10A /* DeviceStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308FCE1A27D8F4C8009FCC7B /* DeviceStatusView.swift */; };
 		D7CC04FF2BFB352700C0B10A /* ResourceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99D9126681097001ACAAA /* ResourceManager.swift */; };
 		D7CC05002BFB352700C0B10A /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99D95266A993E001ACAAA /* Extension.swift */; };
 		D7CC05012BFB352700C0B10A /* WebContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3013614626A1E77B0050CF9E /* WebContentView.swift */; };
 		D7CC05022BFB352700C0B10A /* NavDeviceTTS.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F062228B55C000CA7DD6 /* NavDeviceTTS.m */; };
-		D7CC05032BFB352700C0B10A /* TourDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3013614226A0F8E10050CF9E /* TourDetailView.swift */; };
 		D7CC05042BFB352700C0B10A /* Logging.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E51C38F2AABA88C0095945F /* Logging.m */; };
 		D7CC05052BFB352700C0B10A /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DD3269F77CE00729ABD /* RootView.swift */; };
 		D7CC05062BFB352700C0B10A /* NavUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EF5F1E8228DB07100788987 /* NavUtil.m */; };
 		D7CC05072BFB352700C0B10A /* ConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DDE26A0B21200729ABD /* ConversationView.swift */; };
 		D7CC05082BFB352700C0B10A /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3096BF1326A5C29F0066F256 /* SettingView.swift */; };
 		D7CC05092BFB352700C0B10A /* RosWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E561455E2A6E02A8005CF82F /* RosWebView.swift */; };
-		D7CC050A2BFB352700C0B10A /* MainMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DD6269F784A00729ABD /* MainMenuView.swift */; };
 		D7CC050B2BFB352700C0B10A /* I18NExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EDF3C4129D4776D00AD1115 /* I18NExtension.swift */; };
 		D7CC050C2BFB352700C0B10A /* TTSHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3096BF1726A5D0990066F256 /* TTSHelper.swift */; };
-		D7CC050D2BFB352700C0B10A /* SystemStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308FCE1C27D8F4D3009FCC7B /* SystemStatusView.swift */; };
 		D7CC050E2BFB352700C0B10A /* CaBot.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DD9269F7E3800729ABD /* CaBot.xcdatamodeld */; };
 		D7CC050F2BFB352700C0B10A /* CaBotServiceCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306069B529A686D9001FB5DB /* CaBotServiceCommon.swift */; };
 		D7CC05102BFB352700C0B10A /* SystemStatusDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308FCE2B27E42B7B009FCC7B /* SystemStatusDetailView.swift */; };
@@ -114,6 +110,8 @@
 		D7CC05332BFB3BF900C0B10A /* DestinationDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7CC05322BFB3BF900C0B10A /* DestinationDetailView.swift */; };
 		D7CC05352BFB419900C0B10A /* DestinationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7CC05342BFB419900C0B10A /* DestinationsView.swift */; };
 		D7CC05382BFB688400C0B10A /* User-InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D7CC05362BFB688400C0B10A /* User-InfoPlist.strings */; };
+		D7D7A6FB2BFECB490072ADF6 /* TourDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7D7A6FA2BFECB490072ADF6 /* TourDetailView.swift */; };
+		D7E54B522C0CD03A002FE3C4 /* MainMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E54B512C0CD03A002FE3C4 /* MainMenuView.swift */; };
 		E561455F2A6E02A8005CF82F /* RosWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E561455E2A6E02A8005CF82F /* RosWebView.swift */; };
 /* End PBXBuildFile section */
 
@@ -219,6 +217,8 @@
 		D7CC05342BFB419900C0B10A /* DestinationsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DestinationsView.swift; sourceTree = "<group>"; };
 		D7CC05372BFB688400C0B10A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/User-InfoPlist.strings"; sourceTree = "<group>"; };
 		D7CC05392BFB68BB00C0B10A /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = "ja.lproj/User-InfoPlist.strings"; sourceTree = "<group>"; };
+		D7D7A6FA2BFECB490072ADF6 /* TourDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TourDetailView.swift; sourceTree = "<group>"; };
+		D7E54B512C0CD03A002FE3C4 /* MainMenuView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainMenuView.swift; sourceTree = "<group>"; };
 		E561455E2A6E02A8005CF82F /* RosWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RosWebView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -306,16 +306,12 @@
 				30E50DD3269F77CE00729ABD /* RootView.swift */,
 				30E50DD5269F784A00729ABD /* OnboardGrantAccess.swift */,
 				30E50DDC269FCBC200729ABD /* ResourceSelectView.swift */,
-				30E50DD6269F784A00729ABD /* MainMenuView.swift */,
-				308FCE1A27D8F4C8009FCC7B /* DeviceStatusView.swift */,
 				308FCE2D27E62B30009FCC7B /* BatteryStatusView.swift */,
-				308FCE1C27D8F4D3009FCC7B /* SystemStatusView.swift */,
 				308FCE2B27E42B7B009FCC7B /* SystemStatusDetailView.swift */,
 				308FCE2F27E81B7E009FCC7B /* StatusLabelStyle.swift */,
 				30E50DDE26A0B21200729ABD /* ConversationView.swift */,
 				09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */,
 				30E50DE726A0BBE900729ABD /* ToursView.swift */,
-				3013614226A0F8E10050CF9E /* TourDetailView.swift */,
 				3013614626A1E77B0050CF9E /* WebContentView.swift */,
 				3096BF1326A5C29F0066F256 /* SettingView.swift */,
 				7E9690C229EAF25C0062DEBD /* DetailSettingView.swift */,
@@ -431,6 +427,10 @@
 			children = (
 				30E50DE126A0BA5200729ABD /* DestinationsView.swift */,
 				30C3059D26B9036A00A1383A /* DestinationDetailView.swift */,
+				308FCE1A27D8F4C8009FCC7B /* DeviceStatusView.swift */,
+				30E50DD6269F784A00729ABD /* MainMenuView.swift */,
+				308FCE1C27D8F4D3009FCC7B /* SystemStatusView.swift */,
+				3013614226A0F8E10050CF9E /* TourDetailView.swift */,
 			);
 			path = Attend;
 			sourceTree = "<group>";
@@ -440,6 +440,8 @@
 			children = (
 				D7CC05342BFB419900C0B10A /* DestinationsView.swift */,
 				D7CC05322BFB3BF900C0B10A /* DestinationDetailView.swift */,
+				D7E54B512C0CD03A002FE3C4 /* MainMenuView.swift */,
+				D7D7A6FA2BFECB490072ADF6 /* TourDetailView.swift */,
 			);
 			path = User;
 			sourceTree = "<group>";
@@ -770,6 +772,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D7E54B522C0CD03A002FE3C4 /* MainMenuView.swift in Sources */,
 				D7CC04F42BFB352700C0B10A /* DialogViewControllerCabot.swift in Sources */,
 				D7CC04F52BFB352700C0B10A /* LogFilesView.swift in Sources */,
 				D7CC04F62BFB352700C0B10A /* CaBotAppModel.swift in Sources */,
@@ -781,22 +784,19 @@
 				D7CC04FB2BFB352700C0B10A /* ToursView.swift in Sources */,
 				D7CC04FC2BFB352700C0B10A /* JSHelper.swift in Sources */,
 				D7CC04FD2BFB352700C0B10A /* CaBotApp.swift in Sources */,
-				D7CC04FE2BFB352700C0B10A /* DeviceStatusView.swift in Sources */,
 				D7CC04FF2BFB352700C0B10A /* ResourceManager.swift in Sources */,
 				D7CC05002BFB352700C0B10A /* Extension.swift in Sources */,
 				D7CC05012BFB352700C0B10A /* WebContentView.swift in Sources */,
 				D7CC05022BFB352700C0B10A /* NavDeviceTTS.m in Sources */,
-				D7CC05032BFB352700C0B10A /* TourDetailView.swift in Sources */,
 				D7CC05042BFB352700C0B10A /* Logging.m in Sources */,
 				D7CC05052BFB352700C0B10A /* RootView.swift in Sources */,
 				D7CC05062BFB352700C0B10A /* NavUtil.m in Sources */,
 				D7CC05072BFB352700C0B10A /* ConversationView.swift in Sources */,
+				D7D7A6FB2BFECB490072ADF6 /* TourDetailView.swift in Sources */,
 				D7CC05082BFB352700C0B10A /* SettingView.swift in Sources */,
 				D7CC05092BFB352700C0B10A /* RosWebView.swift in Sources */,
-				D7CC050A2BFB352700C0B10A /* MainMenuView.swift in Sources */,
 				D7CC050B2BFB352700C0B10A /* I18NExtension.swift in Sources */,
 				D7CC050C2BFB352700C0B10A /* TTSHelper.swift in Sources */,
-				D7CC050D2BFB352700C0B10A /* SystemStatusView.swift in Sources */,
 				D7CC050E2BFB352700C0B10A /* CaBot.xcdatamodeld in Sources */,
 				D7CC050F2BFB352700C0B10A /* CaBotServiceCommon.swift in Sources */,
 				D7CC05102BFB352700C0B10A /* SystemStatusDetailView.swift in Sources */,
