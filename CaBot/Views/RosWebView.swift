@@ -23,23 +23,47 @@
 import SwiftUI
 import WebKit
 
-struct RosWebView: View {
+protocol LocalizationStatusDelegate {
+    func updated(status: Int)
+}
+
+struct RosWebView: View, LocalizationStatusDelegate {
+    class LocalizationStatusHandler: NSObject, WKScriptMessageHandlerWithReply {
+        var delegate: LocalizationStatusDelegate?
+        func userContentController(_ userContentController: WKUserContentController,
+                                   didReceive message: WKScriptMessage,
+                                   replyHandler: @escaping (Any?, String?) -> Void) {
+            if let status = message.body as? Int {
+                NSLog("RosWebView.Handler: \(status)")
+                delegate?.updated(status: status)
+            }
+        }
+    }
 
     var address: String
     var port: String
+    var localization = LocalizationStatusHandler()
+    @State private var localizationStatus = 0
     @State private var shouldRefresh = false
     @State private var isConfirming = false
     @EnvironmentObject var modelData: CaBotAppModel
 
+    func updated(status: Int) {
+        localizationStatus = status
+    }
+
     var body: some View {
-        VStack {
+        localization.delegate = self
+        return VStack {
             Button(action: {
                 isConfirming = true
             }, label: {
                 Label(LocalizedStringKey("Restart Localization"), systemImage: "arrow.clockwise")
             })
+            .disabled(localizationStatus != 2)
             .confirmationDialog(Text("Restart Localization"), isPresented: $isConfirming) {
                 Button {
+                    localizationStatus = 0
                     modelData.systemManageCommand(command: .restart_localization)
                 } label: {
                     Text("Restart Localization")
@@ -49,7 +73,7 @@ struct RosWebView: View {
             } message: {
                 Text("RESTART_LOCALIZATION_MESSAGE")
             }
-            LocalWebView(address: address, port: port, reload: $shouldRefresh)
+            LocalWebView(address: address, port: port, handler: localization, reload: $shouldRefresh)
         }
         .navigationBarTitleDisplayMode(.inline)
 // do not show reload button because it is confusing
@@ -79,10 +103,10 @@ struct LocalWebView: UIViewRepresentable {
     
     var address: String
     var port: String
+    var handler: WKScriptMessageHandlerWithReply
     @Binding var reload: Bool
     
     fileprivate func loadRequest(in webView: WKWebView) {
-        
         if let htmlPath = Bundle.main.url(forResource: "Resource/localserver/cabot_map", withExtension: "html"),
            let baseUrl = Bundle.main.resourceURL?.appendingPathComponent("Resource/localserver") {
             do {
@@ -99,7 +123,11 @@ struct LocalWebView: UIViewRepresentable {
     }
     
     func makeUIView(context: UIViewRepresentableContext<LocalWebView>) -> WKWebView {
-        let webView = WKWebView()
+        let configuration = WKWebViewConfiguration()
+        let userContentController = WKUserContentController()
+        userContentController.addScriptMessageHandler(handler, contentWorld: .page, name: "LocalizeStatus")
+        configuration.userContentController = userContentController
+        let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 320, height: 320), configuration: configuration)
         UIApplication.shared.isIdleTimerDisabled = true
         webView.navigationDelegate = context.coordinator
         webView.configuration.userContentController.add(context.coordinator, name: "callbackHandler")
