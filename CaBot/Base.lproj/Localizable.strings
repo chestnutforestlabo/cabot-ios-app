@@ -290,5 +290,7 @@
 
 
 // ROS Web View
+"Reload"="Reload";
 "Restart Localization"="Restart Localization";
+"Restarting Localization"="Restarting Localization";
 "RESTART_LOCALIZATION_MESSAGE"="The localization will be restarted. This should be used when the robot is stopped.";

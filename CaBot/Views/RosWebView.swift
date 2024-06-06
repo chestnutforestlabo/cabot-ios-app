@@ -58,7 +58,11 @@ struct RosWebView: View, LocalizationStatusDelegate {
             Button(action: {
                 isConfirming = true
             }, label: {
-                Label(LocalizedStringKey("Restart Localization"), systemImage: "arrow.clockwise")
+                if (localizationStatus == 2) {
+                    Label(LocalizedStringKey("Restart Localization"), systemImage: "arrow.clockwise")
+                } else {
+                    Label(LocalizedStringKey("Restarting Localization"), systemImage: "arrow.clockwise")
+                }
             })
             .disabled(localizationStatus != 2)
             .confirmationDialog(Text("Restart Localization"), isPresented: $isConfirming) {
@@ -76,16 +80,15 @@ struct RosWebView: View, LocalizationStatusDelegate {
             LocalWebView(address: address, port: port, handler: localization, reload: $shouldRefresh)
         }
         .navigationBarTitleDisplayMode(.inline)
-// do not show reload button because it is confusing
-//        .toolbar {
-//            Button {
-//                reload()
-//            } label: {
-//                Image(systemName: "arrow.clockwise")
-//                Text("Reload")
-//            }
-//            .accessibilityLabel("Reload")
-//        }
+        .toolbar {
+            Button {
+                reload()
+            } label: {
+                Image(systemName: "arrow.clockwise")
+                Text("Reload")
+            }
+            .accessibilityLabel("Reload")
+        }
     }
 
     func reload() {
