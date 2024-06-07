@@ -513,7 +513,8 @@ struct MapMenus: View {
             Section(header:Text("Map")) {
                 HStack {
                     NavigationLink(
-                        destination: RosWebView(address: modelData.getCurrentAddress(), port: modelData.rosPort),
+                        destination: RosWebView(address: modelData.getCurrentAddress(), port: modelData.rosPort)
+                            .environmentObject(modelData),
                         label: {
                             Text("ROS Map")
                         })

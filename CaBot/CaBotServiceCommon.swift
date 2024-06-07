@@ -108,6 +108,7 @@ enum CaBotManageCommand:String {
     case start
     case stop
     case lang
+    case restart_localization
 }
 
 struct DeviceStatus: Decodable {

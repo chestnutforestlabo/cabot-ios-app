@@ -286,3 +286,9 @@
 
 "User App Info"="ユーザーアプリ情報";
 "CUSTOMIZED_TOUR"="カスタムツアー";
+
+// ROS Web View
+"Reload"="リロード";
+"Restart Localization"="位置推定の再試行";
+"Restarting Localization"="位置推定中";
+"RESTART_LOCALIZATION_MESSAGE"="位置推定が再試行されます。必ずロボットが停止した状態で行ってください。";
