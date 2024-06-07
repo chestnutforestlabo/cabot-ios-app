@@ -44,6 +44,7 @@ struct SharedInfo: Codable {
         case OverrideTour
         case OverrideDestination
         case Skip
+        case RequestUserInfo
     }
     init(type: InfoType, value: String, flag1: Bool = false, flag2: Bool = false, location: Int = 0, length: Int = 0) {
         self.type = type
