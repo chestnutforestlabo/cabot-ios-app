@@ -936,6 +936,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 break
             case .lang:
                 break
+            case .restart_localization:
+                break
             }
             systemStatus.components.removeAll()
             objectWillChange.send()
