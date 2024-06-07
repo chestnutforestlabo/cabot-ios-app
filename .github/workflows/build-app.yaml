@@ -16,4 +16,4 @@ jobs:
     - name: Build Xcode Project
       run: |
         xcodebuild -scheme CaBot-User -sdk iphonesimulator -configuration Debug build
-        xcodebuild -scheme "CaBot Attend" -sdk iphonesimulator -configuration Debug build
+        xcodebuild -scheme CaBot-Attend -sdk iphonesimulator -configuration Debug build
