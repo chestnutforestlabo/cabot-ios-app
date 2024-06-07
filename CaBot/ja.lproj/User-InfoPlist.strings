@@ -20,12 +20,12 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-CFBundleDisplayName = "AI Suitcase";
+CFBundleDisplayName = "AIS ユーザー";
 
-NSBluetoothAlwaysUsageDescription = "This app works as an peripheral device of your robot.";
-NSBluetoothPeripheralUsageDescription = "This app works as an peripheral device of your robot.";
-NSLocationAlwaysAndWhenInUseUsageDescription = "This app uses your location always and When in use";
-NSLocationAlwaysUsageDescription = "This app uses your location always";
-NSLocationWhenInUseUsageDescription = "This app uses your location when in use";
-NSMicrophoneUsageDescription = "This app uses your microphone";
-NSSpeechRecognitionUsageDescription = "This app uses speech recognition";
+NSBluetoothAlwaysUsageDescription = "このアプリはロボットの周辺機器として動作します";
+NSBluetoothPeripheralUsageDescription = "このアプリはロボットの周辺機器として動作します";
+NSLocationAlwaysAndWhenInUseUsageDescription = "このアプリはあなたの位置を常に利用します";
+NSLocationAlwaysUsageDescription = "このアプリはあなたの位置を利用します";
+NSLocationWhenInUseUsageDescription = "このアプリは使用中のみあなたの位置を利用します";
+NSMicrophoneUsageDescription = "このアプリはマイクを使用します";
+NSSpeechRecognitionUsageDescription = "このアプリは音声認識を使用します";

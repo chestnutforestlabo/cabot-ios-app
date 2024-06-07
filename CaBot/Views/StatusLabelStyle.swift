@@ -1,4 +1,3 @@
-// please remove this line
 /*******************************************************************************
  * Copyright (c) 2022  Carnegie Mellon University
  *

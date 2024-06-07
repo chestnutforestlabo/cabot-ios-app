@@ -31,7 +31,7 @@ struct LogFilesView: View {
                         },
                                label: {
                             HStack {
-                                Text(log_entry.wrappedValue.name)
+                                Text(log_entry.wrappedValue.logDate(for: locale.identifier))
                                 
                                 Spacer()
                                 if log_entry.wrappedValue.is_uploaded_to_box ?? false {

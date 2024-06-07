@@ -117,6 +117,17 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
             });
         }, 0);
 
+        var localizeStatusTopic = new ROSLIB.Topic({
+            ros : ros,
+            name : '/localize_status',
+            messageType : 'mf_localization_msgs/MFLocalizeStatus',
+            latch : true
+        });
+        localizeStatusTopic.subscribe(function(message) {
+            console.log(message);
+            window.webkit.messageHandlers.LocalizeStatus.postMessage(message.status);
+        });
+
         // Setup a client to listen to TFs.
         var tfClient = new ROSLIB.TFClient({
             ros : ros,

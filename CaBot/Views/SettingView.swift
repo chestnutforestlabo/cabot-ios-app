@@ -33,26 +33,6 @@ struct SettingView: View {
 
     var body: some View {
         return Form {
-            Section{
-                VStack {
-                    HStack{
-                        Text("MODE_TYPE").onTapGesture(count: 5) {
-                            if (modelData.modeType != .Debug){
-                                modelData.modeType = .Debug
-                            }
-                        }
-                        Spacer()
-                    }
-                    Picker("", selection: $modelData.modeType){
-                        Text(LocalizedStringKey(ModeType.Normal.rawValue)).tag(ModeType.Normal)
-                        Text(LocalizedStringKey(ModeType.Advanced.rawValue)).tag(ModeType.Advanced)
-                        if(modelData.modeType == .Debug){
-                            Text(LocalizedStringKey(ModeType.Debug.rawValue)).tag(ModeType.Debug)
-                        }
-                    }.pickerStyle(SegmentedPickerStyle())
-                }
-            }
-
             Section(header: Text("Settings")){
                 Button(action: {
                     UserDefaults.standard.setValue(false, forKey: ResourceSelectView.resourceSelectedKey)

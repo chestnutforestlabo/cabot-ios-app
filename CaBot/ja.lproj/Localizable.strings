@@ -239,6 +239,7 @@
 "CONFIRM_DISCARD_SUBMISSION" = "レポートを破棄しても良いですか？";
 "SUITCASE_DOES_NOT_ACCEPT_NEW_REPORT" = "スーツケースはレポートの提出を受け付けていません";
 "PLEASE_CONNECT_TO_SUITCASE" = "スーツケースと接続してください";
+"INVALID_DATE_STRING" = "無効な日付文字列";
 
 
 // TTSHelper
@@ -285,3 +286,9 @@
 
 "User App Info"="ユーザーアプリ情報";
 "CUSTOMIZED_TOUR"="カスタムツアー";
+
+// ROS Web View
+"Reload"="リロード";
+"Restart Localization"="位置推定の再試行";
+"Restarting Localization"="位置推定中";
+"RESTART_LOCALIZATION_MESSAGE"="位置推定が再試行されます。必ずロボットが停止した状態で行ってください。";

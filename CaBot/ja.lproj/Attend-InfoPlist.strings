@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-CFBundleDisplayName = "AIスーツケース";
+CFBundleDisplayName = "AIS アテンド";
 
 NSBluetoothAlwaysUsageDescription = "このアプリはロボットの周辺機器として動作します";
 NSBluetoothPeripheralUsageDescription = "このアプリはロボットの周辺機器として動作します";

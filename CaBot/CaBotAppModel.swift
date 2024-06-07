@@ -881,6 +881,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func skipDestination() -> Void {
+        guard tourManager.hasDestination else { return }
+
         let skip = tourManager.skipDestination()
         self.stopSpeak()
         var announce = CustomLocalizedString("Skip Message %@", lang: self.resourceLang, skip.title.pron)
@@ -933,6 +935,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 systemStatus.level = .Deactivating
                 break
             case .lang:
+                break
+            case .restart_localization:
                 break
             }
             systemStatus.components.removeAll()

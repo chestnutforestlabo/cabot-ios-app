@@ -35,67 +35,31 @@ struct StaticTourDetailView: View {
 
         Form {
             Section(header: Text("Actions")) {
-                if modelData.modeType == .Normal {
-                    Button(action: {
-                        if tourManager.hasDestination {
-                            targetTour = tour
-                            isConfirming = true
-                        } else {
-                            tourManager.set(tour: tour)
-                            modelData.needToStartAnnounce(wait: true)
-                            NavigationUtil.popToRootView()
-                        }
-                    }) {
-                        Label{
-                            Text("SET_TOUR")
-                        } icon: {
-                            Image(systemName: "arrow.triangle.turn.up.right.diamond")
-                        }
-                    }
-                    .disabled(hasError)
-                    .confirmationDialog(Text("ADD_TOUR"), isPresented: $isConfirming) {
-                        Button {
-                            if let tour = targetTour {
-                                tourManager.set(tour: tour)
-                                NavigationUtil.popToRootView()
-                                targetTour = nil
-                            }
-                        } label: {
-                            Text("OVERWRITE_TOUR")
-                        }
-                        Button("Cancel", role: .cancel) {
-                        }
-                    } message: {
-                        let message = LocalizedStringKey("ADD_TOUR_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
-                        Text(message)
-                    }
-                } else {
-                    Button(action: {
-                        targetTour = tour
-                        isConfirming = true
-                    }) {
-                        Label{
-                            Text("SEND_TOUR")
-                        } icon: {
-                            Image(systemName: "arrow.triangle.turn.up.right.diamond")
-                        }
-                    }
-                    .disabled(hasError)
-                    .confirmationDialog(Text("SEND_TOUR"), isPresented: $isConfirming, presenting: targetTour) { detail in
-                        Button {
-                            modelData.share(tour: targetTour!)
-                            NavigationUtil.popToRootView()
-                            targetTour = nil
-                        } label: {
-                            Text("SEND_TOUR")
-                        }
-                        Button("Cancel", role: .cancel) {
-                        }
-                    } message: { detail in
-                        let message = LocalizedStringKey("SEND_TOUR_MESSAGE \(detail.title.text)")
-                        Text(message)
+                Button(action: {
+                    targetTour = tour
+                    isConfirming = true
+                }) {
+                    Label{
+                        Text("SEND_TOUR")
+                    } icon: {
+                        Image(systemName: "arrow.triangle.turn.up.right.diamond")
                     }
                 }
+                .disabled(hasError)
+                .confirmationDialog(Text("SEND_TOUR"), isPresented: $isConfirming, presenting: targetTour) { detail in
+                    Button {
+                        modelData.share(tour: targetTour!)
+                        NavigationUtil.popToRootView()
+                        targetTour = nil
+                    } label: {
+                        Text("SEND_TOUR")
+                    }
+                    Button("Cancel", role: .cancel) {
+                    }
+                } message: { detail in
+                    let message = LocalizedStringKey("SEND_TOUR_MESSAGE \(detail.title.text)")
+                    Text(message)
+                }                
             }
             Section(header: Text(tour.title.text)) {
                 if let cd = tour.currentDestination {

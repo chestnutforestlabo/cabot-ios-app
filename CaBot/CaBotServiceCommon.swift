@@ -108,6 +108,7 @@ enum CaBotManageCommand:String {
     case start
     case stop
     case lang
+    case restart_localization
 }
 
 struct DeviceStatus: Decodable {
@@ -402,6 +403,7 @@ enum CaBotLogRequestType:String, Decodable {
 
 struct LogEntry: Decodable, Hashable {
     var name: String
+    var nanoseconds: String?
     var title: String?
     var detail: String?
     var is_report_submitted: Bool? = false
@@ -418,6 +420,44 @@ struct LogEntry: Decodable, Hashable {
                 return title.count > 0 && detail.count > 0
             }
             return false
+        }
+    }
+    
+    func logDate(for language: String) -> String {
+        if let str_nanoseconds = nanoseconds {
+            let inputFormatter = DateFormatter()
+            inputFormatter.dateFormat = "'cabot_'yyyy'-'MM'-'dd'-'HH'-'mm'-'ss"
+            
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateStyle = .medium
+            dateFormatter.timeStyle = .none
+            dateFormatter.locale = Locale(identifier: language)
+            
+            let timeFormatter = DateIntervalFormatter()
+            timeFormatter.dateStyle = .none
+            timeFormatter.timeStyle = .short
+            timeFormatter.locale = Locale(identifier: language)
+            
+            guard let date = inputFormatter.date(from: name) else {
+                return CustomLocalizedString("INVALID_DATE_STRING", lang: language)
+            }
+            
+            let formattedDate = dateFormatter.string(from: date)
+            
+            let formattedTime: String
+            if let int_nanoseconds = Int(str_nanoseconds) {
+                var seconds = Double(int_nanoseconds) / 1_000_000_000
+                seconds = max(seconds, 60)
+                let endDate = Date(timeInterval: seconds, since: date)
+                formattedTime = timeFormatter.string(from: date, to: endDate)
+            } else {
+                let endDate = Date() // now
+                formattedTime = timeFormatter.string(from: date, to: endDate)
+            }
+            
+            return "\(formattedDate)  \(formattedTime)"
+        } else {
+            return name
         }
     }
 }
