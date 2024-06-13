@@ -1356,6 +1356,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.share(user_info: SharedInfo(type: .NextDestination, value: self.tourManager.nextDestination?.title.text ?? ""))
             self.share(user_info: SharedInfo(type: .Destinations, value: self.tourManager.destinations.map { $0.title.text }.joined(separator: ",")))
         }
+        if userInfo.type == .ClearDestinations {
+            self.tourManager.clearAll()
+        }
     }
 
     func getSpeechPriority() -> SpeechPriority {
@@ -1700,6 +1703,9 @@ class UserInfoBuffer {
             // do nothing
             break
         case .RequestUserInfo:
+            // do nothing
+            break
+        case .ClearDestinations:
             // do nothing
             break
         }
