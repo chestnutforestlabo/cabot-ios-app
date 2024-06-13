@@ -1027,6 +1027,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
     }
 
+    func stopSpeak(manager: TourManager) {
+        self.stopSpeak()
+    }
+
     private func send(destination: String) -> Bool {
         DispatchQueue.main.async {
             print("Show modal waiting")
