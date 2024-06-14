@@ -25,7 +25,6 @@ import Foundation
 protocol TourManagerDelegate {
     func tour(manager: TourManager, destinationChanged: Destination?)
     func tourUpdated(manager: TourManager)
-    func stopSpeak(manager: TourManager)
 }
 
 class TourManager: TourProtocol {
@@ -144,12 +143,11 @@ class TourManager: TourProtocol {
         delegate?.tour(manager: self, destinationChanged: nil)
     }
 
-    func clearAll() {
+    func clearAllDestinations() {
         _destinations.removeAll()
         _currentDestination = nil
         _arrivedDestination = nil
         title = I18NText(text: [:], pron: [:])
-        delegate?.stopSpeak(manager: self)
         delegate?.tourUpdated(manager: self)
         delegate?.tour(manager: self, destinationChanged: nil)
     }
