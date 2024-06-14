@@ -101,7 +101,7 @@ struct DynamicTourDetailView: View {
                 }
                 .confirmationDialog(Text("CANCEL_NAVIGATION"), isPresented: $isConfirming) {
                     Button {
-                        modelData.tourManager.clearAll()
+                        modelData.clearAll()
                         NavigationUtil.popToRootView()
                     } label: {
                         Text("CANCEL_ALL")
