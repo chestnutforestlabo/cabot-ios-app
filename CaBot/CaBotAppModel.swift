@@ -1364,6 +1364,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if userInfo.type == .ClearDestinations {
             self.clearAll()
         }
+        if userInfo.type == .ChangeLanguage {
+            self.resource?.lang = userInfo.value
+            self.updateVoice()
+        }
     }
 
     func getSpeechPriority() -> SpeechPriority {
@@ -1711,6 +1715,9 @@ class UserInfoBuffer {
             // do nothing
             break
         case .ClearDestinations:
+            // do nothing
+            break
+        case .ChangeLanguage:
             // do nothing
             break
         }
