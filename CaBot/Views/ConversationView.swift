@@ -29,7 +29,7 @@ struct ConversationView: UIViewControllerRepresentable {
 
     let REQUEST_START_NAVIGATION:Notification.Name = Notification.Name(rawValue:"request_start_navigation")
 
-    var src: Source
+    var src: Source?
     var dsrc: Source?
 
     class Observer {
@@ -67,13 +67,18 @@ struct ConversationView: UIViewControllerRepresentable {
 
     func makeUIViewController(context: Context) -> DialogViewController {
         // put dummy config for local converstation
-        DialogManager.sharedManager().config = ["conv_server": "dummy",
-                                                "conv_api_key": "dummy"]
+        
+        DialogManager.sharedManager().config = [
+            //"conv_server": "127.0.0.1:5050",
+            "conv_server": "192.168.1.164:5050",
+            "conv_api_key": "hoge",
+            "conv_client_id": "cabot-app"
+        ]
+        DialogManager.sharedManager().useHttps = false;
 
         let view = DialogViewControllerCabot()
         view.baseHelper = modelData.dialogViewHelper
-        view.voice = modelData.voice!.AVvoice
-        view.modelURL = src.url
+        view.tts = modelData.tts
 
         let observer = Observer.getInstance(owner:self)
         NotificationCenter.default.addObserver(observer,

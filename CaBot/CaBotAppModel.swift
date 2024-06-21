@@ -489,7 +489,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private var bleService: CaBotServiceBLE
     private var tcpService: CaBotServiceTCP
     private var fallbackService: FallbackService
-    private let tts: CaBotTTS
+    let tts: CaBotTTS
     private var willSpeakArriveMessage: Bool = false
     private var touchStartTime: CFAbsoluteTime = 0
     private var announceToPushRightButtonTime: CFAbsoluteTime = 0

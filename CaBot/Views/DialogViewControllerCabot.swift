@@ -25,19 +25,13 @@ import Foundation
 import HLPDialog
 
 class DialogViewControllerCabot : DialogViewController{
-    var modelURL: URL?
-    var voice: AVSpeechSynthesisVoice?
-
     override func viewDidLoad() {
-        self.tts = CaBotTTS(voice: self.voice!)
-        //self.tts = SilverDefaultTTS()
-
         if self.baseHelper == nil {
             self.baseHelper = DialogViewHelper()
         }
     }
-
-    override func getConversation(pre: Locale) -> HLPConversation {
-        return LocalConversation(withScript: modelURL!)
-    }
+    
+    //override func getConversation(pre: Locale) -> HLPConversation {
+    //    return LocalConversation(withScript: modelURL!)
+    //}
 }
