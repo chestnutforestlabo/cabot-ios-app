@@ -179,9 +179,12 @@
 
 
 // SettingView
+"TTS"="テキスト読み上げ";
 "Speech Voice"="読み上げ音声";
 "Voice"="音声";
+"User Voice"="ユーザー音声";
 "Speech Speed"="速度";
+"User Speech Speed"="ユーザー速度";
 "Connection"="接続";
 
 "PRIORITY_CONNECTION"="優先接続先";
@@ -274,6 +277,7 @@
 
 
 "TTS Enabled (Advanced only)"="音声読み上げ有り (詳細モード用)";
+"Sync Voice Settings"="音声設定同期";
 "Speech Priority"="音声の優先順位";
 "Robot"="ロボット";
 "App"="アプリ";

@@ -53,15 +53,47 @@ struct SettingView: View {
                         self.isResourceChanging = true
                         modelData.resource = modelData.resource
                         modelData.updateVoice()
-                        if modelData.modeType != .Normal{
-                            modelData.share(user_info: SharedInfo(type: .ChangeLanguage, value: lang))
-                        }
                     }
                 }
 
                 NavigationLink(destination: DetailSettingView().environmentObject(modelData.detailSettingModel), label: {
                     Text("DETAIL_SETTING")
                 })
+            }
+
+            Section(header:Text("TTS")) {
+                Picker(LocalizedStringKey("Voice"), selection: $modelData.voice) {
+                    ForEach(TTSHelper.getVoices(by: locale), id: \.self) { voice in
+                        Text(voice.AVvoice.name).tag(voice as Voice?)
+                    }
+                }.onChange(of: modelData.voice, perform: { value in
+                    if let voice = modelData.voice {
+                        if !isResourceChanging {
+                            modelData.playSample()
+                        }
+                    }
+                }).onTapGesture {
+                    isResourceChanging = false
+                }
+                .pickerStyle(DefaultPickerStyle())
+                
+                HStack {
+                    Text("Speech Speed")
+                        .accessibility(hidden: true)
+                    Slider(value: $modelData.speechRate,
+                           in: 0...1,
+                           step: 0.05,
+                           onEditingChanged: { editing in
+                            timer?.invalidate()
+                            timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
+                                modelData.playSample()
+                            }
+                    })
+                        .accessibility(label: Text("Speech Speed"))
+                        .accessibility(value: Text(String(format:"%.0f %%", arguments:[modelData.speechRate*100.0])))
+                    Text(String(format:"%.0f %%", arguments:[modelData.speechRate*100.0]))
+                        .accessibility(hidden: true)
+                }
             }
 
             Section(header: Text("Connection")) {
@@ -92,19 +124,17 @@ struct SettingView: View {
                                 $modelData.secondaryAddr)
                 }
             }
-
-            if (modelData.modeType == .Debug){
-                Section(header: Text("DEBUG")) {
-                    Toggle("MENU_DEBUG", isOn: $modelData.menuDebug)
-                    Toggle("NO_SUITCASE_DEBUG", isOn: $modelData.noSuitcaseDebug)
-                }
-            }
         }
     }
 }
 
 struct SettingView_Previews: PreviewProvider {
     static var previews: some View {
+        preview
+        preview_ja
+    }
+    
+    static var preview: some View {
         let modelData = CaBotAppModel()
 
         modelData.teamID = "test"
@@ -112,6 +142,18 @@ struct SettingView_Previews: PreviewProvider {
         return SettingView(langOverride: "en-US")
             .environmentObject(modelData)
             .environment(\.locale, Locale.init(identifier: "en-US"))
+            .previewDisplayName("preview")
+    }
+    
+    static var preview_ja: some View {
+        let modelData = CaBotAppModel()
+
+        modelData.teamID = "test"
+        
+        return SettingView(langOverride: "ja-JP")
+            .environmentObject(modelData)
+            .environment(\.locale, Locale.init(identifier: "ja-JP"))
+            .previewDisplayName("preview_ja")
     }
 }
 

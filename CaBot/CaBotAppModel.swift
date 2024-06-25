@@ -359,6 +359,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
     }
 
+    @Published var isTTSUserSync: Bool = true
+    
     @Published var voice: Voice? = nil {
         didSet {
             if let id = voice?.AVvoice.identifier {

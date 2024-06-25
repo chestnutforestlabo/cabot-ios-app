@@ -536,42 +536,6 @@ struct SettingMenus: View {
         let buildNo = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
 
         Section(header:Text("System")) {
-            Toggle(isOn: $modelData.isTTSEnabledForAdvanced) {
-                Text("TTS Enabled (Advanced only)")
-            }
-            Picker(LocalizedStringKey("Voice"), selection: $modelData.voice) {
-                ForEach(TTSHelper.getVoices(by: locale), id: \.self) { voice in
-                    Text(voice.AVvoice.name).tag(voice as Voice?)
-                }
-            }.onChange(of: modelData.voice, perform: { value in
-                if let voice = modelData.voice {
-                    if !isResourceChanging {
-                        modelData.playSample()
-                    }
-                }
-            }).onTapGesture {
-                isResourceChanging = false
-            }
-            .pickerStyle(DefaultPickerStyle())
-
-            HStack {
-                Text("Speech Speed")
-                    .accessibility(hidden: true)
-                Slider(value: $modelData.speechRate,
-                       in: 0...1,
-                       step: 0.05,
-                       onEditingChanged: { editing in
-                        timer?.invalidate()
-                        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
-                            modelData.playSample()
-                        }
-                })
-                    .accessibility(label: Text("Speech Speed"))
-                    .accessibility(value: Text(String(format:"%.0f %%", arguments:[modelData.speechRate*100.0])))
-                Text(String(format:"%.0f %%", arguments:[modelData.speechRate*100.0]))
-                    .accessibility(hidden: true)
-            }
-
             if #available(iOS 15.0, *) {
                 NavigationLink (destination: LogFilesView(langOverride: modelData.resourceLang)
                     .environmentObject(modelData.logList),
