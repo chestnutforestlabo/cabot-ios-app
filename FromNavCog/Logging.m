@@ -56,10 +56,12 @@ static BOOL isSensorLogging = true;
         return nil;
     }
     isSensorLogging = _isSensorLogging;
+    NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
+
     static NSDateFormatter *formatter;
     if (!formatter) {
         formatter = [[NSDateFormatter alloc] init];
-        [formatter setDateFormat:@"yyyy-MM-dd-HH-mm-ss'.log'"];
+        [formatter setDateFormat:[NSString stringWithFormat:@"'%@-'yyyy-MM-dd-HH-mm-ss'.log'", appName]];
         [formatter setTimeZone:[NSTimeZone systemTimeZone]];
     }
     NSString *fileName = [formatter stringFromDate:[NSDate date]];
