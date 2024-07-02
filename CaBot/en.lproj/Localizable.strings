@@ -291,3 +291,7 @@
 "Restart Localization"="Restart Localization";
 "Restarting Localization"="Restarting Localization";
 "RESTART_LOCALIZATION_MESSAGE"="The localization will be restarted. This should be used when the robot is stopped.";
+
+//Resource Download Alert View
+"RetryAlert" = "Check the connection with the server,Please！";
+"Retry" = "Retry";
