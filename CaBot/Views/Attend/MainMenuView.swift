@@ -545,7 +545,7 @@ struct SettingMenus: View {
                     Text(voice.AVvoice.name).tag(voice as Voice?)
                 }
             }.onChange(of: modelData.voice, perform: { value in
-                if let voice = modelData.voice {
+                if let _ = modelData.voice {
                     if !isResourceChanging {
                         modelData.playSample()
                     }

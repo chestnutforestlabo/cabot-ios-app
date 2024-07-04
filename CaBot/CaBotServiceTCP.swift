@@ -61,7 +61,7 @@ class CaBotServiceTCP: NSObject {
     }
     
     func stop(){
-        NSLog("stopping TCP \(address)")
+        if let address = address { NSLog("stopping TCP \(address)") }
         self.connected = false
         DispatchQueue.main.async {
             self.delegate?.caBot(service: self, centralConnected: self.connected)
@@ -86,7 +86,7 @@ class CaBotServiceTCP: NSObject {
         self.address = addressCandidate.getCurrent()
         self.port = port
         DispatchQueue.global(qos: .utility).async {
-            let timeoutTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] (timer) in
+            _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] (timer) in
                 guard let weakself = self else { return }
                 if weakself.socket == nil {
                     weakself.address = addressCandidate.getNext()
@@ -126,14 +126,12 @@ class CaBotServiceTCP: NSObject {
         }
         socket.on(clientEvent: .error){[weak self] data, ack in
             guard let weakself = self else { return }
-            guard let delegate = weakself.delegate else { return }
             DispatchQueue.main.async {
                 weakself.stop()
             }
         }
         socket.on(clientEvent: .disconnect){[weak self] data, ack in
             guard let weakself = self else { return }
-            guard let delegate = weakself.delegate else { return }
             DispatchQueue.main.async {
                 weakself.stop()
             }
@@ -257,7 +255,6 @@ class CaBotServiceTCP: NSObject {
         }
         socket.connect(timeoutAfter: 2.0) { [weak self] in
             guard let weakself = self else { return }
-            guard let delegate = weakself.delegate else { return }
             weakself.stop()
         }
     }

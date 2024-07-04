@@ -662,6 +662,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		D7CC05212BFB352700C0B10A /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -679,6 +680,7 @@
 		};
 		E5FD56542A835D56008237DC /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -993,10 +995,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"CaBot/Views/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/iOS",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = $PROJECT_DIR/FromNavCog/NavCog3.pch;
 				HEADER_SEARCH_PATHS = "";
@@ -1028,10 +1027,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"CaBot/Views/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/iOS",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = $PROJECT_DIR/FromNavCog/NavCog3.pch;
 				HEADER_SEARCH_PATHS = "";
@@ -1177,10 +1173,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"CaBot/Views/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/iOS",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = $PROJECT_DIR/FromNavCog/NavCog3.pch;
 				HEADER_SEARCH_PATHS = "";
@@ -1212,10 +1205,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"CaBot/Views/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/iOS",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = $PROJECT_DIR/FromNavCog/NavCog3.pch;
 				HEADER_SEARCH_PATHS = "";

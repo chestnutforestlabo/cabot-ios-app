@@ -341,7 +341,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 }
                 UserDefaults.standard.synchronize()
                 
-                self.fallbackService.manage(command: .lang, param: resource.lang)
+                _ = self.fallbackService.manage(command: .lang, param: resource.lang)
             }
         }
     }
@@ -638,7 +638,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         let generalCategory = UNNotificationCategory(identifier: "GENERAL",
                                                      actions: [],
                                                      intentIdentifiers: [],
-                                                     options: [.allowAnnouncement])
+                                                     options: [])
         notificationCenter.setNotificationCategories([generalCategory])
     }
 
@@ -885,7 +885,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
         let skip = tourManager.skipDestination()
         self.stopSpeak()
-        var announce = CustomLocalizedString("Skip Message %@", lang: self.resourceLang, skip.title.pron)
+        let announce = CustomLocalizedString("Skip Message %@", lang: self.resourceLang, skip.title.pron)
         self.tts.speak(announce){
         }
     }
@@ -1092,7 +1092,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     self.share(user_info: SharedInfo(type: .RequestUserInfo, value: ""))
                 }
                 DispatchQueue.main.async {
-                    self.fallbackService.manage(command: .lang, param: self.resourceLang)
+                    _ = self.fallbackService.manage(command: .lang, param: self.resourceLang)
                 }
             }
         }
@@ -1207,7 +1207,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.skipDestination()
         case .getlanguage:
             DispatchQueue.main.async {
-                self.fallbackService.manage(command: .lang, param: I18N.shared.langCode)
+                _ = self.fallbackService.manage(command: .lang, param: I18N.shared.langCode)
             }
             break
         }
