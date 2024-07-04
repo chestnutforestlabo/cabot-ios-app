@@ -1224,7 +1224,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 } else {
                     notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
                         if granted {
-                            self.pushDeviceState()
+                            DispatchQueue.main.async {
+                                self.pushDeviceState()
+                            }
                         } else {
                             print("Permission for notification not granted.")
                         }
@@ -1245,7 +1247,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 } else {
                     notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
                         if granted {
-                            self.pushSystemState()
+                            DispatchQueue.main.async {
+                                self.pushSystemState()
+                            }
                         } else {
                             print("Permission for notification not granted.")
                         }
