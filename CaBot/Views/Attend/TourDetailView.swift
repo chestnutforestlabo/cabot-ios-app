@@ -30,7 +30,6 @@ struct StaticTourDetailView: View {
     var tour: Tour
 
     var body: some View {
-        let tourManager = modelData.tourManager
         let hasError = tour.destinations.first(where: {d in d.error != nil}) != nil
 
         Form {
@@ -101,7 +100,7 @@ struct DynamicTourDetailView: View {
                 }
                 .confirmationDialog(Text("CANCEL_NAVIGATION"), isPresented: $isConfirming) {
                     Button {
-                        modelData.tourManager.clearAll()
+                        modelData.clearAll()
                         NavigationUtil.popToRootView()
                     } label: {
                         Text("CANCEL_ALL")

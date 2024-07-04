@@ -53,6 +53,9 @@ struct SettingView: View {
                         self.isResourceChanging = true
                         modelData.resource = modelData.resource
                         modelData.updateVoice()
+                        if modelData.modeType != .Normal{
+                            modelData.share(user_info: SharedInfo(type: .ChangeLanguage, value: lang))
+                        }
                     }
                 }
 

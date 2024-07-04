@@ -445,6 +445,7 @@ struct SettingMenus: View {
     var body: some View {
         let versionNo = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
         let buildNo = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
+        let commitHash = Bundle.main.infoDictionary!["GitCommitHash"] as! String
 
         Section(header:Text("System")) {
             Picker(LocalizedStringKey("Voice"), selection: $modelData.voice) {
@@ -452,7 +453,7 @@ struct SettingMenus: View {
                     Text(voice.AVvoice.name).tag(voice as Voice?)
                 }
             }.onChange(of: modelData.voice, perform: { value in
-                if let voice = modelData.voice {
+                if let _ = modelData.voice {
                     if !isResourceChanging {
                         modelData.playSample()
                     }
@@ -524,7 +525,7 @@ struct SettingMenus: View {
                     }).pickerStyle(SegmentedPickerStyle())
                 }
             }
-            Text("Version: \(versionNo) (\(buildNo)) - \(CaBotServiceBLE.CABOT_BLE_VERSION)")
+            Text("Version: \(versionNo) (\(buildNo)) \(commitHash) - \(CaBotServiceBLE.CABOT_BLE_VERSION)")
         }
     }
 }
