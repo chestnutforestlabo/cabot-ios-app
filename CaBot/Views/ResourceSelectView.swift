@@ -30,18 +30,27 @@ struct ResourceSelectView: View {
     var body: some View {
         Form {
             Section() {
-                ForEach (model.resourceManager.resources, id: \.self) { resource in
+                if model.resourceManager.resources.count == 0
+                {
                     Button(action: {
-                        UserDefaults.standard.setValue(true, forKey: ResourceSelectView.resourceSelectedKey)
-                        UserDefaults.standard.synchronize()
-                        model.resource = resource
-                        withAnimation() {
-                            model.displayedScene = .App
-                        }
+                        model.displayedScene = .App
                     }) {
-                        HStack {
-                            Image(systemName: "folder")
-                            Text("\(resource.name)")
+                        Text(CustomLocalizedString("ReturnMainmenu", lang: model.resourceLang))
+                    }
+                }else{
+                    ForEach (model.resourceManager.resources, id: \.self) { resource in
+                        Button(action: {
+                            UserDefaults.standard.setValue(true, forKey: ResourceSelectView.resourceSelectedKey)
+                            UserDefaults.standard.synchronize()
+                            model.resource = resource
+                            withAnimation() {
+                                model.displayedScene = .App
+                            }
+                        }) {
+                            HStack {
+                                Image(systemName: "folder")
+                                Text("\(resource.name)")
+                            }
                         }
                     }
                 }

@@ -295,3 +295,4 @@
 //Resource Download Alert View
 "RetryAlert" = "Check the connection with the server,Please！";
 "Retry" = "Retry";
+"ReturnMainmenu" = "ReturnMainMenu";

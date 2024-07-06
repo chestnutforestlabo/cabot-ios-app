@@ -38,6 +38,7 @@ struct SettingView: View {
                     UserDefaults.standard.setValue(false, forKey: ResourceSelectView.resourceSelectedKey)
                     UserDefaults.standard.synchronize()
                     modelData.displayedScene = .ResourceSelect
+                    modelData.resourceManager.updateResources()
                     presentationMode.wrappedValue.dismiss()
                 }) {
                     Text("SELECT_RESOURCE")

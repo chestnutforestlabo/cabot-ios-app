@@ -358,12 +358,12 @@ struct ResourceDownloadRetryUIView :View {
                 let _ = resourceDownload.isStartSpeak = false
             }
             
-            Section(header:  Text("RetryAlert").font(.caption2).foregroundColor(.red).lineLimit(1)){
+            Section(header:  Text(CustomLocalizedString("RetryAlert", lang: modelData.resourceLang)).font(.caption).foregroundColor(.red).lineLimit(1)){
                 Button(action: {
                     let _: () = resourceDownload.startFileDownload()
                     
                 },label: {
-                    Text("Retry").foregroundColor(.blue)
+                    Text(CustomLocalizedString("Retry", lang: modelData.resourceLang)).foregroundColor(.blue)
                 })
             }
         }
