@@ -1010,12 +1010,12 @@ class ResourceManager {
 
     func getResourceRoot() -> URL {
         if preview {
-            let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!//Bundle.main.resourceURL
-            return path//!.appendingPathComponent("PreviewResource")
+            let path = Bundle.main.resourceURL
+            return path!.appendingPathComponent("PreviewResource")
 
         } else {
-            let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!//Bundle.main.resourceURL
-            return path//!.appendingPathComponent("Resource")
+            let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            return path
         }
     }
 
