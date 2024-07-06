@@ -313,10 +313,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             {
             if authRequestedByUser {
                 withAnimation() {
-                    self.displayedScene = .ResourceSelect
+                    self.displayedScene = .App
                 }
             } else {
-                self.displayedScene = .ResourceSelect
+                self.displayedScene = .App
             }
         }
         if self.displayedScene == .ResourceSelect {
