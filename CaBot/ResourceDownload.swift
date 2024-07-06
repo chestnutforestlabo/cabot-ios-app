@@ -281,6 +281,7 @@ class ResourceDownload{
                 unzipFile(at: savedURL, to: documentsURL)
                 self.downloadFailed = false
                 
+                appModel.resourceManager.updateResources()
                 print("Zip file saving completed: \(savedURL)")
             case .failure(let error):
                 print("Failed to save zip file: \(error)")

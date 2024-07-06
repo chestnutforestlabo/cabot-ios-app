@@ -34,7 +34,7 @@ struct SettingView: View {
     var body: some View {
         return Form {
             Section(header: Text("Settings")){
-                Button(action: {
+               /* Button(action: {
                     UserDefaults.standard.setValue(false, forKey: ResourceSelectView.resourceSelectedKey)
                     UserDefaults.standard.synchronize()
                     modelData.displayedScene = .ResourceSelect
@@ -42,7 +42,7 @@ struct SettingView: View {
                     presentationMode.wrappedValue.dismiss()
                 }) {
                     Text("SELECT_RESOURCE")
-                }
+                }*/
 
                 if let resource = modelData.resource {
                     Picker("LANGUAGE", selection: $langOverride) {
