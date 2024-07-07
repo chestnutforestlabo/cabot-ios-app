@@ -44,9 +44,9 @@ func saveHashTextFile(fileName:String,content:String)
     }else{//If the file does not exist, create a new one
         do{
             try content.write(to:fileURL, atomically: true, encoding: .utf8)
-            print("Saving of Hash file is completed:\(fileURL.path)")
+            NSLog("Saving of Hash file is completed:\(fileURL.path)")
         }catch{
-            print("Saving Hash file failed:\(error.localizedDescription)")
+            NSLog("Saving Hash file failed:\(error.localizedDescription)")
         }
     }
 }
@@ -59,11 +59,11 @@ func deleteHashFile()
     //Delete if file already exists
     if FileManager.default.fileExists(atPath: hashFileURL.path) {
         do{
-            print("Hash file deletion completed:\(hashFileURL.path)")
+            NSLog("Hash file deletion completed:\(hashFileURL.path)")
             try FileManager.default.removeItem(at: hashFileURL)
         }catch
         {
-            print("Hash file deletion failed:\(error.localizedDescription)")
+            NSLog("Hash file deletion failed:\(error.localizedDescription)")
         }
         
     }
@@ -72,11 +72,11 @@ func deleteHashFile()
     
     if FileManager.default.fileExists(atPath: resourceFileURL.path) {
         do{
-            print("Resource file deletion completed:\(resourceFileURL.path)")
+            NSLog("Resource file deletion completed:\(resourceFileURL.path)")
             try FileManager.default.removeItem(at: resourceFileURL)
         }catch
         {
-            print("Resource file deletion failed:\(error.localizedDescription)")
+            NSLog("Resource file deletion failed:\(error.localizedDescription)")
         }
         
     }
@@ -92,12 +92,10 @@ func overwriteHashTextFile(fileName:String,content:String)
     {
         do{
             try content.write(to:fileURL, atomically: true, encoding: .utf8)
-            print("Hash file overwriting completed:\(fileURL.path)")
+            NSLog("Hash file overwriting completed:\(fileURL.path)")
         }catch{
-            print("Hash file overwriting failed:\(error.localizedDescription)")
+            NSLog("Hash file overwriting failed:\(error.localizedDescription)")
         }
-        
-    }else{
         
     }
 }
@@ -114,25 +112,25 @@ func unzipFile(at sourceURL:URL,to destinaltionURL:URL)
         //Delete previously unzipped files if they exist
         if FileManager.default.fileExists(atPath: unzipedFilePath.path) {
             try FileManager.default.removeItem(at: unzipedFilePath)
-            print("Existing unzipped files deleted\(unzipedFilePath)")
+            NSLog("Existing unzipped files deleted\(unzipedFilePath)")
             
         }
         
         //Thawing process
         try fileManager.createDirectory(at: destinaltionURL, withIntermediateDirectories: true,attributes:nil)
         try fileManager.unzipItem(at: sourceURL, to: destinaltionURL)
-        print("Unzipping completed！\(destinaltionURL)")
+        NSLog("Unzipping completed！\(destinaltionURL)")
         
         
         //Delete the ZIP file if it exists after unzipping it
         if FileManager.default.fileExists(atPath: sourceURL.path) {
             try FileManager.default.removeItem(at: sourceURL)
-            print("ZIP file deleted after unzipping")
+            NSLog("ZIP file deleted after unzipping")
         }
         
     }catch{
         
-        print("An error occurred while unzipping！")
+        NSLog("An error occurred while unzipping！")
     }
     
 }
@@ -143,8 +141,7 @@ class ResourceDownload{
     var downloadSuccessed = false//Whether the download was successful or not
     var downloadFailed:Bool = false//Whether the download failed
     var isTryFirstDownloaded:Bool = false//First download
-    var isStartSpeak:Bool = false//Will reading begin?
-    
+    var speakCount : Int = 0
     // Call the file download method when the app starts
     public func startFileDownload() {
         
@@ -158,49 +155,52 @@ class ResourceDownload{
             case .success(let data):
                 var hashValue = ""//hash Value
                 //Conversion processing to obtain Hash value
-                if let content = String(data: data, encoding: .utf8) {
-                    let lines = content.split(separator: "\n")
-                    for line in lines {
-                        let components = line.split(separator: " ")
-                        if components.count == 1
-                        {
-                            //I was able to get the Hash value
-                            hashValue = String(components[0])
-                            //Get the app's Document directory
-                            let fileURL=getDocumentsDirectory().appendingPathComponent(hashFileName)
-                            //If a Hash file exists within the app (when starting the app for the second time)
-                            if FileManager.default.fileExists(atPath: fileURL.path)
+                guard let content = String(data: data, encoding: .utf8) else {
+                    return
+                }
+                let lines = content.split(separator: "\n")
+                for line in lines {
+                    let components = line.split(separator: " ")
+                    guard components.count == 1 else{
+                        NSLog("Component count is not 1")
+                        return
+                    }
+                    //I was able to get the Hash value
+                    hashValue = String(components[0])
+                    //Get the app's Document directory
+                    let fileURL = getDocumentsDirectory().appendingPathComponent(hashFileName)
+                    //If a Hash file exists within the app (when starting the app for the second time)
+                    if FileManager.default.fileExists(atPath: fileURL.path)
+                    {
+                        if let hashFileContent = self.readHashTextFile(fileName: hashFileName ){
+                            
+                            NSLog("File content:\(hashFileContent)")
+                            //The existing Hash value in the app is the same as the Hash value obtained from the server
+                            if hashFileContent == hashValue
                             {
-                                if let hashFileContent = self.readHashTextFile(fileName: hashFileName ){
-                                    
-                                    print("File content:\(hashFileContent)")
-                                    //The existing Hash value in the app is the same as the Hash value obtained from the server
-                                    if hashFileContent == hashValue
-                                    {
-                                        self.downloadFailed = false
-                                        print("MD5 hash matched: \(fileURL)")
-                                        //Hash File won't save
-                                    }else{//If the existing Hash value in the app is different from the Hash value obtained from the server
-                                        print("MD5 hashes don't match: \(fileURL.lastPathComponent)")
-                                        //Overwrite Hash file
-                                        overwriteHashTextFile(fileName: hashFileName, content: hashValue )
-                                        //Save zip file
-                                        self.downloadResourceZipFile()
-                                    }
-                                }else{
-                                    print("Failed to get Hash value")
-                                }
-                            }else{//If there is no Hash file in the app (when starting the app for the first time)
-                                //Save new Hash file
-                                saveHashTextFile(fileName: hashFileName, content: hashValue)
+                                self.downloadFailed = false
+                                NSLog("MD5 hash matched: \(fileURL)")
+                                //Hash File won't save
+                            }else{//If the existing Hash value in the app is different from the Hash value obtained from the server
+                                NSLog("MD5 hashes don't match: \(fileURL.lastPathComponent)")
+                                //Overwrite Hash file
+                                overwriteHashTextFile(fileName: hashFileName, content: hashValue )
                                 //Save zip file
                                 self.downloadResourceZipFile()
                             }
+                        }else{
+                            NSLog("Failed to get Hash value")
                         }
-                    }//for　End
-                }//Get hash value　End
+                    }else{//If there is no Hash file in the app (when starting the app for the first time)
+                        //Save new Hash file
+                        saveHashTextFile(fileName: hashFileName, content: hashValue)
+                        //Save zip file
+                        self.downloadResourceZipFile()
+                    }
+                    
+                }//for　End
             case .failure(let error):
-                print("Failed to download hash file：\(error)")
+                NSLog("Failed to download hash file：\(error)")
             }
         }
         
@@ -209,39 +209,47 @@ class ResourceDownload{
     //Get hash value
     func downloadHashFile(retries: Int = 3,completion: @escaping (Result<Data, Error>) -> Void) {
         let appModel = CaBotAppModel()
-        let md5FileURL = URL(string: "http://\(appModel.primaryAddr):9090/map/app-resource-md5")
-        self.isTryFirstDownloaded = true
-        print("Start obtaining hash value。\(String(describing: md5FileURL))")
-        let task = URLSession.shared.dataTask(with: md5FileURL!) { (data, response, error) in
-            if !self.downloadSuccessed {
-                if error != nil {
-                    if retries > 0{
-                        print("Download failed. Attempt to retry. Remaining number of retries: \(retries)")
-                        deleteHashFile()
-                        self.downloadHashFile( retries: retries - 1, completion: completion)
-                        if retries == 3{//An error message is read aloud when retrying for the first time.
-                            self.isStartSpeak = true
+        //Check primaryAddr is nil
+        if appModel.primaryAddr.isEmpty {
+            NSLog("primaryAddr is nil")
+            self.downloadFailed = true
+        }else{
+            if let md5FileURL = URL(string: "http://\(appModel.primaryAddr):9090/map/app-resource-md5")
+            {
+                self.isTryFirstDownloaded = true
+                NSLog("Start obtaining hash value。\(String(describing: md5FileURL))")
+                let task = URLSession.shared.dataTask(with: md5FileURL) { (data, response, error) in
+                    if !self.downloadSuccessed {
+                        if error != nil {
+                            if retries > 0{
+                                NSLog("Download failed. Attempt to retry. Remaining number of retries: \(retries)")
+                                deleteHashFile()
+                                self.downloadHashFile( retries: retries - 1, completion: completion)
+                            }else{
+                                self.downloadFailed = true
+                                NSLog("Download failed. Alert UI is displayed:\(self.downloadFailed)")
+                                
+                                //completion(.failure(error))
+                            }
+                            
+                            return
                         }
-                    }else{
-                        self.downloadFailed = true
-                        print("Download failed. Alert UI is displayed:\(self.downloadFailed)")
-                        
-                        //completion(.failure(error))
                     }
                     
-                    return
+                    guard let data = data else {
+                        let error = NSError(domain: "FileDownloader", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])
+                        completion(.failure(error))
+                        return
+                    }
+                    
+                    completion(.success(data))
                 }
+                task.resume()
+            }else{
+                self.downloadFailed = true
             }
-            
-            guard let data = data else {
-                let error = NSError(domain: "FileDownloader", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])
-                completion(.failure(error))
-                return
-            }
-            
-            completion(.success(data))
         }
-        task.resume()
+        
     }
     
     //Read Hash text file in app
@@ -250,13 +258,13 @@ class ResourceDownload{
         let fileURL=getDocumentsDirectory().appendingPathComponent(fileName)
         do{
             let content = try String(contentsOf:fileURL,encoding: .utf8)
-            print("Read Hash file")
+            NSLog("Read Hash file")
             self.downloadSuccessed = true
             self.downloadFailed = false
             return content
             
         }catch{
-            print("Reading Hash file failed:\(error.localizedDescription)")
+            NSLog("Reading Hash file failed:\(error.localizedDescription)")
             return nil
         }
     }
@@ -266,25 +274,33 @@ class ResourceDownload{
     {
         let appModel = CaBotAppModel()
         ///Below is the Zip file download process
-        ///zip file URL
-        //let path = "http://localhost:9090/map/app-resource.zip"
-        let path = "http://\(appModel.primaryAddr):9090/map/app-resource.zip"
         
-        // Specify the Download folder URL
-        let downloadURL = URL(string: (path))!
-        // Specify the destination folder URL (here, create the "Downloads" folder in the document directory)
-        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        // let savedFolderURL = documentsURL.appendingPathComponent("Downloads")
-        self.downloadZipFileFile(from: downloadURL,to:documentsURL) { result in
-            switch result {
-            case .success(let savedURL):
-                unzipFile(at: savedURL, to: documentsURL)
-                self.downloadFailed = false
-                
-                appModel.resourceManager.updateResources()
-                print("Zip file saving completed: \(savedURL)")
-            case .failure(let error):
-                print("Failed to save zip file: \(error)")
+        //Check primaryAddr is nil
+        if appModel.primaryAddr.isEmpty {
+            NSLog("primaryAddr is nil")
+            self.downloadFailed = true
+        }else{
+            ///zip file URL
+            if let downloadURL = URL(string:"http://\(appModel.primaryAddr):9090/map/app-resource.zip")
+            {
+                // Specify the destination folder URL (here, create the "Downloads" folder in the document directory)
+                let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+                // let savedFolderURL = documentsURL.appendingPathComponent("Downloads")
+                self.downloadZipFileFile(from: downloadURL,to:documentsURL) { result in
+                    switch result {
+                    case .success(let savedURL):
+                        unzipFile(at: savedURL, to: documentsURL)
+                        self.downloadFailed = false
+                        
+                        appModel.resourceManager.updateResources()
+                        NSLog("Zip file saving completed: \(savedURL)")
+                    case .failure(let error):
+                        self.downloadFailed = true
+                        NSLog("Failed to save zip file: \(error)")
+                    }
+                }
+            }else{
+                self.downloadFailed = true
             }
         }
     }
@@ -327,6 +343,7 @@ struct ResourceDownloadRetryUIView :View {
     @EnvironmentObject var modelData: CaBotAppModel
     @State public var isDownloadFinished = false
     @State var resourceDownload = ResourceDownload()
+    
     var body: some View {
         //First time Donwload. Run only once
         if !resourceDownload.isTryFirstDownloaded
@@ -336,13 +353,13 @@ struct ResourceDownloadRetryUIView :View {
         //If ownload fails, an error message and retry will be displayed
         if resourceDownload.downloadFailed
         {
-            if resourceDownload.isStartSpeak
+            let _ = resourceDownload.speakCount += 1
+            //Read-aloud is only once
+            if resourceDownload.speakCount == 1
             {
-                let _ =  print("Error message read out loud: \(resourceDownload.isStartSpeak)")
+                let _ =  NSLog("Error message read out loud")
                 let message = CustomLocalizedString("RetryAlert", lang: modelData.resourceLang)
                 let _ = modelData.speak(message) {}
-                
-                let _ = resourceDownload.isStartSpeak = false
             }
             
             Section(header:  Text(CustomLocalizedString("ResourceDownload", lang: modelData.resourceLang))){
@@ -356,6 +373,8 @@ struct ResourceDownloadRetryUIView :View {
                     Text(CustomLocalizedString("Retry", lang: modelData.resourceLang)).foregroundColor(.blue)
                 })
             }
+        }else{
+            let _ = resourceDownload.speakCount = 0
         }
     }
 }
