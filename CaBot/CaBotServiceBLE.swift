@@ -45,6 +45,7 @@ class CaBotServiceBLE: NSObject {
     }
 
     fileprivate let tts:CaBotTTS
+    fileprivate let mode: ModeType
     fileprivate let actions: CaBotServiceActions
     var delegate:CaBotServiceDelegateBLE?
 
@@ -52,8 +53,9 @@ class CaBotServiceBLE: NSObject {
         return lhs === rhs
     }
 
-    init(with tts:CaBotTTS) {
+    init(with tts:CaBotTTS, mode: ModeType) {
         self.tts = tts
+        self.mode = mode
         self.actions = CaBotServiceActions.shared
     }
 
@@ -133,7 +135,7 @@ class CaBotServiceBLE: NSObject {
                     timer.invalidate()
                     self.contrialCount = 0
                 }
-                if (self.heartbeatChar.notify(value: "1", retry: 0)) {
+                if (self.heartbeatChar.notify(value: "\(self.mode.rawValue)", retry: 0)) {
                     self.contrialCount = CaBotServiceBLE.CONTRIAL_MAX
                     NSLog("BLE heartBeat success")
                 } else {

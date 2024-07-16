@@ -512,13 +512,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.init(preview: true)
     }
 
-    init(preview: Bool) {
+    init(preview: Bool, mode: ModeType = .Normal) {
+        self.modeType = mode
         self.detailSettingModel = DetailSettingModel()
-
         self.preview = preview
         self.tts = CaBotTTS(voice: nil)
-        let bleService = CaBotServiceBLE(with: self.tts)
-        let tcpService = CaBotServiceTCP(with: self.tts)
+        let bleService = CaBotServiceBLE(with: self.tts, mode: mode)
+        let tcpService = CaBotServiceTCP(with: self.tts, mode: mode)
         self.bleService = bleService
         self.tcpService = tcpService
         self.fallbackService = FallbackService(services: [bleService, tcpService])
