@@ -54,7 +54,7 @@ class CaBotTTS : TTSProtocol{
     }
 
     func speak(_ text: String?, forceSelfvoice: Bool, force: Bool, callback: @escaping (Int32) -> Void, progress: ((NSRange) -> Void)? = nil) {
-        guard self.delegate?.getModeType() == .Normal else { return }
+//        guard self.delegate?.getModeType() == .Normal else { return }
         let isForeground = UIApplication.shared.applicationState == .active
         let isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
         let selfspeak = forceSelfvoice || !isForeground || !isVoiceOverRunning
