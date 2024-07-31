@@ -69,8 +69,7 @@ struct ConversationView: UIViewControllerRepresentable {
         // put dummy config for local converstation
         
         DialogManager.sharedManager().config = [
-            //"conv_server": "127.0.0.1:5050",
-            "conv_server": "192.168.1.164:5050",
+            "conv_server": "\(modelData.primaryAddr):5050",
             "conv_api_key": "hoge",
             "conv_client_id": "cabot-app"
         ]
