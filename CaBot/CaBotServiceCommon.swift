@@ -85,6 +85,7 @@ protocol CaBotServiceDelegate {
     func cabot(service:any CaBotTransportProtocol, openRequest:URL)
     func cabot(service:any CaBotTransportProtocol, soundRequest:String)
     func cabot(service:any CaBotTransportProtocol, notification:NavigationNotification)
+    func cabot(service:any CaBotTransportProtocol, notificationRequest: String)
     func cabot(service:any CaBotTransportProtocol, deviceStatus:DeviceStatus)
     func cabot(service:any CaBotTransportProtocol, systemStatus:SystemStatus)
     func cabot(service:any CaBotTransportProtocol, batteryStatus:BatteryStatus)
@@ -348,6 +349,7 @@ enum NavigationEventType:String, Decodable {
     case subtour
     case skip
     case getlanguage
+    case startchat
     case unknown
 }
 
@@ -517,6 +519,9 @@ class CaBotServiceActions {
                 } else {
                     NSLog("Unknown navigation notification type %@", request.type.rawValue)
                 }
+            case .startchat:
+                NSLog("startchat event received")
+                delegate.cabot(service: service, notificationRequest: "request_start_chat")
             case .content:
                 guard let url = URL(string: request.param) else {
                     return

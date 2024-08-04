@@ -59,3 +59,6 @@ struct NavigationUtil {
   }
 }
 
+extension Notification.Name {
+    static let startChatRequest = Notification.Name("request_start_chat")
+}

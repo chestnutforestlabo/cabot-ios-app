@@ -1114,6 +1114,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.open(content: url)
     }
 
+    func cabot(service: any CaBotTransportProtocol, notificationRequest: String) {
+        NotificationCenter.default.post(name: Notification.Name(notificationRequest), object: nil)
+    }
+    
     func cabot(service: any CaBotTransportProtocol, soundRequest: String) {
         switch(soundRequest) {
         case "SpeedUp":

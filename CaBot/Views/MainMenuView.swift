@@ -358,6 +358,7 @@ struct DestinationMenus: View {
 
 struct MainMenus: View {
     @EnvironmentObject var modelData: CaBotAppModel
+    @State private var navigateToConversation = false
 
     var body: some View {
         if let cm = modelData.resource {
@@ -370,9 +371,14 @@ struct MainMenus: View {
                                     modelData.resetAudioSession()
                                 }
                                 .environmentObject(modelData),
+                            isActive: $navigateToConversation,
                             label: {
                                 Text("START_CONVERSATION")
-                            })
+                            }
+                        )
+                        .onReceive(NotificationCenter.default.publisher(for: .startChatRequest)) { _ in
+                            navigateToConversation = true
+                        }
                 //    }
                 //}
                 if let src = cm.destinationsSource {
