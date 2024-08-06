@@ -45,6 +45,7 @@ class CaBotServiceBLE: NSObject {
     }
 
     fileprivate let tts:CaBotTTS
+    fileprivate let mode: ModeType
     fileprivate let actions: CaBotServiceActions
     var delegate:CaBotServiceDelegateBLE?
 
@@ -52,8 +53,9 @@ class CaBotServiceBLE: NSObject {
         return lhs === rhs
     }
 
-    init(with tts:CaBotTTS) {
+    init(with tts:CaBotTTS, mode: ModeType) {
         self.tts = tts
+        self.mode = mode
         self.actions = CaBotServiceActions.shared
     }
 
@@ -128,13 +130,14 @@ class CaBotServiceBLE: NSObject {
         self.heartBeatTimer?.invalidate()
         DispatchQueue.global(qos: .utility).async {
             self.heartBeatTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { (timer) in
-                //NSLog("heartbeat")
+                guard let deviceID = UIDevice.current.identifierForVendor else { return }
+                NSLog("heartbeat")
                 if self.checkAdvertisement() == false {
                     NSLog("disconnected from the server")
                     timer.invalidate()
                     self.contrialCount = 0
                 }
-                if (self.heartbeatChar.notify(value: "1", retry: 0)) {
+                if (self.heartbeatChar.notify(value: "\(deviceID)/\(self.mode.rawValue)", retry: 0)) {
                     self.contrialCount = CaBotServiceBLE.CONTRIAL_MAX
                     NSLog("BLE heartBeat success")
                 } else {
