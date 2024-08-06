@@ -38,6 +38,8 @@ struct MainMenuView: View {
             }
             DestinationMenus()
                 .environmentObject(modelData)
+            ResourceDownloadRetryUIView()
+                .environmentObject(modelData)
             MainMenus()
                 .environmentObject(modelData)
                 .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)

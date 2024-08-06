@@ -28,6 +28,8 @@ struct MainMenuView: View {
 
     var body: some View {
         Form {
+            ResourceDownloadRetryUIView()
+                .environmentObject(modelData)
             UserInfoView()
                 .environmentObject(modelData)
             if modelData.noSuitcaseDebug {

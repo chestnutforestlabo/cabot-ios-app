@@ -1014,8 +1014,10 @@ class ResourceManager {
             return path!.appendingPathComponent("PreviewResource")
 
         } else {
-            let path = Bundle.main.resourceURL
-            return path!.appendingPathComponent("Resource")
+            guard let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+                fatalError("Could not find the document directory.")
+            }
+            return path
         }
     }
 

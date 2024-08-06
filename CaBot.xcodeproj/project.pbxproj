@@ -112,6 +112,10 @@
 		D7D7A6FB2BFECB490072ADF6 /* TourDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7D7A6FA2BFECB490072ADF6 /* TourDetailView.swift */; };
 		D7E54B522C0CD03A002FE3C4 /* MainMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E54B512C0CD03A002FE3C4 /* MainMenuView.swift */; };
 		D7F6BE6E2C2A57C300CD8258 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7F6BE6D2C2A57C300CD8258 /* SettingView.swift */; };
+		E46C82642C18081100917AB3 /* ResourceDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46C82632C18081100917AB3 /* ResourceDownload.swift */; };
+		E46C82652C18081100917AB3 /* ResourceDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46C82632C18081100917AB3 /* ResourceDownload.swift */; };
+		E493D8792C2279F700691097 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = E493D8782C2279F700691097 /* ZIPFoundation */; };
+		E493D87B2C227A0D00691097 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = E493D87A2C227A0D00691097 /* ZIPFoundation */; };
 		E561455F2A6E02A8005CF82F /* RosWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E561455E2A6E02A8005CF82F /* RosWebView.swift */; };
 /* End PBXBuildFile section */
 
@@ -220,6 +224,7 @@
 		D7D7A6FA2BFECB490072ADF6 /* TourDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TourDetailView.swift; sourceTree = "<group>"; };
 		D7E54B512C0CD03A002FE3C4 /* MainMenuView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainMenuView.swift; sourceTree = "<group>"; };
 		D7F6BE6D2C2A57C300CD8258 /* SettingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
+		E46C82632C18081100917AB3 /* ResourceDownload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceDownload.swift; sourceTree = "<group>"; };
 		E561455E2A6E02A8005CF82F /* RosWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RosWebView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -234,6 +239,7 @@
 				308FCE2A27E12844009FCC7B /* Gzip in Frameworks */,
 				0967677F29371BA0005CFA58 /* SocketIO in Frameworks */,
 				3009AC3126AA3F4000370873 /* HLPDialog in Frameworks */,
+				E493D87B2C227A0D00691097 /* ZIPFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -270,6 +276,7 @@
 				D7CC051E2BFB352700C0B10A /* Gzip in Frameworks */,
 				D7CC051F2BFB352700C0B10A /* SocketIO in Frameworks */,
 				D7CC05202BFB352700C0B10A /* HLPDialog in Frameworks */,
+				E493D8792C2279F700691097 /* ZIPFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -366,6 +373,7 @@
 				30E99DA3266B2216001ACAAA /* BeaconSampler.swift */,
 				30E50DCB269F672800729ABD /* TourManager.swift */,
 				3096BF1726A5D0990066F256 /* TTSHelper.swift */,
+				E46C82632C18081100917AB3 /* ResourceDownload.swift */,
 			);
 			path = CaBot;
 			sourceTree = "<group>";
@@ -472,6 +480,7 @@
 				308FCE2927E12844009FCC7B /* Gzip */,
 				0967677E29371BA0005CFA58 /* SocketIO */,
 				306069B329A5E45D001FB5DB /* NavigationBackport */,
+				E493D87A2C227A0D00691097 /* ZIPFoundation */,
 			);
 			productName = CaBot;
 			productReference = 7E29F009228B548100CA7DD6 /* CaBot-Attend.app */;
@@ -542,6 +551,7 @@
 				D7CC051A2BFB352700C0B10A /* Frameworks */,
 				D7CC05212BFB352700C0B10A /* ShellScript */,
 				D7CC05222BFB352700C0B10A /* Resources */,
+				E46C82662C182BB200917AB3 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -555,6 +565,7 @@
 				D7CC04ED2BFB352700C0B10A /* Gzip */,
 				D7CC04EF2BFB352700C0B10A /* SocketIO */,
 				D7CC04F12BFB352700C0B10A /* NavigationBackport */,
+				E493D8782C2279F700691097 /* ZIPFoundation */,
 			);
 			productName = CaBot;
 			productReference = D7CC052B2BFB352700C0B10A /* CaBot-User.app */;
@@ -605,6 +616,7 @@
 				0967677D29371B9F005CFA58 /* XCRemoteSwiftPackageReference "socket" */,
 				306069B229A5E45D001FB5DB /* XCRemoteSwiftPackageReference "NavigationBackport" */,
 				7EDE7C9229B5733D00A65829 /* XCRemoteSwiftPackageReference "swift-argument-parser" */,
+				E493D8772C2279B200691097 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 			);
 			productRefGroup = 7E29F00A228B548100CA7DD6 /* Products */;
 			projectDirPath = "";
@@ -680,6 +692,23 @@
 			shellPath = /bin/sh;
 			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nTHREE_JS=${TEMP_DIR}/three.min.js\ncurl -o $THREE_JS https://cdn.jsdelivr.net/npm/three@0.89.0/build/three.min.js\ncp -f $THREE_JS ${SRCROOT}/Resource/localserver/js/\n\nEVENTEMITTER2_JS=${TEMP_DIR}/eventemitter2.min.js\ncurl -o $EVENTEMITTER2_JS https://cdn.jsdelivr.net/npm/eventemitter2@6.4/lib/eventemitter2.min.js\ncp -f $EVENTEMITTER2_JS ${SRCROOT}/Resource/localserver/js/\n\nROSLIB_JS=${TEMP_DIR}/roslib.js\ncurl -o $ROSLIB_JS https://cdn.jsdelivr.net/npm/roslib@1/build/roslib.js\ncp -f $ROSLIB_JS ${SRCROOT}/Resource/localserver/js/\n\nROS3D_JS=${TEMP_DIR}/ros3d.min.js\ncurl -o $ROS3D_JS https://raw.githubusercontent.com/CMU-cabot/ros3djs/cabot-ros2/build/ros3d.min.js\ncp -f $ROS3D_JS ${SRCROOT}/Resource/localserver/js/\n\nfor lang in en.lproj ja.lproj; do\n    mkdir -p \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/${lang}\"\n    cp \"${SRCROOT}/CaBot/${lang}/User-InfoPlist.strings\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/${lang}/InfoPlist.strings\"\ndone\n\ngit_commit=$(git rev-parse --short HEAD)\n/usr/libexec/PlistBuddy -c \"Set :GitCommitHash ${git_commit}\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n";
 		};
+		E46C82662C182BB200917AB3 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n";
+		};
 		E5FD56542A835D56008237DC /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -729,6 +758,7 @@
 				E561455F2A6E02A8005CF82F /* RosWebView.swift in Sources */,
 				30E50DD8269F784A00729ABD /* MainMenuView.swift in Sources */,
 				7EDF3C4229D4776D00AD1115 /* I18NExtension.swift in Sources */,
+				E46C82642C18081100917AB3 /* ResourceDownload.swift in Sources */,
 				3096BF1826A5D0990066F256 /* TTSHelper.swift in Sources */,
 				308FCE1D27D8F4D3009FCC7B /* SystemStatusView.swift in Sources */,
 				30E50DDB269F7E3800729ABD /* CaBot.xcdatamodeld in Sources */,
@@ -796,6 +826,7 @@
 				D7CC05052BFB352700C0B10A /* RootView.swift in Sources */,
 				D7CC05062BFB352700C0B10A /* NavUtil.m in Sources */,
 				D7CC05072BFB352700C0B10A /* ConversationView.swift in Sources */,
+				E46C82652C18081100917AB3 /* ResourceDownload.swift in Sources */,
 				D7D7A6FB2BFECB490072ADF6 /* TourDetailView.swift in Sources */,
 				D7F6BE6E2C2A57C300CD8258 /* SettingView.swift in Sources */,
 				D7CC05092BFB352700C0B10A /* RosWebView.swift in Sources */,
@@ -1393,6 +1424,14 @@
 				version = 0.7.1;
 			};
 		};
+		E493D8772C2279B200691097 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.19;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1465,6 +1504,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D7CC04F22BFB352700C0B10A /* XCRemoteSwiftPackageReference "NavigationBackport" */;
 			productName = NavigationBackport;
+		};
+		E493D8782C2279F700691097 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E493D8772C2279B200691097 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+		E493D87A2C227A0D00691097 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E493D8772C2279B200691097 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
 		};
 /* End XCSwiftPackageProductDependency section */
 

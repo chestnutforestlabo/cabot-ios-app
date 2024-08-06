@@ -319,10 +319,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             {
             if authRequestedByUser {
                 withAnimation() {
-                    self.displayedScene = .ResourceSelect
+                    self.displayedScene = .App
                 }
             } else {
-                self.displayedScene = .ResourceSelect
+                self.displayedScene = .App
             }
         }
         if self.displayedScene == .ResourceSelect {
@@ -553,6 +553,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var showingSystemStatusMenu: Bool = false
     @Published var batteryStatus: BatteryStatus = BatteryStatus()
     @Published var touchStatus: TouchStatus = TouchStatus()
+    @Published var resourceDownload: ResourceDownload
     @Published var userInfo: UserInfoBuffer
 
     private var addressCandidate: AddressCandidate
@@ -596,6 +597,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.tourManager = TourManager(setting: self.detailSettingModel)
         self.dialogViewHelper = DialogViewHelper()
         self.locationManager =  CLLocationManager()
+        self.resourceDownload = ResourceDownload()
         self.userInfo = UserInfoBuffer(modelData: nil)
 
         // initialize connection type
@@ -616,9 +618,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.tts.delegate = self
         self.logList.delegate = self
 
-        if let selectedIdentifier = UserDefaults.standard.value(forKey: selectedResourceKey) as? String {
-            self.resource = resourceManager.resource(by: selectedIdentifier)
-        }
         if let selectedLang = UserDefaults.standard.value(forKey: selectedResourceLangKey) as? String {
             self.resource?.lang = selectedLang
             self.updateVoice()
