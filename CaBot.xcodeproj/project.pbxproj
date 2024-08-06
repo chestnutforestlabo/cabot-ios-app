@@ -10,7 +10,7 @@
 		0967677F29371BA0005CFA58 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = 0967677E29371BA0005CFA58 /* SocketIO */; };
 		09676781293727CE005CFA58 /* CaBotServiceTCP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09676780293727CE005CFA58 /* CaBotServiceTCP.swift */; };
 		09725B0A24FE4AC300012D42 /* DialogViewControllerCabot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */; };
-		097845C02531E65B004DE1F6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 097845C22531E65B004DE1F6 /* InfoPlist.strings */; };
+		097845C02531E65B004DE1F6 /* Attend-InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 097845C22531E65B004DE1F6 /* Attend-InfoPlist.strings */; };
 		3009AC3126AA3F4000370873 /* HLPDialog in Frameworks */ = {isa = PBXBuildFile; productRef = 3009AC3026AA3F4000370873 /* HLPDialog */; };
 		3013614026A0BF590050CF9E /* PreviewResource in Resources */ = {isa = PBXBuildFile; fileRef = 3013613F26A0BF590050CF9E /* PreviewResource */; };
 		3013614326A0F8E10050CF9E /* TourDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3013614226A0F8E10050CF9E /* TourDetailView.swift */; };
@@ -65,6 +65,53 @@
 		7EDF3C4429D48C3200AD1115 /* Localizable.strings in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7E557EFE2581C79B00B1B9CA /* Localizable.strings */; };
 		7EDF3C4529D4901000AD1115 /* Resource in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3099132A265DE50A000C1BFE /* Resource */; };
 		7EF5F1EA228DB07100788987 /* NavUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EF5F1E8228DB07100788987 /* NavUtil.m */; };
+		D7CC04F42BFB352700C0B10A /* DialogViewControllerCabot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */; };
+		D7CC04F52BFB352700C0B10A /* LogFilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 458B54382A970B4A00AD9D10 /* LogFilesView.swift */; };
+		D7CC04F62BFB352700C0B10A /* CaBotAppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DCF269F76F000729ABD /* CaBotAppModel.swift */; };
+		D7CC04F72BFB352700C0B10A /* OnboardGrantAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DD5269F784A00729ABD /* OnboardGrantAccess.swift */; };
+		D7CC04F82BFB352700C0B10A /* DetailSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E9690C229EAF25C0062DEBD /* DetailSettingView.swift */; };
+		D7CC04FA2BFB352700C0B10A /* LocalConversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3099132C26603B10000C1BFE /* LocalConversation.swift */; };
+		D7CC04FB2BFB352700C0B10A /* ToursView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DE726A0BBE900729ABD /* ToursView.swift */; };
+		D7CC04FC2BFB352700C0B10A /* JSHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99D93266A92EA001ACAAA /* JSHelper.swift */; };
+		D7CC04FD2BFB352700C0B10A /* CaBotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DCD269F75DB00729ABD /* CaBotApp.swift */; };
+		D7CC04FF2BFB352700C0B10A /* ResourceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99D9126681097001ACAAA /* ResourceManager.swift */; };
+		D7CC05002BFB352700C0B10A /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99D95266A993E001ACAAA /* Extension.swift */; };
+		D7CC05012BFB352700C0B10A /* WebContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3013614626A1E77B0050CF9E /* WebContentView.swift */; };
+		D7CC05022BFB352700C0B10A /* NavDeviceTTS.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F062228B55C000CA7DD6 /* NavDeviceTTS.m */; };
+		D7CC05042BFB352700C0B10A /* Logging.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E51C38F2AABA88C0095945F /* Logging.m */; };
+		D7CC05052BFB352700C0B10A /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DD3269F77CE00729ABD /* RootView.swift */; };
+		D7CC05062BFB352700C0B10A /* NavUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EF5F1E8228DB07100788987 /* NavUtil.m */; };
+		D7CC05072BFB352700C0B10A /* ConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DDE26A0B21200729ABD /* ConversationView.swift */; };
+		D7CC05082BFB352700C0B10A /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3096BF1326A5C29F0066F256 /* SettingView.swift */; };
+		D7CC05092BFB352700C0B10A /* RosWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E561455E2A6E02A8005CF82F /* RosWebView.swift */; };
+		D7CC050B2BFB352700C0B10A /* I18NExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EDF3C4129D4776D00AD1115 /* I18NExtension.swift */; };
+		D7CC050C2BFB352700C0B10A /* TTSHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3096BF1726A5D0990066F256 /* TTSHelper.swift */; };
+		D7CC050E2BFB352700C0B10A /* CaBot.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DD9269F7E3800729ABD /* CaBot.xcdatamodeld */; };
+		D7CC050F2BFB352700C0B10A /* CaBotServiceCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306069B529A686D9001FB5DB /* CaBotServiceCommon.swift */; };
+		D7CC05102BFB352700C0B10A /* SystemStatusDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308FCE2B27E42B7B009FCC7B /* SystemStatusDetailView.swift */; };
+		D7CC05112BFB352700C0B10A /* SpokenTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E8F5A1F2BA4D33800E5D547 /* SpokenTextView.swift */; };
+		D7CC05122BFB352700C0B10A /* ResourceSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DDC269FCBC200729ABD /* ResourceSelectView.swift */; };
+		D7CC05132BFB352700C0B10A /* CaBotServiceBLE.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F070228B55FC00CA7DD6 /* CaBotServiceBLE.swift */; };
+		D7CC05142BFB352700C0B10A /* TourManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DCB269F672800729ABD /* TourManager.swift */; };
+		D7CC05152BFB352700C0B10A /* BatteryStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308FCE2D27E62B30009FCC7B /* BatteryStatusView.swift */; };
+		D7CC05162BFB352700C0B10A /* BeaconSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99DA3266B2216001ACAAA /* BeaconSampler.swift */; };
+		D7CC05172BFB352700C0B10A /* StatusLabelStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308FCE2F27E81B7E009FCC7B /* StatusLabelStyle.swift */; };
+		D7CC05182BFB352700C0B10A /* CaBotServiceTCP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09676780293727CE005CFA58 /* CaBotServiceTCP.swift */; };
+		D7CC051B2BFB352700C0B10A /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = D7CC04EB2BFB352700C0B10A /* Collections */; };
+		D7CC051C2BFB352700C0B10A /* Yams in Frameworks */ = {isa = PBXBuildFile; productRef = D7CC04E72BFB352700C0B10A /* Yams */; };
+		D7CC051D2BFB352700C0B10A /* NavigationBackport in Frameworks */ = {isa = PBXBuildFile; productRef = D7CC04F12BFB352700C0B10A /* NavigationBackport */; };
+		D7CC051E2BFB352700C0B10A /* Gzip in Frameworks */ = {isa = PBXBuildFile; productRef = D7CC04ED2BFB352700C0B10A /* Gzip */; };
+		D7CC051F2BFB352700C0B10A /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = D7CC04EF2BFB352700C0B10A /* SocketIO */; };
+		D7CC05202BFB352700C0B10A /* HLPDialog in Frameworks */ = {isa = PBXBuildFile; productRef = D7CC04E92BFB352700C0B10A /* HLPDialog */; };
+		D7CC05232BFB352700C0B10A /* PreviewResource in Resources */ = {isa = PBXBuildFile; fileRef = 3013613F26A0BF590050CF9E /* PreviewResource */; };
+		D7CC05242BFB352700C0B10A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E29F013228B548200CA7DD6 /* Assets.xcassets */; };
+		D7CC05262BFB352700C0B10A /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7E557EFE2581C79B00B1B9CA /* Localizable.strings */; };
+		D7CC05272BFB352700C0B10A /* Resource in Resources */ = {isa = PBXBuildFile; fileRef = 3099132A265DE50A000C1BFE /* Resource */; };
+		D7CC05332BFB3BF900C0B10A /* DestinationDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7CC05322BFB3BF900C0B10A /* DestinationDetailView.swift */; };
+		D7CC05352BFB419900C0B10A /* DestinationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7CC05342BFB419900C0B10A /* DestinationsView.swift */; };
+		D7CC05382BFB688400C0B10A /* User-InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D7CC05362BFB688400C0B10A /* User-InfoPlist.strings */; };
+		D7D7A6FB2BFECB490072ADF6 /* TourDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7D7A6FA2BFECB490072ADF6 /* TourDetailView.swift */; };
+		D7E54B522C0CD03A002FE3C4 /* MainMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E54B512C0CD03A002FE3C4 /* MainMenuView.swift */; };
 		E561455F2A6E02A8005CF82F /* RosWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E561455E2A6E02A8005CF82F /* RosWebView.swift */; };
 /* End PBXBuildFile section */
 
@@ -102,8 +149,8 @@
 /* Begin PBXFileReference section */
 		09676780293727CE005CFA58 /* CaBotServiceTCP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaBotServiceTCP.swift; sourceTree = "<group>"; };
 		09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogViewControllerCabot.swift; sourceTree = "<group>"; };
-		097845C12531E65B004DE1F6 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		097845C32531E685004DE1F6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		097845C12531E65B004DE1F6 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = "ja.lproj/Attend-InfoPlist.strings"; sourceTree = "<group>"; };
+		097845C32531E685004DE1F6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Attend-InfoPlist.strings"; sourceTree = "<group>"; };
 		3013613F26A0BF590050CF9E /* PreviewResource */ = {isa = PBXFileReference; lastKnownFileType = folder; path = PreviewResource; sourceTree = "<group>"; };
 		3013614226A0F8E10050CF9E /* TourDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TourDetailView.swift; sourceTree = "<group>"; };
 		3013614626A1E77B0050CF9E /* WebContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebContentView.swift; sourceTree = "<group>"; };
@@ -140,7 +187,7 @@
 		30E99DA3266B2216001ACAAA /* BeaconSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeaconSampler.swift; sourceTree = "<group>"; };
 		458B54382A970B4A00AD9D10 /* LogFilesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogFilesView.swift; sourceTree = "<group>"; };
 		7E0995842BA510F500365136 /* NavCog3.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NavCog3.pch; sourceTree = "<group>"; };
-		7E29F009228B548100CA7DD6 /* CaBot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CaBot.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7E29F009228B548100CA7DD6 /* CaBot-Attend.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CaBot-Attend.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E29F013228B548200CA7DD6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7E29F018228B548200CA7DD6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7E29F01D228B548200CA7DD6 /* CaBotTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CaBotTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -165,6 +212,13 @@
 		7EDF3C4129D4776D00AD1115 /* I18NExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = I18NExtension.swift; sourceTree = "<group>"; };
 		7EF5F1E8228DB07100788987 /* NavUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NavUtil.m; sourceTree = "<group>"; };
 		7EF5F1E9228DB07100788987 /* NavUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NavUtil.h; sourceTree = "<group>"; };
+		D7CC052B2BFB352700C0B10A /* CaBot-User.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CaBot-User.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D7CC05322BFB3BF900C0B10A /* DestinationDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DestinationDetailView.swift; sourceTree = "<group>"; };
+		D7CC05342BFB419900C0B10A /* DestinationsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DestinationsView.swift; sourceTree = "<group>"; };
+		D7CC05372BFB688400C0B10A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/User-InfoPlist.strings"; sourceTree = "<group>"; };
+		D7CC05392BFB68BB00C0B10A /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = "ja.lproj/User-InfoPlist.strings"; sourceTree = "<group>"; };
+		D7D7A6FA2BFECB490072ADF6 /* TourDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TourDetailView.swift; sourceTree = "<group>"; };
+		D7E54B512C0CD03A002FE3C4 /* MainMenuView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainMenuView.swift; sourceTree = "<group>"; };
 		E561455E2A6E02A8005CF82F /* RosWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RosWebView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -205,6 +259,19 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D7CC051A2BFB352700C0B10A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D7CC051B2BFB352700C0B10A /* Collections in Frameworks */,
+				D7CC051C2BFB352700C0B10A /* Yams in Frameworks */,
+				D7CC051D2BFB352700C0B10A /* NavigationBackport in Frameworks */,
+				D7CC051E2BFB352700C0B10A /* Gzip in Frameworks */,
+				D7CC051F2BFB352700C0B10A /* SocketIO in Frameworks */,
+				D7CC05202BFB352700C0B10A /* HLPDialog in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -222,7 +289,8 @@
 				7E29F013228B548200CA7DD6 /* Assets.xcassets */,
 				7E29F06F228B55FC00CA7DD6 /* bridging.h */,
 				7E29F018228B548200CA7DD6 /* Info.plist */,
-				097845C22531E65B004DE1F6 /* InfoPlist.strings */,
+				D7CC05362BFB688400C0B10A /* User-InfoPlist.strings */,
+				097845C22531E65B004DE1F6 /* Attend-InfoPlist.strings */,
 				7E557EFE2581C79B00B1B9CA /* Localizable.strings */,
 				30E50DD9269F7E3800729ABD /* CaBot.xcdatamodeld */,
 			);
@@ -233,21 +301,17 @@
 			isa = PBXGroup;
 			children = (
 				3013613E26A0BE7E0050CF9E /* Preview Content */,
+				D7CC05302BFB3ADE00C0B10A /* Attend */,
+				D7CC05312BFB3B1A00C0B10A /* User */,
 				30E50DD3269F77CE00729ABD /* RootView.swift */,
 				30E50DD5269F784A00729ABD /* OnboardGrantAccess.swift */,
 				30E50DDC269FCBC200729ABD /* ResourceSelectView.swift */,
-				30E50DD6269F784A00729ABD /* MainMenuView.swift */,
-				308FCE1A27D8F4C8009FCC7B /* DeviceStatusView.swift */,
 				308FCE2D27E62B30009FCC7B /* BatteryStatusView.swift */,
-				308FCE1C27D8F4D3009FCC7B /* SystemStatusView.swift */,
 				308FCE2B27E42B7B009FCC7B /* SystemStatusDetailView.swift */,
 				308FCE2F27E81B7E009FCC7B /* StatusLabelStyle.swift */,
 				30E50DDE26A0B21200729ABD /* ConversationView.swift */,
 				09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */,
-				30E50DE126A0BA5200729ABD /* DestinationsView.swift */,
-				30C3059D26B9036A00A1383A /* DestinationDetailView.swift */,
 				30E50DE726A0BBE900729ABD /* ToursView.swift */,
-				3013614226A0F8E10050CF9E /* TourDetailView.swift */,
 				3013614626A1E77B0050CF9E /* WebContentView.swift */,
 				3096BF1326A5C29F0066F256 /* SettingView.swift */,
 				7E9690C229EAF25C0062DEBD /* DetailSettingView.swift */,
@@ -275,10 +339,11 @@
 		7E29F00A228B548100CA7DD6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7E29F009228B548100CA7DD6 /* CaBot.app */,
+				7E29F009228B548100CA7DD6 /* CaBot-Attend.app */,
 				7E29F01D228B548200CA7DD6 /* CaBotTests.xctest */,
 				7E29F028228B548200CA7DD6 /* CaBotUITests.xctest */,
 				7EDE7C8B29B5715800A65829 /* CaBotTool */,
+				D7CC052B2BFB352700C0B10A /* CaBot-User.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -357,12 +422,36 @@
 			path = CaBotTool;
 			sourceTree = "<group>";
 		};
+		D7CC05302BFB3ADE00C0B10A /* Attend */ = {
+			isa = PBXGroup;
+			children = (
+				30E50DE126A0BA5200729ABD /* DestinationsView.swift */,
+				30C3059D26B9036A00A1383A /* DestinationDetailView.swift */,
+				308FCE1A27D8F4C8009FCC7B /* DeviceStatusView.swift */,
+				30E50DD6269F784A00729ABD /* MainMenuView.swift */,
+				308FCE1C27D8F4D3009FCC7B /* SystemStatusView.swift */,
+				3013614226A0F8E10050CF9E /* TourDetailView.swift */,
+			);
+			path = Attend;
+			sourceTree = "<group>";
+		};
+		D7CC05312BFB3B1A00C0B10A /* User */ = {
+			isa = PBXGroup;
+			children = (
+				D7CC05342BFB419900C0B10A /* DestinationsView.swift */,
+				D7CC05322BFB3BF900C0B10A /* DestinationDetailView.swift */,
+				D7E54B512C0CD03A002FE3C4 /* MainMenuView.swift */,
+				D7D7A6FA2BFECB490072ADF6 /* TourDetailView.swift */,
+			);
+			path = User;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		7E29F008228B548100CA7DD6 /* CaBot */ = {
+		7E29F008228B548100CA7DD6 /* CaBot-Attend */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7E29F031228B548200CA7DD6 /* Build configuration list for PBXNativeTarget "CaBot" */;
+			buildConfigurationList = 7E29F031228B548200CA7DD6 /* Build configuration list for PBXNativeTarget "CaBot-Attend" */;
 			buildPhases = (
 				7E29F005228B548100CA7DD6 /* Sources */,
 				7E29F006228B548100CA7DD6 /* Frameworks */,
@@ -373,7 +462,7 @@
 			);
 			dependencies = (
 			);
-			name = CaBot;
+			name = "CaBot-Attend";
 			packageProductDependencies = (
 				306C7F6B265D435100E5928E /* Yams */,
 				3009AC3026AA3F4000370873 /* HLPDialog */,
@@ -383,7 +472,7 @@
 				306069B329A5E45D001FB5DB /* NavigationBackport */,
 			);
 			productName = CaBot;
-			productReference = 7E29F009228B548100CA7DD6 /* CaBot.app */;
+			productReference = 7E29F009228B548100CA7DD6 /* CaBot-Attend.app */;
 			productType = "com.apple.product-type.application";
 		};
 		7E29F01C228B548200CA7DD6 /* CaBotTests */ = {
@@ -443,6 +532,32 @@
 			productReference = 7EDE7C8B29B5715800A65829 /* CaBotTool */;
 			productType = "com.apple.product-type.tool";
 		};
+		D7CC04E62BFB352700C0B10A /* CaBot-User */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D7CC05282BFB352700C0B10A /* Build configuration list for PBXNativeTarget "CaBot-User" */;
+			buildPhases = (
+				D7CC04F32BFB352700C0B10A /* Sources */,
+				D7CC051A2BFB352700C0B10A /* Frameworks */,
+				D7CC05212BFB352700C0B10A /* ShellScript */,
+				D7CC05222BFB352700C0B10A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "CaBot-User";
+			packageProductDependencies = (
+				D7CC04E72BFB352700C0B10A /* Yams */,
+				D7CC04E92BFB352700C0B10A /* HLPDialog */,
+				D7CC04EB2BFB352700C0B10A /* Collections */,
+				D7CC04ED2BFB352700C0B10A /* Gzip */,
+				D7CC04EF2BFB352700C0B10A /* SocketIO */,
+				D7CC04F12BFB352700C0B10A /* NavigationBackport */,
+			);
+			productName = CaBot;
+			productReference = D7CC052B2BFB352700C0B10A /* CaBot-User.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -493,7 +608,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				7E29F008228B548100CA7DD6 /* CaBot */,
+				7E29F008228B548100CA7DD6 /* CaBot-Attend */,
+				D7CC04E62BFB352700C0B10A /* CaBot-User */,
 				7E29F01C228B548200CA7DD6 /* CaBotTests */,
 				7E29F027228B548200CA7DD6 /* CaBotUITests */,
 				7EDE7C8A29B5715800A65829 /* CaBotTool */,
@@ -508,7 +624,7 @@
 			files = (
 				3013614026A0BF590050CF9E /* PreviewResource in Resources */,
 				7E29F014228B548200CA7DD6 /* Assets.xcassets in Resources */,
-				097845C02531E65B004DE1F6 /* InfoPlist.strings in Resources */,
+				097845C02531E65B004DE1F6 /* Attend-InfoPlist.strings in Resources */,
 				7E557F002581C79B00B1B9CA /* Localizable.strings in Resources */,
 				3099132B265DE50A000C1BFE /* Resource in Resources */,
 			);
@@ -529,11 +645,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D7CC05222BFB352700C0B10A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D7CC05232BFB352700C0B10A /* PreviewResource in Resources */,
+				D7CC05242BFB352700C0B10A /* Assets.xcassets in Resources */,
+				D7CC05382BFB688400C0B10A /* User-InfoPlist.strings in Resources */,
+				D7CC05262BFB352700C0B10A /* Localizable.strings in Resources */,
+				D7CC05272BFB352700C0B10A /* Resource in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		E5FD56542A835D56008237DC /* ShellScript */ = {
+		D7CC05212BFB352700C0B10A /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -547,7 +676,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nTHREE_JS=${TEMP_DIR}/three.min.js\ncurl -o $THREE_JS https://cdn.jsdelivr.net/npm/three@0.89.0/build/three.min.js\ncp -f $THREE_JS ${SRCROOT}/Resource/localserver/js/\n\nEVENTEMITTER2_JS=${TEMP_DIR}/eventemitter2.min.js\ncurl -o $EVENTEMITTER2_JS https://cdn.jsdelivr.net/npm/eventemitter2@6.4/lib/eventemitter2.min.js\ncp -f $EVENTEMITTER2_JS ${SRCROOT}/Resource/localserver/js/\n\nROSLIB_JS=${TEMP_DIR}/roslib.js\ncurl -o $ROSLIB_JS https://cdn.jsdelivr.net/npm/roslib@1/build/roslib.js\ncp -f $ROSLIB_JS ${SRCROOT}/Resource/localserver/js/\n\nROS3D_JS=${TEMP_DIR}/ros3d.min.js\ncurl -o $ROS3D_JS https://raw.githubusercontent.com/CMU-cabot/ros3djs/cabot-ros2/build/ros3d.min.js\ncp -f $ROS3D_JS ${SRCROOT}/Resource/localserver/js/\n\ngit_commit=$(git rev-parse --short HEAD)\n/usr/libexec/PlistBuddy -c \"Set :GitCommitHash ${git_commit}\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nTHREE_JS=${TEMP_DIR}/three.min.js\ncurl -o $THREE_JS https://cdn.jsdelivr.net/npm/three@0.89.0/build/three.min.js\ncp -f $THREE_JS ${SRCROOT}/Resource/localserver/js/\n\nEVENTEMITTER2_JS=${TEMP_DIR}/eventemitter2.min.js\ncurl -o $EVENTEMITTER2_JS https://cdn.jsdelivr.net/npm/eventemitter2@6.4/lib/eventemitter2.min.js\ncp -f $EVENTEMITTER2_JS ${SRCROOT}/Resource/localserver/js/\n\nROSLIB_JS=${TEMP_DIR}/roslib.js\ncurl -o $ROSLIB_JS https://cdn.jsdelivr.net/npm/roslib@1/build/roslib.js\ncp -f $ROSLIB_JS ${SRCROOT}/Resource/localserver/js/\n\nROS3D_JS=${TEMP_DIR}/ros3d.min.js\ncurl -o $ROS3D_JS https://raw.githubusercontent.com/CMU-cabot/ros3djs/cabot-ros2/build/ros3d.min.js\ncp -f $ROS3D_JS ${SRCROOT}/Resource/localserver/js/\n\nfor lang in en.lproj ja.lproj; do\n    mkdir -p \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/${lang}\"\n    cp \"${SRCROOT}/CaBot/${lang}/User-InfoPlist.strings\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/${lang}/InfoPlist.strings\"\ndone\n\ngit_commit=$(git rev-parse --short HEAD)\n/usr/libexec/PlistBuddy -c \"Set :GitCommitHash ${git_commit}\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n";
+		};
+		E5FD56542A835D56008237DC /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nTHREE_JS=${TEMP_DIR}/three.min.js\ncurl -o $THREE_JS https://cdn.jsdelivr.net/npm/three@0.89.0/build/three.min.js\ncp -f $THREE_JS ${SRCROOT}/Resource/localserver/js/\n\nEVENTEMITTER2_JS=${TEMP_DIR}/eventemitter2.min.js\ncurl -o $EVENTEMITTER2_JS https://cdn.jsdelivr.net/npm/eventemitter2@6.4/lib/eventemitter2.min.js\ncp -f $EVENTEMITTER2_JS ${SRCROOT}/Resource/localserver/js/\n\nROSLIB_JS=${TEMP_DIR}/roslib.js\ncurl -o $ROSLIB_JS https://cdn.jsdelivr.net/npm/roslib@1/build/roslib.js\ncp -f $ROSLIB_JS ${SRCROOT}/Resource/localserver/js/\n\nROS3D_JS=${TEMP_DIR}/ros3d.min.js\ncurl -o $ROS3D_JS https://raw.githubusercontent.com/CMU-cabot/ros3djs/cabot-ros2/build/ros3d.min.js\ncp -f $ROS3D_JS ${SRCROOT}/Resource/localserver/js/\n\nfor lang in en.lproj ja.lproj; do\n    mkdir -p \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/${lang}\"\n    cp \"${SRCROOT}/CaBot/${lang}/Attend-InfoPlist.strings\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/${lang}/InfoPlist.strings\"\ndone\n\ngit_commit=$(git rev-parse --short HEAD)\n/usr/libexec/PlistBuddy -c \"Set :GitCommitHash ${git_commit}\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -623,29 +770,72 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D7CC04F32BFB352700C0B10A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D7E54B522C0CD03A002FE3C4 /* MainMenuView.swift in Sources */,
+				D7CC04F42BFB352700C0B10A /* DialogViewControllerCabot.swift in Sources */,
+				D7CC04F52BFB352700C0B10A /* LogFilesView.swift in Sources */,
+				D7CC04F62BFB352700C0B10A /* CaBotAppModel.swift in Sources */,
+				D7CC04F72BFB352700C0B10A /* OnboardGrantAccess.swift in Sources */,
+				D7CC04F82BFB352700C0B10A /* DetailSettingView.swift in Sources */,
+				D7CC05332BFB3BF900C0B10A /* DestinationDetailView.swift in Sources */,
+				D7CC04FA2BFB352700C0B10A /* LocalConversation.swift in Sources */,
+				D7CC05352BFB419900C0B10A /* DestinationsView.swift in Sources */,
+				D7CC04FB2BFB352700C0B10A /* ToursView.swift in Sources */,
+				D7CC04FC2BFB352700C0B10A /* JSHelper.swift in Sources */,
+				D7CC04FD2BFB352700C0B10A /* CaBotApp.swift in Sources */,
+				D7CC04FF2BFB352700C0B10A /* ResourceManager.swift in Sources */,
+				D7CC05002BFB352700C0B10A /* Extension.swift in Sources */,
+				D7CC05012BFB352700C0B10A /* WebContentView.swift in Sources */,
+				D7CC05022BFB352700C0B10A /* NavDeviceTTS.m in Sources */,
+				D7CC05042BFB352700C0B10A /* Logging.m in Sources */,
+				D7CC05052BFB352700C0B10A /* RootView.swift in Sources */,
+				D7CC05062BFB352700C0B10A /* NavUtil.m in Sources */,
+				D7CC05072BFB352700C0B10A /* ConversationView.swift in Sources */,
+				D7D7A6FB2BFECB490072ADF6 /* TourDetailView.swift in Sources */,
+				D7CC05082BFB352700C0B10A /* SettingView.swift in Sources */,
+				D7CC05092BFB352700C0B10A /* RosWebView.swift in Sources */,
+				D7CC050B2BFB352700C0B10A /* I18NExtension.swift in Sources */,
+				D7CC050C2BFB352700C0B10A /* TTSHelper.swift in Sources */,
+				D7CC050E2BFB352700C0B10A /* CaBot.xcdatamodeld in Sources */,
+				D7CC050F2BFB352700C0B10A /* CaBotServiceCommon.swift in Sources */,
+				D7CC05102BFB352700C0B10A /* SystemStatusDetailView.swift in Sources */,
+				D7CC05112BFB352700C0B10A /* SpokenTextView.swift in Sources */,
+				D7CC05122BFB352700C0B10A /* ResourceSelectView.swift in Sources */,
+				D7CC05132BFB352700C0B10A /* CaBotServiceBLE.swift in Sources */,
+				D7CC05142BFB352700C0B10A /* TourManager.swift in Sources */,
+				D7CC05152BFB352700C0B10A /* BatteryStatusView.swift in Sources */,
+				D7CC05162BFB352700C0B10A /* BeaconSampler.swift in Sources */,
+				D7CC05172BFB352700C0B10A /* StatusLabelStyle.swift in Sources */,
+				D7CC05182BFB352700C0B10A /* CaBotServiceTCP.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
 		7E29F01F228B548200CA7DD6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 7E29F008228B548100CA7DD6 /* CaBot */;
+			target = 7E29F008228B548100CA7DD6 /* CaBot-Attend */;
 			targetProxy = 7E29F01E228B548200CA7DD6 /* PBXContainerItemProxy */;
 		};
 		7E29F02A228B548200CA7DD6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 7E29F008228B548100CA7DD6 /* CaBot */;
+			target = 7E29F008228B548100CA7DD6 /* CaBot-Attend */;
 			targetProxy = 7E29F029228B548200CA7DD6 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		097845C22531E65B004DE1F6 /* InfoPlist.strings */ = {
+		097845C22531E65B004DE1F6 /* Attend-InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
 				097845C12531E65B004DE1F6 /* ja */,
 				097845C32531E685004DE1F6 /* en */,
 			);
-			name = InfoPlist.strings;
+			name = "Attend-InfoPlist.strings";
 			sourceTree = "<group>";
 		};
 		7E557EFE2581C79B00B1B9CA /* Localizable.strings */ = {
@@ -656,6 +846,15 @@
 				3013614A26A2262B0050CF9E /* en */,
 			);
 			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		D7CC05362BFB688400C0B10A /* User-InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D7CC05372BFB688400C0B10A /* en */,
+				D7CC05392BFB68BB00C0B10A /* ja */,
+			);
+			name = "User-InfoPlist.strings";
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -796,12 +995,10 @@
 				DEVELOPMENT_ASSET_PATHS = "\"CaBot/Views/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/iOS",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = $PROJECT_DIR/FromNavCog/NavCog3.pch;
+				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = CaBot/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -809,7 +1006,8 @@
 					"@executable_path/Frameworks",
 				);
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = CMU.CaBotRemote.CaBot.Test;
+				OTHER_SWIFT_FLAGS = "\"-DATTEND\"";
+				PRODUCT_BUNDLE_IDENTIFIER = CMU.CaBotRemote.CaBot.Attendant;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = CaBot/bridging.h;
@@ -829,12 +1027,10 @@
 				DEVELOPMENT_ASSET_PATHS = "\"CaBot/Views/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/iOS",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = $PROJECT_DIR/FromNavCog/NavCog3.pch;
+				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = CaBot/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -842,7 +1038,8 @@
 					"@executable_path/Frameworks",
 				);
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = CMU.CaBotRemote.CaBot.Test;
+				OTHER_SWIFT_FLAGS = "\"-DATTEND\"";
+				PRODUCT_BUNDLE_IDENTIFIER = CMU.CaBotRemote.CaBot.Attendant;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = CaBot/bridging.h;
@@ -966,6 +1163,70 @@
 			};
 			name = Release;
 		};
+		D7CC05292BFB352700C0B10A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_ASSET_PATHS = "\"CaBot/Views/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = $PROJECT_DIR/FromNavCog/NavCog3.pch;
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = CaBot/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_SWIFT_FLAGS = "\"-DUSER\"";
+				PRODUCT_BUNDLE_IDENTIFIER = CMU.CaBotRemote.CaBot.User;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = CaBot/bridging.h;
+				SWIFT_PRECOMPILE_BRIDGING_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D7CC052A2BFB352700C0B10A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_ASSET_PATHS = "\"CaBot/Views/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = $PROJECT_DIR/FromNavCog/NavCog3.pch;
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = CaBot/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_SWIFT_FLAGS = "\"-DUSER\"";
+				PRODUCT_BUNDLE_IDENTIFIER = CMU.CaBotRemote.CaBot.User;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = CaBot/bridging.h;
+				SWIFT_PRECOMPILE_BRIDGING_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -978,7 +1239,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7E29F031228B548200CA7DD6 /* Build configuration list for PBXNativeTarget "CaBot" */ = {
+		7E29F031228B548200CA7DD6 /* Build configuration list for PBXNativeTarget "CaBot-Attend" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7E29F032228B548200CA7DD6 /* Debug */,
@@ -1010,6 +1271,15 @@
 			buildConfigurations = (
 				7EDE7C9029B5715800A65829 /* Debug */,
 				7EDE7C9129B5715800A65829 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D7CC05282BFB352700C0B10A /* Build configuration list for PBXNativeTarget "CaBot-User" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D7CC05292BFB352700C0B10A /* Debug */,
+				D7CC052A2BFB352700C0B10A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1073,6 +1343,54 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		D7CC04E82BFB352700C0B10A /* XCRemoteSwiftPackageReference "Yams" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/jpsim/Yams";
+			requirement = {
+				kind = exactVersion;
+				version = 2.0.0;
+			};
+		};
+		D7CC04EA2BFB352700C0B10A /* XCRemoteSwiftPackageReference "HLPDialog" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hulop/HLPDialog";
+			requirement = {
+				branch = "swift-package";
+				kind = branch;
+			};
+		};
+		D7CC04EC2BFB352700C0B10A /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = exactVersion;
+				version = 1.0.1;
+			};
+		};
+		D7CC04EE2BFB352700C0B10A /* XCRemoteSwiftPackageReference "GzipSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/1024jp/GzipSwift";
+			requirement = {
+				kind = exactVersion;
+				version = 5.1.1;
+			};
+		};
+		D7CC04F02BFB352700C0B10A /* XCRemoteSwiftPackageReference "socket" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/socketio/socket.io-client-swift";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		D7CC04F22BFB352700C0B10A /* XCRemoteSwiftPackageReference "NavigationBackport" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/johnpatrickmorgan/NavigationBackport.git";
+			requirement = {
+				kind = exactVersion;
+				version = 0.7.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1115,6 +1433,36 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 306C7F6A265D435100E5928E /* XCRemoteSwiftPackageReference "Yams" */;
 			productName = Yams;
+		};
+		D7CC04E72BFB352700C0B10A /* Yams */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D7CC04E82BFB352700C0B10A /* XCRemoteSwiftPackageReference "Yams" */;
+			productName = Yams;
+		};
+		D7CC04E92BFB352700C0B10A /* HLPDialog */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D7CC04EA2BFB352700C0B10A /* XCRemoteSwiftPackageReference "HLPDialog" */;
+			productName = HLPDialog;
+		};
+		D7CC04EB2BFB352700C0B10A /* Collections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D7CC04EC2BFB352700C0B10A /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = Collections;
+		};
+		D7CC04ED2BFB352700C0B10A /* Gzip */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D7CC04EE2BFB352700C0B10A /* XCRemoteSwiftPackageReference "GzipSwift" */;
+			productName = Gzip;
+		};
+		D7CC04EF2BFB352700C0B10A /* SocketIO */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D7CC04F02BFB352700C0B10A /* XCRemoteSwiftPackageReference "socket" */;
+			productName = SocketIO;
+		};
+		D7CC04F12BFB352700C0B10A /* NavigationBackport */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D7CC04F22BFB352700C0B10A /* XCRemoteSwiftPackageReference "NavigationBackport" */;
+			productName = NavigationBackport;
 		};
 /* End XCSwiftPackageProductDependency section */
 

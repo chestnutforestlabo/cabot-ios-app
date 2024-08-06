@@ -341,7 +341,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 }
                 UserDefaults.standard.synchronize()
                 
-                self.fallbackService.manage(command: .lang, param: resource.lang)
+                _ = self.fallbackService.manage(command: .lang, param: resource.lang)
             }
         }
     }
@@ -638,7 +638,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         let generalCategory = UNNotificationCategory(identifier: "GENERAL",
                                                      actions: [],
                                                      intentIdentifiers: [],
-                                                     options: [.allowAnnouncement])
+                                                     options: [])
         notificationCenter.setNotificationCategories([generalCategory])
     }
 
@@ -885,7 +885,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
         let skip = tourManager.skipDestination()
         self.stopSpeak()
-        var announce = CustomLocalizedString("Skip Message %@", lang: self.resourceLang, skip.title.pron)
+        let announce = CustomLocalizedString("Skip Message %@", lang: self.resourceLang, skip.title.pron)
         self.tts.speak(announce){
         }
     }
@@ -1092,7 +1092,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     self.share(user_info: SharedInfo(type: .RequestUserInfo, value: ""))
                 }
                 DispatchQueue.main.async {
-                    self.fallbackService.manage(command: .lang, param: self.resourceLang)
+                    _ = self.fallbackService.manage(command: .lang, param: self.resourceLang)
                 }
             }
         }
@@ -1207,7 +1207,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.skipDestination()
         case .getlanguage:
             DispatchQueue.main.async {
-                self.fallbackService.manage(command: .lang, param: I18N.shared.langCode)
+                _ = self.fallbackService.manage(command: .lang, param: I18N.shared.langCode)
             }
             break
         }
@@ -1224,7 +1224,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 } else {
                     notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
                         if granted {
-                            self.pushDeviceState()
+                            DispatchQueue.main.async {
+                                self.pushDeviceState()
+                            }
                         } else {
                             print("Permission for notification not granted.")
                         }
@@ -1245,7 +1247,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 } else {
                     notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
                         if granted {
-                            self.pushSystemState()
+                            DispatchQueue.main.async {
+                                self.pushSystemState()
+                            }
                         } else {
                             print("Permission for notification not granted.")
                         }
@@ -1363,6 +1367,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
         if userInfo.type == .ClearDestinations {
             self.clearAll()
+        }
+        if userInfo.type == .ChangeLanguage {
+            self.resource?.lang = userInfo.value
+            self.updateVoice()
         }
     }
 
@@ -1711,6 +1719,9 @@ class UserInfoBuffer {
             // do nothing
             break
         case .ClearDestinations:
+            // do nothing
+            break
+        case .ChangeLanguage:
             // do nothing
             break
         }

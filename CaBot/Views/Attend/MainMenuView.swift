@@ -28,10 +28,8 @@ struct MainMenuView: View {
 
     var body: some View {
         Form {
-            if modelData.modeType != .Normal {
-                UserInfoView()
-                    .environmentObject(modelData)
-            }
+            UserInfoView()
+                .environmentObject(modelData)
             if modelData.noSuitcaseDebug {
                 Label("No Suitcase Debug mode", systemImage: "exclamationmark.triangle")
                     .foregroundColor(.red)
@@ -476,34 +474,32 @@ struct StatusMenus: View {
                         }
                     }
                 ).isDetailLink(false)
-                if (modelData.modeType == .Advanced || modelData.modeType == .Debug) {
-                    NavigationLink(
-                        destination: DeviceStatusView().environmentObject(modelData),
-                        label: {
-                            HStack {
-                                Label(LocalizedStringKey("Device"),
-                                      systemImage: modelData.deviceStatus.level.icon)
-                                .labelStyle(StatusLabelStyle(color: modelData.deviceStatus.level.color))
-                                Text(":")
-                                Text(LocalizedStringKey(modelData.deviceStatus.level.rawValue))
-                            }
+                NavigationLink(
+                    destination: DeviceStatusView().environmentObject(modelData),
+                    label: {
+                        HStack {
+                            Label(LocalizedStringKey("Device"),
+                                  systemImage: modelData.deviceStatus.level.icon)
+                            .labelStyle(StatusLabelStyle(color: modelData.deviceStatus.level.color))
+                            Text(":")
+                            Text(LocalizedStringKey(modelData.deviceStatus.level.rawValue))
                         }
-                    ).isDetailLink(false)
-                    NavigationLink(
-                        destination: SystemStatusView().environmentObject(modelData),
-                        label: {
-                            HStack {
-                                Label(LocalizedStringKey("System"),
-                                      systemImage: modelData.systemStatus.summary.icon)
-                                .labelStyle(StatusLabelStyle(color: modelData.systemStatus.summary.color))
-                                Text(":")
-                                Text(LocalizedStringKey(modelData.systemStatus.levelText()))
-                                Text("-")
-                                Text(LocalizedStringKey(modelData.systemStatus.summary.text))
-                            }
+                    }
+                ).isDetailLink(false)
+                NavigationLink(
+                    destination: SystemStatusView().environmentObject(modelData),
+                    label: {
+                        HStack {
+                            Label(LocalizedStringKey("System"),
+                                  systemImage: modelData.systemStatus.summary.icon)
+                            .labelStyle(StatusLabelStyle(color: modelData.systemStatus.summary.color))
+                            Text(":")
+                            Text(LocalizedStringKey(modelData.systemStatus.levelText()))
+                            Text("-")
+                            Text(LocalizedStringKey(modelData.systemStatus.summary.text))
                         }
-                    ).isDetailLink(false)
-                }
+                    }
+                ).isDetailLink(false)
             }
         }
     }
@@ -513,7 +509,7 @@ struct MapMenus: View {
     @EnvironmentObject var modelData: CaBotAppModel
 
     var body: some View {
-        if modelData.suitcaseConnected && (modelData.modeType == .Advanced || modelData.modeType == .Debug) {
+        if modelData.suitcaseConnected{
             Section(header:Text("Map")) {
                 HStack {
                     NavigationLink(
@@ -541,17 +537,15 @@ struct SettingMenus: View {
         let commitHash = Bundle.main.infoDictionary!["GitCommitHash"] as! String
 
         Section(header:Text("System")) {
-            if modelData.modeType != .Normal {
-                Toggle(isOn: $modelData.isTTSEnabledForAdvanced) {
-                    Text("TTS Enabled (Advanced only)")
-                }
+            Toggle(isOn: $modelData.isTTSEnabledForAdvanced) {
+                Text("TTS Enabled (Advanced only)")
             }
             Picker(LocalizedStringKey("Voice"), selection: $modelData.voice) {
                 ForEach(TTSHelper.getVoices(by: locale), id: \.self) { voice in
                     Text(voice.AVvoice.name).tag(voice as Voice?)
                 }
             }.onChange(of: modelData.voice, perform: { value in
-                if let voice = modelData.voice {
+                if let _ = modelData.voice {
                     if !isResourceChanging {
                         modelData.playSample()
                     }
@@ -579,14 +573,12 @@ struct SettingMenus: View {
                     .accessibility(hidden: true)
             }
 
-            if (modelData.modeType == .Advanced || modelData.modeType == .Debug) {
-                if #available(iOS 15.0, *) {
-                    NavigationLink (destination: LogFilesView(langOverride: modelData.resourceLang)
-                        .environmentObject(modelData.logList),
-                                    label: {
-                        Text("REPORT_BUG")
-                    }).disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
-                }
+            if #available(iOS 15.0, *) {
+                NavigationLink (destination: LogFilesView(langOverride: modelData.resourceLang)
+                    .environmentObject(modelData.logList),
+                                label: {
+                    Text("REPORT_BUG")
+                }).disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
             }
             NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
                 .environmentObject(modelData)

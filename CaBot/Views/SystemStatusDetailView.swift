@@ -1,4 +1,3 @@
-// please remove this line
 /*******************************************************************************
  * Copyright (c) 2022  Carnegie Mellon University
  *
@@ -32,10 +31,11 @@ struct SystemStatusDetailView: View {
             Form {
                 header
                 ForEach (status.details.keys, id:\.self) {key2 in
-                    let diagnostic = status.details[key2]!
+                    //let diagnostic = status.details[key2]!
                     DiagnosticCell(key: key, key2: key2)
                         .environmentObject(modelData)
-                        .animation(.default)
+                        // https://stackoverflow.com/a/72230633
+                        .animation(nil, value: UUID())
                 }
             }
         } else {
@@ -105,7 +105,6 @@ struct DiagnosticCell: View {
 
 struct SystemStatusDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        let model:CaBotAppModel = CaBotAppModel()
         let modelData = CaBotAppModel()
         modelData.suitcaseConnected = true
         let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")

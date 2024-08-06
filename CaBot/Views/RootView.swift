@@ -41,6 +41,7 @@ struct RootView: View {
                     MainMenuView()
                         .environmentObject(modelData)
                 }
+                #if ATTEND
                 NavigationLink(
                     destination: SystemStatusView().environmentObject(modelData),
                     isActive: $modelData.showingSystemStatusMenu){
@@ -53,6 +54,7 @@ struct RootView: View {
                         EmptyView()
                     }
                     .isDetailLink(false)
+                #endif
             }
             .navigationTitle(modelData.displayedScene.text)
             .sheet(isPresented: $modelData.isContentPresenting, content: {

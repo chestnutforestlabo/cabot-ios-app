@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "7E29F008228B548100CA7DD6"
-               BuildableName = "CaBot.app"
-               BlueprintName = "CaBot"
+               BlueprintIdentifier = "D7CC04E62BFB352700C0B10A"
+               BuildableName = "CaBot-User.app"
+               BlueprintName = "CaBot-User"
                ReferencedContainer = "container:CaBot.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -43,12 +43,19 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "7E29F008228B548100CA7DD6"
-            BuildableName = "CaBot.app"
-            BlueprintName = "CaBot"
+            BlueprintIdentifier = "D7CC04E62BFB352700C0B10A"
+            BuildableName = "CaBot-User.app"
+            BlueprintName = "CaBot-User"
             ReferencedContainer = "container:CaBot.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "IDELogRedirectionPolicy"
+            value = "oslogToStdio"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -60,9 +67,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "7E29F008228B548100CA7DD6"
-            BuildableName = "CaBot.app"
-            BlueprintName = "CaBot"
+            BlueprintIdentifier = "D7CC04E62BFB352700C0B10A"
+            BuildableName = "CaBot-User.app"
+            BlueprintName = "CaBot-User"
             ReferencedContainer = "container:CaBot.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
