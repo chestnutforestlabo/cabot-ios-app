@@ -280,7 +280,8 @@ class CaBotServiceTCP: NSObject {
         DispatchQueue.global(qos: .utility).async {
             self.heartBeatTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] (timer) in
                 guard let weakself = self else { return }
-                weakself.emit("heartbeat", "\(weakself.mode.rawValue)")
+                guard let deviceID = UIDevice.current.identifierForVendor else { return }
+                weakself.emit("heartbeat", "\(deviceID)/\(weakself.mode.rawValue)")
                 weakself.emit("req_version", true)
 
                 let now = Date().timeIntervalSince1970
