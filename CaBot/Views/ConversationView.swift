@@ -44,21 +44,9 @@ struct ConversationView: UIViewControllerRepresentable {
             self.owner = owner
         }
         @objc func request_start_navigation(note: Notification) {
-            if let toID = note.userInfo?["toID"] as? String {
-                let title = note.userInfo?["title"] as? String ?? "From Conversation"
-                let pron = note.userInfo?["pron"] as? String
-                
-                if let src = owner.dsrc,
-                   let destinations = try? Destination.load(at: src),
-                   let destination = destinations.first(where: { $0.value == toID }) {
-                    owner.modelData.tourManager.addToLast(destination: destination)
-                } else {
-                    owner.modelData.tourManager.addToLast(destination: Destination(title: title, value: toID, pron: pron, file: nil, summaryMessage: nil, startMessage: nil, content: nil, waitingDestination: nil, subtour: nil))
-                }
-                
-                owner.modelData.needToStartAnnounce(wait: true)
-                NavigationUtil.popToRootView()
-            }
+            NavigationUtil.popToRootView()
+//            owner.modelData.needToStartAnnounce(wait: true) TODO: Modify needToStartAnnounce to announce the destination
+
             DispatchQueue.main.async {
                 self.owner.presentationMode.wrappedValue.dismiss()
             }
