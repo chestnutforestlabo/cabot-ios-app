@@ -1064,9 +1064,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         userInfo.clear()
     }
 
-    func share(destination: Destination, clear: Bool = true) {
+    func share(destination: Destination, clear: Bool = true, addFirst: Bool = false) {
         if let value = destination.value {
-            self.share(user_info: SharedInfo(type: .OverrideDestination, value: value, flag1: clear))
+            self.share(user_info: SharedInfo(type: .OverrideDestination, value: value, flag1: clear, flag2: addFirst))
             userInfo.clear()
         }
     }
@@ -1433,7 +1433,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                                 if userInfo.flag1 { // clear and add
                                     self.clearAll()
                                 }
-                                tourManager.addToLast(destination: dest)
+                                if userInfo.flag2 {
+                                    tourManager.addToFirst(destination: dest)
+                                }
+                                else {
+                                    tourManager.addToLast(destination: dest)
+                                }
                                 needToStartAnnounce(wait: true)
                                 return
                             }
