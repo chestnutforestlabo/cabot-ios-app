@@ -61,4 +61,5 @@ struct NavigationUtil {
 
 extension Notification.Name {
     static let startChatRequest = Notification.Name("request_start_chat")
+    static let finishChatRequest = Notification.Name("request_finish_chat")
 }

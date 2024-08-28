@@ -350,6 +350,7 @@ enum NavigationEventType:String, Decodable {
     case skip
     case getlanguage
     case startchat
+    case finishchat
     case unknown
 }
 
@@ -506,6 +507,7 @@ class CaBotServiceActions {
     }
 
     func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, request: NavigationEventRequest) {
+        NSLog("received event " + request.type.rawValue)
         guard delegate.getModeType() == .Normal else { return } // only for Normal mode
         // noop for same request ID from different transport
         guard lastNavigationEventRequestID < request.request_id else { return }
@@ -522,6 +524,9 @@ class CaBotServiceActions {
             case .startchat:
                 NSLog("startchat event received")
                 delegate.cabot(service: service, notificationRequest: "request_start_chat")
+            case .finishchat:
+                NSLog("finishchat event received")
+                delegate.cabot(service: service, notificationRequest: "request_finish_chat")
             case .content:
                 guard let url = URL(string: request.param) else {
                     return

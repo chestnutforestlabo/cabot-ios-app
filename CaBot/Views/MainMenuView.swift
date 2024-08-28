@@ -379,6 +379,9 @@ struct MainMenus: View {
                         .onReceive(NotificationCenter.default.publisher(for: .startChatRequest)) { _ in
                             navigateToConversation = true
                         }
+                        .onReceive(NotificationCenter.default.publisher(for: .finishChatRequest)) { _ in
+                            navigateToConversation = false
+                        }
                 //    }
                 //}
                 if let src = cm.destinationsSource {

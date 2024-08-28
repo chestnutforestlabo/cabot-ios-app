@@ -1151,7 +1151,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             break
         case .next:
             self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent() - 20
-            self.shouldNoAnnounceToPushRightButton = true
+            self.shouldNoAnnounceToPushRightButton = false
             if tourManager.proceedToNextDestination() {
                 self.playAudio(file: self.detailSettingModel.startSound)
             }else {
