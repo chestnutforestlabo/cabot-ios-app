@@ -34,6 +34,7 @@ public func NSLog(_ format: String, _ args: CVarArg...) {
 @main
 struct CaBotApp: App {
     @Environment(\.scenePhase) var scenePhase
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     #if ATTEND
     var modelData: CaBotAppModel = CaBotAppModel(preview: false, mode: .Advanced)
@@ -49,6 +50,7 @@ struct CaBotApp: App {
             RootView()
                 .environmentObject(modelData)
         }.onChange(of: scenePhase) { newScenePhase in
+            NSLog("ScenePhase to \(newScenePhase)")
 
             modelData.onChange(of: newScenePhase)
 
@@ -62,12 +64,28 @@ struct CaBotApp: App {
                 if isVoiceOverRunning {
                     modelData.stopSpeak()
                 }
-                Logging.stopLog()
-                Logging.startLog(true)
                 break
             @unknown default:
                 break
             }
         }
+    }
+}
+
+
+class AppDelegate: UIResponder, UIApplicationDelegate {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        Logging.startLog(true)
+        let versionNo = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
+        let buildNo = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
+        let commitHash = Bundle.main.infoDictionary!["GitCommitHash"] as! String
+        NSLog("FinishLaunching Version: \(versionNo) (\(buildNo)) \(commitHash) - \(CaBotServiceBLE.CABOT_BLE_VERSION)")
+
+        return true
+    }
+    
+    func applicationWillTerminate(_ application: UIApplication) {
+        NSLog("WillTerminate")
+        Logging.stopLog()
     }
 }
