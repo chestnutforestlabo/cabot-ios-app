@@ -112,6 +112,7 @@ class CaBotServiceBLE: NSObject {
 
         self.naviChar = CaBotNaviChar(service: self, handle:0x0040)
         self.chars.append(self.naviChar)
+        self.chars.append(CaBotTouchChar(service: self, handle:0x0041))
         
         self.logRequestChar = CaBotNotifyChar(service: self, handle:0x0050)
         self.chars.append(self.logRequestChar)
@@ -570,6 +571,15 @@ class CaBotNaviChar: CaBotJSONChar<NavigationEventRequest> {
     override func handle(json: NavigationEventRequest) {
         guard let delegate = self.service.delegate else { return }
         self.service.actions.handle(service: self.service, delegate: delegate, request: json)
+    }
+}
+
+class CaBotTouchChar: CaBotJSONChar<TouchStatus> {
+    override func handle(json: TouchStatus) {
+        guard let delegate = self.service.delegate else { return }
+        DispatchQueue.main.async {
+            delegate.cabot(service: self.service, touchStatus: json)
+        }
     }
 }
 
