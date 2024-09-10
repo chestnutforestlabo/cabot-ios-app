@@ -50,7 +50,7 @@ struct CaBotApp: App {
             RootView()
                 .environmentObject(modelData)
         }.onChange(of: scenePhase) { newScenePhase in
-            NSLog("ScenePhase to \(newScenePhase)")
+            NSLog( "<ScenePhase to \(newScenePhase)>" )
 
             modelData.onChange(of: newScenePhase)
 
@@ -79,13 +79,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let versionNo = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
         let buildNo = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
         let commitHash = Bundle.main.infoDictionary!["GitCommitHash"] as! String
-        NSLog("FinishLaunching Version: \(versionNo) (\(buildNo)) \(commitHash) - \(CaBotServiceBLE.CABOT_BLE_VERSION)")
+        NSLog( "<Launched> Version: \(versionNo) (\(buildNo)) \(commitHash) - \(CaBotServiceBLE.CABOT_BLE_VERSION)")
 
         return true
     }
     
     func applicationWillTerminate(_ application: UIApplication) {
-        NSLog("WillTerminate")
+        NSLog( "<Terminate>" )
         Logging.stopLog()
     }
 }

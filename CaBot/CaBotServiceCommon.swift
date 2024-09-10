@@ -570,3 +570,60 @@ class CaBotServiceActions {
         }
     }
 }
+
+class LogPack {
+    private let title :String
+    private let threshold :TimeInterval
+    private let maxPacking : Int
+    private let isLogWithText : Bool
+    private var last :(at:Date,text:String?)? = nil
+    private var packingCount : Int = 0
+    
+    init( title:String, threshold:TimeInterval, isLogWithText:Bool = false, maxPacking:Int = 10 ) {
+        self.title = title
+        self.threshold = threshold
+        self.isLogWithText = isLogWithText
+        self.maxPacking = maxPacking
+    }
+    
+    func log( text:String? = nil ) {
+        let now = Date()
+        
+        if let (lastAt,lastText) = self.last {
+            if (text != lastText)
+                || (now.timeIntervalSince(lastAt) >= threshold) {
+                _packlog(lastText)
+                _log( now, text )
+            }
+            else {
+                packingCount += 1
+                if packingCount >= maxPacking {
+                    _packlog(lastText)
+                }
+            }
+        }
+        else {
+            _log( now, text )
+        }
+        self.last = (now, text)
+    }
+    
+    private func _log( _ date:Date, _ text:String? ) {
+        var output = self.title
+        if let text, isLogWithText {
+            output = "\(self.title): \(text)"
+        }
+        NSLog(output)
+    }
+    
+    private func _packlog( _ text:String? ) {
+        guard packingCount > 0
+            else { return }
+        var output = self.title
+        if let text, isLogWithText {
+            output = "\(self.title): \(text)"
+        }
+        NSLog("\(output)  x \(packingCount)")
+        packingCount = 0
+    }
+}
