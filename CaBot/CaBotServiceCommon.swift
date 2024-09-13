@@ -627,3 +627,34 @@ class LogPack {
         packingCount = 0
     }
 }
+
+
+struct HeartbeatViewModifier: ViewModifier {
+    let label :String
+    let period :UInt64
+    @State var isAppeare:Bool = true
+
+    func body(content: Content) -> some View {
+        return content
+            .task {
+                isAppeare = true
+                NSLog("<[\(label)] appear>")
+                while !Task.isCancelled {
+                    try? await Task.sleep(nanoseconds:period)
+                    if isAppeare {
+                        NSLog("<[\(label)] showing>")
+                    }
+                }
+            }
+            .onDisappear() {
+                isAppeare = false
+                NSLog("<[\(label)] disappear>")
+            }
+    }
+}
+
+extension View {
+    func heartbeat( _ label:String, period sec:Double = 3.0 ) -> some View {
+        modifier(HeartbeatViewModifier(label:label, period:UInt64(sec * 1_000_000_000)))
+    }
+}

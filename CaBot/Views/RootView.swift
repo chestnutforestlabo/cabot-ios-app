@@ -40,6 +40,7 @@ struct RootView: View {
                 case .App:
                     MainMenuView()
                         .environmentObject(modelData)
+                        .heartbeat("MainMenuView")
                 }
                 #if ATTEND
                 NavigationLink(
