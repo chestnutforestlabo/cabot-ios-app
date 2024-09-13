@@ -504,14 +504,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             bleService.startAdvertising()
         }
     }
-    @Published var primaryAddr: String = "172.20.10.7" {
+    @Published var primaryAddr: String = "127.0.0.1" {
         didSet {
             UserDefaults.standard.setValue(primaryAddr, forKey: primaryAddrKey)
             UserDefaults.standard.synchronize()
             updateNetworkConfig()
         }
     }
-    @Published var secondaryAddr: String = "" {
+    @Published var secondaryAddr: String = "127.0.0.1" {
         didSet {
             UserDefaults.standard.setValue(secondaryAddr, forKey: secondaryAddrKey)
             UserDefaults.standard.synchronize()

@@ -37,10 +37,10 @@ class CaBotServiceTCP: NSObject {
     private var connected: Bool = true
     private var primaryIP = true
     private var connectTimer: Timer?
-    private let cabotVersionLogPack = LogPack(title:"<Socket on: cabot_version>", threshold:3.0, maxPacking:50 )
-    private let deviceStatusLogPack = LogPack(title:"<Socket on: device_status>", threshold:7.0 )
-    private let systemStatusLogPack = LogPack(title:"<Socket on: system_status>", threshold:7.0 )
-    private let touchLogPack = LogPack(title:"<Socket on: touch>", threshold:3.0, maxPacking:200 )
+    private let cabotVersionLogPack = LogPack(title:"<Socket on: cabot_version>", threshold:3.0, maxPacking:20)
+    private let deviceStatusLogPack = LogPack(title:"<Socket on: device_status>", threshold:7.0, maxPacking:4)
+    private let systemStatusLogPack = LogPack(title:"<Socket on: system_status>", threshold:7.0, maxPacking:4)
+    private let touchLogPack = LogPack(title:"<Socket on: touch>", threshold:3.0, maxPacking:80)
 
     var delegate:CaBotServiceDelegate?
 
