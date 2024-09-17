@@ -415,6 +415,7 @@ struct MainMenus: View {
                         label: {
                             Text("SELECT_DESTINATION")
                         })
+                    .disabled(!modelData.isUserAppConnect)
                 }
                 //if modelData.modeType == .Debug{
                     if let src = cm.toursSource {
@@ -424,6 +425,7 @@ struct MainMenus: View {
                             label: {
                                 Text("SELECT_TOUR")
                             })
+                        .disabled(!modelData.isUserAppConnect)
                     }
                 //}
             }
