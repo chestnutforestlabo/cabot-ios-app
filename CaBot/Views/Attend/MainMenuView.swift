@@ -205,6 +205,13 @@ struct UserInfoView: View {
                     SpokenTextView.showText(text: text)
                 }
             }
+            if !modelData.isUserAppConnect {
+                Label {
+                    Text("USER_APP_NOT_CONNECTED").foregroundColor(.red)
+                } icon: {
+                    Image(systemName: "xmark.circle").foregroundColor(.red)
+                }
+            }
         }
     }
 }
