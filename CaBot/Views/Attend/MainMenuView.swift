@@ -175,7 +175,7 @@ struct UserInfoView: View {
                 }
             }
             if (modelData.userInfo.destinations.count >= 1) {
-                NavigationLink(destination: UserInfoDestinations().environmentObject(modelData), label: {
+                NavigationLink(destination: UserInfoDestinations().environmentObject(modelData).heartbeat("UserInfoDestinations"), label: {
                     HStack {
                         Spacer()
                         Text("See detail")
@@ -193,7 +193,7 @@ struct UserInfoView: View {
                     SpokenTextView.showText(text: text)
                 }
                 if modelData.userInfo.speakingText.count > 2 {
-                    NavigationLink(destination: SpokenTextView().environmentObject(modelData), label: {
+                    NavigationLink(destination: SpokenTextView().environmentObject(modelData).heartbeat("SpokenTextView"), label: {
                         HStack {
                             Spacer()
                             Text("See history")
@@ -369,7 +369,7 @@ struct DestinationMenus: View {
                 }
                 if modelData.tourManager.destinations.count > 0 {
                     NavigationLink(
-                        destination: DynamicTourDetailView(tour: modelData.tourManager),
+                        destination: DynamicTourDetailView(tour: modelData.tourManager).heartbeat("DynamicTourDetailView"),
                         label: {
                             HStack {
                                 Spacer()
@@ -395,7 +395,7 @@ struct MainMenus: View {
                                 .onDisappear(){
                                     modelData.resetAudioSession()
                                 }
-                                .environmentObject(modelData),
+                                .environmentObject(modelData).heartbeat("ConversationView"),
                             label: {
                                 Text("START_CONVERSATION")
                             })
@@ -404,7 +404,7 @@ struct MainMenus: View {
                 if let src = cm.destinationsSource {
                     NavigationLink(
                         destination: DestinationsView(src: src)
-                            .environmentObject(modelData),
+                            .environmentObject(modelData).heartbeat("DestinationsView"),
                         label: {
                             Text("SELECT_DESTINATION")
                         })
@@ -413,7 +413,7 @@ struct MainMenus: View {
                     if let src = cm.toursSource {
                         NavigationLink(
                             destination: ToursView(src: src)
-                                .environmentObject(modelData),
+                                .environmentObject(modelData).heartbeat("ToursView"),
                             label: {
                                 Text("SELECT_TOUR")
                             })
@@ -491,7 +491,7 @@ struct StatusMenus: View {
                         .foregroundColor(Color.red)
                 }
                 NavigationLink(
-                    destination: BatteryStatusView().environmentObject(modelData),
+                    destination: BatteryStatusView().environmentObject(modelData).heartbeat("BatteryStatusView"),
                     label: {
                         HStack {
                             Label(LocalizedStringKey("Battery"),
@@ -503,7 +503,7 @@ struct StatusMenus: View {
                     }
                 ).isDetailLink(false)
                 NavigationLink(
-                    destination: DeviceStatusView().environmentObject(modelData),
+                    destination: DeviceStatusView().environmentObject(modelData).heartbeat("DeviceStatusView"),
                     label: {
                         HStack {
                             Label(LocalizedStringKey("Device"),
@@ -515,7 +515,7 @@ struct StatusMenus: View {
                     }
                 ).isDetailLink(false)
                 NavigationLink(
-                    destination: SystemStatusView().environmentObject(modelData),
+                    destination: SystemStatusView().environmentObject(modelData).heartbeat("SystemStatusView"),
                     label: {
                         HStack {
                             Label(LocalizedStringKey("System"),
@@ -542,7 +542,7 @@ struct MapMenus: View {
                 HStack {
                     NavigationLink(
                         destination: RosWebView(address: modelData.getCurrentAddress(), port: modelData.rosPort)
-                            .environmentObject(modelData),
+                            .environmentObject(modelData).heartbeat("RosWebView"),
                         label: {
                             Text("ROS Map")
                         })
@@ -567,7 +567,7 @@ struct SettingMenus: View {
         Section(header:Text("System")) {
             if #available(iOS 15.0, *) {
                 NavigationLink (destination: LogFilesView(langOverride: modelData.resourceLang)
-                    .environmentObject(modelData.logList),
+                    .environmentObject(modelData.logList).heartbeat("LogFilesView"),
                                 label: {
                     Text("REPORT_BUG")
                 }).disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
@@ -577,6 +577,7 @@ struct SettingMenus: View {
                 .onDisappear {
                     modelData.tcpServiceRestart()
                 }
+                .heartbeat("SettingView")
             ) {
                 HStack {
                     Label(LocalizedStringKey("Settings"), systemImage: "gearshape")

@@ -143,7 +143,7 @@ struct UserInfoView: View {
                 }
             }
             if (modelData.userInfo.destinations.count > 1) {
-                NavigationLink(destination: UserInfoDestinations().environmentObject(modelData), label: {
+                NavigationLink(destination: UserInfoDestinations().environmentObject(modelData).heartbeat("UserInfoDestinations"), label: {
                     HStack {
                         Spacer()
                         Text("See detail")
@@ -161,7 +161,7 @@ struct UserInfoView: View {
                     SpokenTextView.showText(text: text)
                 }
                 if modelData.userInfo.speakingText.count > 2 {
-                    NavigationLink(destination: SpokenTextView().environmentObject(modelData), label: {
+                    NavigationLink(destination: SpokenTextView().environmentObject(modelData).heartbeat("SpokenTextView"), label: {
                         HStack {
                             Spacer()
                             Text("See history")
@@ -337,7 +337,7 @@ struct DestinationMenus: View {
                 }
                 if modelData.tourManager.destinations.count > 0 {
                     NavigationLink(
-                        destination: DynamicTourDetailView(tour: modelData.tourManager),
+                        destination: DynamicTourDetailView(tour: modelData.tourManager).heartbeat("DynamicTourDetailView"),
                         label: {
                             HStack {
                                 Spacer()
@@ -359,7 +359,7 @@ struct MainMenus: View {
                 if let src = cm.destinationsSource {
                     NavigationLink(
                         destination: DestinationsView(src: src)
-                            .environmentObject(modelData),
+                            .environmentObject(modelData).heartbeat("DestinationsView"),
                         label: {
                             Text("SELECT_DESTINATION")
                         })
@@ -368,7 +368,7 @@ struct MainMenus: View {
                     if let src = cm.toursSource {
                         NavigationLink(
                             destination: ToursView(src: src)
-                                .environmentObject(modelData),
+                                .environmentObject(modelData).heartbeat("ToursView"),
                             label: {
                                 Text("SELECT_TOUR")
                             })
@@ -417,7 +417,7 @@ struct StatusMenus: View {
                         .foregroundColor(Color.red)
                 }
                 NavigationLink(
-                    destination: BatteryStatusView().environmentObject(modelData),
+                    destination: BatteryStatusView().environmentObject(modelData).heartbeat("BatteryStatusView"),
                     label: {
                         HStack {
                             Label(LocalizedStringKey("Battery"),
@@ -451,6 +451,7 @@ struct SettingMenus: View {
                 .onDisappear {
                     modelData.tcpServiceRestart()
                 }
+                .heartbeat("SettingView")
             ) {
                 HStack {
                     Label(LocalizedStringKey("Settings"), systemImage: "gearshape")

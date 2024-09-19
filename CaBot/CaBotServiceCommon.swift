@@ -641,7 +641,7 @@ struct HeartbeatViewModifier: ViewModifier {
                 NSLog("<[\(label)] appear>")
                 while !Task.isCancelled {
                     try? await Task.sleep(nanoseconds:period)
-                    if isAppeare {
+                    if isAppeare && (UIApplication.shared.applicationState != .background) {
                         NSLog("<[\(label)] showing>")
                     }
                 }

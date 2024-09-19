@@ -34,9 +34,11 @@ struct RootView: View {
                 case .Onboard:
                     OnboardGrantAccess()
                         .environmentObject(modelData)
+                        .heartbeat("OnboardGrantAccess")
                 case .ResourceSelect:
                     ResourceSelectView()
                         .environmentObject(modelData)
+                        .heartbeat("ResourceSelectView")
                 case .App:
                     MainMenuView()
                         .environmentObject(modelData)
@@ -44,13 +46,13 @@ struct RootView: View {
                 }
                 #if ATTEND
                 NavigationLink(
-                    destination: SystemStatusView().environmentObject(modelData),
+                    destination: SystemStatusView().environmentObject(modelData).heartbeat("SystemStatusView"),
                     isActive: $modelData.showingSystemStatusMenu){
                         EmptyView()
                     }
                     .isDetailLink(false)
                 NavigationLink(
-                    destination: DeviceStatusView().environmentObject(modelData),
+                    destination: DeviceStatusView().environmentObject(modelData).heartbeat("DeviceStatusView"),
                     isActive: $modelData.showingDeviceStatusMenu){
                         EmptyView()
                     }
@@ -63,6 +65,7 @@ struct RootView: View {
                     VStack {
                         WebContentView(url: url, handlers: [:])
                             .environmentObject(modelData)
+                            .heartbeat("WebContentView")
                         HStack {
                             Spacer()
                             Button(action: {
