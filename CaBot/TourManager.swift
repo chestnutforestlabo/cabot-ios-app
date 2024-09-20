@@ -106,13 +106,30 @@ class TourManager: TourProtocol {
         _destinations.removeAll()
         _currentDestination = nil
         _arrivedDestination = nil
-        _tempNavigationSetting = tour.setting
+        //_tempNavigationSetting = tour.setting
         self.title = tour.title
-        for d in tour.destinations {
-            _destinations.append(d)
-        }
+        SetDestination(tour:tour)
         delegate?.tourUpdated(manager: self)
         delegate?.tour(manager: self, destinationChanged: nil)
+    }
+    
+    func SetDestination(tour: Tour)
+    {
+        for d in tour.destinationsJSON {
+            let destination = Destination(
+                title: d.title,
+                value: d.matchedDestinationD?.value,
+                pron: "porn",
+                file: nil,
+                summaryMessage: d.matchedMessage?.summaryMessage?.text ?? "",
+                startMessage: d.matchedMessage?.startMessage?.text ?? "",
+                arriveMessages: d.matchedMessage?.arriveMessages?.map { $0.text } ?? [],
+                content: nil,
+                waitingDestination: nil,
+                subtour: nil
+            )
+            _destinations.append(destination)
+        }
     }
 
     func cannotStartCurrent() {
