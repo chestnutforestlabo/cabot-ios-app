@@ -759,7 +759,7 @@ class Destination: Decodable, Hashable {
             }
             if let ref = Reference.from(ref: subtour) {
                 let src = Source(base: base, type: .local, src: ref.file, i18n: i18n)
-                if let tempTour = try? Tour.loadFromJSON(){
+                if let tempTour = try? Tour.load(){
                     if tempTour.count == 1 {
                         tempSubtour = tempTour[0]
                         error.add(info: tempTour[0].error)
@@ -1052,7 +1052,7 @@ class Tour: Decodable, Hashable, TourProtocol {
     }
     
     // MARK: - Static Methods
-    static func loadFromJSON() throws -> [Tour] {
+    static func load() throws -> [Tour] {
         do {
             let fileURL = getTourDataJSON().appendingPathComponent("app-resource/tourdata.json")
             let data = try Data(contentsOf: fileURL)
@@ -1074,7 +1074,7 @@ class Tour: Decodable, Hashable, TourProtocol {
                 tour.matchMessage()
             }
             
-            let features = try Feature.loadFromJSON()
+            let features = try Feature.loadFeature()
             
             for tourIndex in 0..<tours.count {
                 let tour = tours[tourIndex]
@@ -1185,7 +1185,7 @@ class Feature: Decodable, Hashable {
         hasher.combine(ent1Node)
     }
     
-    class func loadFromJSON() throws -> [Feature] {
+    class func loadFeature() throws -> [Feature] {
         do {
             let featrueJsonFileName = "app-resource/features.json"
             let fileURL = getFacilityDataJSON().appendingPathComponent(featrueJsonFileName)

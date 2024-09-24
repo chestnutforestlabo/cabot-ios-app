@@ -1409,7 +1409,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
         if userInfo.type == .OverrideTour {
             do {
-                let tours = try Tour.loadFromJSON()
+                let tours = try Tour.load()
                 for tour in tours {
                     if tour.id == userInfo.value {
                         tourManager.set(tour: tour)

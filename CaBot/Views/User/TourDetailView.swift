@@ -144,7 +144,7 @@ struct TourDetailView_Previews: PreviewProvider {
         modelData.modeType = .Advanced
 
         let resource = modelData.resourceManager.resource(by: "Test data")!
-        let tours = try! Tour.loadFromJSON()
+        let tours = try! Tour.load()
 
         return DynamicTourDetailView(tour: tours[0])
             .environmentObject(modelData)
@@ -156,7 +156,7 @@ struct TourDetailView_Previews: PreviewProvider {
         modelData.modeType = .Normal
 
         let resource = modelData.resourceManager.resource(by: "Test data")!
-        let tours = try! Tour.loadFromJSON()
+        let tours = try! Tour.load()
 
         return DynamicTourDetailView(tour: tours[0])
             .environmentObject(modelData)
@@ -168,7 +168,7 @@ struct TourDetailView_Previews: PreviewProvider {
         modelData.modeType = .Advanced
 
         let resource = modelData.resourceManager.resource(by: "Test data")!
-        let tours = try! Tour.loadFromJSON()
+        let tours = try! Tour.load()
 
         return StaticTourDetailView(tour: tours[0])
             .environmentObject(modelData)
@@ -180,7 +180,7 @@ struct TourDetailView_Previews: PreviewProvider {
         modelData.modeType = .Normal
 
         let resource = modelData.resourceManager.resource(by: "Test data")!
-        let tours = try! Tour.loadFromJSON()
+        let tours = try! Tour.load()
 
         return StaticTourDetailView(tour: tours[1])
             .environmentObject(modelData)

@@ -654,7 +654,7 @@ struct ContentView_Previews: PreviewProvider {
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
             if let url = r.toursSource {
-                if let tours = try? Tour.loadFromJSON() {
+                if let tours = try? Tour.load() {
                     modelData.tourManager.set(tour: tours[0])
                     _ = modelData.tourManager.proceedToNextDestination()
                 }
@@ -672,7 +672,7 @@ struct ContentView_Previews: PreviewProvider {
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
             if let url = r.toursSource {
-                if let tours = try? Tour.loadFromJSON() {
+                if let tours = try? Tour.load() {
                     modelData.tourManager.set(tour: tours[0])
                 }
             }
@@ -689,7 +689,7 @@ struct ContentView_Previews: PreviewProvider {
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
             if let url = r.toursSource {
-                if let tours = try? Tour.loadFromJSON() {
+                if let tours = try? Tour.load() {
                     modelData.tourManager.set(tour: tours[1])
                 }
             }
@@ -706,7 +706,7 @@ struct ContentView_Previews: PreviewProvider {
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
             if let url = r.toursSource {
-                if let tours = try? Tour.loadFromJSON() {
+                if let tours = try? Tour.load() {
                     modelData.tourManager.set(tour: tours[1])
                 }
             }

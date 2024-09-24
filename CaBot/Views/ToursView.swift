@@ -47,7 +47,7 @@ struct ToursView: View {
     
     private func loadTours() {
         do {
-            tours = try Tour.loadFromJSON()
+            tours = try Tour.load()
         } catch {
             NSLog("Error loading tours: \(error)")
         }
