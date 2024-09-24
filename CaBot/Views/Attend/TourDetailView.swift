@@ -50,7 +50,6 @@ struct StaticTourDetailView: View {
                 .confirmationDialog(Text("SEND_TOUR"), isPresented: $isConfirming, presenting: targetTour) { detail in
                     Button {
                         modelData.share(tour: targetTour!)
-                        tourManager.set(tour: targetTour!)
                         NavigationUtil.popToRootView()
                         targetTour = nil
                     } label: {
