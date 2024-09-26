@@ -205,6 +205,13 @@ struct UserInfoView: View {
                     SpokenTextView.showText(text: text)
                 }
             }
+            if !modelData.isUserAppConnected {
+                Label {
+                    Text("USER_APP_NOT_CONNECTED").foregroundColor(.red)
+                } icon: {
+                    Image(systemName: "xmark.circle").foregroundColor(.red)
+                }
+            }
         }
     }
 }
@@ -408,6 +415,7 @@ struct MainMenus: View {
                         label: {
                             Text("SELECT_DESTINATION")
                         })
+                    .disabled(!modelData.isUserAppConnected)
                 }
                 //if modelData.modeType == .Debug{
                     if let src = cm.toursSource {
@@ -417,6 +425,7 @@ struct MainMenus: View {
                             label: {
                                 Text("SELECT_TOUR")
                             })
+                        .disabled(!modelData.isUserAppConnected)
                     }
                 //}
             }
