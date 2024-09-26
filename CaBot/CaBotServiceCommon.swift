@@ -571,7 +571,7 @@ class CaBotServiceActions {
     }
 }
 
-class LogPack {
+actor LogPack {
     private let title :String
     private let threshold :TimeInterval
     private let maxPacking : Int
@@ -586,7 +586,13 @@ class LogPack {
         self.maxPacking = maxPacking
     }
     
-    func log( text:String? = nil ) {
+    nonisolated func log( text:String? = nil ) {
+        Task {
+            await _log( text:text )
+        }
+    }
+    
+    private func _log( text:String? = nil ) {
         let now = Date()
         
         if let (lastAt,lastText) = self.last {
