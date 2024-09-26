@@ -205,7 +205,7 @@ struct UserInfoView: View {
                     SpokenTextView.showText(text: text)
                 }
             }
-            if !modelData.isUserAppConnect {
+            if !modelData.isUserAppConnected {
                 Label {
                     Text("USER_APP_NOT_CONNECTED").foregroundColor(.red)
                 } icon: {
@@ -415,7 +415,7 @@ struct MainMenus: View {
                         label: {
                             Text("SELECT_DESTINATION")
                         })
-                    .disabled(!modelData.isUserAppConnect)
+                    .disabled(!modelData.isUserAppConnected)
                 }
                 //if modelData.modeType == .Debug{
                     if let src = cm.toursSource {
@@ -425,7 +425,7 @@ struct MainMenus: View {
                             label: {
                                 Text("SELECT_TOUR")
                             })
-                        .disabled(!modelData.isUserAppConnect)
+                        .disabled(!modelData.isUserAppConnected)
                     }
                 //}
             }

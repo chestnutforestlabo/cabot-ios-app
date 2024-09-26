@@ -547,12 +547,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     @Published var deviceStatus: DeviceStatus = DeviceStatus(){
         didSet{
-            isUserAppConnect = deviceStatus.devices.contains { device in
+            isUserAppConnected = deviceStatus.devices.contains { device in
                     device.type == "User App" && device.level == .OK
             }
         }
     }
-    @Published var isUserAppConnect: Bool = false
+    @Published var isUserAppConnected: Bool = false
     @Published var showingDeviceStatusNotification: Bool = false
     @Published var showingDeviceStatusMenu: Bool = false
     @Published var systemStatus: SystemStatusData = SystemStatusData()
