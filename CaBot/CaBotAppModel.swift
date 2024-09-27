@@ -511,7 +511,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             updateNetworkConfig()
         }
     }
-    @Published var secondaryAddr: String = "172.20.10.7" {
+    @Published var secondaryAddr: String = "" {
         didSet {
             UserDefaults.standard.setValue(secondaryAddr, forKey: secondaryAddrKey)
             UserDefaults.standard.synchronize()
