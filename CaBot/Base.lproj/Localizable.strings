@@ -292,6 +292,7 @@
 
 "User App Info"="User App Info";
 "CUSTOMIZED_TOUR"="Customized Tour";
+"USER_APP_NOT_CONNECTED"="User app is not connected";
 
 
 // ROS Web View

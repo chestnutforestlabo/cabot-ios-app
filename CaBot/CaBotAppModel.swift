@@ -545,7 +545,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var contentURL: URL? = nil
     @Published var tourUpdated: Bool = false
 
-    @Published var deviceStatus: DeviceStatus = DeviceStatus()
+    @Published var deviceStatus: DeviceStatus = DeviceStatus(){
+        didSet{
+            isUserAppConnected = deviceStatus.devices.contains { device in
+                    device.type == "User App" && device.level == .OK
+            }
+        }
+    }
+    @Published var isUserAppConnected: Bool = false
     @Published var showingDeviceStatusNotification: Bool = false
     @Published var showingDeviceStatusMenu: Bool = false
     @Published var systemStatus: SystemStatusData = SystemStatusData()
@@ -1183,6 +1190,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             if self.suitcaseConnected {
                 if self.modeType != .Normal{
                     self.share(user_info: SharedInfo(type: .RequestUserInfo, value: ""))
+                }
+                else if self.modeType == .Normal{
+                    self.share(user_info: SharedInfo(type: .ChangeLanguage, value: self.resourceLang))
                 }
                 DispatchQueue.main.async {
                     _ = self.fallbackService.manage(command: .lang, param: self.resourceLang)
