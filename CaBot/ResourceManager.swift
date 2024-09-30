@@ -963,16 +963,10 @@ class Tour: Decodable, Hashable, TourProtocol {
             switch type {
             case "summary":
                 summaryMessage = I18NText(text: ["ja": textJa, "en": textEn], pron: [:])
-                startMessage = nil
-                arriveMessages = nil
             case "startMessage":
                 startMessage = I18NText(text: ["ja": textJa, "en": textEn], pron: [:])
-                summaryMessage = nil
-                arriveMessages = nil
             case "arriveMessage":
                 arriveMessages = [I18NText(text: ["ja": textJa, "en": textEn], pron: [:])]
-                summaryMessage = nil
-                startMessage = nil
             default:
                 summaryMessage = nil
                 startMessage = nil
@@ -1043,11 +1037,21 @@ class Tour: Decodable, Hashable, TourProtocol {
     
     private func matchMessage() {
         for index in 0..<destinationsJSON.count {
-            let destination = destinationsJSON[index]
-            let matchedMessageForDestination = Tour.allMessages.first { message in
-                return message.parent == destination.ref
+            var destination = destinationsJSON[index]
+            let matchedMessages = Tour.allMessages.filter { message in
+                !destination.ref.isEmpty && message.parent == destination.ref
             }
-            destinationsJSON[index].matchedMessage = matchedMessageForDestination
+            if let startMessage = matchedMessages.first(where: { $0.type == "startMessage" }) {
+                destination.matchedMessage = startMessage // matchedMessageを設定
+            }
+            if let summaryMessage = matchedMessages.first(where: { $0.type == "summary" }) {
+                destination.matchedMessage?.summaryMessage = summaryMessage.summaryMessage // summaryMessageを設定
+            }
+            if let arriveMessage = matchedMessages.first(where: { $0.type == "arriveMessage" }) {
+                destination.matchedMessage?.arriveMessages = arriveMessage.arriveMessages // arriveMessagesを設定
+            }
+                  
+            destinationsJSON[index] = destination
         }
     }
     
