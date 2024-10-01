@@ -944,35 +944,53 @@ class Tour: Decodable, Hashable, TourProtocol {
         var summaryMessage: I18NText?
         var startMessage: I18NText?
         var arriveMessages: [I18NText]?
+        var text: [String: String] = [:]
         
         enum CodingKeys: String, CodingKey {
             case type
             case parent
-            case textJa = "text:ja"
-            case textEn = "text:en"
         }
         
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             type = try container.decode(String.self, forKey: .type)
             parent = try container.decode(String.self, forKey: .parent)
-            
-            let textJa = try container.decode(String.self, forKey: .textJa)
-            let textEn = try container.decode(String.self, forKey: .textEn)
-            
+            let allValues = try decoder.container(keyedBy: DynamicCodingKeys.self)
+           
+            for key in allValues.allKeys {
+                if key.stringValue.hasPrefix("text:") {
+                    let newKey = String(key.stringValue.dropFirst(5))
+                    if let value = try? allValues.decodeIfPresent(String.self, forKey: key) {
+                        text[newKey] = value
+                    }
+                }
+            }
             switch type {
             case "summary":
-                summaryMessage = I18NText(text: ["ja": textJa, "en": textEn], pron: [:])
+                summaryMessage = I18NText(text: text, pron: [:])
             case "startMessage":
-                startMessage = I18NText(text: ["ja": textJa, "en": textEn], pron: [:])
+                startMessage = I18NText(text: text, pron: [:])
             case "arriveMessage":
-                arriveMessages = [I18NText(text: ["ja": textJa, "en": textEn], pron: [:])]
+                arriveMessages = [I18NText(text:text, pron: [:])]
             default:
                 summaryMessage = nil
                 startMessage = nil
                 arriveMessages = nil
             }
         }
+          struct DynamicCodingKeys: CodingKey {
+              var stringValue: String
+              var intValue: Int?
+
+              init?(stringValue: String) {
+                  self.stringValue = stringValue
+              }
+
+              init?(intValue: Int) {
+                  self.intValue = intValue
+                  self.stringValue = "\(intValue)"
+              }
+          }
     }
     
     // MARK: - Initializers
@@ -996,9 +1014,15 @@ class Tour: Decodable, Hashable, TourProtocol {
         defaultVar = try container.decodeIfPresent(String.self, forKey: .defaultVar)
         destinations = []
         
-        let titleJa = try container.decodeIfPresent(String.self, forKey: .titleJa) ?? ""
-        let titleEn = try container.decodeIfPresent(String.self, forKey: .titleEn) ?? ""
-        title = I18NText(text: ["ja": titleJa, "en": titleEn], pron: [:])
+        var titleText: [String: String] = [:]
+        for key in container.allKeys {
+            if key.stringValue.hasPrefix("title-") {
+                if let value = try? container.decodeIfPresent(String.self, forKey: key) {
+                    titleText[key.stringValue] = value
+                }
+            }
+        }
+        title = I18NText(text: titleText, pron: [:])
         introduction = I18NText(text: [:], pron: [:])
         error = nil
         matchDestinationsD()
@@ -1042,13 +1066,13 @@ class Tour: Decodable, Hashable, TourProtocol {
                 !destination.ref.isEmpty && message.parent == destination.ref
             }
             if let startMessage = matchedMessages.first(where: { $0.type == "startMessage" }) {
-                destination.matchedMessage = startMessage // matchedMessageを設定
+                destination.matchedMessage = startMessage
             }
             if let summaryMessage = matchedMessages.first(where: { $0.type == "summary" }) {
-                destination.matchedMessage?.summaryMessage = summaryMessage.summaryMessage // summaryMessageを設定
+                destination.matchedMessage?.summaryMessage = summaryMessage.summaryMessage
             }
             if let arriveMessage = matchedMessages.first(where: { $0.type == "arriveMessage" }) {
-                destination.matchedMessage?.arriveMessages = arriveMessage.arriveMessages // arriveMessagesを設定
+                destination.matchedMessage?.arriveMessages = arriveMessage.arriveMessages
             }
                   
             destinationsJSON[index] = destination
@@ -1087,10 +1111,10 @@ class Tour: Decodable, Hashable, TourProtocol {
                     if let matchedD = destination.matchedDestinationD {
                         if let matchedFeature = features.first(where: { $0.ent1Node == matchedD.value }) {
                             let newTitle = I18NText(
-                                text: ["ja": matchedFeature.nameJa, "en": matchedFeature.nameEn],
+                                text: matchedFeature.names,
                                 pron: [:]
                             )
-                            destination.title = newTitle
+                            destination.title = I18NText(text: matchedFeature.names, pron: [:])
                             tours[tourIndex].destinationsJSON[destIndex] = destination
                         } else {
                             NSLog("No matching Feature found")
@@ -1121,11 +1145,18 @@ class Tour: Decodable, Hashable, TourProtocol {
                 )
             }
             
-            let titleJa = tourDict["title-ja"] as? String ?? ""
-            let titleEn = tourDict["title-en"] as? String ?? ""
-            let title = I18NText(text: ["ja": titleJa, "en": titleEn], pron: [:])
+            var titleText: [String: String] = [:]
+            for key in tourDict.keys {
+                if key.hasPrefix("title-") {
+                    if let value = tourDict[key] as? String {
+                        titleText[key.replacingOccurrences(of: "title-", with: "")] = value // "title-"を削除して言語コードをキーにする
+                    }
+                }
+            }
+            let title = I18NText(text: titleText, pron: [:])
             let destinations = parseDestinationsFromTourDict(tourDict)
-            let introduction = I18NText(text: ["en": "Introduction for \(id)", "ja": "紹介文 \(id)"], pron: [:])
+            let introductionText: [String: String] = [:]
+            let introduction = I18NText(text: introductionText, pron: [:])
             let defaultVar = tourDict["default_var"] as? String
             
             return Tour(
@@ -1166,21 +1197,18 @@ class Tour: Decodable, Hashable, TourProtocol {
         case id = "tour_id"
         case destinations
         case defaultVar = "default_var"
-        case titleJa = "title-ja"
-        case titleEn = "title-en"
     }
 }
 class Feature: Decodable, Hashable {
     let ent1Node: String
-    let nameJa: String
-    let nameEn: String
-    
-    init(ent1Node: String, nameJa: String, nameEn: String) {
+    var names: [String: String]
+
+    init(ent1Node: String, names: [String: String]) {
         self.ent1Node = ent1Node
-        self.nameJa = nameJa
-        self.nameEn = nameEn
+        self.names = names
     }
     
+    // MARK: - Hashable
     static func == (lhs: Feature, rhs: Feature) -> Bool {
         return lhs.ent1Node == rhs.ent1Node
     }
@@ -1189,10 +1217,11 @@ class Feature: Decodable, Hashable {
         hasher.combine(ent1Node)
     }
     
+    // MARK: - ReadJSON
     class func loadFeature() throws -> [Feature] {
         do {
-            let featrueJsonFileName = "app-resource/features.json"
-            let fileURL = getFacilityDataJSON().appendingPathComponent(featrueJsonFileName)
+            let featureJsonFileName = "app-resource/features.json"
+            let fileURL = getFacilityDataJSON().appendingPathComponent(featureJsonFileName)
             
             let data = try Data(contentsOf: fileURL)
             let jsonObject = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
@@ -1213,14 +1242,20 @@ class Feature: Decodable, Hashable {
             guard let geometry = jsonDict["geometry"] as? [String: Any],
                   let type = geometry["type"] as? String, type == "Point",
                   let properties = jsonDict["properties"] as? [String: Any],
-                  let ent1Node = properties["ent1_node"] as? String,
-                  let nameJaEscaped = properties["name_ja"] as? String,
-                  let nameEn = properties["name_en"] as? String else {
+                  let ent1Node = properties["ent1_node"] as? String else {
                 continue
             }
             
-            let nameJa = nameJaEscaped.removingPercentEncoding ?? nameJaEscaped
-            let feature = Feature(ent1Node: ent1Node, nameJa: nameJa, nameEn: nameEn)
+            var names: [String: String] = [:]
+            for (key, value) in properties {
+                if key.hasPrefix("name_") {
+                    let languageCode = String(key.dropFirst(5))
+                    if let nameValue = value as? String {
+                        names[languageCode] = nameValue
+                    }
+                }
+            }
+            let feature = Feature(ent1Node: ent1Node, names: names)
             features.append(feature)
         }
         
