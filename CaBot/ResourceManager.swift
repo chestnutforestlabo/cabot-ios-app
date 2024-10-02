@@ -1110,7 +1110,7 @@ class Tour: Decodable, Hashable, TourProtocol {
                     var destination = tour.destinationsJSON[destIndex]
                     if let matchedD = destination.matchedDestinationD {
                         if let matchedFeature = features.first(where: { $0.ent1Node == matchedD.value }) {
-                            let newTitle = I18NText(
+                            _ = I18NText(
                                 text: matchedFeature.names,
                                 pron: [:]
                             )
@@ -1121,6 +1121,15 @@ class Tour: Decodable, Hashable, TourProtocol {
                         }
                     } else {
                         NSLog("No matched DestinationD found")
+                        if let matchedFeature = features.first(where: { $0.ent1Node == destination.ref })
+                        {
+                            _ = I18NText(
+                                text: matchedFeature.names,
+                                pron: [:]
+                            )
+                            destination.title = I18NText(text: matchedFeature.names, pron: [:])
+                            tours[tourIndex].destinationsJSON[destIndex] = destination
+                        }
                     }
                 }
             }
@@ -1149,7 +1158,7 @@ class Tour: Decodable, Hashable, TourProtocol {
             for key in tourDict.keys {
                 if key.hasPrefix("title-") {
                     if let value = tourDict[key] as? String {
-                        titleText[key.replacingOccurrences(of: "title-", with: "")] = value // "title-"を削除して言語コードをキーにする
+                        titleText[key.replacingOccurrences(of: "title-", with: "")] = value
                     }
                 }
             }
