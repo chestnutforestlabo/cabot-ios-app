@@ -136,7 +136,6 @@ struct SettingView: View {
                 }.onChange(of: modelData.userVoice, perform: { value in
                     if let voice = modelData.userVoice {
                         if !isResourceChanging {
-                            modelData.playSample(mode: VoiceMode.User)
                             modelData.share(user_info: SharedInfo(type: .ChangeUserVoiceType, value: "\(voice.id)"))
                         }
                     }
@@ -154,7 +153,6 @@ struct SettingView: View {
                            onEditingChanged: { editing in
                             timer?.invalidate()
                             timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
-                                modelData.playSample(mode: VoiceMode.User)
                                 modelData.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(modelData.userSpeechRate)"))
                             }
                     })

@@ -1486,10 +1486,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if userInfo.type == .ChangeUserVoiceRate {
             self.userSpeechRate = Double(userInfo.value) ?? 0.5
             self.updateTTS()
+            self.playSample(mode: .User)
         }
         if userInfo.type == .ChangeUserVoiceType {
             self.userVoice = TTSHelper.getVoice(by: userInfo.value)
             self.updateTTS()
+            self.playSample(mode: .User)
         }
     }
 

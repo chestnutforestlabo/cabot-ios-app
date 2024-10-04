@@ -75,7 +75,6 @@ struct SettingView: View {
                         if !isResourceChanging {
                             if(userVoicePickerSelection != modelData.userVoice){
                                 modelData.userVoice = value
-                                modelData.playSample(mode: VoiceMode.User)
                                 modelData.share(user_info: SharedInfo(type: .ChangeUserVoiceType, value: "\(voice.id)"))
                             }
                             userVoicePickerSelection = value
@@ -102,7 +101,6 @@ struct SettingView: View {
                            onEditingChanged: { editing in
                             timer?.invalidate()
                             timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
-                                modelData.playSample(mode: VoiceMode.User)
                                 modelData.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(modelData.userSpeechRate)"))
                             }
                     })
