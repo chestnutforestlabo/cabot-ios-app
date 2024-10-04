@@ -116,9 +116,11 @@ class TourManager: TourProtocol {
     func SetDestination(tour: Tour)
     {
         for d in tour.destinationsJSON {
+            let arrivalAngleString = d.matchedDestinationD?.arrivalAngle.map { "@" + String($0) } ?? ""
+            let valueString = d.matchedDestinationD?.value ?? d.ref
             let destination = Destination(
                 title: d.title,
-                value: d.matchedDestinationD?.value,
+                value: valueString+arrivalAngleString,
                 pron: "porn",
                 file: nil,
                 summaryMessage: d.matchedMessage?.summaryMessage?.text ?? "",
