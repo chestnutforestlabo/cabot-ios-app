@@ -1484,6 +1484,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if userInfo.type == .ChangeLanguage {
             self.resource?.lang = userInfo.value
             self.updateVoice()
+            self.updateTTS()
         }
         if userInfo.type == .ChangeUserVoiceRate {
             self.userSpeechRate = Double(userInfo.value) ?? 0.5
