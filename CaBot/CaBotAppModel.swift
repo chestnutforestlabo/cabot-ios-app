@@ -348,6 +348,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 UserDefaults.standard.synchronize()
                 
                 _ = self.fallbackService.manage(command: .lang, param: resource.lang)
+                self.updateVoice()
+                self.updateTTS()
             }
         }
     }
