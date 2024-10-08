@@ -59,7 +59,7 @@ struct SettingView: View {
                     }
                 }
 
-                NavigationLink(destination: DetailSettingView().environmentObject(modelData.detailSettingModel), label: {
+                NavigationLink(destination: DetailSettingView().environmentObject(modelData.detailSettingModel).heartbeat("DetailSettingView"), label: {
                     Text("DETAIL_SETTING")
                 })
             }
