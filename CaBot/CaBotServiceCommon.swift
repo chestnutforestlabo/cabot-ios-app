@@ -498,7 +498,7 @@ class CaBotServiceActions {
             let force = request.force
             if !tts.isSpeaking || (delegate.getSpeechPriority() == .Robot && force) {
                 _ = service.activityLog(category: "ble speech request speaking", text: String(line), memo: "force=\(force)")
-                tts.speak(String(line), force: force) { code in
+                tts.speak(String(line), force: force, priority:.parse(priority:request.priority)) { code in
                     if code > 0 {
                         _ = service.activityLog(category: "ble speech request completed", text: String(line), memo: "force=\(force),return_code=\(code)")
                     } else {
