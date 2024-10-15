@@ -24,6 +24,7 @@ import Foundation
 import AVKit
 import HLPDialog
 import SwiftUI
+import PriorityQueueTTS
 
 
 protocol CaBotTTSDelegate {
@@ -32,31 +33,35 @@ protocol CaBotTTSDelegate {
     func share(user_info:SharedInfo)
 }
 
-class CaBotTTS : TTSProtocol{
+
+typealias ProgressHandler = (String?,Int,NSRange)->Void
+
+class CaBotTTS : TTSProtocol {
 
     var voice: AVSpeechSynthesisVoice?
     var rate: Double = 0.6
     var isSpeaking: Bool {
         get {
-            self._tts.isSpeaking()
+            self._tts.isSpeaking
         }
     }
     var delegate:CaBotTTSDelegate?
 
     init(voice: AVSpeechSynthesisVoice?) {
         self.voice = voice
+        _tts.delegate = self
+        _tts.start()
     }
 
-    private let _tts:NavDeviceTTS = NavDeviceTTS.shared()
+    private let _tts = PriorityQueueTTS.shared
+    private var _progressHandlers = [UUID : ProgressHandler]()
 
-    func reset() {
-        self._tts.reset()
-    }
 
-    func speak(_ text: String?, forceSelfvoice: Bool, force: Bool, callback: @escaping (Int32) -> Void, progress: ((NSRange) -> Void)? = nil) {
+    func speak(_ text: String?, forceSelfvoice: Bool, force: Bool, priority: SpeechPriority = .Normal, callback: @escaping (Int32) -> Void, progress: ((NSRange) -> Void)? = nil) {
         guard self.delegate?.getModeType() == .Normal else { return }
         let isForeground = UIApplication.shared.applicationState == .active
         let isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
+        //FIXME: !selfspeak での VO呼び出し
         let selfspeak = forceSelfvoice || !isForeground || !isVoiceOverRunning
 
         var voiceover = false
@@ -65,11 +70,8 @@ class CaBotTTS : TTSProtocol{
         }
         self.delegate?.activityLog(category: "app speech speaking", text: text ?? "", memo: "force=\(force)")
 
-        var options:Dictionary<String,Any> = ["rate": rate, "selfspeak": selfspeak, "force": force]
-        if let voice = self.voice {
-            options["voice"] = voice
-        }
-        self._tts.speak(text == nil ? "" : text, withOptions: options, completionHandler: { code in
+
+        self._speak(text == nil ? "" : text!, priority:priority, completionHandler: { utext, code in
             if code > 0 {
                 self.delegate?.activityLog(category: "app speech completed", text: text ?? "", memo: "force=\(force)")
             } else {
@@ -77,7 +79,7 @@ class CaBotTTS : TTSProtocol{
             }
             callback(code)
             //print("code=\(code), text=\(text)")
-            if code >= 0, let text = text {
+            if code >= 0, let text = utext {
                 self.delegate?.share(user_info: SharedInfo(type: .SpeakProgress, value: text, flag1: true, flag2: voiceover, length: Int(code)))
             }
         }, progressHandler: { text, count, range in
@@ -96,11 +98,7 @@ class CaBotTTS : TTSProtocol{
     }
 
     func speakForAdvanced(_ text:String?, force: Bool, callback: @escaping (Int32) -> Void) {
-        var options:Dictionary<String,Any> = ["rate": rate, "selfspeak": true, "force": force]
-        if let voice = self.voice {
-            options["voice"] = voice
-        }
-        self._tts.speak(text == nil ? "" : text, withOptions: options, completionHandler: { code in
+        self._speak(text == nil ? "" : text!, priority:.parse(force:force, mode:.Advanced), completionHandler: { utext, code in
             callback(code)
         }, progressHandler: { text, count, range in
         })
@@ -110,19 +108,23 @@ class CaBotTTS : TTSProtocol{
         self._tts.stop(false)
     }
 
-    func speak(_ text: String?, force: Bool, callback: @escaping (Int32) -> Void) {
-        self.speak(text, forceSelfvoice: false, force: force, callback: callback)
+    func speak(_ text: String?, force: Bool, priority: SpeechPriority, callback: @escaping (Int32) -> Void) {
+        self.speak(text, forceSelfvoice: false, force: force, priority: priority, callback: callback)
     }
 
     // to conform to TTSProtocol for HLPDialog
     func speak(_ text:String?, callback: @escaping ()->Void) {
-        self.speak(text) { _ in
+        self.speak(text, priority: .Normal, callback: callback)
+    }
+    
+    func speak(_ text:String?, priority: SpeechPriority, callback: @escaping ()->Void) {
+        self.speak(text, priority:priority ) { _ in
             callback()
         }
     }
 
-    func speak(_ text: String?, callback: @escaping (Int32) -> Void) {
-        self.speak(text, forceSelfvoice: false, force: false, callback: callback)
+    func speak(_ text: String?, priority: SpeechPriority, callback: @escaping (Int32) -> Void) {
+        self.speak(text, forceSelfvoice: false, force: false, priority:priority, callback: callback)
     }
 
     func stop() {
@@ -196,8 +198,107 @@ class TTSHelper {
         let tts = CaBotTTS(voice: voice.AVvoice)
         tts.rate = rate
 
-        tts.speak(CustomLocalizedString("Hello Suitcase!", lang: voice.AVvoice.language), forceSelfvoice:true, force:true) {_ in
-
+        tts.speak(CustomLocalizedString("Hello Suitcase!", lang: voice.AVvoice.language), forceSelfvoice:true, force:true, priority:.Required ) {_ in
         }
+    }
+}
+
+extension CaBotTTS : PriorityQueueTTSDelegate {
+    
+    public enum SpeechPriority: Int8 {
+        public typealias RawValue = Int8
+
+        case Low = 0
+        case Normal = 1
+        case High = 2
+        case Required = 3
+        
+        public init( queuePriority: SpeechQueuePriority ) {
+            switch queuePriority {
+            case .Low:
+                self = .Low
+            case .Normal:
+                self = .Normal
+            case .High:
+                self = .High
+            case .Required:
+                self = .Required
+            }
+        }
+        
+        var queuePriority : SpeechQueuePriority {
+            switch self {
+            case .Low:
+                return .Low
+            case .Normal:
+                return .Normal
+            case .High:
+                return .High
+            case .Required:
+                return .Required
+            }
+        }
+    }
+    
+    func _speak( _ text:String, priority:SpeechPriority, completionHandler:@escaping (String?, Int32)->Void, progressHandler: ((String?,Int,NSRange)->Void)? = nil ) {
+        
+        //FIXME: セパレータの対応
+        let separators = ["。", "."]
+        //            priority: SpeechPriority = .Normal,
+        //            tag: Tag = .Default,
+        
+        let entry = TokenizerEntry( separators:separators, priority:priority.queuePriority, timeout_sec: 90.0, speechRate:Float(rate), voice:voice ) { [weak self] entry, utterance, reason in
+            if reason != .Paused {
+                self?._progressHandlers[entry.uuid] = nil
+            }
+            
+            let compLen = Int32((reason != .Canceled ? utterance?.speechString.count : nil) ?? -1)
+            
+            completionHandler( utterance?.speechString, compLen )
+        }
+        try! entry.append(text: text)
+        entry.close()
+        _progressHandlers[entry.uuid] = progressHandler
+        
+        self._tts.append(entry: entry)
+    }
+    
+    func progress(queue: PriorityQueueTTS, entry: QueueEntry) {
+        guard let handler = _progressHandlers[entry.uuid], let token = entry.token
+        else { return }
+        handler( token.text, token.bufferedRange.progressCount, token.bufferedRange.range );
+    }
+    
+    func completed(queue: PriorityQueueTTS, entry: QueueEntry) {
+    }
+}
+
+
+extension CaBotTTS.SpeechPriority {
+    
+    static func parse( force: Bool? = nil, priority: Int32? = nil, mode:ModeType = .Normal ) -> Self {
+        if let force, force == true { return .Required }
+        
+        if let priority {
+            switch priority {
+            case _ where priority <= 25:
+                return .Low
+            case 26 ... 50:
+                return .Normal
+            case 51 ... 75:
+                return .High
+            default:
+                return .Required
+            }
+        }
+        return .Normal
+    }
+}
+
+
+extension PriorityQueueTTS {
+
+    func stop( _ immediate:Bool ) {
+        self.cancel( at:immediate ? .immediate : .word )
     }
 }
