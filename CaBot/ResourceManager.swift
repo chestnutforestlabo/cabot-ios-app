@@ -978,19 +978,29 @@ class Tour: Decodable, Hashable, TourProtocol {
                 arriveMessages = nil
             }
         }
-          struct DynamicCodingKeys: CodingKey {
-              var stringValue: String
-              var intValue: Int?
-
-              init?(stringValue: String) {
-                  self.stringValue = stringValue
-              }
-
-              init?(intValue: Int) {
-                  self.intValue = intValue
-                  self.stringValue = "\(intValue)"
-              }
-          }
+        
+        init(type: String, parent: String) {
+            self.type = type
+            self.parent = parent
+            self.summaryMessage = nil
+            self.startMessage = nil
+            self.arriveMessages = nil
+            self.text = [:]
+        }
+        
+        struct DynamicCodingKeys: CodingKey {
+            var stringValue: String
+            var intValue: Int?
+            
+            init?(stringValue: String) {
+                self.stringValue = stringValue
+            }
+            
+            init?(intValue: Int) {
+                self.intValue = intValue
+                self.stringValue = "\(intValue)"
+            }
+        }
     }
     
     // MARK: - Initializers
@@ -1067,6 +1077,8 @@ class Tour: Decodable, Hashable, TourProtocol {
             }
             if let startMessage = matchedMessages.first(where: { $0.type == "startMessage" }) {
                 destination.matchedMessage = startMessage
+            }else{
+                destination.matchedMessage = Tour.Message(type: "default", parent: "default")
             }
             if let summaryMessage = matchedMessages.first(where: { $0.type == "summary" }) {
                 destination.matchedMessage?.summaryMessage = summaryMessage.summaryMessage
