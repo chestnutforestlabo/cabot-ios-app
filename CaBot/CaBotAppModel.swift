@@ -351,6 +351,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 self.updateVoice()
                 self.updateTTS()
             }
+            
+            self.tts.lang = resource?.lang
         }
     }
 
