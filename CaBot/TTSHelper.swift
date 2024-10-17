@@ -39,6 +39,7 @@ typealias ProgressHandler = (String?,Int,NSRange)->Void
 class CaBotTTS : TTSProtocol {
 
     var voice: AVSpeechSynthesisVoice?
+    var lang: String?
     var rate: Double = 0.6
     var isSpeaking: Bool {
         get {
@@ -47,8 +48,9 @@ class CaBotTTS : TTSProtocol {
     }
     var delegate:CaBotTTSDelegate?
 
-    init(voice: AVSpeechSynthesisVoice?) {
+    init(voice: AVSpeechSynthesisVoice?, lang: String? = nil ) {
         self.voice = voice
+        self.lang = lang
         _tts.delegate = self
         _tts.start()
     }
@@ -242,11 +244,6 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
     
     func _speak( _ text:String, priority:SpeechPriority, completionHandler:@escaping (String?, Int32)->Void, progressHandler: ((String?,Int,NSRange)->Void)? = nil ) {
         
-        //FIXME: セパレータの対応
-        let separators = ["。", "."]
-        //            priority: SpeechPriority = .Normal,
-        //            tag: Tag = .Default,
-        
         let entry = TokenizerEntry( separators:separators, priority:priority.queuePriority, timeout_sec: 90.0, speechRate:Float(rate), voice:voice ) { [weak self] entry, utterance, reason in
             if reason != .Paused {
                 self?._progressHandlers[entry.uuid] = nil
@@ -261,6 +258,22 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
         _progressHandlers[entry.uuid] = progressHandler
         
         self._tts.append(entry: entry)
+    }
+    
+    var separators :[String] {
+        let key = "TOKEN_SEPARATORS"
+        let testLang = self.lang ?? self.voice?.language
+        if let testLang {
+            let res = CustomLocalizedString(key, lang: testLang)
+            if res != key {
+                let splits = res.components(separatedBy: ";")
+                if splits.count > 0 {
+                    return splits
+                }
+            }
+        }
+        let res = NSLocalizedString(key, value: ". ", comment: "")
+        return res.components(separatedBy: ";")
     }
     
     func progress(queue: PriorityQueueTTS, entry: QueueEntry) {

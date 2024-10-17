@@ -349,6 +349,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 
                 _ = self.fallbackService.manage(command: .lang, param: resource.lang)
             }
+            
+            self.tts.lang = resource?.lang
         }
     }
 
