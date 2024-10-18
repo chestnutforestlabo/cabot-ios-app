@@ -100,7 +100,7 @@ class CaBotTTS : TTSProtocol {
     }
 
     func speakForAdvanced(_ text:String?, force: Bool, callback: @escaping (Int32) -> Void) {
-        self._speak(text == nil ? "" : text!, priority:.parse(force:force, mode:.Advanced), completionHandler: { utext, code in
+        self._speak(text == nil ? "" : text!, priority:.parse(force:force, mode:.Advanced), tag:ModeType.Advanced.rawValue, completionHandler: { utext, code in
             callback(code)
         }, progressHandler: { text, count, range in
         })
@@ -207,13 +207,11 @@ class TTSHelper {
 
 extension CaBotTTS : PriorityQueueTTSDelegate {
     
-    public enum SpeechPriority: Int8 {
-        public typealias RawValue = Int8
-
-        case Low = 0
-        case Normal = 1
-        case High = 2
-        case Required = 3
+    public enum SpeechPriority {
+        case Low
+        case Normal
+        case High
+        case Required
         
         public init( queuePriority: SpeechQueuePriority ) {
             switch queuePriority {
@@ -242,9 +240,9 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
         }
     }
     
-    func _speak( _ text:String, priority:SpeechPriority, completionHandler:@escaping (String?, Int32)->Void, progressHandler: ((String?,Int,NSRange)->Void)? = nil ) {
-        
-        let entry = TokenizerEntry( separators:separators, priority:priority.queuePriority, timeout_sec: 90.0, speechRate:Float(rate), voice:voice ) { [weak self] entry, utterance, reason in
+    func _speak( _ text:String, priority:SpeechPriority, tag:Tag? = nil, completionHandler:@escaping (String?, Int32)->Void, progressHandler: ((String?,Int,NSRange)->Void)? = nil ) {
+
+        let entry = TokenizerEntry( separators:separators, priority:priority.queuePriority, timeout_sec: 90.0, tag: (tag ?? Tag.Default), speechRate:Float(rate), voice:voice ) { [weak self] entry, utterance, reason in
             if reason != .Paused {
                 self?._progressHandlers[entry.uuid] = nil
             }
@@ -257,7 +255,12 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
         entry.close()
         _progressHandlers[entry.uuid] = progressHandler
         
-        self._tts.append(entry: entry)
+        if let _ = tag {
+            self._tts.append(entry: entry, withRemoving: SameTag, cancelBoundary: .immediate)
+        }
+        else {
+            self._tts.append(entry: entry)
+        }
     }
     
     var separators :[String] {
