@@ -190,7 +190,7 @@ struct UserInfoView: View {
                 }
             } else if modelData.userInfo.speakingText.count > 1 {
                 ForEach(modelData.userInfo.speakingText[..<2], id: \.self) { text in
-                    SpokenTextView.showText(text: text)
+                    SpokenTokenView(speakingText: text)
                 }
                 if modelData.userInfo.speakingText.count > 2 {
                     NavigationLink(destination: SpokenTextView().environmentObject(modelData), label: {
@@ -202,7 +202,7 @@ struct UserInfoView: View {
                 }
             } else {
                 ForEach(modelData.userInfo.speakingText, id: \.self) { text in
-                    SpokenTextView.showText(text: text)
+                    SpokenTokenView(speakingText: text)
                 }
             }
             if !modelData.isUserAppConnected {

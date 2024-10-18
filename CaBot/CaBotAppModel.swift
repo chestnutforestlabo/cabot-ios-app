@@ -1750,7 +1750,7 @@ struct PersistenceController {
     }
 }
 
-class SpeakingText: Hashable {
+class SpeakingText: Hashable, ObservableObject {
     static func == (lhs: SpeakingText, rhs: SpeakingText) -> Bool {
         lhs.text == rhs.text && lhs.date == rhs.date
     }
@@ -1758,11 +1758,11 @@ class SpeakingText: Hashable {
         hasher.combine(text)
         hasher.combine(date)
     }
-    var text: String = ""
+    @Published var text: String = ""
     var date: Date
     var voiceover: Bool
-    var location = 0
-    var length = 0
+    @Published var location = 0
+    @Published var length = 0
     init(text: String, voiceover: Bool) {
         self.text = text
         self.date = Date()
