@@ -30,7 +30,7 @@ struct StaticTourDetailView: View {
     var tour: Tour
 
     var body: some View {
-        let hasError = tour.destinations.first(where: {d in d.error != nil}) != nil
+        //let hasError = tour.destinations.first(where: {d in d.error != nil}) != nil
         let tourManager = modelData.tourManager
         
         Form {
@@ -46,7 +46,7 @@ struct StaticTourDetailView: View {
                         Image(systemName: "arrow.triangle.turn.up.right.diamond")
                     }
                 }
-                .disabled(hasError)
+                //.disabled(hasError)
                 .confirmationDialog(Text("SEND_TOUR"), isPresented: $isConfirming, presenting: targetTour) { detail in
                     Button {
                         modelData.share(tour: targetTour!)
@@ -63,7 +63,7 @@ struct StaticTourDetailView: View {
                 }
             }
             Section(header: Text(tour.title.text)) {
-                ForEach(tour.destinationsJSON, id: \.ref) { dest in
+                ForEach(tour.destinations, id: \.ref) { dest in
                     Label(dest.title.text, systemImage: "mappin.and.ellipse")
                 }
             }
@@ -139,7 +139,7 @@ struct TourDetailView_Previews: PreviewProvider {
         let resource = modelData.resourceManager.resource(by: "Test data")!
         let tours = try! Tour.load()
 
-        return DynamicTourDetailView(tour: tours[0])
+        return DynamicTourDetailView(tour: tours[0] as! TourProtocol)
             .environmentObject(modelData)
             .previewDisplayName("Dynamic Advanced")
     }
@@ -151,7 +151,7 @@ struct TourDetailView_Previews: PreviewProvider {
         let resource = modelData.resourceManager.resource(by: "Test data")!
         let tours = try! Tour.load()
 
-        return DynamicTourDetailView(tour: tours[0])
+        return DynamicTourDetailView(tour: tours[0] as! TourProtocol)
             .environmentObject(modelData)
             .previewDisplayName("Dynamic Normal")
     }

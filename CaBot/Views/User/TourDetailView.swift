@@ -35,7 +35,6 @@ struct StaticTourDetailView: View {
         Form {
             Section(header: Text("Actions")) {
                 Button(action: {
-                    print("Debug: Tour destinations count: \(tour.destinationsJSON.count)")
                     if tourManager.hasDestination {
                         targetTour = tour
                         isConfirming = true
@@ -53,7 +52,6 @@ struct StaticTourDetailView: View {
                 }
                 .confirmationDialog(Text("ADD_TOUR"), isPresented: $isConfirming) {
                     Button {
-                        print("Debug: Confirming tour destinations count: \(tour.destinationsJSON.count)")
                         if let tour = targetTour {
                             tourManager.set(tour: tour)
                             NavigationUtil.popToRootView()
@@ -70,7 +68,7 @@ struct StaticTourDetailView: View {
                 }
             }
             Section(header: Text(tour.title.text)) {
-                ForEach(tour.destinationsJSON, id: \.ref) { dest in
+                ForEach(tour.destinations, id: \.ref) { dest in
                     Label(dest.title.text, systemImage: "mappin.and.ellipse")
                 }
             }
@@ -146,7 +144,7 @@ struct TourDetailView_Previews: PreviewProvider {
         let resource = modelData.resourceManager.resource(by: "Test data")!
         let tours = try! Tour.load()
 
-        return DynamicTourDetailView(tour: tours[0])
+        return DynamicTourDetailView(tour: tours[0] as! TourProtocol)
             .environmentObject(modelData)
             .previewDisplayName("Dynamic Advanced")
     }
@@ -158,7 +156,7 @@ struct TourDetailView_Previews: PreviewProvider {
         let resource = modelData.resourceManager.resource(by: "Test data")!
         let tours = try! Tour.load()
 
-        return DynamicTourDetailView(tour: tours[0])
+        return DynamicTourDetailView(tour: tours[0] as! TourProtocol)
             .environmentObject(modelData)
             .previewDisplayName("Dynamic Normal")
     }

@@ -863,17 +863,114 @@ class NavigationSetting: Decodable, NavigationSettingProtocol {
         }
     }
 }
+// MARK: - Nested Types
+struct DestinationJSON: Decodable {
+    let ref: String
+    let refTitle: String
+    var matchedDestinationRef: DestinationRef?
+   // var matchedMessage: Message?
+    var summaryMessage: Message?
+    var startMessage: Message?
+    var arriveMessages: [Message]
+    var title: I18NText
+    
+    enum CodingKeys: String, CodingKey {
+        case ref
+        case refTitle = "#ref"
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        ref = try container.decode(String.self, forKey: .ref)
+        refTitle = try container.decode(String.self, forKey: .refTitle)
+        matchedDestinationRef = nil
+        summaryMessage = nil
+        startMessage = nil
+        arriveMessages = []
+        title = I18NText(text: [:], pron: [:])
+    }
+    
+    init(ref: String, refTitle: String, title: I18NText) {
+        self.ref = ref
+        self.refTitle = refTitle
+        self.matchedDestinationRef = nil
+        summaryMessage = nil
+        startMessage = nil
+        arriveMessages = []
+        self.title = title
+    }
+}
 
-class Tour: Decodable, Hashable, TourProtocol {
-    var currentDestination: Destination?
+struct DestinationRef: Decodable {
+    let floor: Int
+    let value: String
+    let title: String
+    let variation: String?
+    let arrivalAngle: Int?
+    
+    enum CodingKeys: String, CodingKey {
+        case floor, value
+        case title = "#title"
+        case variation = "var"
+        case arrivalAngle
+    }
+}
+
+struct Message: Decodable {
+    let type: String
+    let parent: String
+    var text: I18NText
+    
+    enum CodingKeys: String, CodingKey {
+        case type
+        case parent
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        type = try container.decode(String.self, forKey: .type)
+        parent = try container.decode(String.self, forKey: .parent)
+        let allValues = try decoder.container(keyedBy: DynamicCodingKeys.self)
+        var textDict: [String: String] = [:]
+        for key in allValues.allKeys {
+            if key.stringValue.hasPrefix("text:") {
+                let newKey = String(key.stringValue.dropFirst(5))
+                if let value = try? allValues.decodeIfPresent(String.self, forKey: key) {
+                    textDict[newKey] = value
+                }
+            }
+        }
+        self.text = I18NText(text: textDict, pron: [:])
+    }
+    
+    init(type: String, parent: String) {
+        self.type = type
+        self.parent = parent
+        self.text = I18NText(text: [:], pron: [:])
+    }
+    
+    struct DynamicCodingKeys: CodingKey {
+        var stringValue: String
+        var intValue: Int?
+        
+        init?(stringValue: String) {
+            self.stringValue = stringValue
+        }
+        
+        init?(intValue: Int) {
+            self.intValue = intValue
+            self.stringValue = "\(intValue)"
+        }
+    }
+}
+class Tour: Decodable, Hashable{
     
     // MARK: - Properties
     let title: I18NText
     let id: String
-    var destinationsJSON: [DestinationJSON]
+    var destinations: [DestinationJSON]
     let defaultVar: String?
     let introduction: I18NText
-    var destinations: [Destination]
     let error: String?
     
     // MARK: - Coding Keys
@@ -885,12 +982,12 @@ class Tour: Decodable, Hashable, TourProtocol {
     
     
     // MARK: - Static Properties
-    private static var _allDestinationsD: [DestinationD] = []
+    private static var _allDestinationsRef: [DestinationRef] = []
     private static var _allMessages: [Message] = []
     
-    static var allDestinationsD: [DestinationD] {
-        get { return _allDestinationsD }
-        set { _allDestinationsD = newValue }
+    static var allDestinationsRef: [DestinationRef] {
+        get { return _allDestinationsRef }
+        set { _allDestinationsRef = newValue }
     }
     
     static var allMessages: [Message] {
@@ -900,141 +997,17 @@ class Tour: Decodable, Hashable, TourProtocol {
     
     struct Root: Decodable {
         let tours: [Tour]
-        let destinations: [DestinationD]
+        let destinations: [DestinationRef]
         let messages: [Message]
     }
-    // MARK: - Nested Types
-    struct DestinationJSON: Decodable {
-        let ref: String
-        let refTitle: String
-        var matchedDestinationD: DestinationD?
-        var matchedMessages: Message?
-        var matchedMessage: Message?
-        var title: I18NText
-        
-        enum CodingKeys: String, CodingKey {
-            case ref
-            case refTitle = "#ref"
-        }
-        
-        init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            ref = try container.decode(String.self, forKey: .ref)
-            refTitle = try container.decode(String.self, forKey: .refTitle)
-            matchedDestinationD = nil
-            matchedMessage = nil
-            title = I18NText(text: [:], pron: [:])
-        }
-        
-        init(ref: String, refTitle: String, title: I18NText) {
-            self.ref = ref
-            self.refTitle = refTitle
-            self.matchedDestinationD = nil
-            matchedMessage = nil
-            self.title = title
-        }
-    }
     
-    struct DestinationD: Decodable {
-        let floor: Int
-        let value: String
-        let title: String
-        let variation: String?
-        let arrivalAngle: Int?
-        
-        enum CodingKeys: String, CodingKey {
-            case floor, value
-            case title = "#title"
-            case variation = "var"
-            case arrivalAngle
-        }
-    }
-    
-    struct Message: Decodable {
-        let type: String
-        let parent: String
-        var summaryMessage: I18NText?
-        var startMessage: I18NText?
-        var arriveMessages: [I18NText]?
-        var text: [String: String] = [:]
-        
-        enum CodingKeys: String, CodingKey {
-            case type
-            case parent
-        }
-        
-        init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            type = try container.decode(String.self, forKey: .type)
-            parent = try container.decode(String.self, forKey: .parent)
-            let allValues = try decoder.container(keyedBy: DynamicCodingKeys.self)
-           
-            for key in allValues.allKeys {
-                if key.stringValue.hasPrefix("text:") {
-                    let newKey = String(key.stringValue.dropFirst(5))
-                    if let value = try? allValues.decodeIfPresent(String.self, forKey: key) {
-                        text[newKey] = value
-                    }
-                }
-            }
-            switch type {
-            case "summary":
-                summaryMessage = I18NText(text: text, pron: [:])
-            case "startMessage":
-                startMessage = I18NText(text: text, pron: [:])
-            case "arriveMessage":
-                arriveMessages = [I18NText(text:text, pron: [:])]
-            default:
-                summaryMessage = nil
-                startMessage = nil
-                arriveMessages = nil
-            }
-        }
-        
-        init(type: String, parent: String) {
-            self.type = type
-            self.parent = parent
-            self.summaryMessage = nil
-            self.startMessage = nil
-            self.arriveMessages = nil
-            self.text = [:]
-        }
-        
-        struct DynamicCodingKeys: CodingKey {
-            var stringValue: String
-            var intValue: Int?
-            
-            init?(stringValue: String) {
-                self.stringValue = stringValue
-            }
-            
-            init?(intValue: Int) {
-                self.intValue = intValue
-                self.stringValue = "\(intValue)"
-            }
-        }
-    }
-    
-    // MARK: - Initializers
-  /*  init(title: I18NText, id: String, destinationsJSON: [DestinationJSON],defaultVar: String?, introduction: I18NText, destinations: [Destination],error:String?) {
-        self.title = title
-        self.id = id
-        self.destinationsJSON = destinationsJSON
-        self.defaultVar = defaultVar
-        self.introduction = introduction
-        self.destinations = []
-        self.error = nil
-        self.matchDestinationsD()
-        self.matchMessage()
-    }*/
     
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
         id = try container.decode(String.self, forKey: .id)
-        destinationsJSON = try container.decode([DestinationJSON].self, forKey: .destinations)
+        destinations = try container.decode([DestinationJSON].self, forKey: .destinations)
         defaultVar = try container.decodeIfPresent(String.self, forKey: .defaultVar)
-        destinations = []
         
         var titleText: [String: String] = [:]
         let additionalKeysContainer = try decoder.container(keyedBy: DynamicCodingKeys.self)
@@ -1081,45 +1054,60 @@ class Tour: Decodable, Hashable, TourProtocol {
     }
     
     // MARK: - Private Methods
-    private func matchDestinationsD() {
-        for index in 0..<destinationsJSON.count {
-            let destination = destinationsJSON[index]
+    private func matchDestinationsRef() {
+
+        var destinationsRefIndex: [String: DestinationRef] = [:]
+        for ref in Tour.allDestinationsRef {
+            destinationsRefIndex[ref.value] = ref
+        }
+
+        for index in 0..<destinations.count {
+            let destination = destinations[index]
             let refParts = destination.ref.split(separator: "#")
+            
             if refParts.count == 2 {
                 let value = String(refParts[0])
                 let variation = String(refParts[1])
-                if let matched = Tour.allDestinationsD.first(where: {
-                    $0.value == value && ($0.variation == variation || $0.variation == nil)
-                }) {
-                    destinationsJSON[index].matchedDestinationD = matched
+
+                if let matched = destinationsRefIndex[value], matched.variation == variation || matched.variation == nil {
+                    destinations[index].matchedDestinationRef = matched
                 }
             } else {
-                if let matched = Tour.allDestinationsD.first(where: { $0.value == destination.ref }) {
-                    destinationsJSON[index].matchedDestinationD = matched
+
+                if let matched = destinationsRefIndex[destination.ref] {
+                    destinations[index].matchedDestinationRef = matched
                 }
             }
         }
     }
     
     private func matchMessage() {
-        for index in 0..<destinationsJSON.count {
-            var destination = destinationsJSON[index]
-            let matchedMessages = Tour.allMessages.filter { message in
-               return !destination.ref.isEmpty && message.parent == destination.ref
+
+        var destinationIndex: [String: Int] = [:]
+        for (index, destination) in destinations.enumerated() {
+            destinationIndex[destination.ref] = index
+        }
+
+        for message in Tour.allMessages {
+            guard let index = destinationIndex[message.parent], !message.parent.isEmpty else {
+                continue
             }
-            if let startMessage = matchedMessages.first(where: { $0.type == "startMessage" }) {
-                destination.matchedMessage = startMessage
-            }else{
-                destination.matchedMessage = Tour.Message(type: "default", parent: "default")
-            }
-            if let summaryMessage = matchedMessages.first(where: { $0.type == "summary" }) {
-                destination.matchedMessage?.summaryMessage = summaryMessage.summaryMessage
-            }
-            if let arriveMessage = matchedMessages.first(where: { $0.type == "arriveMessage" }) {
-                destination.matchedMessage?.arriveMessages = arriveMessage.arriveMessages
+            
+            var destination = destinations[index]
+
+            switch message.type {
+            case "startMessage":
+                destination.startMessage = message
+            case "summary":
+                destination.summaryMessage = message
+            case "arriveMessage":
+                destination.arriveMessages = [message]
+            default:
+                break
             }
                   
-            destinationsJSON[index] = destination
+
+            destinations[index] = destination
         }
     }
     
@@ -1129,11 +1117,11 @@ class Tour: Decodable, Hashable, TourProtocol {
             let fileURL = getTourDataJSON().appendingPathComponent("app-resource/tourdata.json")
             let data = try Data(contentsOf: fileURL)
             let root = try JSONDecoder().decode(Root.self, from: data)
-            allDestinationsD = root.destinations
+            allDestinationsRef = root.destinations
             allMessages = root.messages
            
             for tour in root.tours {
-                tour.matchDestinationsD()
+                tour.matchDestinationsRef()
                 tour.matchMessage()
             }
             
@@ -1141,16 +1129,16 @@ class Tour: Decodable, Hashable, TourProtocol {
             
             for tourIndex in 0..<root.tours.count {
                 let tour = root.tours[tourIndex]
-                for destIndex in 0..<tour.destinationsJSON.count {
-                    var destination = tour.destinationsJSON[destIndex]
-                    if let matchedD = destination.matchedDestinationD {
+                for destIndex in 0..<tour.destinations.count {
+                    var destination = tour.destinations[destIndex]
+                    if let matchedD = destination.matchedDestinationRef {
                         if let matchedFeature = features.first(where: { $0.properties.ent1Node == matchedD.value }) {
                             _ = I18NText(
                                 text: matchedFeature.properties.names,
                                 pron: [:]
                             )
                             destination.title = I18NText(text: matchedFeature.properties.names, pron: [:])
-                            root.tours[tourIndex].destinationsJSON[destIndex] = destination
+                            root.tours[tourIndex].destinations[destIndex] = destination
                         } else {
                             NSLog("No matching Feature found")
                         }
@@ -1165,7 +1153,7 @@ class Tour: Decodable, Hashable, TourProtocol {
                                 pron: [:]
                             )
                             destination.title = I18NText(text: matchedFeature.properties.names, pron: [:])
-                            root.tours[tourIndex].destinationsJSON[destIndex] = destination
+                            root.tours[tourIndex].destinations[destIndex] = destination
                         }
                     }
                 }

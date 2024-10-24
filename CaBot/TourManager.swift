@@ -115,17 +115,17 @@ class TourManager: TourProtocol {
     
     func SetDestination(tour: Tour)
     {
-        for d in tour.destinationsJSON {
-            let arrivalAngleString = d.matchedDestinationD?.arrivalAngle.map { "@" + String($0) } ?? ""
-            let valueString = d.matchedDestinationD?.value ?? d.ref
+        for d in tour.destinations {
+            let arrivalAngleString = d.matchedDestinationRef?.arrivalAngle.map { "@" + String($0) } ?? ""
+            let valueString = d.matchedDestinationRef?.value ?? d.ref
             let destination = Destination(
                 title: d.title,
                 value: valueString+arrivalAngleString,
                 pron: "porn",
                 file: nil,
-                summaryMessage: d.matchedMessage?.summaryMessage?.text ?? "",
-                startMessage: d.matchedMessage?.startMessage?.text ?? "",
-                arriveMessages: d.matchedMessage?.arriveMessages?.map { $0.text } ?? [],
+                summaryMessage: d.summaryMessage?.text.text ?? "",
+                startMessage: d.startMessage?.text.text ?? "",
+                arriveMessages: d.arriveMessages.map { $0.text.text } ,
                 content: nil,
                 waitingDestination: nil,
                 subtour: nil
@@ -173,7 +173,6 @@ class TourManager: TourProtocol {
         
     func addSubTour(tour: Tour) {
         _subtours.append(tour)
-        _destinations.insert(contentsOf: tour.destinations, at: 0)
         delegate?.tourUpdated(manager: self)
     }
 
@@ -214,10 +213,6 @@ class TourManager: TourProtocol {
     func pop() -> Destination {
         let dest = _destinations.removeFirst()
         
-        if let last = _subtours.last,
-           last.destinations.last == dest {
-            _ = _subtours.popLast()
-        }
         
         return dest
     }
