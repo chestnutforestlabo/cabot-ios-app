@@ -30,6 +30,9 @@ import os.log
 public func NSLog(_ format: String, _ args: CVarArg...) {
     withVaList(args) { NavNSLogv(format, $0) }
 }
+public func Debug( log:String ) {
+    NSLog(log)
+}
 
 @main
 struct CaBotApp: App {

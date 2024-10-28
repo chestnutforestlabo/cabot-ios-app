@@ -496,20 +496,16 @@ class CaBotServiceActions {
             }
             let line = request.text
             let force = request.force
-            if !tts.isSpeaking || (delegate.getSpeechPriority() == .Robot && force) {
-                _ = service.activityLog(category: "ble speech request speaking", text: String(line), memo: "force=\(force)")
-                tts.speak(String(line), force: force, priority:.parse(priority:request.priority)) { code in
-                    if code > 0 {
-                        _ = service.activityLog(category: "ble speech request completed", text: String(line), memo: "force=\(force),return_code=\(code)")
-                    } else {
-                        _ = service.activityLog(category: "ble speech request canceled", text: String(line), memo: "force=\(force),return_code=\(code)")
-                    }
+            let priority = request.priority
+            let bias = !tts.isSpeaking || (delegate.getSpeechPriority() == .Robot && force)
+            _ = service.activityLog(category: "ble speech request speaking", text: String(line), memo: "force=\(force)")
+            tts.speak(String(line), force: force, priority: .parse(force:force, priority:priority, priorityBias:bias)) { code in
+                if code > 0 {
+                    _ = service.activityLog(category: "ble speech request completed", text: String(line), memo: "force=\(force),return_code=\(code)")
+                } else {
+                    _ = service.activityLog(category: "ble speech request canceled", text: String(line), memo: "force=\(force),return_code=\(code)")
                 }
-            } else {
-                NSLog("TTS is busy and skip speaking: \(line)")
-                _ = service.activityLog(category: "ble speech request skipped", text: String(line), memo: "TTS is busy")
             }
-
         }
     }
 
