@@ -65,8 +65,8 @@
 		7EDF3C4429D48C3200AD1115 /* Localizable.strings in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7E557EFE2581C79B00B1B9CA /* Localizable.strings */; };
 		7EDF3C4529D4901000AD1115 /* Resource in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3099132A265DE50A000C1BFE /* Resource */; };
 		7EF5F1EA228DB07100788987 /* NavUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EF5F1E8228DB07100788987 /* NavUtil.m */; };
-		A96B6DB02CCF1D5200B51955 /* PriorityQueueTTS in Frameworks */ = {isa = PBXBuildFile; productRef = A96B6DAF2CCF1D5200B51955 /* PriorityQueueTTS */; };
-		A96B6DB22CCF1D6200B51955 /* PriorityQueueTTS in Frameworks */ = {isa = PBXBuildFile; productRef = A96B6DB12CCF1D6200B51955 /* PriorityQueueTTS */; };
+		A97F30DF2CDDC9FA00BE5C43 /* PriorityQueueTTS in Frameworks */ = {isa = PBXBuildFile; productRef = A97F30DE2CDDC9FA00BE5C43 /* PriorityQueueTTS */; };
+		A97F30E12CDDCA0D00BE5C43 /* PriorityQueueTTS in Frameworks */ = {isa = PBXBuildFile; productRef = A97F30E02CDDCA0D00BE5C43 /* PriorityQueueTTS */; };
 		D7CC04F42BFB352700C0B10A /* DialogViewControllerCabot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */; };
 		D7CC04F52BFB352700C0B10A /* LogFilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 458B54382A970B4A00AD9D10 /* LogFilesView.swift */; };
 		D7CC04F62BFB352700C0B10A /* CaBotAppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DCF269F76F000729ABD /* CaBotAppModel.swift */; };
@@ -231,7 +231,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				308FCE2327D9014E009FCC7B /* Collections in Frameworks */,
-				A96B6DB02CCF1D5200B51955 /* PriorityQueueTTS in Frameworks */,
+				A97F30DF2CDDC9FA00BE5C43 /* PriorityQueueTTS in Frameworks */,
 				306C7F6C265D435100E5928E /* Yams in Frameworks */,
 				306069B429A5E45D001FB5DB /* NavigationBackport in Frameworks */,
 				308FCE2A27E12844009FCC7B /* Gzip in Frameworks */,
@@ -268,7 +268,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D7CC051B2BFB352700C0B10A /* Collections in Frameworks */,
-				A96B6DB22CCF1D6200B51955 /* PriorityQueueTTS in Frameworks */,
+				A97F30E12CDDCA0D00BE5C43 /* PriorityQueueTTS in Frameworks */,
 				D7CC051C2BFB352700C0B10A /* Yams in Frameworks */,
 				D7CC051D2BFB352700C0B10A /* NavigationBackport in Frameworks */,
 				D7CC051E2BFB352700C0B10A /* Gzip in Frameworks */,
@@ -476,7 +476,7 @@
 				308FCE2927E12844009FCC7B /* Gzip */,
 				0967677E29371BA0005CFA58 /* SocketIO */,
 				306069B329A5E45D001FB5DB /* NavigationBackport */,
-				A96B6DAF2CCF1D5200B51955 /* PriorityQueueTTS */,
+				A97F30DE2CDDC9FA00BE5C43 /* PriorityQueueTTS */,
 			);
 			productName = CaBot;
 			productReference = 7E29F009228B548100CA7DD6 /* CaBot-Attend.app */;
@@ -560,7 +560,7 @@
 				D7CC04ED2BFB352700C0B10A /* Gzip */,
 				D7CC04EF2BFB352700C0B10A /* SocketIO */,
 				D7CC04F12BFB352700C0B10A /* NavigationBackport */,
-				A96B6DB12CCF1D6200B51955 /* PriorityQueueTTS */,
+				A97F30E02CDDCA0D00BE5C43 /* PriorityQueueTTS */,
 			);
 			productName = CaBot;
 			productReference = D7CC052B2BFB352700C0B10A /* CaBot-User.app */;
@@ -611,7 +611,7 @@
 				0967677D29371B9F005CFA58 /* XCRemoteSwiftPackageReference "socket" */,
 				306069B229A5E45D001FB5DB /* XCRemoteSwiftPackageReference "NavigationBackport" */,
 				7EDE7C9229B5733D00A65829 /* XCRemoteSwiftPackageReference "swift-argument-parser" */,
-				A96B6DAE2CCF1D5200B51955 /* XCRemoteSwiftPackageReference "PriorityQueueTTS" */,
+				A97F30DD2CDDC9FA00BE5C43 /* XCRemoteSwiftPackageReference "PriorityQueueTTS" */,
 			);
 			productRefGroup = 7E29F00A228B548100CA7DD6 /* Products */;
 			projectDirPath = "";
@@ -1352,11 +1352,11 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		A96B6DAE2CCF1D5200B51955 /* XCRemoteSwiftPackageReference "PriorityQueueTTS" */ = {
+		A97F30DD2CDDC9FA00BE5C43 /* XCRemoteSwiftPackageReference "PriorityQueueTTS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/CMU-cabot/PriorityQueueTTS.git";
 			requirement = {
-				branch = fix/suspended_token_range;
+				branch = fix/utterance_attribute;
 				kind = branch;
 			};
 		};
@@ -1451,14 +1451,14 @@
 			package = 306C7F6A265D435100E5928E /* XCRemoteSwiftPackageReference "Yams" */;
 			productName = Yams;
 		};
-		A96B6DAF2CCF1D5200B51955 /* PriorityQueueTTS */ = {
+		A97F30DE2CDDC9FA00BE5C43 /* PriorityQueueTTS */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A96B6DAE2CCF1D5200B51955 /* XCRemoteSwiftPackageReference "PriorityQueueTTS" */;
+			package = A97F30DD2CDDC9FA00BE5C43 /* XCRemoteSwiftPackageReference "PriorityQueueTTS" */;
 			productName = PriorityQueueTTS;
 		};
-		A96B6DB12CCF1D6200B51955 /* PriorityQueueTTS */ = {
+		A97F30E02CDDCA0D00BE5C43 /* PriorityQueueTTS */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A96B6DAE2CCF1D5200B51955 /* XCRemoteSwiftPackageReference "PriorityQueueTTS" */;
+			package = A97F30DD2CDDC9FA00BE5C43 /* XCRemoteSwiftPackageReference "PriorityQueueTTS" */;
 			productName = PriorityQueueTTS;
 		};
 		D7CC04E72BFB352700C0B10A /* Yams */ = {

@@ -38,9 +38,18 @@ typealias ProgressHandler = (String?,Int,NSRange)->Void
 
 class CaBotTTS : TTSProtocol {
 
-    var voice: AVSpeechSynthesisVoice?
+    var voice: AVSpeechSynthesisVoice? {
+        didSet {
+            self._tts.voice = voice
+        }
+    }
     var lang: String?
-    var rate: Double = 0.6
+    var rate: Double = 0.6 {
+        didSet {
+            self._tts.speechRate = Float(rate)
+        }
+    }
+    
     var isSpeaking: Bool {
         get {
             self._tts.isSpeaking
@@ -52,6 +61,7 @@ class CaBotTTS : TTSProtocol {
         self.voice = voice
         self.lang = lang
         _tts.delegate = self
+        _tts.speechRate = 0.6
         _tts.start()
     }
 
@@ -59,7 +69,7 @@ class CaBotTTS : TTSProtocol {
     private var _progressHandlers = [UUID : ProgressHandler]()
 
 
-    func speak(_ text: String?, forceSelfvoice: Bool, force: Bool, priority: SpeechPriority = .Normal, callback: @escaping (Int32) -> Void, progress: ((NSRange) -> Void)? = nil) {
+    func speak(_ text: String?, forceSelfvoice: Bool, force: Bool, priority: SpeechPriority = .Normal, timeout sec : TimeInterval? = nil, tag:Tag? = nil, callback: @escaping (Int32) -> Void, progress: ((NSRange) -> Void)? = nil) {
         guard self.delegate?.getModeType() == .Normal else { return }
         
         // - pendding - fix voiceover
@@ -79,7 +89,7 @@ class CaBotTTS : TTSProtocol {
         self.delegate?.activityLog(category: "app speech speaking", text: text ?? "", memo: "force=\(force)")
 
 
-        self._speak(text == nil ? "" : text!, priority:priority, completionHandler: { utext, code in
+        self._speak(text == nil ? "" : text!, priority:priority, timeout :sec, tag: tag, completionHandler: { utext, code in
             if code > 0 {
                 self.delegate?.activityLog(category: "app speech completed", text: text ?? "", memo: "force=\(force)")
             } else {
@@ -105,8 +115,8 @@ class CaBotTTS : TTSProtocol {
         })
     }
 
-    func speakForAdvanced(_ text:String?, force: Bool, callback: @escaping (Int32) -> Void) {
-        self._speak(text == nil ? "" : text!, priority:.parse(force:force, mode:.Advanced), completionHandler: { utext, code in
+    func speakForAdvanced(_ text:String?, force: Bool, tag:Tag? = nil, callback: @escaping (Int32) -> Void) {
+        self._speak(text == nil ? "" : text!, priority:.parse(force:force, mode:.Advanced), tag: tag, completionHandler: { utext, code in
             callback(code)
         }, progressHandler: { text, count, range in
         })
@@ -116,23 +126,23 @@ class CaBotTTS : TTSProtocol {
         self._tts.stop(false)
     }
 
-    func speak(_ text: String?, force: Bool, priority: SpeechPriority, callback: @escaping (Int32) -> Void) {
-        self.speak(text, forceSelfvoice: false, force: force, priority: priority, callback: callback)
+    func speak(_ text: String?, force: Bool, priority: CaBotTTS.SpeechPriority, timeout sec : TimeInterval? = nil, tag:Tag? = nil, callback: @escaping (Int32) -> Void) {
+        self.speak(text, forceSelfvoice: false, force: force, priority: priority, timeout: sec, tag: tag, callback: callback)
     }
 
     // to conform to TTSProtocol for HLPDialog
     func speak(_ text:String?, callback: @escaping ()->Void) {
-        self.speak(text, priority: .Normal, callback: callback)
+        self.speak(text, priority: .Normal, timeout:nil, callback: callback)
     }
     
-    func speak(_ text:String?, priority: SpeechPriority, callback: @escaping ()->Void) {
-        self.speak(text, priority:priority ) { _ in
+    func speak(_ text:String?, priority: SpeechPriority, timeout sec : TimeInterval? = nil, tag: String? = nil, callback: @escaping ()->Void) {
+        self.speak(text, priority:priority, timeout:sec, tag:tag ) { _ in
             callback()
         }
     }
 
-    func speak(_ text: String?, priority: SpeechPriority, callback: @escaping (Int32) -> Void) {
-        self.speak(text, forceSelfvoice: false, force: false, priority:priority, callback: callback)
+    func speak(_ text: String?, priority: SpeechPriority, timeout sec : TimeInterval?, tag: String? = nil, callback: @escaping (Int32) -> Void) {
+        self.speak(text, forceSelfvoice: false, force: false, priority:priority, timeout: sec, tag: tag, callback: callback)
     }
 
     func stop() {
@@ -206,7 +216,7 @@ class TTSHelper {
         let tts = CaBotTTS(voice: voice.AVvoice)
         tts.rate = rate
 
-        tts.speak(CustomLocalizedString("Hello Suitcase!", lang: voice.AVvoice.language), forceSelfvoice:true, force:true, priority:.Required ) {_ in
+        tts.speak(CustomLocalizedString("Hello Suitcase!", lang: voice.AVvoice.language), forceSelfvoice:true, force:true, priority:.High ) {_ in
         }
     }
 }
@@ -246,9 +256,10 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
         }
     }
     
-    func _speak( _ text:String, priority:SpeechPriority, tag:Tag? = nil, completionHandler:@escaping (String?, Int32)->Void, progressHandler: ((String?,Int,NSRange)->Void)? = nil ) {
-
-        let entry = TokenizerEntry( separators:separators, priority:priority.queuePriority, timeout_sec: 90.0, tag: (tag ?? Tag.Default), speechRate:Float(rate), voice:voice ) { [weak self] entry, token, reason in
+    func _speak( _ text:String, priority:SpeechPriority, timeout sec : TimeInterval? = nil, tag:Tag? = nil, completionHandler:@escaping (String?, Int32)->Void, progressHandler: ((String?,Int,NSRange)->Void)? = nil ) {
+        
+        
+        let entry = TokenizerEntry( separators:separators, priority:priority.queuePriority, timeout_sec: (sec ?? 90.0), tag: (tag ?? Tag.Default) ) { [weak self] entry, token, reason in
             
             if reason == .Completed || reason == .Canceled {
                 self?._progressHandlers[entry.uuid] = nil
@@ -263,8 +274,8 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
         _progressHandlers[entry.uuid] = progressHandler
         
         if let tag {
-            self._tts.append(entry: entry, withRemoving: SameTag, cancelBoundary: .word)
-            Debug(log:"<TTS> request text:\(text._summary()) priority:\(priority) tag:\(tag)")
+            self._tts.append(entry: entry, withRemoving: SameTag, cancelBoundary: .immediate)
+            Debug(log:"<TTS> request text:\(text._summary()) priority:\(priority) \("timeout"._dump(of:sec)) tag:\(tag)")
         }
         else {
             self._tts.append(entry: entry)
@@ -306,7 +317,7 @@ extension CaBotTTS.SpeechPriority {
     static func parse( force: Bool? = nil, priority: Int32? = nil, priorityBias: Bool = false, mode: ModeType = .Normal ) -> Self {
         
         if force == true, priority == nil {
-            return .Required
+            return .High
         }
         
         // now, `mode`, `priorityBias` is not use. (for using priority bias)
@@ -341,5 +352,10 @@ extension String {
     func _summary( _ limit: Int = 25 ) -> String {
         let count = self.count
         return (count > limit) ? "\(self.prefix(limit))... (\(count))" : "\(self) (len:\(count))"
+    }
+    
+    func _dump<T>( of val :T? ) -> String {
+        guard let val else { return "" }
+        return " \(self):\(val)"
     }
 }
