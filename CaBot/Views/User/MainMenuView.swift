@@ -28,6 +28,21 @@ struct MainMenuView: View {
 
     var body: some View {
         Form {
+            Button(action: {
+                modelData.tourManager.clearAllDestinations()
+            },label:{
+                Text("Clear Tour Data")
+            })
+            Button(action: {
+                modelData.tourManager.saveDataClear()
+            },label:{
+                Text("Clear Save Data")
+            })
+            Button(action: {
+                modelData.tourManager.tourDataLoad(model: modelData)
+            },label:{
+                Text("Load Tour Data")
+            })
             if modelData.noSuitcaseDebug {
                 Label("No Suitcase Debug mode", systemImage: "exclamationmark.triangle")
                     .foregroundColor(.red)

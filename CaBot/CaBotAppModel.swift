@@ -577,7 +577,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     let logList: LogReportModel = LogReportModel()
     let preview: Bool
     let resourceManager: ResourceManager
-    let tourManager: TourManager
+    var tourManager: TourManager
+    //{
+        //didSet{
+        //    UserDefaults.standard.setValue(tourManager, forKey: "tourManager")
+        //    UserDefaults.standard.synchronize()
+        //    NSLog("TourManager saved: \(tourManager.title.text)")
+        //}
+    //}
     let dialogViewHelper: DialogViewHelper
     private let feedbackGenerator = UINotificationFeedbackGenerator()
     let notificationCenter = UNUserNotificationCenter.current()
@@ -678,6 +685,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
         // tour manager
         self.tourManager.delegate = self
+        //if(self.modeType == .Normal){
+        //    self.tourManager = UserDefaults.standard.object(forKey:"tourManager") as? TourManager ?? TourManager(setting: self.detailSettingModel)
+        //    NSLog("TourManager loaded: \(self.tourManager.title.text)")
+        //}
 
         // Error/Warning Notification
         self.notificationCenter.delegate = self
@@ -971,6 +982,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         guard tourManager.hasDestination else { return }
 
         let skip = tourManager.skipDestination()
+        tourManager.save()
         self.stopSpeak()
         let announce = CustomLocalizedString("Skip Message %@", lang: self.resourceLang, skip.title.pron)
         self.tts.speak(announce){
@@ -1194,6 +1206,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     self.share(user_info: SharedInfo(type: .RequestUserInfo, value: ""))
                 }
                 else if self.modeType == .Normal{
+                    tourManager.tourDataLoad(model: self)
                     self.share(user_info: SharedInfo(type: .ChangeLanguage, value: self.resourceLang))
                 }
                 DispatchQueue.main.async {
