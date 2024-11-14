@@ -569,6 +569,76 @@ struct Reference: CustomStringConvertible {
 /// - content: <Source> file including a web content to show in the browser
 /// - waitingDestination: <WaitingDestination>
 /// ```
+func downloadConfigFile() {
+    let destination : Destination
+    let fileName = "config.json"
+    
+    guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+        return
+    }
+    let fileURL = documentsDirectory.appendingPathComponent(fileName)
+    
+    let urlString = "http://localhost:9090/map/api/config"
+    guard let url = URL(string: urlString) else {
+        return
+    }
+    
+    let task = URLSession.shared.dataTask(with: url) { data, response, error in
+        if let error = error {
+            return
+        }
+        
+        guard let data = data else {
+            return
+        }
+        
+        do {
+            try data.write(to: fileURL)
+            print("config.json SavePath: \(fileURL.path)")
+            
+            Destination.loadConfigFile(fileURL: fileURL)
+        } catch {
+            print("Save Error: \(error)")
+        }
+    }
+    
+    task.resume()
+}
+
+func downloadDirectoryJson(user: String, lat: Double, lng: Double, dist: Int) {
+    let fileName = "directory.json"
+    
+    guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+        return
+    }
+    
+    let fileURL = documentsDirectory.appendingPathComponent(fileName)
+    
+    let urlString = "http://localhost:9090/query/directory?user=\(user)&lat=\(lat)&lng=\(lng)&dist=\(dist)"
+    guard let url = URL(string: urlString) else {
+        return
+    }
+    
+    let task = URLSession.shared.dataTask(with: url) { data, response, error in
+        if let error = error {
+            return
+        }
+        
+        guard let data = data else {
+            return
+        }
+        
+        do {
+            try data.write(to: fileURL)
+            NSLog("directory.json SavePath: \(fileURL.path)")
+        } catch {
+            print("SaveError: \(error)")
+        }
+    }
+    
+    task.resume()
+}
+
 class Destination: Decodable, Hashable {
     static func == (lhs: Destination, rhs: Destination) -> Bool {
         if let lhsfile = lhs.file,
@@ -622,6 +692,37 @@ class Destination: Decodable, Hashable {
         case waitingDestination
         case subtour
         case debug
+    }
+    
+    static func loadConfigFile(fileURL: URL) {
+        do {
+            let data = try Data(contentsOf: fileURL)
+            
+            struct InitialLocation: Codable {
+                let lat: Double
+                let lng: Double
+                let floor: Int
+            }
+            
+            struct Config: Codable {
+                let DO_NOT_USE_SAVED_CENTER: String
+                let INITIAL_LOCATION: InitialLocation
+                let MAP_SERVICE: String
+                let MAP_SERVICE_USE_HTTP: String
+            }
+            
+            let config = try JSONDecoder().decode(Config.self, from: data)
+            
+            let lat = config.INITIAL_LOCATION.lat
+            let lng = config.INITIAL_LOCATION.lng
+            let dist = 5000
+            let user = "user-id"
+            
+            print("LAT: \(lat), LNG: \(lng), DIST: \(dist), USER: \(user)")
+            downloadDirectoryJson(user: user, lat: lat, lng: lng, dist: dist)
+        } catch {
+            print("config.json Read Error: \(error)")
+        }
     }
 
     static func load(at src: Source, refCount: Int = 0, reference: Reference? = nil) throws -> [Destination] {
