@@ -36,7 +36,7 @@ struct ToursView: View {
             Section(header: Text("SELECT_TOUR")) {
                 ForEach(filteredTours, id: \.self) { tour in
                     NavigationLink(
-                        destination: StaticTourDetailView(tour: tour),
+                        destination: StaticTourDetailView(tour: tour).heartbeat("StaticTourDetailView"),
                         label: {
                             Text(tour.title.text)
                         })
