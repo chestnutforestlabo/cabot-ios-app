@@ -153,7 +153,7 @@ struct SettingView: View {
                            onEditingChanged: { editing in
                             timer?.invalidate()
                             timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
-                                modelData.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(modelData.userSpeechRate)"))
+                                modelData.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(modelData.userSpeechRate)", flag1: true))
                             }
                     })
                         .accessibility(label: Text("Speech Speed"))
