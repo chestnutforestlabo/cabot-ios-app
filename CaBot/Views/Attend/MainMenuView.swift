@@ -205,7 +205,13 @@ struct UserInfoView: View {
                     SpokenTextView.showText(text: text)
                 }
             }
-            if !modelData.isUserAppConnected {
+            if !modelData.suitcaseConnected{
+                Label {
+                    Text("ATTEND_APP_NOT_CONNECTED").foregroundColor(.red)
+                } icon: {
+                    Image(systemName: "xmark.circle").foregroundColor(.red)
+                }
+            } else if !modelData.isUserAppConnected {
                 Label {
                     Text("USER_APP_NOT_CONNECTED").foregroundColor(.red)
                 } icon: {
