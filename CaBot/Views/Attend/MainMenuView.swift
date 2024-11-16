@@ -29,6 +29,19 @@ struct MainMenuView: View {
 
     var body: some View {
         Form {
+            if !modelData.suitcaseConnected {
+                Label {
+                    Text("ATTEND_APP_NOT_CONNECTED").foregroundColor(.red)
+                } icon: {
+                    Image(systemName: "xmark.circle").foregroundColor(.red)
+                }
+            } else if !modelData.isUserAppConnected {
+                Label {
+                    Text("USER_APP_NOT_CONNECTED").foregroundColor(.red)
+                } icon: {
+                    Image(systemName: "xmark.circle").foregroundColor(.red)
+                }
+            }
             UserInfoView()
                 .environmentObject(modelData)
             if modelData.noSuitcaseDebug {
@@ -204,13 +217,6 @@ struct UserInfoView: View {
             } else {
                 ForEach(modelData.userInfo.speakingText, id: \.self) { text in
                     SpokenTextView.showText(text: text)
-                }
-            }
-            if modelData.suitcaseConnected && !modelData.isUserAppConnected {
-                Label {
-                    Text("USER_APP_NOT_CONNECTED").foregroundColor(.red)
-                } icon: {
-                    Image(systemName: "xmark.circle").foregroundColor(.red)
                 }
             }
         }
