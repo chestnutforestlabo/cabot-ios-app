@@ -405,9 +405,11 @@ struct StatusMenus: View {
                 Label(LocalizedStringKey("Suitcase Connected"),
                       systemImage: "antenna.radiowaves.left.and.right")
             }else{
-                Label(LocalizedStringKey("Suitcase Not Connected"),
-                      systemImage: "antenna.radiowaves.left.and.right")
-                .opacity(0.1)
+                Label {
+                    Text(LocalizedStringKey("Suitcase Not Connected")).foregroundColor(.red)
+                } icon: {
+                    Image(systemName: "xmark.circle").foregroundColor(.red)
+                }
             }
             if modelData.suitcaseConnected {
                 if (modelData.suitcaseConnectedBLE && modelData.versionMatchedBLE == false) ||

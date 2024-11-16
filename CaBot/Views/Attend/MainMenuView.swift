@@ -205,13 +205,7 @@ struct UserInfoView: View {
                     SpokenTextView.showText(text: text)
                 }
             }
-            if !modelData.suitcaseConnected{
-                Label {
-                    Text("ATTEND_APP_NOT_CONNECTED").foregroundColor(.red)
-                } icon: {
-                    Image(systemName: "xmark.circle").foregroundColor(.red)
-                }
-            } else if !modelData.isUserAppConnected {
+            if modelData.suitcaseConnected && !modelData.isUserAppConnected {
                 Label {
                     Text("USER_APP_NOT_CONNECTED").foregroundColor(.red)
                 } icon: {
@@ -493,9 +487,11 @@ struct StatusMenus: View {
                     Label(LocalizedStringKey("Suitcase Connected"),
                           systemImage: "antenna.radiowaves.left.and.right")
                 }else{
-                    Label(LocalizedStringKey("Suitcase Not Connected"),
-                          systemImage: "antenna.radiowaves.left.and.right")
-                    .opacity(0.1)
+                    Label {
+                        Text(LocalizedStringKey("Suitcase Not Connected")).foregroundColor(.red)
+                    } icon: {
+                        Image(systemName: "xmark.circle").foregroundColor(.red)
+                    }
                 }
             }
             if modelData.suitcaseConnected {
