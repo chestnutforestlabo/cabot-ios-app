@@ -25,6 +25,7 @@ import CoreData
 import NavigationBackport
 
 struct RootView: View {
+    @Environment(\.locale) var locale
     @EnvironmentObject var modelData: CaBotAppModel
 
     var body: some View {

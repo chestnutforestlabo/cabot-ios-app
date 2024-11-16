@@ -51,7 +51,11 @@ enum DisplayedScene {
             case .ResourceSelect:
                 return Text("SELECT_RESOURCE")
             case .App:
+                #if ATTEND
+                return Text("ATTEND_MENU")
+                #elseif USER
                 return Text("MAIN_MENU")
+                #endif
             }
         }
     }

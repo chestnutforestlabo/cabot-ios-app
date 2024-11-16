@@ -30,6 +30,7 @@
 // CaBotAppModel
 "SELECT_RESOURCE"="リソースの選択";
 "MAIN_MENU"="メインメニュー";
+"ATTEND_MENU"="アテンドメニュー";
 
 /// func summon
 "Sending the command to the suitcase"="スーツケースに指示を送っています。ハンドルから手を離してください。";
