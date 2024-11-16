@@ -43,20 +43,18 @@ enum DisplayedScene {
     case ResourceSelect
     case App
 
-    var text: Text {
-        get {
-            switch self {
-            case .Onboard:
-                return Text("")
-            case .ResourceSelect:
-                return Text("SELECT_RESOURCE")
-            case .App:
-                #if ATTEND
-                return Text("ATTEND_MENU")
-                #elseif USER
-                return Text("MAIN_MENU")
-                #endif
-            }
+    func text(lang: String) -> Text {
+        switch self {
+        case .Onboard:
+            return Text(CustomLocalizedString("", lang: lang))
+        case .ResourceSelect:
+            return Text(CustomLocalizedString("SELECT_RESOURCE", lang: lang))
+        case .App:
+            #if ATTEND
+            return Text(CustomLocalizedString("ATTEND_MENU", lang: lang))
+            #elseif USER
+            return Text(CustomLocalizedString("MAIN_MENU", lang: lang))
+            #endif
         }
     }
 }

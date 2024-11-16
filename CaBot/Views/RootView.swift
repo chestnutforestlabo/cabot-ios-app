@@ -60,7 +60,7 @@ struct RootView: View {
                     .isDetailLink(false)
                 #endif
             }
-            .navigationTitle(modelData.displayedScene.text)
+            .navigationTitle(modelData.displayedScene.text(lang: modelData.resourceLang))
             .sheet(isPresented: $modelData.isContentPresenting, content: {
                 if let url = modelData.contentURL {
                     VStack {
