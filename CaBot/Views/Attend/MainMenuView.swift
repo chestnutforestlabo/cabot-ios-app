@@ -491,6 +491,16 @@ struct StatusMenus: View {
                           systemImage: "antenna.radiowaves.left.and.right")
                     .opacity(0.1)
                 }
+                // TODO: Replace the following temporary labels with functional buttons to allow toggling between left-hand and right-hand grips.
+                var isLeftHandGrip: Bool = false
+                Label {
+                    Text(isLeftHandGrip ? "Left Hand Grip/左手持ち" : "Right Hand Grip/右手持ち")
+                } icon: {
+                    Image(isLeftHandGrip ? "AISuitcaseHandle.left" : "AISuitcaseHandle.right")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundColor(isLeftHandGrip ? .blue : .orange)
+                }
             }
             if modelData.suitcaseConnected {
                 if (modelData.suitcaseConnectedBLE && modelData.versionMatchedBLE == false) ||
