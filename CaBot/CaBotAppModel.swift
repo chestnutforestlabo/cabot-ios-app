@@ -1207,6 +1207,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 }
                 else if self.modeType == .Normal{
                     tourManager.tourDataLoad(model: self)
+                    self.share(user_info: SharedInfo(type: .Tour, value: self.tourManager.title.text))
+                    self.share(user_info: SharedInfo(type: .CurrentDestination, value: self.tourManager.currentDestination?.title.text ?? ""))
+                    self.share(user_info: SharedInfo(type: .NextDestination, value: self.tourManager.nextDestination?.title.text ?? ""))
+                    self.share(user_info: SharedInfo(type: .Destinations, value: self.tourManager.destinations.map { $0.title.text }.joined(separator: ",")))
                     self.share(user_info: SharedInfo(type: .ChangeLanguage, value: self.resourceLang))
                 }
                 DispatchQueue.main.async {
