@@ -285,6 +285,11 @@ class TourManager: TourProtocol {
                             let destination = try! Destination.load(at: dList.file!)
                             for d in destination{
                                 destinations.append(d)
+                                if decoded.currentDestination == (d.value ?? d.ref?.value ?? "") {
+                                    addToFirst(destination: d)
+                                    var _ = proceedToNextDestination()
+                                }
+                                    
                             }
                         }
                         
@@ -351,7 +356,7 @@ class TourManager: TourProtocol {
                     
                 }
             }
-            save()
+            //save()
         }
     }
 }
