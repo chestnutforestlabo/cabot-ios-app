@@ -29,6 +29,7 @@ struct SettingView: View {
 
     @State var timer:Timer?
     @State var langOverride:String
+    @State var handleSideOverride: String
     @State var isResourceChanging:Bool = false
 
     var body: some View {
@@ -56,6 +57,15 @@ struct SettingView: View {
                         modelData.share(user_info: SharedInfo(type: .ChangeLanguage, value: lang))
                     }
                 }
+
+                Picker(LocalizedStringKey("Handle"), selection: $handleSideOverride) {
+                    ForEach(HandleSide.allCases, id: \.rawValue) { grip in
+                        Text(LocalizedStringKey(grip.text)).tag(grip)
+                    }
+                }.onChange(of: handleSideOverride, perform: { value in
+                    modelData.selectedHandleSide = HandleSide(rawValue: value) ?? .left
+                    modelData.share(user_info: SharedInfo(type: .ChangeHandleSide, value: modelData.selectedHandleSide.rawValue))
+                })
 
                 NavigationLink(destination: DetailSettingView().environmentObject(modelData.detailSettingModel).heartbeat("DetailSettingView"), label: {
                     Text("DETAIL_SETTING")
@@ -213,7 +223,7 @@ struct SettingView_Previews: PreviewProvider {
         
         modelData.teamID = "test"
         
-        return SettingView(langOverride: "en-US")
+        return SettingView(langOverride: "en-US", handleSideOverride: "left")
             .environmentObject(modelData)
             .environment(\.locale, Locale.init(identifier: "en-US"))
             .previewDisplayName("preview")
@@ -223,7 +233,7 @@ struct SettingView_Previews: PreviewProvider {
         
         modelData.teamID = "test"
         
-        return SettingView(langOverride: "ja-JP")
+        return SettingView(langOverride: "ja-JP", handleSideOverride: "left")
             .environmentObject(modelData)
             .environment(\.locale, Locale.init(identifier: "ja-JP"))
             .previewDisplayName("preview_ja")

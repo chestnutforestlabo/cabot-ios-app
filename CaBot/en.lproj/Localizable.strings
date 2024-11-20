@@ -114,6 +114,9 @@
 "TCP Connected"="TCP Connected";
 "TCP Not Connected"="TCP Not Connected";
 "Protocol mismatch %@"="Protocol mismatch %@";
+"Handle"="Handle";
+"GRIP_HAND_LEFT"="Left Hand Grip";
+"GRIP_HAND_RIGHT"="Right Hand Grip";
 "Battery"="Battery";
 "Device"="Device";
 

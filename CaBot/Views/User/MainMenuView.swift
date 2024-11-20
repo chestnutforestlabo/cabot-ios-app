@@ -409,6 +409,26 @@ struct StatusMenus: View {
                       systemImage: "antenna.radiowaves.left.and.right")
                 .opacity(0.1)
             }
+            NavigationLink (destination: SettingView(langOverride: modelData.resourceLang, handleSideOverride: modelData.selectedHandleSide.rawValue)
+                .environmentObject(modelData)
+                .onDisappear {
+                    modelData.tcpServiceRestart()
+                }
+                .heartbeat("SettingView")
+            ) {
+                Label {
+                    HStack {
+                        Text(LocalizedStringKey("Handle"))
+                        Text(":")
+                        Text(LocalizedStringKey(modelData.selectedHandleSide.text))
+                    }
+                } icon: {
+                    Image(modelData.selectedHandleSide.imageName)
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundColor(modelData.selectedHandleSide.color)
+                }
+            }
             if modelData.suitcaseConnected {
                 if (modelData.suitcaseConnectedBLE && modelData.versionMatchedBLE == false) ||
                 (modelData.suitcaseConnectedTCP && modelData.versionMatchedTCP == false) {
@@ -446,7 +466,7 @@ struct SettingMenus: View {
         let commitHash = Bundle.main.infoDictionary!["GitCommitHash"] as! String
 
         Section(header:Text("System")) {
-            NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
+            NavigationLink (destination: SettingView(langOverride: modelData.resourceLang, handleSideOverride: modelData.selectedHandleSide.rawValue)
                 .environmentObject(modelData)
                 .onDisappear {
                     modelData.tcpServiceRestart()

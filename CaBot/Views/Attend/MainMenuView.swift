@@ -492,14 +492,25 @@ struct StatusMenus: View {
                     .opacity(0.1)
                 }
                 // TODO: Replace the following temporary labels with functional buttons to allow toggling between left-hand and right-hand grips.
-                var isLeftHandGrip: Bool = false
-                Label {
-                    Text(isLeftHandGrip ? "Left Hand Grip/左手持ち" : "Right Hand Grip/右手持ち")
-                } icon: {
-                    Image(isLeftHandGrip ? "AISuitcaseHandle.left" : "AISuitcaseHandle.right")
-                        .resizable()
-                        .scaledToFit()
-                        .foregroundColor(isLeftHandGrip ? .blue : .orange)
+                NavigationLink (destination: SettingView(langOverride: modelData.resourceLang, handleSideOverride: modelData.selectedHandleSide.rawValue)
+                    .environmentObject(modelData)
+                    .onDisappear {
+                        modelData.tcpServiceRestart()
+                    }
+                    .heartbeat("SettingView")
+                ) {
+                    Label {
+                        HStack {
+                            Text(LocalizedStringKey("Handle"))
+                            Text(":")
+                            Text(LocalizedStringKey(modelData.selectedHandleSide.text))
+                        }
+                    } icon: {
+                        Image(modelData.selectedHandleSide.imageName)
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundColor(modelData.selectedHandleSide.color)
+                    }
                 }
             }
             if modelData.suitcaseConnected {
@@ -591,7 +602,7 @@ struct SettingMenus: View {
                     Text("REPORT_BUG")
                 }).disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
             }
-            NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
+            NavigationLink (destination: SettingView(langOverride: modelData.resourceLang, handleSideOverride: modelData.selectedHandleSide.rawValue)
                 .environmentObject(modelData)
                 .onDisappear {
                     modelData.tcpServiceRestart()

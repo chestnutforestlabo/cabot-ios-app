@@ -114,6 +114,9 @@
 "TCP Connected"="TCP 接続あり";
 "TCP Not Connected"="TCP 接続なし";
 "Protocol mismatch %@"="通信規格の不一致 %@";
+"Handle"="ハンドル";
+"GRIP_HAND_LEFT"="左手持ち";
+"GRIP_HAND_RIGHT"="右手持ち";
 "Battery"="バッテリー";
 "Device"="デバイス";
 
