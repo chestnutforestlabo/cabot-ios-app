@@ -25,6 +25,7 @@ import CoreData
 import NavigationBackport
 
 struct RootView: View {
+    @Environment(\.locale) var locale
     @EnvironmentObject var modelData: CaBotAppModel
 
     var body: some View {
@@ -59,7 +60,7 @@ struct RootView: View {
                     .isDetailLink(false)
                 #endif
             }
-            .navigationTitle(modelData.displayedScene.text)
+            .navigationTitle(modelData.displayedScene.text(lang: modelData.resourceLang))
             .sheet(isPresented: $modelData.isContentPresenting, content: {
                 if let url = modelData.contentURL {
                     VStack {
