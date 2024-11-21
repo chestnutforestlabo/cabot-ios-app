@@ -29,13 +29,6 @@ struct MainMenuView: View {
 
     var body: some View {
         Form {
-            if !modelData.suitcaseConnected {
-                Label {
-                    Text("ATTEND_APP_NOT_CONNECTED").foregroundColor(.red)
-                } icon: {
-                    Image(systemName: "xmark.circle").foregroundColor(.red)
-                }
-            }
             UserInfoView()
                 .environmentObject(modelData)
             if modelData.noSuitcaseDebug {
