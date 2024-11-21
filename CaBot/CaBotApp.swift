@@ -34,24 +34,34 @@ public func NSLog(_ format: String, _ args: CVarArg...) {
 struct SuitcaseStatusView: View {
     @EnvironmentObject var modelData: CaBotAppModel
     var body: some View {
-        VStack {
+        HStack {
+            Image(systemName: "l.circle")
+                .font(.title2)
+                .padding(12)
+                .background(Color.white)
+                .foregroundColor(Color.blue)
+                .clipShape(Circle())
+                .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
             if modelData.suitcaseConnected {
                 Image(systemName: "suitcase.rolling")
                     .font(.title2)
                     .padding(12)
                     .background(Color.white)
                     .foregroundColor(Color.blue)
+                    .clipShape(Circle())
+                    .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                    .padding(.trailing, 8)
             } else {
                 Image("suitcase.rolling.slash", bundle: Bundle.main)
                     .font(.title2)
                     .padding(12)
                     .background(Color.white)
                     .foregroundColor(Color.red)
+                    .clipShape(Circle())
+                    .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                    .padding(.trailing, 8)
             }
         }
-        .clipShape(Circle())
-        .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
-        .padding(8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
     }
 }
