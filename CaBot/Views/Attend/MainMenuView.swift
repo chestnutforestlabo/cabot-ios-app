@@ -513,7 +513,6 @@ struct StatusMenus: View {
                             .padding(2)
                     }
                 }
-                // TODO: Replace the following temporary labels with functional buttons to allow toggling between left-hand and right-hand grips.
                 NavigationLink (destination: SettingView(langOverride: modelData.resourceLang, handleSideOverride: modelData.selectedHandleSide.rawValue)
                     .environmentObject(modelData)
                     .onDisappear {
