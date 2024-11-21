@@ -61,14 +61,6 @@ struct RootView: View {
                 #endif
             }
             .navigationTitle(modelData.displayedScene.text(lang: modelData.resourceLang))
-            #if ATTEND
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Image(systemName: modelData.suitcaseConnected ? "checkmark.circle.fill" : "xmark.circle.fill")
-                        .foregroundColor(modelData.suitcaseConnected ? .blue : .red)
-                }
-            }
-            #endif
             .sheet(isPresented: $modelData.isContentPresenting, content: {
                 if let url = modelData.contentURL {
                     VStack {

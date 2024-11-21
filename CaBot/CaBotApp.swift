@@ -31,6 +31,31 @@ public func NSLog(_ format: String, _ args: CVarArg...) {
     withVaList(args) { NavNSLogv(format, $0) }
 }
 
+struct SuitcaseStatusView: View {
+    @EnvironmentObject var modelData: CaBotAppModel
+    var body: some View {
+        VStack {
+            if modelData.suitcaseConnected {
+                Image(systemName: "suitcase.rolling")
+                    .font(.title2)
+                    .padding(12)
+                    .background(Color.white)
+                    .foregroundColor(Color.blue)
+            } else {
+                Image("suitcase.rolling.slash", bundle: Bundle.main)
+                    .font(.title2)
+                    .padding(12)
+                    .background(Color.white)
+                    .foregroundColor(Color.red)
+            }
+        }
+        .clipShape(Circle())
+        .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+        .padding(8)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+    }
+}
+
 @main
 struct CaBotApp: App {
     @Environment(\.scenePhase) var scenePhase
@@ -49,6 +74,9 @@ struct CaBotApp: App {
         WindowGroup {
             RootView()
                 .environmentObject(modelData)
+#if ATTEND
+                .overlay(SuitcaseStatusView().environmentObject(modelData), alignment: .topTrailing)
+#endif
         }.onChange(of: scenePhase) { newScenePhase in
             NSLog( "<ScenePhase to \(newScenePhase)>" )
 
