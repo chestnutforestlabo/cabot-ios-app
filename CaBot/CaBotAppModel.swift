@@ -1238,6 +1238,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 }
                 else if self.modeType == .Normal{
                     self.share(user_info: SharedInfo(type: .ChangeLanguage, value: self.resourceLang))
+                    self.selectedHandleSide = HandleSide(rawValue: self.selectedHandleSide.rawValue) ?? .left
+                    self.share(user_info: SharedInfo(type: .ChangeHandleSide, value: self.selectedHandleSide.rawValue))
                 }
                 DispatchQueue.main.async {
                     _ = self.fallbackService.manage(command: .lang, param: self.resourceLang)
@@ -1526,6 +1528,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.share(user_info: SharedInfo(type: .ChangeUserVoiceType, value: "\(self.userVoice?.id ?? "")"))
             self.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(self.userSpeechRate)"))
             self.share(user_info: SharedInfo(type: .ChangeHandleSide, value: self.selectedHandleSide.rawValue))
+            self.selectedHandleSide = HandleSide(rawValue: self.selectedHandleSide.rawValue) ?? .left
         }
         if userInfo.type == .ClearDestinations {
             self.clearAll()
