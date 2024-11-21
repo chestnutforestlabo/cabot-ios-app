@@ -35,9 +35,11 @@ struct SuitcaseStatusView: View {
     @EnvironmentObject var modelData: CaBotAppModel
     var body: some View {
         HStack {
-            Image(systemName: "l.circle")
-                .font(.title2)
-                .padding(12)
+            Image("AISuitcaseHandle.left", bundle: Bundle.main)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 34, height: 34)
+                .padding(7)
                 .background(Color.white)
                 .foregroundColor(Color.blue)
                 .clipShape(Circle())
