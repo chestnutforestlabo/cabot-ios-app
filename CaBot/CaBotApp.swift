@@ -41,7 +41,7 @@ struct SuitcaseStatusView: View {
                 .frame(width: 34, height: 34)
                 .padding(7)
                 .background(Color.white)
-                .foregroundColor(Color.blue)
+                .foregroundColor(modelData.suitcaseConnected ? Color.blue : Color.gray)
                 .clipShape(Circle())
                 .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
             if modelData.suitcaseConnected {
