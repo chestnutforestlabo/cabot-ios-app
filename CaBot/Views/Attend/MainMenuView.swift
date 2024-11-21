@@ -463,38 +463,54 @@ struct StatusMenus: View {
                 HStack {
                     if modelData.suitcaseConnectedBLE {
                         Label(LocalizedStringKey("BLE Connected"),
-                              systemImage: "antenna.radiowaves.left.and.right")
+                              systemImage: "suitcase.rolling")
                         if let version = modelData.serverBLEVersion {
                             Text("(\(version))")
                         }
                     } else {
-                        Label(LocalizedStringKey("BLE Not Connected"),
-                              systemImage: "antenna.radiowaves.left.and.right")
-                        .opacity(0.1)
+                        Label {
+                            Text(LocalizedStringKey("BLE Not Connected"))
+                        } icon: {
+                            Image("suitcase.rolling.slash")
+                                .resizable()
+                                .scaledToFit()
+                                .foregroundColor(.red)
+                                .padding(2)
+                        }
                     }
                 }
                 HStack {
                     if modelData.suitcaseConnectedTCP {
                         Label(LocalizedStringKey("TCP Connected"),
-                              systemImage: "antenna.radiowaves.left.and.right")
+                              systemImage: "suitcase.rolling")
                         if let version = modelData.serverTCPVersion {
                             Text("(\(version))")
                         }
                     } else {
-                        Label(LocalizedStringKey("TCP Not Connected"),
-                              systemImage: "antenna.radiowaves.left.and.right")
-                            .opacity(0.1)
+                        Label {
+                            Text(LocalizedStringKey("BLE Not Connected"))
+                        } icon: {
+                            Image("suitcase.rolling.slash")
+                                .resizable()
+                                .scaledToFit()
+                                .foregroundColor(.red)
+                                .padding(2)
+                        }
                     }
                 }
             }else{
                 if modelData.suitcaseConnected{
                     Label(LocalizedStringKey("Suitcase Connected"),
-                          systemImage: "antenna.radiowaves.left.and.right")
+                          systemImage: "suitcase.rolling")
                 }else{
                     Label {
-                        Text(LocalizedStringKey("Suitcase Not Connected")).foregroundColor(.red)
+                        Text(LocalizedStringKey("BLE Not Connected"))
                     } icon: {
-                        Image(systemName: "xmark.circle").foregroundColor(.red)
+                        Image("suitcase.rolling.slash")
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundColor(.red)
+                            .padding(2)
                     }
                 }
             }

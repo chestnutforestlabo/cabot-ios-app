@@ -403,12 +403,16 @@ struct StatusMenus: View {
         Section(header:Text("Status")) {
             if modelData.suitcaseConnected{
                 Label(LocalizedStringKey("Suitcase Connected"),
-                      systemImage: "antenna.radiowaves.left.and.right")
+                      systemImage: "suitcase.rolling")
             }else{
                 Label {
-                    Text(LocalizedStringKey("Suitcase Not Connected")).foregroundColor(.red)
+                    Text(LocalizedStringKey("BLE Not Connected"))
                 } icon: {
-                    Image(systemName: "xmark.circle").foregroundColor(.red)
+                    Image("suitcase.rolling.slash")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundColor(.red)
+                        .padding(2)
                 }
             }
             if modelData.suitcaseConnected {
