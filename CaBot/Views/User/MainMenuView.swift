@@ -406,7 +406,7 @@ struct StatusMenus: View {
                       systemImage: "suitcase.rolling")
             }else{
                 Label {
-                    Text(LocalizedStringKey("BLE Not Connected"))
+                    Text(LocalizedStringKey("Suitcase Not Connected"))
                 } icon: {
                     Image("suitcase.rolling.slash")
                         .resizable()
