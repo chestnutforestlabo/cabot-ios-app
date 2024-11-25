@@ -578,13 +578,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     let preview: Bool
     let resourceManager: ResourceManager
     var tourManager: TourManager
-    //{
-        //didSet{
-        //    UserDefaults.standard.setValue(tourManager, forKey: "tourManager")
-        //    UserDefaults.standard.synchronize()
-        //    NSLog("TourManager saved: \(tourManager.title.text)")
-        //}
-    //}
     let dialogViewHelper: DialogViewHelper
     private let feedbackGenerator = UINotificationFeedbackGenerator()
     let notificationCenter = UNUserNotificationCenter.current()
@@ -685,10 +678,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
         // tour manager
         self.tourManager.delegate = self
-        //if(self.modeType == .Normal){
-        //    self.tourManager = UserDefaults.standard.object(forKey:"tourManager") as? TourManager ?? TourManager(setting: self.detailSettingModel)
-        //    NSLog("TourManager loaded: \(self.tourManager.title.text)")
-        //}
 
         // Error/Warning Notification
         self.notificationCenter.delegate = self

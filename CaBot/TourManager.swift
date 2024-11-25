@@ -184,7 +184,6 @@ class TourManager: TourProtocol {
         _arrivedDestination = nil
         delegate?.tourUpdated(manager: self)
         delegate?.tour(manager: self, destinationChanged: nil)
-        //save()
     }
 
     func proceedToNextDestination() -> Bool {
@@ -266,7 +265,6 @@ class TourManager: TourProtocol {
     }
     
     func tourDataLoad(model: CaBotAppModel){
-        //clearAllDestinations()
         if let data = UserDefaults.standard.data(forKey: "tourSaveData") {
             let decoder = JSONDecoder()
             if let decoded = try? decoder.decode(TourSaveData.self, from: data) {
@@ -316,7 +314,6 @@ class TourManager: TourProtocol {
                                                 var _ = pop()
                                             }
                                             else{
-                                                //var _ = pop()
                                                 var _ = proceedToNextDestination()
                                                 break
                                             }
@@ -328,13 +325,9 @@ class TourManager: TourProtocol {
                                                 if(destinations.count > 0){
                                                     if(destinations[0].value ?? destinations[0].ref?.value != _tourSaveData.destinations[0]){
                                                         var _ = pop()
-                                                        NSLog("skip:\(d.title.text)")
                                                     }
                                                 }
                                                 else{
-                                                    for d in destinations{
-                                                        NSLog("desination:\(d.title.text)")
-                                                    }
                                                     break
                                                 }
                                             }
@@ -343,9 +336,7 @@ class TourManager: TourProtocol {
                                             clearAllDestinations()
                                         }
                                     }
-                                    
                                     model.needToStartAnnounce(wait: true)
-                                    NSLog("Tour data matched")
                                     return
                                 }
                             }
@@ -356,7 +347,6 @@ class TourManager: TourProtocol {
                     
                 }
             }
-            //save()
         }
     }
 }
