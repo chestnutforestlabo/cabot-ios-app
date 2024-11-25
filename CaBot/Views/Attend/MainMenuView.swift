@@ -24,6 +24,7 @@ import SwiftUI
 import CoreData
 
 struct MainMenuView: View {
+    @Environment(\.locale) var locale
     @EnvironmentObject var modelData: CaBotAppModel
 
     var body: some View {
@@ -120,98 +121,101 @@ struct UserInfoView: View {
     @EnvironmentObject var modelData: CaBotAppModel
     
     var body: some View {
+        let grayOutOpacity = (modelData.isUserAppConnected && modelData.suitcaseConnected) ? 1.0 : 0.1
         Section(header: Text("User App Info")) {
-            Label {
-                if (modelData.userInfo.selectedTour.isEmpty) {
-                    if (modelData.userInfo.destinations.count == 0) {
-                        Text("PLACEHOLDER_TOUR_TITLE").foregroundColor(.gray)
-                    } else {
-                        Text("CUSTOMIZED_TOUR")
-                    }
-                } else {
-                    Text(modelData.userInfo.selectedTour)
-                }
-            } icon: {
-                Image(systemName: "list.bullet.rectangle.portrait")
-            }
-            Label {
-                if modelData.userInfo.currentDestination != "" {
-                    Text(modelData.userInfo.currentDestination)
-                } else if modelData.userInfo.nextDestination != "" {
-                    Text(modelData.userInfo.nextDestination)
-                } else {
-                    Text("PLACEHOLDER_DESTINATION_TITLE").foregroundColor(.gray)
-                }
-                if modelData.systemStatus.level == .Active{
-                    Spacer()
-                    HStack {
-                        Image(systemName: modelData.touchStatus.level.icon)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 24, height: 24)
-                    }
-                    .foregroundColor(modelData.touchStatus.level.color)
-                }
-            } icon: {
-                if modelData.userInfo.currentDestination != "" {
-                    Image(systemName: "arrow.triangle.turn.up.right.diamond")
-                } else {
-                    Image(systemName: "mappin.and.ellipse")
-                }
-            }
-            if modelData.userInfo.nextDestination != "" {
-                Button(action: {
-                    modelData.share(user_info: SharedInfo(type: .Skip, value: ""))
-                }) {
-                    Label{
-                        if modelData.userInfo.currentDestination != ""{
-                            Text("Skip Label \(modelData.userInfo.currentDestination)")
-                        }else{
-                            Text("Skip Label \(modelData.userInfo.nextDestination)")
-                        }
-                    } icon: {
-                        Image(systemName: "arrow.right.to.line")
-                    }
-                }
-            }
-            if (modelData.userInfo.destinations.count >= 1) {
-                NavigationLink(destination: UserInfoDestinations().environmentObject(modelData).heartbeat("UserInfoDestinations"), label: {
-                    HStack {
-                        Spacer()
-                        Text("See detail")
-                    }
-                })
-            }
-            if modelData.userInfo.speakingText.count == 0 {
-                Label {
-                    Text("PLACEHOLDER_SPEAKING_TEXT").foregroundColor(.gray)
-                } icon: {
-                    Image(systemName: "text.bubble")
-                }
-            } else if modelData.userInfo.speakingText.count > 1 {
-                ForEach(modelData.userInfo.speakingText[..<2], id: \.self) { text in
-                    SpokenTextView.showText(text: text)
-                }
-                if modelData.userInfo.speakingText.count > 2 {
-                    NavigationLink(destination: SpokenTextView().environmentObject(modelData).heartbeat("SpokenTextView"), label: {
-                        HStack {
-                            Spacer()
-                            Text("See history")
-                        }
-                    })
-                }
-            } else {
-                ForEach(modelData.userInfo.speakingText, id: \.self) { text in
-                    SpokenTextView.showText(text: text)
-                }
-            }
-            if !modelData.isUserAppConnected {
+            if modelData.suitcaseConnected && !modelData.isUserAppConnected {
                 Label {
                     Text("USER_APP_NOT_CONNECTED").foregroundColor(.red)
                 } icon: {
                     Image(systemName: "xmark.circle").foregroundColor(.red)
                 }
             }
+            Group {
+                Label {
+                    if (modelData.userInfo.selectedTour.isEmpty) {
+                        if (modelData.userInfo.destinations.count == 0) {
+                            Text("PLACEHOLDER_TOUR_TITLE").foregroundColor(.gray)
+                        } else {
+                            Text("CUSTOMIZED_TOUR")
+                        }
+                    } else {
+                        Text(modelData.userInfo.selectedTour)
+                    }
+                } icon: {
+                    Image(systemName: "list.bullet.rectangle.portrait")
+                }
+                Label {
+                    if modelData.userInfo.currentDestination != "" {
+                        Text(modelData.userInfo.currentDestination)
+                    } else if modelData.userInfo.nextDestination != "" {
+                        Text(modelData.userInfo.nextDestination)
+                    } else {
+                        Text("PLACEHOLDER_DESTINATION_TITLE").foregroundColor(.gray)
+                    }
+                    if modelData.systemStatus.level == .Active{
+                        Spacer()
+                        HStack {
+                            Image(systemName: modelData.touchStatus.level.icon)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 24, height: 24)
+                        }
+                        .foregroundColor(modelData.touchStatus.level.color)
+                    }
+                } icon: {
+                    if modelData.userInfo.currentDestination != "" {
+                        Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                    } else {
+                        Image(systemName: "mappin.and.ellipse")
+                    }
+                }
+                if modelData.userInfo.nextDestination != "" {
+                    Button(action: {
+                        modelData.share(user_info: SharedInfo(type: .Skip, value: ""))
+                    }) {
+                        Label{
+                            if modelData.userInfo.currentDestination != ""{
+                                Text("Skip Label \(modelData.userInfo.currentDestination)")
+                            }else{
+                                Text("Skip Label \(modelData.userInfo.nextDestination)")
+                            }
+                        } icon: {
+                            Image(systemName: "arrow.right.to.line")
+                        }
+                    }
+                }
+                if (modelData.userInfo.destinations.count >= 1) {
+                    NavigationLink(destination: UserInfoDestinations().environmentObject(modelData).heartbeat("UserInfoDestinations"), label: {
+                        HStack {
+                            Spacer()
+                            Text("See detail")
+                        }
+                    })
+                }
+                if modelData.userInfo.speakingText.count == 0 {
+                    Label {
+                        Text("PLACEHOLDER_SPEAKING_TEXT").foregroundColor(.gray)
+                    } icon: {
+                        Image(systemName: "text.bubble")
+                    }
+                } else if modelData.userInfo.speakingText.count > 1 {
+                    ForEach(modelData.userInfo.speakingText[..<2], id: \.self) { text in
+                        SpokenTextView.showText(text: text)
+                    }
+                    if modelData.userInfo.speakingText.count > 2 {
+                        NavigationLink(destination: SpokenTextView().environmentObject(modelData).heartbeat("SpokenTextView"), label: {
+                            HStack {
+                                Spacer()
+                                Text("See history")
+                            }
+                        })
+                    }
+                } else {
+                    ForEach(modelData.userInfo.speakingText, id: \.self) { text in
+                        SpokenTextView.showText(text: text)
+                    }
+                }
+            }.opacity(grayOutOpacity)
         }
     }
 }
@@ -459,37 +463,55 @@ struct StatusMenus: View {
                 HStack {
                     if modelData.suitcaseConnectedBLE {
                         Label(LocalizedStringKey("BLE Connected"),
-                              systemImage: "antenna.radiowaves.left.and.right")
+                              systemImage: "suitcase.rolling")
                         if let version = modelData.serverBLEVersion {
                             Text("(\(version))")
                         }
                     } else {
-                        Label(LocalizedStringKey("BLE Not Connected"),
-                              systemImage: "antenna.radiowaves.left.and.right")
-                        .opacity(0.1)
+                        Label {
+                            Text(LocalizedStringKey("BLE Not Connected"))
+                        } icon: {
+                            Image("suitcase.rolling.slash")
+                                .resizable()
+                                .scaledToFit()
+                                .foregroundColor(.red)
+                                .padding(2)
+                        }
                     }
                 }
                 HStack {
                     if modelData.suitcaseConnectedTCP {
                         Label(LocalizedStringKey("TCP Connected"),
-                              systemImage: "antenna.radiowaves.left.and.right")
+                              systemImage: "suitcase.rolling")
                         if let version = modelData.serverTCPVersion {
                             Text("(\(version))")
                         }
                     } else {
-                        Label(LocalizedStringKey("TCP Not Connected"),
-                              systemImage: "antenna.radiowaves.left.and.right")
-                            .opacity(0.1)
+                        Label {
+                            Text(LocalizedStringKey("Suitcase Not Connected"))
+                        } icon: {
+                            Image("suitcase.rolling.slash")
+                                .resizable()
+                                .scaledToFit()
+                                .foregroundColor(.red)
+                                .padding(2)
+                        }
                     }
                 }
             }else{
                 if modelData.suitcaseConnected{
                     Label(LocalizedStringKey("Suitcase Connected"),
-                          systemImage: "antenna.radiowaves.left.and.right")
+                          systemImage: "suitcase.rolling")
                 }else{
-                    Label(LocalizedStringKey("Suitcase Not Connected"),
-                          systemImage: "antenna.radiowaves.left.and.right")
-                    .opacity(0.1)
+                    Label {
+                        Text(LocalizedStringKey("Suitcase Not Connected"))
+                    } icon: {
+                        Image("suitcase.rolling.slash")
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundColor(.red)
+                            .padding(2)
+                    }
                 }
             }
             if modelData.suitcaseConnected {
