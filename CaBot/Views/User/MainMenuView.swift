@@ -403,11 +403,17 @@ struct StatusMenus: View {
         Section(header:Text("Status")) {
             if modelData.suitcaseConnected{
                 Label(LocalizedStringKey("Suitcase Connected"),
-                      systemImage: "antenna.radiowaves.left.and.right")
+                      systemImage: "suitcase.rolling")
             }else{
-                Label(LocalizedStringKey("Suitcase Not Connected"),
-                      systemImage: "antenna.radiowaves.left.and.right")
-                .opacity(0.1)
+                Label {
+                    Text(LocalizedStringKey("Suitcase Not Connected"))
+                } icon: {
+                    Image("suitcase.rolling.slash")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundColor(.red)
+                        .padding(2)
+                }
             }
             if modelData.suitcaseConnected {
                 if (modelData.suitcaseConnectedBLE && modelData.versionMatchedBLE == false) ||

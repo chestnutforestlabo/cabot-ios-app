@@ -43,16 +43,18 @@ enum DisplayedScene {
     case ResourceSelect
     case App
 
-    var text: Text {
-        get {
-            switch self {
-            case .Onboard:
-                return Text("")
-            case .ResourceSelect:
-                return Text("SELECT_RESOURCE")
-            case .App:
-                return Text("MAIN_MENU")
-            }
+    func text(lang: String) -> Text {
+        switch self {
+        case .Onboard:
+            return Text(CustomLocalizedString("", lang: lang))
+        case .ResourceSelect:
+            return Text(CustomLocalizedString("SELECT_RESOURCE", lang: lang))
+        case .App:
+            #if ATTEND
+            return Text(CustomLocalizedString("ATTEND_MENU", lang: lang))
+            #elseif USER
+            return Text(CustomLocalizedString("MAIN_MENU", lang: lang))
+            #endif
         }
     }
 }
@@ -1199,7 +1201,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             
             if self.suitcaseConnected {
                 if self.modeType != .Normal{
-                    self.share(user_info: SharedInfo(type: .RequestUserInfo, value: ""))
+                    self.share(user_info: SharedInfo(type: .RequestUserInfo, value: "", flag1: false)) // do not speak
                 }
                 else if self.modeType == .Normal{
                     self.share(user_info: SharedInfo(type: .ChangeLanguage, value: self.resourceLang))
@@ -1485,8 +1487,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.share(user_info: SharedInfo(type: .NextDestination, value: self.tourManager.nextDestination?.title.text ?? ""))
             self.share(user_info: SharedInfo(type: .Destinations, value: self.tourManager.destinations.map { $0.title.text }.joined(separator: ",")))
             self.share(user_info: SharedInfo(type: .ChangeLanguage, value: self.resourceLang))
-            self.share(user_info: SharedInfo(type: .ChangeUserVoiceType, value: "\(self.userVoice?.id ?? "")"))
-            self.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(self.userSpeechRate)"))
+            self.share(user_info: SharedInfo(type: .ChangeUserVoiceType, value: "\(self.userVoice?.id ?? "")", flag1: userInfo.flag1))
+            self.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(self.userSpeechRate)", flag1: userInfo.flag1))
         }
         if userInfo.type == .ClearDestinations {
             self.clearAll()
@@ -1499,12 +1501,16 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if userInfo.type == .ChangeUserVoiceRate {
             self.userSpeechRate = Double(userInfo.value) ?? 0.5
             self.updateTTS()
-            self.playSample(mode: .User, priority: .Required, timeout: 1.0)
+            if userInfo.flag1 {
+                self.playSample(mode: .User)
+            }
         }
         if userInfo.type == .ChangeUserVoiceType {
             self.userVoice = TTSHelper.getVoice(by: userInfo.value)
             self.updateTTS()
-            self.playSample(mode: .User, priority: .Required, timeout: 1.0)
+            if userInfo.flag1 {
+                self.playSample(mode: .User)
+            }
         }
     }
 
