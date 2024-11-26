@@ -161,7 +161,7 @@ class TourManager: TourProtocol {
         _destinations.removeAll()
         _currentDestination = nil
         _arrivedDestination = nil
-        //id = "TourManager"
+        id = "TourManager"
         title = I18NText(text: [:], pron: [:])
         delegate?.tourUpdated(manager: self)
         delegate?.tour(manager: self, destinationChanged: nil)
