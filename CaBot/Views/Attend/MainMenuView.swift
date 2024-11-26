@@ -405,7 +405,7 @@ struct MainMenus: View {
                 }
                 if let src = cm.destinationsSource {
                     NavigationLink(
-                        destination: DestinationsView(src: src)
+                        destination: DestinationsFloorView(src: src)
                             .environmentObject(modelData),
                         label: {
                             Text("SELECT_DESTINATION")

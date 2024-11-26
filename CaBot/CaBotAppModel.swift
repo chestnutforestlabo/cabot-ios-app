@@ -1423,19 +1423,21 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if userInfo.type == .OverrideDestination {
             func traverseDest(src: Source) {
                 do {
-                    let dests = try Destination.load(at: src)
-                    for dest in dests {
-                        if let value = dest.value {
-                            if value == userInfo.value {
-                                if userInfo.flag1 { // clear and add
-                                    self.clearAll()
+                    let floorDestinations = try downloadDirectoryJson()
+                    for floorDest in floorDestinations {
+                        for dest in floorDest.destinations {
+                            if let value = dest.value {
+                                if value == userInfo.value {
+                                    if userInfo.flag1 {
+                                        self.clearAll()
+                                    }
+                                    tourManager.addToLast(destination: dest)
+                                    needToStartAnnounce(wait: true)
+                                    return
                                 }
-                                tourManager.addToLast(destination: dest)
-                                needToStartAnnounce(wait: true)
-                                return
+                            } else if let src = dest.file {
+                                traverseDest(src: src)
                             }
-                        } else if let src = dest.file {
-                            traverseDest(src: src)
                         }
                     }
                 } catch {

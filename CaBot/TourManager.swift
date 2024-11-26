@@ -119,6 +119,7 @@ class TourManager: TourProtocol {
             let arrivalAngleString = d.matchedDestinationRef?.arrivalAngle.map { "@" + String($0) } ?? ""
             let valueString = d.matchedDestinationRef?.value ?? d.ref
             let destination = Destination(
+                floorTitle: I18NText(text: [:], pron: [:]),
                 title: d.title,
                 value: valueString+arrivalAngleString,
                 pron: "porn",
@@ -128,7 +129,7 @@ class TourManager: TourProtocol {
                 arriveMessages: d.arriveMessages.map { $0.text.text } ,
                 content: nil,
                 waitingDestination: nil,
-                subtour: nil
+                subtour: nil, forDemonstration: false
             )
             _destinations.append(destination)
         }

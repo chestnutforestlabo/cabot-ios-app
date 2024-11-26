@@ -29,28 +29,17 @@ struct DestinationsView: View {
 
     var src: Source
     var destination: Destination?
+    var destinations: [Destination] = []
 
     var body: some View {
-        let destinations = try! Destination.load(at: src)
         var header: Text?
-        if let title = destination?.title {
-            header = Text(title.text)
-        } else {
-            header = Text("SELECT_DESTINATION")
-        }
-
-        let filteredDestinations = destinations.filter{
-            destination in (modelData.modeType == .Debug || !destination.debug)}
-
+        header = Text(destinations.first?.floorTitle.text ?? "SELECT_DESTINATION")
         return Form {
             Section(
                 header: header) {
-                ForEach(filteredDestinations, id: \.self) { destination in
-                    if let error = destination.error {
-                        HStack{
-                            Text(destination.title.text)
-                            Text(error).font(.system(size: 11))
-                        }.foregroundColor(Color.red)
+                ForEach(destinations, id: \.self) { destination in
+                    if destination.forDemonstration {
+                        EmptyView()
                     } else if let src = destination.file {
                         NavigationLink(
                             destination: DestinationsView(src: src, destination: destination)
@@ -131,6 +120,48 @@ struct DestinationsView: View {
     }
 }
 
+struct DestinationsFloorView: View {
+    @EnvironmentObject var modelData: CaBotAppModel
+    @State private var isConfirming = false
+    @State private var targetDestination: Destination?
+    @State private var floorDestinations: [FloorDestination] = []
+
+    var src: Source
+    var destination: Destination?
+
+    var body: some View {
+        var header: Text?
+        header = Text("SELECT_DESTINATION")
+        
+        return Form {
+            Section(
+                header: header
+            ) {
+                ForEach(floorDestinations, id: \.floorTitle.text) { floorDestination in
+                    NavigationLink(
+                        destination: DestinationsView(
+                            src: src,
+                            destination: destination,
+                            destinations: floorDestination.destinations
+                        )
+                        .environmentObject(modelData),
+                        label: {
+                            Text(floorDestination.floorTitle.text)
+                                .accessibilityLabel(floorDestination.floorTitle.pron)
+                        }
+                    )
+                }
+            }
+        }
+        .listStyle(PlainListStyle())
+        .onAppear {
+            if floorDestinations.isEmpty {
+                floorDestinations = try! downloadDirectoryJson()
+            }
+        }
+    }
+}
+
 struct DestinationsView_Previews: PreviewProvider {
     static var previews: some View {
         preview2
@@ -151,9 +182,9 @@ struct DestinationsView_Previews: PreviewProvider {
 
         let resource = modelData.resourceManager.resource(by: "Test data")!
 
-        let destinations = try! Destination.load(at: resource.destinationsSource!)
+        let floorDestinations = try! downloadDirectoryJson()
 
-        return DestinationsView(src: destinations[0].file!)
+        return DestinationsView(src: floorDestinations[0].destinations[0].file!)
             .environmentObject(modelData)
     }
 }

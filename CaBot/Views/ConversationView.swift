@@ -49,11 +49,13 @@ struct ConversationView: UIViewControllerRepresentable {
                 let pron = note.userInfo?["pron"] as? String
                 
                 if let src = owner.dsrc,
-                   let destinations = try? Destination.load(at: src),
-                   let destination = destinations.first(where: { $0.value == toID }) {
-                    owner.modelData.tourManager.addToLast(destination: destination)
+                   let floorDestinations = try? downloadDirectoryJson(),
+                   let matchedDestination = floorDestinations
+                        .flatMap({ $0.destinations })
+                        .first(where: { $0.value == toID }) {
+                    owner.modelData.tourManager.addToLast(destination: matchedDestination)
                 } else {
-                    owner.modelData.tourManager.addToLast(destination: Destination(title: I18NText(text: ["en": title, "ja": title], pron: [:]), value: toID, pron: pron, file: nil, summaryMessage: "nil", startMessage: "nil", arriveMessages: [],content: nil, waitingDestination: nil, subtour: nil))
+                    owner.modelData.tourManager.addToLast(destination: Destination(floorTitle: I18NText(text: ["en": title, "ja": title], pron: [:]),title: I18NText(text: ["en": title, "ja": title], pron: [:]), value: toID, pron: pron, file: nil, summaryMessage: "nil", startMessage: "nil", arriveMessages: [],content: nil, waitingDestination: nil, subtour: nil,forDemonstration: false))
                 }
                 
                 owner.modelData.needToStartAnnounce(wait: true)
