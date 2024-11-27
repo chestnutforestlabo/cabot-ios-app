@@ -23,7 +23,7 @@
 import Foundation
 
 protocol TourManagerDelegate {
-    func tour(manager: TourManager, destinationChanged: Destination?)
+    func tour(manager: TourManager, destinationChanged: Destination?, isStartMessageSpeaking: Bool)
     func tourUpdated(manager: TourManager)
 }
 
@@ -121,7 +121,7 @@ class TourManager: TourProtocol {
             _destinations.append(d)
         }
         delegate?.tourUpdated(manager: self)
-        delegate?.tour(manager: self, destinationChanged: nil)
+        delegate?.tour(manager: self, destinationChanged: nil, isStartMessageSpeaking: true)
         save()
     }
 
@@ -138,7 +138,7 @@ class TourManager: TourProtocol {
         if let cd = _currentDestination {
             addToFirst(destination: cd)
             _currentDestination = nil
-            delegate?.tour(manager: self, destinationChanged: nil)
+            delegate?.tour(manager: self, destinationChanged: nil, isStartMessageSpeaking: true)
             save()
         }
     }
@@ -153,7 +153,7 @@ class TourManager: TourProtocol {
     func clearCurrent() {
         _currentDestination = nil
         delegate?.tourUpdated(manager: self)
-        delegate?.tour(manager: self, destinationChanged: nil)
+        delegate?.tour(manager: self, destinationChanged: nil, isStartMessageSpeaking: true)
         save()
     }
 
@@ -164,7 +164,7 @@ class TourManager: TourProtocol {
         id = "TourManager"
         title = I18NText(text: [:], pron: [:])
         delegate?.tourUpdated(manager: self)
-        delegate?.tour(manager: self, destinationChanged: nil)
+        delegate?.tour(manager: self, destinationChanged: nil, isStartMessageSpeaking: true)
         saveDataClear()
     }
         
@@ -183,10 +183,10 @@ class TourManager: TourProtocol {
         }
         _arrivedDestination = nil
         delegate?.tourUpdated(manager: self)
-        delegate?.tour(manager: self, destinationChanged: nil)
+        delegate?.tour(manager: self, destinationChanged: nil, isStartMessageSpeaking: true)
     }
 
-    func proceedToNextDestination() -> Bool {
+    func proceedToNextDestination(isStartMessageSpeaking: Bool = true) -> Bool {
         if _destinations.count == 0  {
             self._currentDestination = nil
             delegate?.tourUpdated(manager: self)
@@ -196,7 +196,7 @@ class TourManager: TourProtocol {
         self._arrivedDestination = nil
         self._currentDestination = pop()
         delegate?.tourUpdated(manager: self)
-        delegate?.tour(manager: self, destinationChanged: currentDestination)
+        delegate?.tour(manager: self, destinationChanged: currentDestination, isStartMessageSpeaking: isStartMessageSpeaking)
         save()
         return true
     }
@@ -285,9 +285,8 @@ class TourManager: TourProtocol {
                                 destinations.append(d)
                                 if decoded.currentDestination == (d.value ?? d.ref?.value ?? "") {
                                     addToFirst(destination: d)
-                                    var _ = proceedToNextDestination()
+                                    var _ = proceedToNextDestination(isStartMessageSpeaking: false)
                                 }
-                                    
                             }
                         }
                         
@@ -297,6 +296,10 @@ class TourManager: TourProtocol {
                                     addToLast(destination: d)
                                 }
                             }
+                        }
+                        
+                        if(decoded.currentDestination == ""){
+                            model.needToStartAnnounce(wait: true)
                         }
                     }
                 }
@@ -314,7 +317,7 @@ class TourManager: TourProtocol {
                                                 var _ = pop()
                                             }
                                             else{
-                                                var _ = proceedToNextDestination()
+                                                var _ = proceedToNextDestination(isStartMessageSpeaking: false)
                                                 break
                                             }
                                         }
@@ -331,12 +334,13 @@ class TourManager: TourProtocol {
                                                     break
                                                 }
                                             }
+                                            model.needToStartAnnounce(wait: true)
                                         }
                                         else{
                                             clearAllDestinations()
                                         }
                                     }
-                                    model.needToStartAnnounce(wait: true)
+                                    
                                     return
                                 }
                             }
