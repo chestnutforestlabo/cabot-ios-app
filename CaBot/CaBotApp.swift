@@ -38,13 +38,13 @@ struct SuitcaseStatusView: View {
     @EnvironmentObject var modelData: CaBotAppModel
     var body: some View {
         HStack {
-            Image("AISuitcaseHandle.left", bundle: Bundle.main)
+            Image(modelData.selectedHandleSide.imageName, bundle: Bundle.main)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 34, height: 34)
+                .frame(width: 33, height: 33)
                 .padding(7)
                 .background(Color.white)
-                .foregroundColor(modelData.suitcaseConnected ? Color.blue : Color.gray)
+                .foregroundColor(modelData.suitcaseConnected ? modelData.selectedHandleSide.color : Color.gray)
                 .clipShape(Circle())
                 .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
             if modelData.suitcaseConnected {
