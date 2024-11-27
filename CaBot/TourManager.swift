@@ -199,7 +199,7 @@ class TourManager: TourProtocol {
            last.destinations.last == dest {
             _ = _subtours.popLast()
         }
-        
+
         return dest
     }
 }

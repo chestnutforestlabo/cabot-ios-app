@@ -43,7 +43,7 @@ struct SpeakTag {
 }
 
 
-typealias ProgressHandler = (String?,Int,NSRange)->Void
+typealias ProgressHandler = (UUID,String?,Int,NSRange)->Void
 
 class CaBotTTS : TTSProtocol {
 
@@ -76,6 +76,7 @@ class CaBotTTS : TTSProtocol {
 
     private let _tts = PriorityQueueTTS.shared
     private var _progressHandlers = [UUID : ProgressHandler]()
+    private var _lastSpokenEntryUUID: UUID? = nil
 
 
     func speak(_ text: String?, forceSelfvoice: Bool, force: Bool, priority: SpeechPriority = .Normal, timeout sec : TimeInterval? = nil, tag:SpeakTag? = nil, callback: @escaping (Int32) -> Void, progress: ((NSRange) -> Void)? = nil) {
@@ -98,25 +99,27 @@ class CaBotTTS : TTSProtocol {
         self.delegate?.activityLog(category: "app speech speaking", text: text ?? "", memo: "force=\(force)")
 
 
-        self._speak(text == nil ? "" : text!, priority:priority, timeout :sec, tag: tag, completionHandler: { utext, code in
+        self._speak(text == nil ? "" : text!, priority:priority, timeout :sec, tag: tag, completionHandler: { uuid, utext, code in
             if code > 0 {
-                self.delegate?.activityLog(category: "app speech completed", text: text ?? "", memo: "force=\(force)")
+                self.delegate?.activityLog(category: "app speech completed", text: text ?? "", memo: "force=\(force),code=\(code)")
             } else {
-                self.delegate?.activityLog(category: "app speech canceled", text: text ?? "", memo: "force=\(force)")
+                self.delegate?.activityLog(category: "app speech canceled", text: text ?? "", memo: "force=\(force),code=\(code)")
             }
             callback(code)
             //print("code=\(code), text=\(text)")
             if code >= 0, let text = utext {
                 self.delegate?.share(user_info: SharedInfo(type: .SpeakProgress, value: text, flag1: true, flag2: voiceover, length: Int(code)))
+                self._lastSpokenEntryUUID = nil
             }
-        }, progressHandler: { text, count, range in
+        }, progressHandler: { uuid, text, count, range in
             if let progress = progress{
                 progress(range)
             }
             if let text = text {
-                //print(count, range, text)
-                if count == 1 {
-                    self.delegate?.share(user_info: SharedInfo(type: .Speak, value: text, flag1: force, flag2: voiceover))
+                print(count, self._lastSpokenEntryUUID, uuid, text, range)
+                if self._lastSpokenEntryUUID != uuid {
+                    self.delegate?.share(user_info: SharedInfo(type: .Speak, value: text, flag1: true, flag2: voiceover, location: range.location))
+                    self._lastSpokenEntryUUID = uuid
                 }
 
                 self.delegate?.share(user_info: SharedInfo(type: .SpeakProgress, value: text, location: range.location, length: range.length))
@@ -125,14 +128,17 @@ class CaBotTTS : TTSProtocol {
     }
 
     func speakForAdvanced(_ text:String?, force: Bool, tag:SpeakTag? = nil, callback: @escaping (Int32) -> Void) {
-        self._speak(text == nil ? "" : text!, priority:.parse(force:force, mode:.Advanced), tag: tag, completionHandler: { utext, code in
+        if force {
+            self._tts.cancel(at: .immediate)
+        }
+        self._speak(text == nil ? "" : text!, priority:.parse(force:force, mode:.Advanced), tag: tag, completionHandler: { uuid, utext, code in
             callback(code)
-        }, progressHandler: { text, count, range in
+        }, progressHandler: { uuid, text, count, range in
         })
     }
 
     func stopSpeakForAdvanced() {
-        self._tts.stop(false)
+        self._tts.stop(true)
     }
 
     func speak(_ text: String?, force: Bool, priority: CaBotTTS.SpeechPriority, timeout sec : TimeInterval? = nil, tag:SpeakTag? = nil, callback: @escaping (Int32) -> Void) {
@@ -265,7 +271,7 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
         }
     }
     
-    func _speak( _ text:String, priority:SpeechPriority, timeout sec : TimeInterval? = nil, tag:SpeakTag? = nil, completionHandler:@escaping (String?, Int32)->Void, progressHandler: ((String?,Int,NSRange)->Void)? = nil ) {
+    func _speak( _ text:String, priority:SpeechPriority, timeout sec : TimeInterval? = nil, tag:SpeakTag? = nil, completionHandler:@escaping (UUID, String?, Int32)->Void, progressHandler: ((UUID, String?,Int,NSRange)->Void)? = nil ) {
         
         
         let entry = TokenizerEntry( separators:separators, priority:priority.queuePriority, timeout_sec: (sec ?? 90.0), tag: (tag?.tag ?? Tag.Default) ) { [weak self] entry, token, reason in
@@ -276,7 +282,7 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
             
             let compLen = Int32((reason != .Canceled ? token?.text?.count : nil) ?? -1)
             Debug(log:"<TTS> complate token:\(token?.text ?? "") reason:\(reason)")
-            completionHandler( token?.text, compLen )
+            completionHandler( entry.uuid, token?.text, compLen )
         }
         try! entry.append(text: text)
         entry.close()
@@ -314,7 +320,7 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
         
         Debug(log:"<TTS> progress token:\(token.text ?? "") pos:\(token.bufferedRange.range.location) len:\(token.bufferedRange.range.length)")
         
-        _progressHandlers[entry.uuid]?( token.text, token.bufferedRange.progressCount, token.bufferedRange.range );
+        _progressHandlers[entry.uuid]?( entry.uuid, token.text, token.bufferedRange.progressCount, token.bufferedRange.range );
     }
     
     func completed(queue: PriorityQueueTTS, entry: QueueEntry) {
@@ -351,7 +357,8 @@ extension CaBotTTS.SpeechPriority {
 extension PriorityQueueTTS {
 
     func stop( _ immediate:Bool ) {
-        self.stopSpeaking(at: immediate ? .immediate : .word)
+        self.cancel(at:  immediate ? .immediate : .word)
+        //self.stopSpeaking(at: immediate ? .immediate : .word)
     }
 }
 

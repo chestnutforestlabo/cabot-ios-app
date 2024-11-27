@@ -1421,11 +1421,15 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if modeType != .Normal {
             self.userInfo.update(userInfo: userInfo)
             if userInfo.type == .Speak {
+                print("Speak share \(userInfo)")
                 if isTTSEnabledForAdvanced {
                     if userInfo.value.isEmpty && userInfo.flag1 { // stop
                         tts.stopSpeakForAdvanced()
                     } else {
-                        tts.speakForAdvanced(userInfo.value, force: userInfo.flag1) { _ in
+                        var text = userInfo.value
+                        let startIndex = text.index(text.startIndex, offsetBy: userInfo.location)
+                        text = String(text[startIndex...])
+                        tts.speakForAdvanced(text, force: userInfo.flag1) { _ in
                         }
                     }
                 }
