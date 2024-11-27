@@ -587,7 +587,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     let logList: LogReportModel = LogReportModel()
     let preview: Bool
     let resourceManager: ResourceManager
-    let tourManager: TourManager
+    var tourManager: TourManager
     let dialogViewHelper: DialogViewHelper
     private let feedbackGenerator = UINotificationFeedbackGenerator()
     let notificationCenter = UNUserNotificationCenter.current()
@@ -981,6 +981,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         guard tourManager.hasDestination else { return }
 
         let skip = tourManager.skipDestination()
+        tourManager.save()
         self.stopSpeak()
         let announce = CustomLocalizedString("Skip Message %@", lang: self.resourceLang, skip.title.pron)
         self.tts.speak(announce, priority:.Required){
@@ -1106,7 +1107,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.tourManager.clearAllDestinations()
     }
 
-    func tour(manager: TourManager, destinationChanged destination: Destination?) {
+    func tour(manager: TourManager, destinationChanged destination: Destination?, isStartMessageSpeaking: Bool = true) {
         if let dest = destination {
             if let dest_id = dest.value {
                 if !send(destination: dest_id) {
@@ -1130,11 +1131,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                         self.willSpeakArriveMessage = true
                         let announce = CustomLocalizedString("Going to %@", lang: self.resourceLang, dest.title.pron)
                             + (dest.startMessage?.content ?? "")
-                        self.tts.speak(announce, forceSelfvoice: false, force: true, priority: .High, timeout: nil, tag: .Next(erase:true), callback: {code in }, progress: {range in
-                            if range.location == 0{
-                                self.willSpeakArriveMessage = true
-                            }
-                        })
+                        if(isStartMessageSpeaking){
+                            self.tts.speak(announce, forceSelfvoice: false, force: true, priority: .High, timeout: nil, tag: .Next(erase:true), callback: {code in }, progress: {range in
+                                if range.location == 0{
+                                    self.willSpeakArriveMessage = true
+                                }
+                            })
+                        }
                     }
                 }
                 self.activityLog(category: "destination-text", text: dest.title.text, memo: dest.title.pron)
@@ -1204,6 +1207,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     self.share(user_info: SharedInfo(type: .RequestUserInfo, value: "", flag1: false)) // do not speak
                 }
                 else if self.modeType == .Normal{
+                    tourManager.tourDataLoad(model: self)
+                    self.share(user_info: SharedInfo(type: .Tour, value: self.tourManager.title.text))
+                    self.share(user_info: SharedInfo(type: .CurrentDestination, value: self.tourManager.currentDestination?.title.text ?? ""))
+                    self.share(user_info: SharedInfo(type: .NextDestination, value: self.tourManager.nextDestination?.title.text ?? ""))
+                    self.share(user_info: SharedInfo(type: .Destinations, value: self.tourManager.destinations.map { $0.title.text }.joined(separator: ",")))
                     self.share(user_info: SharedInfo(type: .ChangeLanguage, value: self.resourceLang))
                 }
                 DispatchQueue.main.async {
