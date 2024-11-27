@@ -834,6 +834,18 @@ protocol TourProtocol {
     var currentDestination: Destination? { get }
 }
 
+struct TourSaveData: Codable {
+    var id: String
+    var destinations: [String]
+    var currentDestination: String
+    
+    init(){
+        self.id = ""
+        self.destinations = []
+        self.currentDestination = ""
+    }
+}
+
 protocol NavigationSettingProtocol {
     var enableSubtourOnHandle: Bool { get }
     var showContentWhenArrive: Bool { get }
