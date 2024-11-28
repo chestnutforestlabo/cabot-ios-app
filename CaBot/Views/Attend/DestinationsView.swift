@@ -38,9 +38,7 @@ struct DestinationsView: View {
             Section(
                 header: header) {
                 ForEach(destinations, id: \.self) { destination in
-                    if destination.forDemonstration {
-                        EmptyView()
-                    } else if let src = destination.file {
+                    if let src = destination.file {
                         NavigationLink(
                             destination: DestinationsView(src: src, destination: destination)
                                 .environmentObject(modelData),
