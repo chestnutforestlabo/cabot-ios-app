@@ -75,30 +75,6 @@ enum SpeechPriority: String, CaseIterable {
     case App = "App"
 }
 
-enum HandleSide: String, CaseIterable {
-    case left = "left"
-    case right = "right"
-
-    var imageName: String {
-        switch self {
-        case .left: return "AISuitcaseHandle.left"
-        case .right: return "AISuitcaseHandle.right"
-        }
-    }
-    var text: String{
-        switch self{
-        case .left: return "GRIP_HAND_LEFT"
-        case .right: return "GRIP_HAND_RIGHT"
-        }
-    }
-    var color: Color {
-        switch self{
-        case .left: return .blue
-        case .right: return .orange
-        }
-    }
-}
-
 class FallbackService: CaBotServiceProtocol {
     private let services: [CaBotServiceProtocol]
     private var selectedService: CaBotServiceProtocol?
@@ -299,7 +275,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private let selectedResourceKey = "SelectedResourceKey"
     private let selectedResourceLangKey = "selectedResourceLangKey"
     private let selectedVoiceKey = "SelectedVoiceKey"
-    private let selectedHandleSideKey = "SelectedHandleSideKey"
     private let isTTSEnabledKey = "isTTSEnabledKey"
     private let speechRateKey = "speechRateKey"
     private let attendSpeechRateKey = "attendSpeechRateKey"
@@ -414,22 +389,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
     }
     
-    @Published var selectedHandleSide: HandleSide = .left {
-        didSet {
-            if !isSharingHandleSide {
-                UserDefaults.standard.setValue(selectedHandleSide.rawValue, forKey: selectedResourceKey)
-                UserDefaults.standard.synchronize()
-                _ = self.fallbackService.manage(command: .handleside, param: selectedHandleSide.rawValue)
-            }
-        }
-    }
-    private var isSharingHandleSide = false
-    func shareHandleSide(_ side: HandleSide) {
-        isSharingHandleSide = true
-        selectedHandleSide = side
-        isSharingHandleSide = false
-    }
-
     #if ATTEND
     @Published var voiceSetting: VoiceMode = .Attend {
         didSet {
@@ -1084,8 +1043,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 break
             case .restart_localization:
                 break
-            case .handleside:
-                break
             }
             systemStatus.components.removeAll()
             objectWillChange.send()
@@ -1248,8 +1205,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     self.share(user_info: SharedInfo(type: .NextDestination, value: self.tourManager.nextDestination?.title.text ?? ""))
                     self.share(user_info: SharedInfo(type: .Destinations, value: self.tourManager.destinations.map { $0.title.text }.joined(separator: ",")))
                     self.share(user_info: SharedInfo(type: .ChangeLanguage, value: self.resourceLang))
-                    self.selectedHandleSide = HandleSide(rawValue: self.selectedHandleSide.rawValue) ?? .left
-                    self.share(user_info: SharedInfo(type: .ChangeHandleSide, value: self.selectedHandleSide.rawValue))
                 }
                 DispatchQueue.main.async {
                     _ = self.fallbackService.manage(command: .lang, param: self.resourceLang)
@@ -1368,11 +1323,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         case .getlanguage:
             DispatchQueue.main.async {
                 _ = self.fallbackService.manage(command: .lang, param: I18N.shared.langCode)
-            }
-            break
-        case .gethandleside:
-            DispatchQueue.main.async {
-                _ = self.fallbackService.manage(command: .handleside, param: self.selectedHandleSide.rawValue)
             }
             break
         }
@@ -1537,8 +1487,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.share(user_info: SharedInfo(type: .ChangeLanguage, value: self.resourceLang))
             self.share(user_info: SharedInfo(type: .ChangeUserVoiceType, value: "\(self.userVoice?.id ?? "")", flag1: userInfo.flag1))
             self.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(self.userSpeechRate)", flag1: userInfo.flag1))
-            self.share(user_info: SharedInfo(type: .ChangeHandleSide, value: self.selectedHandleSide.rawValue))
-            self.selectedHandleSide = HandleSide(rawValue: self.selectedHandleSide.rawValue) ?? .left
         }
         if userInfo.type == .ClearDestinations {
             self.clearAll()
@@ -1561,9 +1509,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             if userInfo.flag1 {
                 self.playSample(mode: .User)
             }
-        }
-        if userInfo.type == .ChangeHandleSide {
-            self.shareHandleSide(HandleSide(rawValue: userInfo.value) ?? .left)
         }
     }
 
@@ -1933,9 +1878,6 @@ class UserInfoBuffer {
         case .ChangeUserVoiceType:
             modelData?.userVoice = TTSHelper.getVoice(by: userInfo.value)
             modelData?.updateTTS()
-            break
-        case .ChangeHandleSide:
-            modelData?.shareHandleSide(HandleSide(rawValue: userInfo.value) ?? .left)
             break
         }
     }
