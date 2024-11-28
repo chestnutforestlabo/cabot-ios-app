@@ -75,6 +75,12 @@ enum SpeechPriority: String, CaseIterable {
     case App = "App"
 }
 
+extension SpeakTag {
+    static func Next( erase:Bool = true ) -> Self { return SpeakTag(tag:"Next", erase:erase) }
+    static func Sample( erase:Bool = true ) -> Self { return SpeakTag(tag:"Sample", erase:erase) }
+}
+
+
 enum HandleSide: String, CaseIterable {
     case left = "left"
     case right = "right"
@@ -378,6 +384,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 self.updateVoice()
                 self.updateTTS()
             }
+            
+            self.tts.lang = resource?.lang
         }
     }
 
@@ -983,7 +991,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             NavUtil.showModalWaiting(withMessage: CustomLocalizedString("processing...", lang: self.resourceLang))
         }
         if self.fallbackService.summon(destination: destination) || self.noSuitcaseDebug {
-            self.speak(CustomLocalizedString("Sending the command to the suitcase", lang: self.resourceLang)) {}
+            self.speak(CustomLocalizedString("Sending the command to the suitcase", lang: self.resourceLang), priority:.Required) {}
             DispatchQueue.main.async {
                 print("hide modal waiting")
                 NavUtil.hideModalWaiting()
@@ -997,7 +1005,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             DispatchQueue.main.async {
                 let message = CustomLocalizedString("Suitcase may not be connected", lang: self.resourceLang)
 
-                self.speak(message) {}
+                self.speak(message, priority:.Required) {}
             }
             return false
         }
@@ -1017,15 +1025,15 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         tourManager.save()
         self.stopSpeak()
         let announce = CustomLocalizedString("Skip Message %@", lang: self.resourceLang, skip.title.pron)
-        self.tts.speak(announce){
+        self.tts.speak(announce, priority:.Required){
         }
     }
 
-    func speak(_ text:String, callback: @escaping () -> Void) {
+    func speak(_ text:String, priority: CaBotTTS.SpeechPriority, timeout sec : TimeInterval? = nil, tag: SpeakTag? = nil, callback: @escaping () -> Void) {
         if (preview) {
             print("previewing speak - \(text)")
         } else {
-            self.tts.speak(text, callback: callback)
+            self.tts.speak(text, priority: priority, timeout: sec, tag: tag, callback: callback)
         }
     }
 
@@ -1033,11 +1041,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.tts.stop(false)
     }
 
-    func playSample(mode: VoiceMode){
+    func playSample(mode: VoiceMode, priority: CaBotTTS.SpeechPriority? = nil, timeout sec : TimeInterval? = nil ){
         if(self.modeType == .Normal){
             self.tts.rate = self.userSpeechRate
             self.tts.voice = self.userVoice?.AVvoice
-            self.tts.speak(CustomLocalizedString("Hello Suitcase!", lang: self.resourceLang), force:true) {_ in
+            self.tts.speak(CustomLocalizedString("Hello Suitcase!", lang: self.resourceLang), force:true, priority:priority ?? .High, timeout:sec, tag: .Sample(erase:true)) {_ in
             }
         } else {
             if(mode == .User){
@@ -1047,7 +1055,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 self.tts.rate = self.attendSpeechRate
                 self.tts.voice = self.attendVoice?.AVvoice
             }
-            self.tts.speakForAdvanced(CustomLocalizedString("Hello Suitcase!", lang: self.resourceLang), force:true) {_ in
+            self.tts.speakForAdvanced(CustomLocalizedString("Hello Suitcase!", lang: self.resourceLang), force:true, tag: .Sample(erase:true)) {_ in
             }
         }
         
@@ -1063,7 +1071,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent()
         self.shouldNoAnnounceToPushRightButton = true
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            self.speak(CustomLocalizedString("You can proceed by pressing the right button of the suitcase handle", lang: self.resourceLang)) {
+            self.speak(CustomLocalizedString("You can proceed by pressing the right button of the suitcase handle", lang: self.resourceLang), priority: .Required, timeout: nil) {
             }
         }
     }
@@ -1167,7 +1175,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                         let announce = CustomLocalizedString("Going to %@", lang: self.resourceLang, dest.title.pron)
                             + (dest.startMessage?.content ?? "")
                         if(isStartMessageSpeaking){
-                            self.tts.speak(announce, forceSelfvoice: false, force: true, callback: {code in }, progress: {range in
+                            self.tts.speak(announce, forceSelfvoice: false, force: true, priority: .High, timeout: nil, tag: .Next(erase:true), callback: {code in }, progress: {range in
                                 if range.location == 0{
                                     self.willSpeakArriveMessage = true
                                 }
@@ -1201,7 +1209,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             DispatchQueue.main.async {
                 let message = CustomLocalizedString("Suitcase may not be connected", lang: self.resourceLang)
 
-                self.speak(message) {}
+                self.speak(message, priority:.Required) {}
             }
             return false
         }
@@ -1235,7 +1243,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if self.suitcaseConnected != saveSuitcaseConnected {
             let text = centralConnected ? CustomLocalizedString("Suitcase has been connected", lang: self.resourceLang) :
                 CustomLocalizedString("Suitcase has been disconnected", lang: self.resourceLang)
-            self.tts.speak(text, force: true) {_ in }
+            self.tts.speak(text, force: true, priority:.Normal) {_ in }
             
             if self.suitcaseConnected {
                 if self.modeType != .Normal{
@@ -1311,7 +1319,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             if tourManager.proceedToNextDestination() {
                 self.playAudio(file: self.detailSettingModel.startSound)
             }else {
-                self.speak(CustomLocalizedString("No destination is selected", lang: self.resourceLang)) {
+                self.speak(CustomLocalizedString("No destination is selected", lang: self.resourceLang), priority:.Required, timeout:nil) {
                 }
             }
             break
@@ -1320,7 +1328,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 self.playAudio(file: self.detailSettingModel.arrivedSound)
                 tourManager.arrivedCurrent()
 
-                var announce = CustomLocalizedString("You have arrived at %@. ", lang: self.resourceLang, cd.title.pron)
+                let arrivedMsg = CustomLocalizedString("You have arrived at %@. ", lang: self.resourceLang, cd.title.pron)
+                var announce = ""
                 if let count = cd.arriveMessages?.count {
                     for i in 0 ..< count{
                         announce += cd.arriveMessages?[i].content ?? ""
@@ -1348,7 +1357,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     delay = 3.0
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                    self.speak(announce) {
+                    self.speak(arrivedMsg, priority:.High, timeout: nil ) {}
+                    self.speak(announce, priority:.Normal, timeout: nil, tag: .Next(erase:false) ) {
                         // if user pressed the next button while reading announce, skip open content
                         if self.tourManager.currentDestination == nil {
                             if let contentURL = cd.content?.url,
@@ -1445,7 +1455,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 if self.shouldNoAnnounceToPushRightButton == false && self.willSpeakArriveMessage == false{
                     if tourManager.hasDestination {
                         let announce = CustomLocalizedString("PRESS_RIGHT_BUTTON", lang: self.resourceLang)
-                        self.speak(announce){}
+                        self.speak(announce, priority:.Required){}
                         self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent()
                         self.shouldNoAnnounceToPushRightButton = true
                     }
@@ -1469,11 +1479,15 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if modeType != .Normal {
             self.userInfo.update(userInfo: userInfo)
             if userInfo.type == .Speak {
+                print("Speak share \(userInfo)")
                 if isTTSEnabledForAdvanced {
                     if userInfo.value.isEmpty && userInfo.flag1 { // stop
                         tts.stopSpeakForAdvanced()
                     } else {
-                        tts.speakForAdvanced(userInfo.value, force: userInfo.flag1) { _ in
+                        var text = userInfo.value
+                        let startIndex = text.index(text.startIndex, offsetBy: userInfo.location)
+                        text = String(text[startIndex...])
+                        tts.speakForAdvanced(text, force: userInfo.flag1) { _ in
                         }
                     }
                 }
@@ -1822,7 +1836,7 @@ struct PersistenceController {
     }
 }
 
-class SpeakingText: Hashable {
+class SpeakingText: Hashable, ObservableObject {
     static func == (lhs: SpeakingText, rhs: SpeakingText) -> Bool {
         lhs.text == rhs.text && lhs.date == rhs.date
     }
@@ -1830,11 +1844,11 @@ class SpeakingText: Hashable {
         hasher.combine(text)
         hasher.combine(date)
     }
-    var text: String = ""
+    @Published var text: String = ""
     var date: Date
     var voiceover: Bool
-    var location = 0
-    var length = 0
+    @Published var location = 0
+    @Published var length = 0
     init(text: String, voiceover: Bool) {
         self.text = text
         self.date = Date()

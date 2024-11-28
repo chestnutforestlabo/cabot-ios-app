@@ -25,6 +25,7 @@
 "No"="いいえ";
 "Okay"="OK";
 "ERROR"="エラー";
+"TOKEN_SEPARATORS"="。";
 
 
 // CaBotAppModel
