@@ -105,6 +105,34 @@ enum HandleSide: String, CaseIterable {
     }
 }
 
+enum TouchMode: String, CaseIterable {
+    case cap = "cap"
+    case tof = "tof"
+    case dual = "dual"
+
+    var imageName: String {
+        switch self {
+        case .cap: return "c.circle"
+        case .tof: return "t.circle"
+        case .dual: return "d.circle"
+        }
+    }
+    var text: String{
+        switch self{
+        case .cap: return "Capacitive"
+        case .tof: return "Time of Flight"
+        case .dual: return "Dual"
+        }
+    }
+    var color: Color {
+        switch self{
+        case .cap: return .blue
+        case .tof: return .orange
+        case .dual: return .green
+        }
+    }
+}
+
 class FallbackService: CaBotServiceProtocol {
     private let services: [CaBotServiceProtocol]
     private var selectedService: CaBotServiceProtocol?
@@ -306,6 +334,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private let selectedResourceLangKey = "selectedResourceLangKey"
     private let selectedVoiceKey = "SelectedVoiceKey"
     private let selectedHandleSideKey = "SelectedHandleSideKey"
+    private let selectedTouchModeKey = "selectedTouchModeKey"
     private let isTTSEnabledKey = "isTTSEnabledKey"
     private let speechRateKey = "speechRateKey"
     private let attendSpeechRateKey = "attendSpeechRateKey"
@@ -431,11 +460,29 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             }
         }
     }
+
+    @Published var selectedTouchMode: TouchMode = .cap {
+        didSet {
+            if !isSharingTouchMode {
+                UserDefaults.standard.setValue(selectedTouchMode.rawValue, forKey: selectedTouchModeKey)
+                UserDefaults.standard.synchronize()
+                _ = self.fallbackService.manage(command: .touchmode, param: selectedTouchMode.rawValue)
+            }
+        }
+    }
+
     private var isSharingHandleSide = false
     func shareHandleSide(_ side: HandleSide) {
         isSharingHandleSide = true
         selectedHandleSide = side
         isSharingHandleSide = false
+    }
+
+    private var isSharingTouchMode = false
+    func shareTouchMode(_ side: TouchMode) {
+        isSharingTouchMode = true
+        selectedTouchMode = side
+        isSharingTouchMode = false
     }
 
     #if ATTEND
@@ -1094,6 +1141,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 break
             case .handleside:
                 break
+            case .touchmode:
+                break
             }
             systemStatus.components.removeAll()
             objectWillChange.send()
@@ -1258,6 +1307,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     self.share(user_info: SharedInfo(type: .ChangeLanguage, value: self.resourceLang))
                     self.selectedHandleSide = HandleSide(rawValue: self.selectedHandleSide.rawValue) ?? .left
                     self.share(user_info: SharedInfo(type: .ChangeHandleSide, value: self.selectedHandleSide.rawValue))
+                    self.share(user_info: SharedInfo(type: .ChangeTouchMode, value: self.selectedTouchMode.rawValue))
                 }
                 DispatchQueue.main.async {
                     _ = self.fallbackService.manage(command: .lang, param: self.resourceLang)
@@ -1383,6 +1433,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         case .gethandleside:
             DispatchQueue.main.async {
                 _ = self.fallbackService.manage(command: .handleside, param: self.selectedHandleSide.rawValue)
+            }
+            break
+        case .gettouchmode:
+            DispatchQueue.main.async {
+                _ = self.fallbackService.manage(command: .handleside, param: self.selectedTouchMode.rawValue)
             }
             break
         }
@@ -1552,6 +1607,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.share(user_info: SharedInfo(type: .ChangeUserVoiceType, value: "\(self.userVoice?.id ?? "")", flag1: userInfo.flag1))
             self.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(self.userSpeechRate)", flag1: userInfo.flag1))
             self.share(user_info: SharedInfo(type: .ChangeHandleSide, value: self.selectedHandleSide.rawValue))
+            self.share(user_info: SharedInfo(type: .ChangeTouchMode, value: self.selectedTouchMode.rawValue))
             self.selectedHandleSide = HandleSide(rawValue: self.selectedHandleSide.rawValue) ?? .left
         }
         if userInfo.type == .ClearDestinations {
@@ -1950,6 +2006,9 @@ class UserInfoBuffer {
             break
         case .ChangeHandleSide:
             modelData?.shareHandleSide(HandleSide(rawValue: userInfo.value) ?? .left)
+            break
+        case .ChangeTouchMode:
+            modelData?.shareTouchMode(TouchMode(rawValue: userInfo.value) ?? .cap)
             break
         }
     }

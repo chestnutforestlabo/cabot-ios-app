@@ -69,6 +69,14 @@ struct SettingView: View {
                     modelData.share(user_info: SharedInfo(type: .ChangeHandleSide, value: modelData.selectedHandleSide.rawValue))
                 })
 
+                Picker(LocalizedStringKey("Touch Mode"), selection: $modelData.selectedTouchMode) {
+                    ForEach(TouchMode.allCases, id: \.rawValue) { touch in
+                        Text(LocalizedStringKey(touch.text)).tag(touch)
+                    }
+                }.onChange(of: modelData.selectedTouchMode, perform: { value in
+                    modelData.share(user_info: SharedInfo(type: .ChangeTouchMode, value: modelData.selectedTouchMode.rawValue))
+                })
+
                 NavigationLink(destination: DetailSettingView().environmentObject(modelData.detailSettingModel).heartbeat("DetailSettingView"), label: {
                     Text("DETAIL_SETTING")
                 })

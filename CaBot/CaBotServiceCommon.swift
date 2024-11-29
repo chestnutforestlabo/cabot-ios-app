@@ -50,6 +50,7 @@ struct SharedInfo: Codable {
         case ChangeUserVoiceRate
         case ChangeUserVoiceType
         case ChangeHandleSide
+        case ChangeTouchMode
     }
     init(type: InfoType, value: String, flag1: Bool = false, flag2: Bool = false, location: Int = 0, length: Int = 0) {
         self.type = type
@@ -107,6 +108,7 @@ enum NavigationNotification:String {
     case skip
     case getlanguage
     case gethandleside
+    case gettouchmode
 }
 
 enum CaBotManageCommand:String {
@@ -116,6 +118,7 @@ enum CaBotManageCommand:String {
     case stop
     case lang
     case handleside
+    case touchmode
     case restart_localization
 }
 
@@ -355,6 +358,7 @@ enum NavigationEventType:String, Decodable {
     case skip
     case getlanguage
     case gethandleside
+    case gettouchmode
     case unknown
 }
 
@@ -521,7 +525,7 @@ class CaBotServiceActions {
 
         DispatchQueue.main.async {
             switch(request.type) {
-            case .next, .arrived, .subtour, .skip, .getlanguage, .gethandleside:
+            case .next, .arrived, .subtour, .skip, .getlanguage, .gethandleside, .gettouchmode:
                 if let note = NavigationNotification(rawValue: request.type.rawValue) {
                     delegate.cabot(service: service, notification: note)
                 } else {

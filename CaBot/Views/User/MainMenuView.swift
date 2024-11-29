@@ -435,6 +435,27 @@ struct StatusMenus: View {
                         .foregroundColor(modelData.selectedHandleSide.color)
                 }
             }
+
+            NavigationLink (destination: SettingView(langOverride: modelData.resourceLang, handleSideOverride: modelData.selectedTouchMode.rawValue)
+                .environmentObject(modelData)
+                .onDisappear {
+                    modelData.tcpServiceRestart()
+                }
+                .heartbeat("SettingView")
+            ) {
+                Label {
+                    HStack {
+                        Text(LocalizedStringKey("Touch Mode"))
+                        Text(":")
+                        Text(LocalizedStringKey(modelData.selectedTouchMode.text))
+                    }
+                } icon: {
+                    Image(systemName: modelData.selectedTouchMode.imageName)
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundColor(modelData.selectedTouchMode.color)
+                }
+            }
             if modelData.suitcaseConnected {
                 if (modelData.suitcaseConnectedBLE && modelData.versionMatchedBLE == false) ||
                 (modelData.suitcaseConnectedTCP && modelData.versionMatchedTCP == false) {
