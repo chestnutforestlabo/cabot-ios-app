@@ -425,7 +425,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var selectedHandleSide: HandleSide = .left {
         didSet {
             if !isSharingHandleSide {
-                UserDefaults.standard.setValue(selectedHandleSide.rawValue, forKey: selectedResourceKey)
+                UserDefaults.standard.setValue(selectedHandleSide.rawValue, forKey: selectedHandleSideKey)
                 UserDefaults.standard.synchronize()
                 _ = self.fallbackService.manage(command: .handleside, param: selectedHandleSide.rawValue)
             }
