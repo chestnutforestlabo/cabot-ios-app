@@ -348,6 +348,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private let noSuitcaseDebugKey = "noSuitcaseDebugKey"
     private let modeTypeKey = "modeTypeKey"
     private let notificationCenterID = "cabot_state_notification"
+    private let voiceSettingKey = "voiceSettingKey"
     
     let detailSettingModel: DetailSettingModel
 
@@ -400,21 +401,30 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var resource: Resource? = nil {
         didSet {
             if let resource = resource {
-
                 NSLog("resource.identifier = \(resource.identifier)")
                 UserDefaults.standard.setValue(resource.identifier, forKey: selectedResourceKey)
-                if let langOverride = resource.langOverride {
-                    NSLog("resource.langOverride = \(langOverride)")
-                    UserDefaults.standard.setValue(langOverride, forKey: selectedResourceLangKey)
-                }
                 UserDefaults.standard.synchronize()
-                
-                _ = self.fallbackService.manage(command: .lang, param: resource.lang)
                 self.updateVoice()
                 self.updateTTS()
             }
-            
+        }
+    }
+
+    @Published var selectedLanguage: String = "en" {
+        willSet {
+            if slientForChange == false {
+                share(user_info: SharedInfo(type: .ChangeLanguage, value: newValue))
+            }
+            slientForChange = false
+        }
+        didSet {
+            self.resource?.lang = selectedLanguage
+            NSLog("selectedLanguage = \(selectedLanguage)")
+            UserDefaults.standard.setValue(selectedLanguage, forKey: selectedResourceLangKey)
+            _ = self.fallbackService.manage(command: .lang, param: resource?.lang)
             self.tts.lang = resource?.lang
+            self.updateVoice()
+            self.updateTTS()
         }
     }
 
@@ -440,8 +450,24 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             }
         }
     }
-    
+
+    @Published var attendSpeechRate: Double = 0.5 {
+        didSet {
+            UserDefaults.standard.setValue(attendSpeechRate, forKey: attendSpeechRateKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
+
     @Published var userVoice: Voice? = nil {
+        willSet {
+            if slientForChange == false {
+                if let id = newValue?.AVvoice.identifier {
+                    print("willSet userVoice \(userVoice) \(id)")
+                    share(user_info: SharedInfo(type: .ChangeUserVoiceType, value: id))
+                }
+            }
+            slientForChange = false
+        }
         didSet {
             if let id = userVoice?.AVvoice.identifier {
                 let key = "\(selectedVoiceKey)_\(resource?.locale.identifier ?? "en-US")"
@@ -450,8 +476,21 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             }
         }
     }
-    
-    var slientForChange: Bool = false
+
+    @Published var userSpeechRate: Double = 0.5 {
+        willSet {
+            if slientForChange == false {
+                print("willSet userSpeechRate \(userSpeechRate) \(newValue)")
+                share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(newValue)"))
+            }
+            slientForChange = false
+        }
+        didSet {
+            UserDefaults.standard.setValue(userSpeechRate, forKey: speechRateKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
+
     @Published var selectedHandleSide: HandleSide = .left {
         willSet {
             if slientForChange == false {
@@ -482,12 +521,28 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
     }
 
-    func shareHandleSide(_ side: HandleSide) {
+    var slientForChange: Bool = false
+    func silentUpdate(language: String) {
+        slientForChange = true
+        selectedLanguage = language
+    }
+
+    func silentUpdate(voice: Voice?) {
+        slientForChange = true
+        userVoice = voice
+    }
+
+    func silentUpdate(rate: Double) {
+        slientForChange = true
+        userSpeechRate = rate
+    }
+
+    func silentUpdate(side: HandleSide) {
         slientForChange = true
         selectedHandleSide = side
     }
 
-    func shareTouchMode(_ mode: TouchMode) {
+    func silentUpdate(mode: TouchMode) {
         slientForChange = true
         selectedTouchMode = mode
     }
@@ -495,6 +550,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     #if ATTEND
     @Published var voiceSetting: VoiceMode = .Attend {
         didSet {
+            UserDefaults.standard.setValue(voiceSetting.rawValue, forKey: voiceSettingKey)
+            UserDefaults.standard.synchronize()
             self.updateTTS()
         }
     }
@@ -552,20 +609,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         } else if(voiceSetting == .Attend) {
             self.tts.rate = self.attendSpeechRate
             self.tts.voice = self.attendVoice?.AVvoice
-        }
-    }
-
-    @Published var attendSpeechRate: Double = 0.5 {
-        didSet {
-            UserDefaults.standard.setValue(attendSpeechRate, forKey: attendSpeechRateKey)
-            UserDefaults.standard.synchronize()
-        }
-    }
-    
-    @Published var userSpeechRate: Double = 0.5 {
-        didSet {
-            UserDefaults.standard.setValue(userSpeechRate, forKey: speechRateKey)
-            UserDefaults.standard.synchronize()
         }
     }
 
@@ -733,8 +776,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if let selectedIdentifier = UserDefaults.standard.value(forKey: selectedResourceKey) as? String {
             self.resource = resourceManager.resource(by: selectedIdentifier)
         }
-        if let selectedLang = UserDefaults.standard.value(forKey: selectedResourceLangKey) as? String {
-            self.resource?.lang = selectedLang
+        if let selectedLanguage = UserDefaults.standard.value(forKey: selectedResourceLangKey) as? String {
+            self.selectedLanguage = selectedLanguage
             self.updateVoice()
         }
         if let groupID = UserDefaults.standard.value(forKey: teamIDKey) as? String {
@@ -761,6 +804,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
         if let isTTSEnabled = UserDefaults.standard.value(forKey: isTTSEnabledKey) as? Bool {
             self.isTTSEnabledForAdvanced = isTTSEnabled
+        }
+        if let voiceSetting = UserDefaults.standard.value(forKey: voiceSettingKey) as? String {
+            self.voiceSetting = VoiceMode(rawValue: voiceSetting)!
         }
 
         // services
@@ -1621,29 +1667,25 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.clearAll()
         }
         if userInfo.type == .ChangeLanguage {
-            self.resource?.lang = userInfo.value
-            self.updateVoice()
-            self.updateTTS()
+            self.silentUpdate(language: userInfo.value)
         }
         if userInfo.type == .ChangeUserVoiceRate {
-            self.userSpeechRate = Double(userInfo.value) ?? 0.5
-            self.updateTTS()
+            self.silentUpdate(rate: Double(userInfo.value) ?? 0.5)
             if userInfo.flag1 {
                 self.playSample(mode: .User)
             }
         }
         if userInfo.type == .ChangeUserVoiceType {
-            self.userVoice = TTSHelper.getVoice(by: userInfo.value)
-            self.updateTTS()
+            self.silentUpdate(voice: TTSHelper.getVoice(by: userInfo.value))
             if userInfo.flag1 {
                 self.playSample(mode: .User)
             }
         }
         if userInfo.type == .ChangeHandleSide {
-            self.shareHandleSide(HandleSide(rawValue: userInfo.value) ?? .left)
+            self.silentUpdate(side: HandleSide(rawValue: userInfo.value) ?? .left)
         }
         if userInfo.type == .ChangeTouchMode {
-            self.shareTouchMode(TouchMode(rawValue: userInfo.value) ?? .cap)
+            self.silentUpdate(mode: TouchMode(rawValue: userInfo.value) ?? .cap)
         }
     }
 
@@ -2003,22 +2045,19 @@ class UserInfoBuffer {
             // do nothing
             break
         case .ChangeLanguage:
-            modelData?.resource?.lang = userInfo.value
-            modelData?.updateVoice()
+            modelData?.silentUpdate(language: userInfo.value)
             break
         case .ChangeUserVoiceRate:
-            modelData?.userSpeechRate = Double(userInfo.value) ?? 0.5
-            modelData?.updateTTS()
+            modelData?.silentUpdate(rate: Double(userInfo.value) ?? 0.5)
             break
         case .ChangeUserVoiceType:
-            modelData?.userVoice = TTSHelper.getVoice(by: userInfo.value)
-            modelData?.updateTTS()
+            modelData?.silentUpdate(voice: TTSHelper.getVoice(by: userInfo.value))
             break
         case .ChangeHandleSide:
-            modelData?.shareHandleSide(HandleSide(rawValue: userInfo.value) ?? .left)
+            modelData?.silentUpdate(side: HandleSide(rawValue: userInfo.value) ?? .left)
             break
         case .ChangeTouchMode:
-            modelData?.shareTouchMode(TouchMode(rawValue: userInfo.value) ?? .cap)
+            modelData?.silentUpdate(mode: TouchMode(rawValue: userInfo.value) ?? .cap)
             break
         }
     }

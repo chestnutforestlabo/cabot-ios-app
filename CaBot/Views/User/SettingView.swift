@@ -46,16 +46,10 @@ struct SettingView: View {
                 }
 
                 if let resource = modelData.resource {
-                    Picker("LANGUAGE", selection: $langOverride) {
+                    Picker("LANGUAGE", selection: $modelData.selectedLanguage) {
                         ForEach(resource.languages, id: \.self) { language in
                             Text(language).tag(language)
                         }
-                    }.onChange(of: langOverride) { lang in
-                        modelData.resource?.lang = lang
-                        self.isResourceChanging = true
-                        modelData.resource = modelData.resource
-                        modelData.updateVoice()
-                        modelData.share(user_info: SharedInfo(type: .ChangeLanguage, value: lang))
                     }
                 }
 
@@ -77,32 +71,15 @@ struct SettingView: View {
             }
 
             Section(header:Text("TTS")) {
-                Picker(LocalizedStringKey("Voice"), selection: $userVoicePickerSelection) {
+                Picker(LocalizedStringKey("Voice"), selection: $modelData.userVoice) {
                     ForEach(TTSHelper.getVoices(by: locale), id: \.self) { voice in
                         Text(voice.AVvoice.name).tag(voice as Voice?)
                     }
                 }
-                .onChange(of: userVoicePickerSelection, perform: { value in
-                    if let voice = value {
-                        if !isResourceChanging {
-                            if(userVoicePickerSelection != modelData.userVoice){
-                                modelData.userVoice = value
-                                modelData.share(user_info: SharedInfo(type: .ChangeUserVoiceType, value: "\(voice.id)"))
-                            }
-                            userVoicePickerSelection = value
-                        }
-                    }
-                })
                 .onChange(of: modelData.userVoice, perform: { value in
-                    userVoicePickerSelection = modelData.userVoice
+                    modelData.playSample(mode: .User)
                 })
-                .onTapGesture {
-                    isResourceChanging = false
-                }
                 .pickerStyle(DefaultPickerStyle())
-                .onAppear {
-                    userVoicePickerSelection = modelData.userVoice
-                }
                 
                 HStack {
                     Text("Speech Speed")
@@ -113,7 +90,7 @@ struct SettingView: View {
                            onEditingChanged: { editing in
                             timer?.invalidate()
                             timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
-                                modelData.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(modelData.userSpeechRate)", flag1: true))
+                                modelData.playSample(mode: .User)
                             }
                     })
                         .accessibility(label: Text("Speech Speed"))

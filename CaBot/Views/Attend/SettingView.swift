@@ -44,16 +44,10 @@ struct SettingView: View {
                 }
 
                 if let resource = modelData.resource {
-                    Picker("LANGUAGE", selection: $langOverride) {
+                    Picker("LANGUAGE", selection: $modelData.selectedLanguage) {
                         ForEach(resource.languages, id: \.self) { language in
                             Text(language).tag(language)
                         }
-                    }.onChange(of: langOverride) { lang in
-                        modelData.resource?.lang = lang
-                        self.isResourceChanging = true
-                        modelData.resource = modelData.resource
-                        modelData.updateVoice()
-                        modelData.share(user_info: SharedInfo(type: .ChangeLanguage, value: lang))
                     }
                 }
 
@@ -104,13 +98,9 @@ struct SettingView: View {
                     }
                 }.onChange(of: modelData.attendVoice, perform: { value in
                     if let _ = modelData.attendVoice {
-                        if !isResourceChanging {
-                            modelData.playSample(mode: VoiceMode.Attend)
-                        }
+                        modelData.playSample(mode: VoiceMode.Attend)
                     }
-                }).onTapGesture {
-                    isResourceChanging = false
-                }
+                })
                 .pickerStyle(DefaultPickerStyle())
                 .listRowSeparator(.hidden)
                 
@@ -145,14 +135,6 @@ struct SettingView: View {
                     ForEach(TTSHelper.getVoices(by: locale), id: \.self) { voice in
                         Text(voice.AVvoice.name).tag(voice as Voice?)
                     }
-                }.onChange(of: modelData.userVoice, perform: { value in
-                    if let voice = modelData.userVoice {
-                        if !isResourceChanging {
-                            modelData.share(user_info: SharedInfo(type: .ChangeUserVoiceType, value: "\(voice.id)"))
-                        }
-                    }
-                }).onTapGesture {
-                    isResourceChanging = false
                 }
                 .pickerStyle(DefaultPickerStyle())
                 .listRowSeparator(.hidden)
@@ -163,10 +145,6 @@ struct SettingView: View {
                            in: 0...1,
                            step: 0.05,
                            onEditingChanged: { editing in
-                            timer?.invalidate()
-                            timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
-                                modelData.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(modelData.userSpeechRate)", flag1: true))
-                            }
                     })
                         .accessibility(label: Text("Speech Speed"))
                         .accessibility(value: Text(String(format:"%.0f %%", arguments:[modelData.userSpeechRate*100.0])))
