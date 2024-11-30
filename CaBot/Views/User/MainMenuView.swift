@@ -415,7 +415,7 @@ struct StatusMenus: View {
                         .padding(2)
                 }
             }
-            NavigationLink (destination: SettingView(langOverride: modelData.resourceLang, handleSideOverride: modelData.selectedHandleSide.rawValue)
+            NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
                 .environmentObject(modelData)
                 .onDisappear {
                     modelData.tcpServiceRestart()
@@ -436,7 +436,7 @@ struct StatusMenus: View {
                 }
             }
 
-            NavigationLink (destination: SettingView(langOverride: modelData.resourceLang, handleSideOverride: modelData.selectedTouchMode.rawValue)
+            NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
                 .environmentObject(modelData)
                 .onDisappear {
                     modelData.tcpServiceRestart()
@@ -493,7 +493,7 @@ struct SettingMenus: View {
         let commitHash = Bundle.main.infoDictionary!["GitCommitHash"] as! String
 
         Section(header:Text("System")) {
-            NavigationLink (destination: SettingView(langOverride: modelData.resourceLang, handleSideOverride: modelData.selectedHandleSide.rawValue)
+            NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
                 .environmentObject(modelData)
                 .onDisappear {
                     modelData.tcpServiceRestart()

@@ -29,7 +29,6 @@ struct SettingView: View {
 
     @State var timer:Timer?
     @State var langOverride:String
-    @State var handleSideOverride: String
     @State var isResourceChanging:Bool = false
     
     @State var userVoicePickerSelection: Voice?
@@ -60,22 +59,17 @@ struct SettingView: View {
                     }
                 }
 
-                Picker(LocalizedStringKey("Handle"), selection: $handleSideOverride) {
+                Picker(LocalizedStringKey("Handle"), selection: $modelData.selectedHandleSide) {
                     ForEach(HandleSide.allCases, id: \.rawValue) { grip in
                         Text(LocalizedStringKey(grip.text)).tag(grip)
                     }
-                }.onChange(of: handleSideOverride, perform: { value in
-                    modelData.selectedHandleSide = HandleSide(rawValue: value) ?? .left
-                    modelData.share(user_info: SharedInfo(type: .ChangeHandleSide, value: modelData.selectedHandleSide.rawValue))
-                })
+                }
 
                 Picker(LocalizedStringKey("Touch Mode"), selection: $modelData.selectedTouchMode) {
                     ForEach(TouchMode.allCases, id: \.rawValue) { touch in
                         Text(LocalizedStringKey(touch.text)).tag(touch)
                     }
-                }.onChange(of: modelData.selectedTouchMode, perform: { value in
-                    modelData.share(user_info: SharedInfo(type: .ChangeTouchMode, value: modelData.selectedTouchMode.rawValue))
-                })
+                }
 
                 NavigationLink(destination: DetailSettingView().environmentObject(modelData.detailSettingModel).heartbeat("DetailSettingView"), label: {
                     Text("DETAIL_SETTING")
@@ -172,7 +166,7 @@ struct SettingView_Previews: PreviewProvider {
 
         modelData.teamID = "test"
         
-        return SettingView(langOverride: "en-US", handleSideOverride: "left")
+        return SettingView(langOverride: "en-US")
             .environmentObject(modelData)
             .environment(\.locale, Locale.init(identifier: "en-US"))
             .previewDisplayName("preview")
@@ -183,7 +177,7 @@ struct SettingView_Previews: PreviewProvider {
 
         modelData.teamID = "test"
         
-        return SettingView(langOverride: "ja-JP", handleSideOverride: "left")
+        return SettingView(langOverride: "ja-JP")
             .environmentObject(modelData)
             .environment(\.locale, Locale.init(identifier: "ja-JP"))
             .previewDisplayName("preview_ja")

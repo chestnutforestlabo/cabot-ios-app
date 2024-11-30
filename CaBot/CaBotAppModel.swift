@@ -451,38 +451,45 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
     }
     
+    var slientForChange: Bool = false
     @Published var selectedHandleSide: HandleSide = .left {
-        didSet {
-            if !isSharingHandleSide {
-                UserDefaults.standard.setValue(selectedHandleSide.rawValue, forKey: selectedHandleSideKey)
-                UserDefaults.standard.synchronize()
-                _ = self.fallbackService.manage(command: .handleside, param: selectedHandleSide.rawValue)
+        willSet {
+            if slientForChange == false {
+                print("willSet selectedHandleSide \(selectedHandleSide) \(newValue)")
+                share(user_info: SharedInfo(type: .ChangeHandleSide, value: newValue.rawValue))
+                _ = self.fallbackService.manage(command: .handleside, param: newValue.rawValue)
             }
+            slientForChange = false
+        }
+        didSet {
+            UserDefaults.standard.setValue(selectedHandleSide.rawValue, forKey: selectedHandleSideKey)
+            UserDefaults.standard.synchronize()
         }
     }
 
     @Published var selectedTouchMode: TouchMode = .cap {
-        didSet {
-            if !isSharingTouchMode {
-                UserDefaults.standard.setValue(selectedTouchMode.rawValue, forKey: selectedTouchModeKey)
-                UserDefaults.standard.synchronize()
-                _ = self.fallbackService.manage(command: .touchmode, param: selectedTouchMode.rawValue)
+        willSet {
+            if slientForChange == false {
+                print("willSet selectedTouchMode \(selectedTouchMode) \(newValue)")
+                share(user_info: SharedInfo(type: .ChangeTouchMode, value: newValue.rawValue))
+                _ = self.fallbackService.manage(command: .touchmode, param: newValue.rawValue)
             }
+            slientForChange = false
+        }
+        didSet {
+            UserDefaults.standard.setValue(selectedTouchMode.rawValue, forKey: selectedTouchModeKey)
+            UserDefaults.standard.synchronize()
         }
     }
 
-    private var isSharingHandleSide = false
     func shareHandleSide(_ side: HandleSide) {
-        isSharingHandleSide = true
+        slientForChange = true
         selectedHandleSide = side
-        isSharingHandleSide = false
     }
 
-    private var isSharingTouchMode = false
-    func shareTouchMode(_ side: TouchMode) {
-        isSharingTouchMode = true
-        selectedTouchMode = side
-        isSharingTouchMode = false
+    func shareTouchMode(_ mode: TouchMode) {
+        slientForChange = true
+        selectedTouchMode = mode
     }
 
     #if ATTEND
@@ -1634,6 +1641,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
         if userInfo.type == .ChangeHandleSide {
             self.shareHandleSide(HandleSide(rawValue: userInfo.value) ?? .left)
+        }
+        if userInfo.type == .ChangeTouchMode {
+            self.shareTouchMode(TouchMode(rawValue: userInfo.value) ?? .cap)
         }
     }
 

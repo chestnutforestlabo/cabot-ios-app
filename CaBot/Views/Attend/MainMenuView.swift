@@ -513,7 +513,7 @@ struct StatusMenus: View {
                             .padding(2)
                     }
                 }
-                NavigationLink (destination: SettingView(langOverride: modelData.resourceLang, handleSideOverride: modelData.selectedHandleSide.rawValue)
+                NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
                     .environmentObject(modelData)
                     .onDisappear {
                         modelData.tcpServiceRestart()
@@ -623,7 +623,7 @@ struct SettingMenus: View {
                     Text("REPORT_BUG")
                 }).disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
             }
-            NavigationLink (destination: SettingView(langOverride: modelData.resourceLang, handleSideOverride: modelData.selectedHandleSide.rawValue)
+            NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
                 .environmentObject(modelData)
                 .onDisappear {
                     modelData.tcpServiceRestart()
