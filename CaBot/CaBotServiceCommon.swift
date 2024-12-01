@@ -89,7 +89,7 @@ protocol CaBotServiceDelegate {
     func caBot(service:any CaBotTransportProtocol, versionMatched:Bool, with:String)
     func cabot(service:any CaBotTransportProtocol, openRequest:URL)
     func cabot(service:any CaBotTransportProtocol, soundRequest:String)
-    func cabot(service:any CaBotTransportProtocol, notification:NavigationNotification)
+    func cabot(service:any CaBotTransportProtocol, notification:NavigationNotification, param:String?)
     func cabot(service:any CaBotTransportProtocol, deviceStatus:DeviceStatus)
     func cabot(service:any CaBotTransportProtocol, systemStatus:SystemStatus)
     func cabot(service:any CaBotTransportProtocol, batteryStatus:BatteryStatus)
@@ -527,7 +527,7 @@ class CaBotServiceActions {
             switch(request.type) {
             case .next, .arrived, .subtour, .skip, .getlanguage, .gethandleside, .gettouchmode:
                 if let note = NavigationNotification(rawValue: request.type.rawValue) {
-                    delegate.cabot(service: service, notification: note)
+                    delegate.cabot(service: service, notification: note, param: request.param)
                 } else {
                     NSLog("Unknown navigation notification type %@", request.type.rawValue)
                 }
@@ -583,7 +583,7 @@ actor LogPack {
     private var last :(at:Date,text:String?)? = nil
     private var packingCount : Int = 0
     
-    init( title:String, threshold:TimeInterval, isLogWithText:Bool = false, maxPacking:Int = 10 ) {
+    init( title:String, threshold:TimeInterval, isLogWithText:Bool = true, maxPacking:Int = 10 ) {
         self.title = title
         self.threshold = threshold
         self.isLogWithText = isLogWithText
@@ -597,18 +597,21 @@ actor LogPack {
     }
     
     private func _log( text:String? = nil ) {
-        let now = Date()
+        var now = Date()
         
         if let (lastAt,lastText) = self.last {
-            if (text != lastText)
-                || (now.timeIntervalSince(lastAt) >= threshold) {
+            if text != lastText {
                 _packlog(lastText)
                 _log( now, text )
             }
             else {
                 packingCount += 1
-                if packingCount >= maxPacking {
+                if (now.timeIntervalSince(lastAt) >= threshold) {
                     _packlog(lastText)
+                } else if packingCount >= maxPacking {
+                    _packlog(lastText)
+                } else {
+                    now = lastAt
                 }
             }
         }

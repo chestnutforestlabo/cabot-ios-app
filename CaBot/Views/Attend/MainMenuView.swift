@@ -524,13 +524,13 @@ struct StatusMenus: View {
                         HStack {
                             Text(LocalizedStringKey("Handle"))
                             Text(":")
-                            Text(LocalizedStringKey(modelData.selectedHandleSide.text))
+                            Text(LocalizedStringKey(modelData.suitcaseFeatures.selectedHandleSide.text))
                         }
                     } icon: {
-                        Image(modelData.selectedHandleSide.imageName)
+                        Image(modelData.suitcaseFeatures.selectedHandleSide.imageName)
                             .resizable()
                             .scaledToFit()
-                            .foregroundColor(modelData.selectedHandleSide.color)
+                            .foregroundColor(modelData.suitcaseFeatures.selectedHandleSide.color)
                     }
                 }
             }

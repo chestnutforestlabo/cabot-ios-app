@@ -51,14 +51,14 @@ struct SettingView: View {
                     }
                 }
 
-                Picker(LocalizedStringKey("Handle"), selection: $modelData.selectedHandleSide) {
-                    ForEach(HandleSide.allCases, id: \.rawValue) { grip in
+                Picker(LocalizedStringKey("Handle"), selection: $modelData.suitcaseFeatures.selectedHandleSide) {
+                    ForEach(modelData.suitcaseFeatures.possibleHandleSides, id: \.rawValue) { grip in
                         Text(LocalizedStringKey(grip.text)).tag(grip)
                     }
                 }
 
-                Picker(LocalizedStringKey("Touch Mode"), selection: $modelData.selectedTouchMode) {
-                    ForEach(TouchMode.allCases, id: \.rawValue) { touch in
+                Picker(LocalizedStringKey("Touch Mode"), selection: $modelData.suitcaseFeatures.selectedTouchMode) {
+                    ForEach(modelData.suitcaseFeatures.possibleTouchModes, id: \.rawValue) { touch in
                         Text(LocalizedStringKey(touch.text)).tag(touch)
                     }
                 }
@@ -72,10 +72,10 @@ struct SettingView: View {
                 Toggle(isOn: $modelData.isTTSEnabledForAdvanced) {
                     Text("TTS Enabled (Advanced only)")
                 }
-                
+
                 Text("Select Voice Settings")
                     .listRowSeparator(.hidden, edges: .bottom)
-                
+
                 Picker("", selection: $modelData.voiceSetting){
                     Text(LocalizedStringKey("Attend Voice")).tag(VoiceMode.Attend)
                     Text(LocalizedStringKey("User Voice")).tag(VoiceMode.User)
@@ -103,14 +103,14 @@ struct SettingView: View {
                 })
                 .pickerStyle(DefaultPickerStyle())
                 .listRowSeparator(.hidden)
-                
+
                 HStack {
                     Text("Speech Speed")
                         .accessibility(hidden: true)
                     Slider(value: $modelData.attendSpeechRate,
-                            in: 0...1,
-                            step: 0.05,
-                            onEditingChanged: { editing in
+                           in: 0...1,
+                           step: 0.05,
+                           onEditingChanged: { editing in
                         timer?.invalidate()
                         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
                             modelData.playSample(mode: VoiceMode.Attend)
@@ -121,7 +121,7 @@ struct SettingView: View {
                     Text(String(format:"%.0f %%", arguments:[modelData.attendSpeechRate*100.0]))
                         .accessibility(hidden: true)
                 }
-                
+
                 HStack{
                     Text("User Voice")
                     if(modelData.voiceSetting == .User){
@@ -146,8 +146,8 @@ struct SettingView: View {
                            step: 0.05,
                            onEditingChanged: { editing in
                     })
-                        .accessibility(label: Text("Speech Speed"))
-                        .accessibility(value: Text(String(format:"%.0f %%", arguments:[modelData.userSpeechRate*100.0])))
+                    .accessibility(label: Text("Speech Speed"))
+                    .accessibility(value: Text(String(format:"%.0f %%", arguments:[modelData.userSpeechRate*100.0])))
                     Text(String(format:"%.0f %%", arguments:[modelData.userSpeechRate*100.0]))
                         .accessibility(hidden: true)
                 }
@@ -197,12 +197,12 @@ struct SettingView_Previews: PreviewProvider {
         preview
         preview_ja
     }
-    
+
     static var preview: some View {
         let modelData = CaBotAppModel()
-        
+
         modelData.teamID = "test"
-        
+
         return SettingView(langOverride: "en-US")
             .environmentObject(modelData)
             .environment(\.locale, Locale.init(identifier: "en-US"))
@@ -210,9 +210,9 @@ struct SettingView_Previews: PreviewProvider {
     }
     static var preview_ja: some View {
         let modelData = CaBotAppModel()
-        
+
         modelData.teamID = "test"
-        
+
         return SettingView(langOverride: "ja-JP")
             .environmentObject(modelData)
             .environment(\.locale, Locale.init(identifier: "ja-JP"))

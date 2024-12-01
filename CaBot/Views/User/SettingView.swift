@@ -30,9 +30,9 @@ struct SettingView: View {
     @State var timer:Timer?
     @State var langOverride:String
     @State var isResourceChanging:Bool = false
-    
+
     @State var userVoicePickerSelection: Voice?
-    
+
     var body: some View {
         return Form {
             Section(header: Text("Settings")){
@@ -53,14 +53,14 @@ struct SettingView: View {
                     }
                 }
 
-                Picker(LocalizedStringKey("Handle"), selection: $modelData.selectedHandleSide) {
-                    ForEach(HandleSide.allCases, id: \.rawValue) { grip in
+                Picker(LocalizedStringKey("Handle"), selection: $modelData.suitcaseFeatures.selectedHandleSide) {
+                    ForEach(modelData.suitcaseFeatures.possibleHandleSides, id: \.rawValue) { grip in
                         Text(LocalizedStringKey(grip.text)).tag(grip)
                     }
                 }
 
-                Picker(LocalizedStringKey("Touch Mode"), selection: $modelData.selectedTouchMode) {
-                    ForEach(TouchMode.allCases, id: \.rawValue) { touch in
+                Picker(LocalizedStringKey("Touch Mode"), selection: $modelData.suitcaseFeatures.selectedTouchMode) {
+                    ForEach(modelData.suitcaseFeatures.possibleTouchModes, id: \.rawValue) { touch in
                         Text(LocalizedStringKey(touch.text)).tag(touch)
                     }
                 }
@@ -80,7 +80,7 @@ struct SettingView: View {
                     modelData.playSample(mode: .User)
                 })
                 .pickerStyle(DefaultPickerStyle())
-                
+
                 HStack {
                     Text("Speech Speed")
                         .accessibility(hidden: true)
@@ -88,13 +88,13 @@ struct SettingView: View {
                            in: 0...1,
                            step: 0.05,
                            onEditingChanged: { editing in
-                            timer?.invalidate()
-                            timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
-                                modelData.playSample(mode: .User)
-                            }
+                        timer?.invalidate()
+                        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
+                            modelData.playSample(mode: .User)
+                        }
                     })
-                        .accessibility(label: Text("Speech Speed"))
-                        .accessibility(value: Text(String(format:"%.0f %%", arguments:[modelData.userSpeechRate*100.0])))
+                    .accessibility(label: Text("Speech Speed"))
+                    .accessibility(value: Text(String(format:"%.0f %%", arguments:[modelData.userSpeechRate*100.0])))
                     Text(String(format:"%.0f %%", arguments:[modelData.userSpeechRate*100.0]))
                         .accessibility(hidden: true)
                 }
@@ -137,23 +137,23 @@ struct SettingView_Previews: PreviewProvider {
         preview
         preview_ja
     }
-    
+
     static var preview: some View {
         let modelData = CaBotAppModel()
 
         modelData.teamID = "test"
-        
+
         return SettingView(langOverride: "en-US")
             .environmentObject(modelData)
             .environment(\.locale, Locale.init(identifier: "en-US"))
             .previewDisplayName("preview")
     }
-    
+
     static var preview_ja: some View {
         let modelData = CaBotAppModel()
 
         modelData.teamID = "test"
-        
+
         return SettingView(langOverride: "ja-JP")
             .environmentObject(modelData)
             .environment(\.locale, Locale.init(identifier: "ja-JP"))

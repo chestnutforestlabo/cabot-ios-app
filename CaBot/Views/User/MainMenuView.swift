@@ -426,34 +426,13 @@ struct StatusMenus: View {
                     HStack {
                         Text(LocalizedStringKey("Handle"))
                         Text(":")
-                        Text(LocalizedStringKey(modelData.selectedHandleSide.text))
+                        Text(LocalizedStringKey(modelData.suitcaseFeatures.selectedHandleSide.text))
                     }
                 } icon: {
-                    Image(modelData.selectedHandleSide.imageName)
+                    Image(modelData.suitcaseFeatures.selectedHandleSide.imageName)
                         .resizable()
                         .scaledToFit()
-                        .foregroundColor(modelData.selectedHandleSide.color)
-                }
-            }
-
-            NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
-                .environmentObject(modelData)
-                .onDisappear {
-                    modelData.tcpServiceRestart()
-                }
-                .heartbeat("SettingView")
-            ) {
-                Label {
-                    HStack {
-                        Text(LocalizedStringKey("Touch Mode"))
-                        Text(":")
-                        Text(LocalizedStringKey(modelData.selectedTouchMode.text))
-                    }
-                } icon: {
-                    Image(systemName: modelData.selectedTouchMode.imageName)
-                        .resizable()
-                        .scaledToFit()
-                        .foregroundColor(modelData.selectedTouchMode.color)
+                        .foregroundColor(modelData.suitcaseFeatures.selectedHandleSide.color)
                 }
             }
             if modelData.suitcaseConnected {

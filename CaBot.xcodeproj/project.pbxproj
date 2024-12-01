@@ -55,6 +55,8 @@
 		7E557F002581C79B00B1B9CA /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7E557EFE2581C79B00B1B9CA /* Localizable.strings */; };
 		7E8F5A202BA4D33800E5D547 /* SpokenTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E8F5A1F2BA4D33800E5D547 /* SpokenTextView.swift */; };
 		7E9690C329EAF25C0062DEBD /* DetailSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E9690C229EAF25C0062DEBD /* DetailSettingView.swift */; };
+		7ECCFD872CFB93BC00894970 /* SuitcaseFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ECCFD862CFB93BC00894970 /* SuitcaseFeatures.swift */; };
+		7ECCFD882CFB940100894970 /* SuitcaseFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ECCFD862CFB93BC00894970 /* SuitcaseFeatures.swift */; };
 		7EDE7C8629B428BB00A65829 /* data in Resources */ = {isa = PBXBuildFile; fileRef = 7EDE7C8529B428BB00A65829 /* data */; };
 		7EDE7C8E29B5715800A65829 /* ResourceChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EDE7C8D29B5715800A65829 /* ResourceChecker.swift */; };
 		7EDE7C9629B5737C00A65829 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 7EDE7C9529B5737C00A65829 /* ArgumentParser */; };
@@ -208,6 +210,7 @@
 		7E557F042581C80E00B1B9CA /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		7E8F5A1F2BA4D33800E5D547 /* SpokenTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpokenTextView.swift; sourceTree = "<group>"; };
 		7E9690C229EAF25C0062DEBD /* DetailSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailSettingView.swift; sourceTree = "<group>"; };
+		7ECCFD862CFB93BC00894970 /* SuitcaseFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuitcaseFeatures.swift; sourceTree = "<group>"; };
 		7EDE7C8529B428BB00A65829 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = data; sourceTree = "<group>"; };
 		7EDE7C8B29B5715800A65829 /* CaBotTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CaBotTool; sourceTree = BUILT_PRODUCTS_DIR; };
 		7EDE7C8D29B5715800A65829 /* ResourceChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceChecker.swift; sourceTree = "<group>"; };
@@ -358,6 +361,7 @@
 				30991329265DE4C5000C1BFE /* Supporting Files */,
 				30E50DCD269F75DB00729ABD /* CaBotApp.swift */,
 				30E50DCF269F76F000729ABD /* CaBotAppModel.swift */,
+				7ECCFD852CFB939800894970 /* Models */,
 				30E50DD2269F77BE00729ABD /* Views */,
 				30E99D95266A993E001ACAAA /* Extension.swift */,
 				7EDF3C4129D4776D00AD1115 /* I18NExtension.swift */,
@@ -416,6 +420,14 @@
 				306A57DA265C4435006B510D /* Speech.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		7ECCFD852CFB939800894970 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				7ECCFD862CFB93BC00894970 /* SuitcaseFeatures.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		7EDE7C8C29B5715800A65829 /* CaBotTool */ = {
@@ -725,6 +737,7 @@
 				308FCE1B27D8F4C8009FCC7B /* DeviceStatusView.swift in Sources */,
 				30E99D9226681097001ACAAA /* ResourceManager.swift in Sources */,
 				30E99D96266A993E001ACAAA /* Extension.swift in Sources */,
+				7ECCFD872CFB93BC00894970 /* SuitcaseFeatures.swift in Sources */,
 				3013614726A1E77B0050CF9E /* WebContentView.swift in Sources */,
 				7E29F06D228B55C000CA7DD6 /* NavDeviceTTS.m in Sources */,
 				3013614326A0F8E10050CF9E /* TourDetailView.swift in Sources */,
@@ -783,6 +796,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7ECCFD882CFB940100894970 /* SuitcaseFeatures.swift in Sources */,
 				D7E54B522C0CD03A002FE3C4 /* MainMenuView.swift in Sources */,
 				D7CC04F42BFB352700C0B10A /* DialogViewControllerCabot.swift in Sources */,
 				D7CC04F52BFB352700C0B10A /* LogFilesView.swift in Sources */,
