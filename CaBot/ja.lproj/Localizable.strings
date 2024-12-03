@@ -119,6 +119,10 @@
 "Handle"="ハンドル";
 "GRIP_HAND_LEFT"="左手持ち";
 "GRIP_HAND_RIGHT"="右手持ち";
+"Touch Mode"="タッチモード";
+"Capacitive"="静電容量";
+"Time of Flight"="距離センサー(ToF)";
+"Dual"="両方";
 "Battery"="バッテリー";
 "Device"="デバイス";
 
@@ -149,6 +153,8 @@
 "Stop System"="システム停止";
 "Are you sure to stop the suitcase system?"="スーツケースのシステム停止しますが、よろしいですか？";
 "System Status"="システム状態";
+"SYSTEM_OK" = "OK";
+"SYSTEM_ERROR" = "エラー";
 "SYSTEM_ERROR_ALERT%@" = "システム - %@";
 "CHECK_SYSTEM_STATUS" = "システムメニューを確認してください";
 "CHECK_MENU" = "確認する";
@@ -281,7 +287,6 @@
 "CLEAR_AND_ADD_DESTINATION"="クリアして目的地を追加";
 "ADD_DESTINATION"="目的地を追加";
 
-
 "TTS Enabled (Advanced only)"="音声読み上げ有り (詳細モード用)";
 "Select Voice Settings"="音声設定選択";
 "Speech Priority"="音声の優先順位";
@@ -298,6 +303,7 @@
 "CUSTOMIZED_TOUR"="カスタムツアー";
 "USER_APP_NOT_CONNECTED"="ユーザーアプリが接続されていません";
 "ATTEND_APP_NOT_CONNECTED"="アテンドアプリが接続されていません";
+
 
 // ROS Web View
 "Reload"="リロード";
