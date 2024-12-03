@@ -117,6 +117,7 @@ enum CaBotManageCommand:String {
     case start
     case stop
     case lang
+    case reqfeatures
     case handleside
     case touchmode
     case restart_localization

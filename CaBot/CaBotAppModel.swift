@@ -1112,6 +1112,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 break
             case .restart_localization:
                 break
+            case .reqfeatures:
+                break
             case .handleside:
                 break
             case .touchmode:
@@ -1277,8 +1279,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 }
                 DispatchQueue.main.async {
                     _ = self.fallbackService.manage(command: .lang, param: self.resourceLang)
-                    _ = self.fallbackService.manage(command: .handleside, param: self.suitcaseFeatures.selectedHandleSide.rawValue)
-                    _ = self.fallbackService.manage(command: .touchmode, param: self.suitcaseFeatures.selectedTouchMode.rawValue)
+                    _ = self.fallbackService.manage(command: .reqfeatures)
                 }
             }
         }
