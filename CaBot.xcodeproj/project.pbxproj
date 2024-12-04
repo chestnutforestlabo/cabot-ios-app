@@ -55,6 +55,8 @@
 		7E557F002581C79B00B1B9CA /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7E557EFE2581C79B00B1B9CA /* Localizable.strings */; };
 		7E8F5A202BA4D33800E5D547 /* SpokenTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E8F5A1F2BA4D33800E5D547 /* SpokenTextView.swift */; };
 		7E9690C329EAF25C0062DEBD /* DetailSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E9690C229EAF25C0062DEBD /* DetailSettingView.swift */; };
+		7ECCFD872CFB93BC00894970 /* SuitcaseFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ECCFD862CFB93BC00894970 /* SuitcaseFeatures.swift */; };
+		7ECCFD882CFB940100894970 /* SuitcaseFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ECCFD862CFB93BC00894970 /* SuitcaseFeatures.swift */; };
 		7EDE7C8629B428BB00A65829 /* data in Resources */ = {isa = PBXBuildFile; fileRef = 7EDE7C8529B428BB00A65829 /* data */; };
 		7EDE7C8E29B5715800A65829 /* ResourceChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EDE7C8D29B5715800A65829 /* ResourceChecker.swift */; };
 		7EDE7C9629B5737C00A65829 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 7EDE7C9529B5737C00A65829 /* ArgumentParser */; };
@@ -65,6 +67,8 @@
 		7EDF3C4429D48C3200AD1115 /* Localizable.strings in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7E557EFE2581C79B00B1B9CA /* Localizable.strings */; };
 		7EDF3C4529D4901000AD1115 /* Resource in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3099132A265DE50A000C1BFE /* Resource */; };
 		7EF5F1EA228DB07100788987 /* NavUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EF5F1E8228DB07100788987 /* NavUtil.m */; };
+		A97F30DF2CDDC9FA00BE5C43 /* PriorityQueueTTS in Frameworks */ = {isa = PBXBuildFile; productRef = A97F30DE2CDDC9FA00BE5C43 /* PriorityQueueTTS */; };
+		A97F30E12CDDCA0D00BE5C43 /* PriorityQueueTTS in Frameworks */ = {isa = PBXBuildFile; productRef = A97F30E02CDDCA0D00BE5C43 /* PriorityQueueTTS */; };
 		D7CC04F42BFB352700C0B10A /* DialogViewControllerCabot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */; };
 		D7CC04F52BFB352700C0B10A /* LogFilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 458B54382A970B4A00AD9D10 /* LogFilesView.swift */; };
 		D7CC04F62BFB352700C0B10A /* CaBotAppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DCF269F76F000729ABD /* CaBotAppModel.swift */; };
@@ -210,6 +214,7 @@
 		7E557F042581C80E00B1B9CA /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		7E8F5A1F2BA4D33800E5D547 /* SpokenTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpokenTextView.swift; sourceTree = "<group>"; };
 		7E9690C229EAF25C0062DEBD /* DetailSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailSettingView.swift; sourceTree = "<group>"; };
+		7ECCFD862CFB93BC00894970 /* SuitcaseFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuitcaseFeatures.swift; sourceTree = "<group>"; };
 		7EDE7C8529B428BB00A65829 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = data; sourceTree = "<group>"; };
 		7EDE7C8B29B5715800A65829 /* CaBotTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CaBotTool; sourceTree = BUILT_PRODUCTS_DIR; };
 		7EDE7C8D29B5715800A65829 /* ResourceChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceChecker.swift; sourceTree = "<group>"; };
@@ -234,6 +239,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				308FCE2327D9014E009FCC7B /* Collections in Frameworks */,
+				A97F30DF2CDDC9FA00BE5C43 /* PriorityQueueTTS in Frameworks */,
 				306C7F6C265D435100E5928E /* Yams in Frameworks */,
 				306069B429A5E45D001FB5DB /* NavigationBackport in Frameworks */,
 				308FCE2A27E12844009FCC7B /* Gzip in Frameworks */,
@@ -271,6 +277,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D7CC051B2BFB352700C0B10A /* Collections in Frameworks */,
+				A97F30E12CDDCA0D00BE5C43 /* PriorityQueueTTS in Frameworks */,
 				D7CC051C2BFB352700C0B10A /* Yams in Frameworks */,
 				D7CC051D2BFB352700C0B10A /* NavigationBackport in Frameworks */,
 				D7CC051E2BFB352700C0B10A /* Gzip in Frameworks */,
@@ -361,6 +368,7 @@
 				30991329265DE4C5000C1BFE /* Supporting Files */,
 				30E50DCD269F75DB00729ABD /* CaBotApp.swift */,
 				30E50DCF269F76F000729ABD /* CaBotAppModel.swift */,
+				7ECCFD852CFB939800894970 /* Models */,
 				30E50DD2269F77BE00729ABD /* Views */,
 				30E99D95266A993E001ACAAA /* Extension.swift */,
 				7EDF3C4129D4776D00AD1115 /* I18NExtension.swift */,
@@ -422,6 +430,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		7ECCFD852CFB939800894970 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				7ECCFD862CFB93BC00894970 /* SuitcaseFeatures.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		7EDE7C8C29B5715800A65829 /* CaBotTool */ = {
 			isa = PBXGroup;
 			children = (
@@ -481,6 +497,7 @@
 				0967677E29371BA0005CFA58 /* SocketIO */,
 				306069B329A5E45D001FB5DB /* NavigationBackport */,
 				E493D87A2C227A0D00691097 /* ZIPFoundation */,
+				A97F30DE2CDDC9FA00BE5C43 /* PriorityQueueTTS */,
 			);
 			productName = CaBot;
 			productReference = 7E29F009228B548100CA7DD6 /* CaBot-Attend.app */;
@@ -565,7 +582,8 @@
 				D7CC04ED2BFB352700C0B10A /* Gzip */,
 				D7CC04EF2BFB352700C0B10A /* SocketIO */,
 				D7CC04F12BFB352700C0B10A /* NavigationBackport */,
-				E493D8782C2279F700691097 /* ZIPFoundation */,
+                E493D8782C2279F700691097 /* ZIPFoundation */,
+				A97F30E02CDDCA0D00BE5C43 /* PriorityQueueTTS */,
 			);
 			productName = CaBot;
 			productReference = D7CC052B2BFB352700C0B10A /* CaBot-User.app */;
@@ -617,6 +635,7 @@
 				306069B229A5E45D001FB5DB /* XCRemoteSwiftPackageReference "NavigationBackport" */,
 				7EDE7C9229B5733D00A65829 /* XCRemoteSwiftPackageReference "swift-argument-parser" */,
 				E493D8772C2279B200691097 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+				A97F30DD2CDDC9FA00BE5C43 /* XCRemoteSwiftPackageReference "PriorityQueueTTS" */,
 			);
 			productRefGroup = 7E29F00A228B548100CA7DD6 /* Products */;
 			projectDirPath = "";
@@ -747,6 +766,7 @@
 				308FCE1B27D8F4C8009FCC7B /* DeviceStatusView.swift in Sources */,
 				30E99D9226681097001ACAAA /* ResourceManager.swift in Sources */,
 				30E99D96266A993E001ACAAA /* Extension.swift in Sources */,
+				7ECCFD872CFB93BC00894970 /* SuitcaseFeatures.swift in Sources */,
 				3013614726A1E77B0050CF9E /* WebContentView.swift in Sources */,
 				7E29F06D228B55C000CA7DD6 /* NavDeviceTTS.m in Sources */,
 				3013614326A0F8E10050CF9E /* TourDetailView.swift in Sources */,
@@ -806,6 +826,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7ECCFD882CFB940100894970 /* SuitcaseFeatures.swift in Sources */,
 				D7E54B522C0CD03A002FE3C4 /* MainMenuView.swift in Sources */,
 				D7CC04F42BFB352700C0B10A /* DialogViewControllerCabot.swift in Sources */,
 				D7CC04F52BFB352700C0B10A /* LogFilesView.swift in Sources */,
@@ -1376,6 +1397,14 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		A97F30DD2CDDC9FA00BE5C43 /* XCRemoteSwiftPackageReference "PriorityQueueTTS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/CMU-cabot/PriorityQueueTTS.git";
+			requirement = {
+				branch = fix/utterance_attribute;
+				kind = branch;
+			};
+		};
 		D7CC04E82BFB352700C0B10A /* XCRemoteSwiftPackageReference "Yams" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/jpsim/Yams";
@@ -1474,6 +1503,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 306C7F6A265D435100E5928E /* XCRemoteSwiftPackageReference "Yams" */;
 			productName = Yams;
+		};
+		A97F30DE2CDDC9FA00BE5C43 /* PriorityQueueTTS */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A97F30DD2CDDC9FA00BE5C43 /* XCRemoteSwiftPackageReference "PriorityQueueTTS" */;
+			productName = PriorityQueueTTS;
+		};
+		A97F30E02CDDCA0D00BE5C43 /* PriorityQueueTTS */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A97F30DD2CDDC9FA00BE5C43 /* XCRemoteSwiftPackageReference "PriorityQueueTTS" */;
+			productName = PriorityQueueTTS;
 		};
 		D7CC04E72BFB352700C0B10A /* Yams */ = {
 			isa = XCSwiftPackageProductDependency;

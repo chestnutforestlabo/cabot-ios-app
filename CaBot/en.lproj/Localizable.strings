@@ -25,11 +25,13 @@
 "No"="No";
 "Okay"="Okay";
 "ERROR"="Error";
+"TOKEN_SEPARATORS"=". ";
 
 
 // CaBotAppModel
 "SELECT_RESOURCE"="Select Resource";
 "MAIN_MENU"="Main Menu";
+"ATTEND_MENU"="Attend Menu";
 
 /// func summon
 "Sending the command to the suitcase"="Sending the command to the suitcase. Please let the suitcase go.";
@@ -114,6 +116,13 @@
 "TCP Connected"="TCP Connected";
 "TCP Not Connected"="TCP Not Connected";
 "Protocol mismatch %@"="Protocol mismatch %@";
+"Handle"="Handle";
+"GRIP_HAND_LEFT"="Left Hand Grip";
+"GRIP_HAND_RIGHT"="Right Hand Grip";
+"Touch Mode"="Touch Mode";
+"Capacitive"="Capacitive";
+"Time of Flight"="Time of Flight";
+"Dual"="Dual";
 "Battery"="Battery";
 "Device"="Device";
 
@@ -144,6 +153,8 @@
 "Stop System"="Stop System";
 "Are you sure to stop the suitcase system?"="Are you sure to stop the suitcase system?";
 "System Status"="System Status";
+"SYSTEM_OK" = "OK";
+"SYSTEM_ERROR" = "Error";
 "SYSTEM_ERROR_ALERT%@" = "System - %@";
 "CHECK_SYSTEM_STATUS" = "Please Check System Status Menu";
 "CHECK_MENU" = "Check Menu";
@@ -290,6 +301,9 @@
 
 "User App Info"="User App Info";
 "CUSTOMIZED_TOUR"="Customized Tour";
+"USER_APP_NOT_CONNECTED"="User app is not connected";
+"ATTEND_APP_NOT_CONNECTED"="Attend app is not connected";
+
 
 // ROS Web View
 "Reload"="Reload";

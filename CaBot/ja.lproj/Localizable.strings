@@ -25,11 +25,13 @@
 "No"="いいえ";
 "Okay"="OK";
 "ERROR"="エラー";
+"TOKEN_SEPARATORS"="。";
 
 
 // CaBotAppModel
 "SELECT_RESOURCE"="リソースの選択";
 "MAIN_MENU"="メインメニュー";
+"ATTEND_MENU"="アテンドメニュー";
 
 /// func summon
 "Sending the command to the suitcase"="スーツケースに指示を送っています。ハンドルから手を離してください。";
@@ -114,6 +116,13 @@
 "TCP Connected"="TCP 接続あり";
 "TCP Not Connected"="TCP 接続なし";
 "Protocol mismatch %@"="通信規格の不一致 %@";
+"Handle"="ハンドル";
+"GRIP_HAND_LEFT"="左手持ち";
+"GRIP_HAND_RIGHT"="右手持ち";
+"Touch Mode"="タッチモード";
+"Capacitive"="静電容量";
+"Time of Flight"="距離センサー(ToF)";
+"Dual"="両方";
 "Battery"="バッテリー";
 "Device"="デバイス";
 
@@ -126,7 +135,7 @@
 "Details"="詳細";
 "Reboot"="リブート";
 "Suitcase Connected"="スーツケース接続あり";
-"Suitcase Not Connected"="スーツケース接続なし";
+"Suitcase Not Connected"="スーツケースに接続されていません";
 "Reboot Computer"="コンピュータをリブート";
 "The app will be disconnected."="スーツケースとの接続が解除されます";
 "Power off"="電源オフ";
@@ -144,6 +153,8 @@
 "Stop System"="システム停止";
 "Are you sure to stop the suitcase system?"="スーツケースのシステム停止しますが、よろしいですか？";
 "System Status"="システム状態";
+"SYSTEM_OK" = "OK";
+"SYSTEM_ERROR" = "エラー";
 "SYSTEM_ERROR_ALERT%@" = "システム - %@";
 "CHECK_SYSTEM_STATUS" = "システムメニューを確認してください";
 "CHECK_MENU" = "確認する";
@@ -276,7 +287,6 @@
 "CLEAR_AND_ADD_DESTINATION"="クリアして目的地を追加";
 "ADD_DESTINATION"="目的地を追加";
 
-
 "TTS Enabled (Advanced only)"="音声読み上げ有り (詳細モード用)";
 "Select Voice Settings"="音声設定選択";
 "Speech Priority"="音声の優先順位";
@@ -291,6 +301,9 @@
 
 "User App Info"="ユーザーアプリ情報";
 "CUSTOMIZED_TOUR"="カスタムツアー";
+"USER_APP_NOT_CONNECTED"="ユーザーアプリが接続されていません";
+"ATTEND_APP_NOT_CONNECTED"="アテンドアプリが接続されていません";
+
 
 // ROS Web View
 "Reload"="リロード";

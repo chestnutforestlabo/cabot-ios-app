@@ -49,6 +49,8 @@ struct SharedInfo: Codable {
         case ChangeLanguage
         case ChangeUserVoiceRate
         case ChangeUserVoiceType
+        case ChangeHandleSide
+        case ChangeTouchMode
     }
     init(type: InfoType, value: String, flag1: Bool = false, flag2: Bool = false, location: Int = 0, length: Int = 0) {
         self.type = type
@@ -87,7 +89,7 @@ protocol CaBotServiceDelegate {
     func caBot(service:any CaBotTransportProtocol, versionMatched:Bool, with:String)
     func cabot(service:any CaBotTransportProtocol, openRequest:URL)
     func cabot(service:any CaBotTransportProtocol, soundRequest:String)
-    func cabot(service:any CaBotTransportProtocol, notification:NavigationNotification)
+    func cabot(service:any CaBotTransportProtocol, notification:NavigationNotification, param:String?)
     func cabot(service:any CaBotTransportProtocol, deviceStatus:DeviceStatus)
     func cabot(service:any CaBotTransportProtocol, systemStatus:SystemStatus)
     func cabot(service:any CaBotTransportProtocol, batteryStatus:BatteryStatus)
@@ -105,6 +107,8 @@ enum NavigationNotification:String {
     case subtour
     case skip
     case getlanguage
+    case gethandleside
+    case gettouchmode
 }
 
 enum CaBotManageCommand:String {
@@ -113,6 +117,9 @@ enum CaBotManageCommand:String {
     case start
     case stop
     case lang
+    case reqfeatures
+    case handleside
+    case touchmode
     case restart_localization
 }
 
@@ -351,6 +358,8 @@ enum NavigationEventType:String, Decodable {
     case subtour
     case skip
     case getlanguage
+    case gethandleside
+    case gettouchmode
     case unknown
 }
 
@@ -496,20 +505,16 @@ class CaBotServiceActions {
             }
             let line = request.text
             let force = request.force
-            if !tts.isSpeaking || (delegate.getSpeechPriority() == .Robot && force) {
-                _ = service.activityLog(category: "ble speech request speaking", text: String(line), memo: "force=\(force)")
-                tts.speak(String(line), force: force) { code in
-                    if code > 0 {
-                        _ = service.activityLog(category: "ble speech request completed", text: String(line), memo: "force=\(force),return_code=\(code)")
-                    } else {
-                        _ = service.activityLog(category: "ble speech request canceled", text: String(line), memo: "force=\(force),return_code=\(code)")
-                    }
+            let priority = request.priority
+            let bias = !tts.isSpeaking || (delegate.getSpeechPriority() == .Robot && force)
+            _ = service.activityLog(category: "ble speech request speaking", text: String(line), memo: "force=\(force)")
+            tts.speak(String(line), force: force, priority: .parse(force:force, priority:priority, priorityBias:bias)) { code in
+                if code > 0 {
+                    _ = service.activityLog(category: "ble speech request completed", text: String(line), memo: "force=\(force),return_code=\(code)")
+                } else {
+                    _ = service.activityLog(category: "ble speech request canceled", text: String(line), memo: "force=\(force),return_code=\(code)")
                 }
-            } else {
-                NSLog("TTS is busy and skip speaking: \(line)")
-                _ = service.activityLog(category: "ble speech request skipped", text: String(line), memo: "TTS is busy")
             }
-
         }
     }
 
@@ -521,9 +526,9 @@ class CaBotServiceActions {
 
         DispatchQueue.main.async {
             switch(request.type) {
-            case .next, .arrived, .subtour, .skip, .getlanguage:
+            case .next, .arrived, .subtour, .skip, .getlanguage, .gethandleside, .gettouchmode:
                 if let note = NavigationNotification(rawValue: request.type.rawValue) {
-                    delegate.cabot(service: service, notification: note)
+                    delegate.cabot(service: service, notification: note, param: request.param)
                 } else {
                     NSLog("Unknown navigation notification type %@", request.type.rawValue)
                 }
@@ -568,5 +573,102 @@ class CaBotServiceActions {
         DispatchQueue.main.async {
             delegate.cabot(service: service, userInfo: user_info)
         }
+    }
+}
+
+actor LogPack {
+    private let title :String
+    private let threshold :TimeInterval
+    private let maxPacking : Int
+    private let isLogWithText : Bool
+    private var last :(at:Date,text:String?)? = nil
+    private var packingCount : Int = 0
+    
+    init( title:String, threshold:TimeInterval, isLogWithText:Bool = true, maxPacking:Int = 10 ) {
+        self.title = title
+        self.threshold = threshold
+        self.isLogWithText = isLogWithText
+        self.maxPacking = maxPacking
+    }
+    
+    nonisolated func log( text:String? = nil ) {
+        Task {
+            await _log( text:text )
+        }
+    }
+    
+    private func _log( text:String? = nil ) {
+        var now = Date()
+        
+        if let (lastAt,lastText) = self.last {
+            if text != lastText {
+                _packlog(lastText)
+                _log( now, text )
+            }
+            else {
+                packingCount += 1
+                if (now.timeIntervalSince(lastAt) >= threshold) {
+                    _packlog(lastText)
+                } else if packingCount >= maxPacking {
+                    _packlog(lastText)
+                } else {
+                    now = lastAt
+                }
+            }
+        }
+        else {
+            _log( now, text )
+        }
+        self.last = (now, text)
+    }
+    
+    private func _log( _ date:Date, _ text:String? ) {
+        var output = self.title
+        if let text, isLogWithText {
+            output = "\(self.title): \(text)"
+        }
+        NSLog(output)
+    }
+    
+    private func _packlog( _ text:String? ) {
+        guard packingCount > 0
+            else { return }
+        var output = self.title
+        if let text, isLogWithText {
+            output = "\(self.title): \(text)"
+        }
+        NSLog("\(output)  x \(packingCount)")
+        packingCount = 0
+    }
+}
+
+
+struct HeartbeatViewModifier: ViewModifier {
+    let label :String
+    let period :UInt64
+    @State var isAppeare:Bool = true
+
+    func body(content: Content) -> some View {
+        return content
+            .task {
+                isAppeare = true
+                NSLog("<[\(label)] appear>")
+                while !Task.isCancelled {
+                    try? await Task.sleep(nanoseconds:period)
+                    if isAppeare && (UIApplication.shared.applicationState != .background) {
+                        NSLog("<[\(label)] showing>")
+                    }
+                }
+            }
+            .onDisappear() {
+                isAppeare = false
+                NSLog("<[\(label)] disappear>")
+            }
+    }
+}
+
+extension View {
+    func heartbeat( _ label:String, period sec:Double = 3.0 ) -> some View {
+        modifier(HeartbeatViewModifier(label:label, period:UInt64(sec * 1_000_000_000)))
     }
 }
