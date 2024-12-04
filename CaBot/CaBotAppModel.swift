@@ -30,6 +30,7 @@ import UserNotifications
 import Combine
 import os.log
 import HLPDialog
+import Speech
 
 enum GrantState {
     case Init
@@ -323,23 +324,37 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.checkOnboardCondition()
         }
     }
+    @Published var recordPermission: AVAudioApplication.recordPermission = AVAudioApplication.shared.recordPermission {
+        didSet {
+            self.checkOnboardCondition()
+        }
+    }
+    @Published var speechRecoState: SFSpeechRecognizerAuthorizationStatus = SFSpeechRecognizer.authorizationStatus() {
+        didSet {
+            self.checkOnboardCondition()
+        }
+    }
     func checkOnboardCondition() {
-        if (self.bluetoothState == .poweredOn || self.bluetoothState == .poweredOff) &&
-            self.notificationState != .Init &&
-            self.locationState != .Init
-        {
-            if authRequestedByUser {
-                withAnimation() {
+        DispatchQueue.main.async {
+            if (self.bluetoothState == .poweredOn || self.bluetoothState == .poweredOff) &&
+                self.notificationState != .Init &&
+                self.locationState != .Init &&
+                self.recordPermission != .undetermined &&
+                self.speechRecoState != .notDetermined
+            {
+                if self.authRequestedByUser {
+                    withAnimation() {
+                        self.displayedScene = .ResourceSelect
+                    }
+                } else {
                     self.displayedScene = .ResourceSelect
                 }
-            } else {
-                self.displayedScene = .ResourceSelect
             }
-        }
-        if self.displayedScene == .ResourceSelect {
-            guard let value = UserDefaults.standard.value(forKey: ResourceSelectView.resourceSelectedKey) as? Bool else { return }
-            if value {
-                displayedScene = .App
+            if self.displayedScene == .ResourceSelect {
+                guard let value = UserDefaults.standard.value(forKey: ResourceSelectView.resourceSelectedKey) as? Bool else { return }
+                if value {
+                    self.displayedScene = .App
+                }
             }
         }
     }
@@ -649,6 +664,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     var locationUpdateStartTime: CFAbsoluteTime = 0
     var audioAvailableEstimate: Bool = false
 
+    var chatModel: ChatViewModel = ChatViewModel()
+
     convenience override init() {
         self.init(preview: true)
     }
@@ -883,7 +900,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.showingDeviceStatusNotification = true
     }
 
-    // MARK: onboading
+    // MARK: onboarding
 
     func requestLocationAuthorization() {
         self.authRequestedByUser = true
@@ -903,6 +920,24 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             (granted, error) in
             DispatchQueue.main.async {
                 self.notificationState = granted ? .Granted : .Denied
+            }
+        }
+    }
+
+    func requestMicrophoneAuthorization() {
+        self.authRequestedByUser = true
+        AVAudioApplication.requestRecordPermission(completionHandler: {_ in
+            DispatchQueue.main.async {
+                self.recordPermission = AVAudioApplication.shared.recordPermission
+            }
+        })
+    }
+
+    func requestSpeechRecoAuthorization() {
+        self.authRequestedByUser = true
+        SFSpeechRecognizer.requestAuthorization { authStatus in
+            DispatchQueue.main.async {
+                self.speechRecoState = authStatus
             }
         }
     }
