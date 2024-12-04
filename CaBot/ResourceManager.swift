@@ -599,7 +599,7 @@ struct FloorSection: Decodable {
 
 struct Item: Decodable {
     let title: I18NText
-    let ItemsContent: Content?
+    let content: ItemsContent?
     
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)

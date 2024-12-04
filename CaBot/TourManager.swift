@@ -292,26 +292,24 @@ class TourManager: TourProtocol {
                 else if(_tourSaveData.id == "TourManager"){
                     // load destinations
                     if let src = model.resource?.destinationsSource {
-                        let destinationList = try! Destination.load(at: src)
-                        var destinations : [Destination] = destinationList
-                        for dList in destinationList {
-                            let destination = try! Destination.load(at: dList.file!)
-                            for d in destination{
-                                destinations.append(d)
-                                if decoded.currentDestination == (d.value ?? d.ref?.value ?? "") {
-                                    addToFirst(destination: d)
-                                    var _ = proceedToNextDestination(isStartMessageSpeaking: false)
-                                }
-                            }
-                        }
+                        let floorDestinations: [FloorDestination] = try! downloadDirectoryJson()
+                        let allDestinations: [Destination] = floorDestinations.flatMap { $0.destinations }
+
+                        for destination in allDestinations {
+                             if decoded.currentDestination == (destination.value ?? destination.ref?.value ?? "") {
+                                 addToFirst(destination: destination)
+                                 let _ = proceedToNextDestination(isStartMessageSpeaking: false)
+                             }
+                         }
                         
                         for decodedDestination in decoded.destinations {
-                            for d in destinations {
-                                if decodedDestination == (d.value ?? d.ref?.value ?? "") {
-                                    addToLast(destination: d)
+                            for destination in allDestinations {
+                                if decodedDestination == (destination.value ?? destination.ref?.value ?? "") {
+                                    addToLast(destination: destination)
                                 }
                             }
                         }
+
                         
                         if(decoded.currentDestination == ""){
                             model.needToStartAnnounce(wait: true)
@@ -322,7 +320,7 @@ class TourManager: TourProtocol {
                     // load tour
                     if let src = model.resource?.toursSource {
                         do {
-                            let tours = try Tour.load(at: src)
+                            let tours = try Tour.load()
                             for tour in tours {
                                 if tour.id == decoded.id {
                                     set(tour: tour)
