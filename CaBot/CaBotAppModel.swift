@@ -1199,7 +1199,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                         self.willSpeakArriveMessage = true
                         let announce = CustomLocalizedString("Going to %@", lang: self.resourceLang, dest.title.pron)
-                        + (dest.startMessage)
+                        + (dest.startMessage.text)
                         if(isStartMessageSpeaking){
                             self.tts.speak(announce, forceSelfvoice: false, force: true, priority: .High, timeout: nil, tag: .Next(erase:true), callback: {code in }, progress: {range in
                                 if range.location == 0{
@@ -1353,7 +1353,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 var announce = ""
                 if let count = cd.arriveMessages?.count {
                     for i in 0 ..< count{
-                        announce += cd.arriveMessages?[i] ?? ""
+                        announce += cd.arriveMessages?[i].text ?? ""
                     }
                 } else{
                     if let _ = cd.content?.content,

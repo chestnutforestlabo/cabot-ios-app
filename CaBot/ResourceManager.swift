@@ -811,8 +811,8 @@ func createDestination(from subItem: NestedItem, itemTitle: I18NText, tours: [To
                 value: subItem.nodeID,
                 pron: nil,
                 file: nil,
-                summaryMessage: "",
-                startMessage: "",
+                summaryMessage: I18NText(text: [:], pron: [:]),
+                startMessage: I18NText(text: [:], pron: [:]),
                 arriveMessages: [],
                 content: nil,
                 waitingDestination: nil,
@@ -824,9 +824,9 @@ func createDestination(from subItem: NestedItem, itemTitle: I18NText, tours: [To
                 if let tourDestination = tour.destinations.first(where: {
                     $0.matchedDestinationRef?.value ?? $0.ref == subItem.nodeID
                 }) {
-                    destination?.summaryMessage = tourDestination.summaryMessage?.text.text ?? ""
-                    destination?.startMessage = tourDestination.startMessage?.text.text ?? ""
-                    destination?.arriveMessages = tourDestination.arriveMessages.map { $0.text.text }
+                    destination?.summaryMessage = tourDestination.summaryMessage?.text ?? I18NText(text: [:], pron: [:])
+                    destination?.startMessage = tourDestination.startMessage?.text ?? I18NText(text: [:], pron: [:])
+                    destination?.arriveMessages = tourDestination.arriveMessages.map { $0.text }
                 }
             }
             break
@@ -875,9 +875,9 @@ class Destination:  Hashable {
     let title: I18NText
     let value:String?
     let file:Source?
-    var summaryMessage: String
-    var startMessage:String
-    var arriveMessages: [String]?
+    var summaryMessage: I18NText
+    var startMessage:I18NText
+    var arriveMessages: [I18NText]?
     let content:Source?
     let waitingDestination:WaitingDestination?
     let subtour:Tour?
@@ -903,7 +903,7 @@ class Destination:  Hashable {
         case subtour
         case debug
     }
-    init(floorTitle: I18NText,title: I18NText,value: String?, pron: String?, file: Source?, summaryMessage: String, startMessage: String,arriveMessages: [String], content: Source?, waitingDestination: WaitingDestination?, subtour: Tour?,forDemonstration:Bool) {
+    init(floorTitle: I18NText,title: I18NText,value: String?, pron: String?, file: Source?, summaryMessage: I18NText, startMessage: I18NText,arriveMessages: [I18NText], content: Source?, waitingDestination: WaitingDestination?, subtour: Tour?,forDemonstration:Bool) {
         self.i18n = I18N.shared
         self.title = title
         self.floorTitle = floorTitle

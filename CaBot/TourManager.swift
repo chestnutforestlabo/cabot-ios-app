@@ -134,9 +134,9 @@ class TourManager: TourProtocol {
                 value: valueString+arrivalAngleString,
                 pron: "porn",
                 file: nil,
-                summaryMessage: d.summaryMessage?.text.text ?? "",
-                startMessage: d.startMessage?.text.text ?? "",
-                arriveMessages: d.arriveMessages.map { $0.text.text } ,
+                summaryMessage: d.summaryMessage?.text ?? I18NText(text: [:], pron: [:]),
+                startMessage: d.startMessage?.text ?? I18NText(text: [:], pron: [:]),
+                arriveMessages: d.arriveMessages.map { $0.text } ,
                 content: nil,
                 waitingDestination: nil,
                 subtour: nil, forDemonstration: false
