@@ -669,7 +669,7 @@ struct NestedItem: Decodable {
     }
 }
 
-func downloadDirectoryJson() throws -> [FloorDestination] {
+func downloadDirectoryJson(modelData: CaBotAppModel) throws -> [FloorDestination] {
     let fileConfigName = "config.json"
     
     guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
@@ -677,8 +677,9 @@ func downloadDirectoryJson() throws -> [FloorDestination] {
     }
     let fileConfigURL = documentsDirectory.appendingPathComponent(fileConfigName)
     
-    let configUrlString = "http://localhost:9090/map/api/config"
-    guard let url = URL(string: configUrlString) else {
+    let configUrlString =  URL(string: "http://\(modelData.getCurrentAddress()):9090/map/api/config")
+   
+    guard let url = configUrlString else {
         throw MetadataError.contentLoadError
     }
     var downloadedFloorDestinations: [FloorDestination] = []
@@ -735,8 +736,8 @@ func downloadDirectoryJson() throws -> [FloorDestination] {
         let fileDirectoryFileName = "directory.json"
         
         let fileDirectoryURL = documentsDirectory.appendingPathComponent(fileDirectoryFileName)
-        let directoryUrlString = "http://localhost:9090/query/directory?user=\(user)&lat=\(lat)&lng=\(lng)&dist=\(dist)"
-        guard let directoryUrl = URL(string: directoryUrlString) else {
+        let directoryUrlString = URL(string: "http://\(modelData.getCurrentAddress()):9090/query/directory?user=\(user)&lat=\(lat)&lng=\(lng)&dist=\(dist)")
+        guard let directoryUrl = directoryUrlString else {
             throw MetadataError.contentLoadError
         }
         

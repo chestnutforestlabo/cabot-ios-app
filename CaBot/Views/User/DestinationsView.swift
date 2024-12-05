@@ -177,7 +177,7 @@ struct DestinationsFloorView: View {
         .listStyle(PlainListStyle())
         .onAppear {
             if floorDestinations.isEmpty {
-                floorDestinations = try! downloadDirectoryJson()
+                floorDestinations = try! downloadDirectoryJson(modelData: modelData)
             }
         }
     }
@@ -203,7 +203,7 @@ struct DestinationsView_Previews: PreviewProvider {
 
         let resource = modelData.resourceManager.resource(by: "Test data")!
 
-        let floorDestinations = try! downloadDirectoryJson()
+        let floorDestinations = try! downloadDirectoryJson(modelData: modelData)
 
         return DestinationsView(src: floorDestinations[0].destinations[0].file!)
             .environmentObject(modelData)

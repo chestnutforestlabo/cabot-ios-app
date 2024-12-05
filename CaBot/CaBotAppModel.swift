@@ -1574,7 +1574,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if userInfo.type == .OverrideDestination {
             func traverseDest(src: Source) {
                 do {
-                    let floorDestinations = try downloadDirectoryJson()
+                    let floorDestinations = try downloadDirectoryJson(modelData: self)
                     for floorDest in floorDestinations {
                         for dest in floorDest.destinations {
                             if let value = dest.value {

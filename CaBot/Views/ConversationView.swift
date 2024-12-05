@@ -49,7 +49,7 @@ struct ConversationView: UIViewControllerRepresentable {
                 let pron = note.userInfo?["pron"] as? String
                 
                 if let src = owner.dsrc,
-                   let floorDestinations = try? downloadDirectoryJson(),
+                   let floorDestinations = try? downloadDirectoryJson(modelData: owner.modelData),
                    let matchedDestination = floorDestinations
                         .flatMap({ $0.destinations })
                         .first(where: { $0.value == toID }) {
