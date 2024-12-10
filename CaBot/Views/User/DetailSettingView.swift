@@ -109,7 +109,7 @@ struct DetailSettingView: View {
                 } message: {
                     Text("Are you sure to stop the suitcase system?")
                 }
-                //.disabled(!cabotAppModel.systemStatus.canStop || !cabotAppModel.suitcaseConnected)
+                .disabled(!cabotAppModel.systemStatus.canStop || !cabotAppModel.suitcaseConnected)
             }
             
             Section(header: Text("Tour")) {
