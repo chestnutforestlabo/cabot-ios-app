@@ -11,6 +11,7 @@
 		09676781293727CE005CFA58 /* CaBotServiceTCP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09676780293727CE005CFA58 /* CaBotServiceTCP.swift */; };
 		09725B0A24FE4AC300012D42 /* DialogViewControllerCabot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */; };
 		097845C02531E65B004DE1F6 /* Attend-InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 097845C22531E65B004DE1F6 /* Attend-InfoPlist.strings */; };
+		0D05CB7B2D01DCF80077CAA1 /* DetailSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D05CB7A2D01DCF80077CAA1 /* DetailSettingView.swift */; };
 		3009AC3126AA3F4000370873 /* HLPDialog in Frameworks */ = {isa = PBXBuildFile; productRef = 3009AC3026AA3F4000370873 /* HLPDialog */; };
 		3013614026A0BF590050CF9E /* PreviewResource in Resources */ = {isa = PBXBuildFile; fileRef = 3013613F26A0BF590050CF9E /* PreviewResource */; };
 		3013614326A0F8E10050CF9E /* TourDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3013614226A0F8E10050CF9E /* TourDetailView.swift */; };
@@ -73,7 +74,6 @@
 		D7CC04F52BFB352700C0B10A /* LogFilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 458B54382A970B4A00AD9D10 /* LogFilesView.swift */; };
 		D7CC04F62BFB352700C0B10A /* CaBotAppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DCF269F76F000729ABD /* CaBotAppModel.swift */; };
 		D7CC04F72BFB352700C0B10A /* OnboardGrantAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DD5269F784A00729ABD /* OnboardGrantAccess.swift */; };
-		D7CC04F82BFB352700C0B10A /* DetailSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E9690C229EAF25C0062DEBD /* DetailSettingView.swift */; };
 		D7CC04FA2BFB352700C0B10A /* LocalConversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3099132C26603B10000C1BFE /* LocalConversation.swift */; };
 		D7CC04FB2BFB352700C0B10A /* ToursView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DE726A0BBE900729ABD /* ToursView.swift */; };
 		D7CC04FC2BFB352700C0B10A /* JSHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E99D93266A92EA001ACAAA /* JSHelper.swift */; };
@@ -155,6 +155,7 @@
 		09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogViewControllerCabot.swift; sourceTree = "<group>"; };
 		097845C12531E65B004DE1F6 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = "ja.lproj/Attend-InfoPlist.strings"; sourceTree = "<group>"; };
 		097845C32531E685004DE1F6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Attend-InfoPlist.strings"; sourceTree = "<group>"; };
+		0D05CB7A2D01DCF80077CAA1 /* DetailSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailSettingView.swift; sourceTree = "<group>"; };
 		3013613F26A0BF590050CF9E /* PreviewResource */ = {isa = PBXFileReference; lastKnownFileType = folder; path = PreviewResource; sourceTree = "<group>"; };
 		3013614226A0F8E10050CF9E /* TourDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TourDetailView.swift; sourceTree = "<group>"; };
 		3013614626A1E77B0050CF9E /* WebContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebContentView.swift; sourceTree = "<group>"; };
@@ -321,7 +322,6 @@
 				09725B0924FE4AC300012D42 /* DialogViewControllerCabot.swift */,
 				30E50DE726A0BBE900729ABD /* ToursView.swift */,
 				3013614626A1E77B0050CF9E /* WebContentView.swift */,
-				7E9690C229EAF25C0062DEBD /* DetailSettingView.swift */,
 				E561455E2A6E02A8005CF82F /* RosWebView.swift */,
 				458B54382A970B4A00AD9D10 /* LogFilesView.swift */,
 				7E8F5A1F2BA4D33800E5D547 /* SpokenTextView.swift */,
@@ -448,6 +448,7 @@
 				3096BF1326A5C29F0066F256 /* SettingView.swift */,
 				308FCE1C27D8F4D3009FCC7B /* SystemStatusView.swift */,
 				3013614226A0F8E10050CF9E /* TourDetailView.swift */,
+				7E9690C229EAF25C0062DEBD /* DetailSettingView.swift */,
 			);
 			path = Attend;
 			sourceTree = "<group>";
@@ -460,6 +461,7 @@
 				D7E54B512C0CD03A002FE3C4 /* MainMenuView.swift */,
 				D7F6BE6D2C2A57C300CD8258 /* SettingView.swift */,
 				D7D7A6FA2BFECB490072ADF6 /* TourDetailView.swift */,
+				0D05CB7A2D01DCF80077CAA1 /* DetailSettingView.swift */,
 			);
 			path = User;
 			sourceTree = "<group>";
@@ -802,7 +804,6 @@
 				D7CC04F52BFB352700C0B10A /* LogFilesView.swift in Sources */,
 				D7CC04F62BFB352700C0B10A /* CaBotAppModel.swift in Sources */,
 				D7CC04F72BFB352700C0B10A /* OnboardGrantAccess.swift in Sources */,
-				D7CC04F82BFB352700C0B10A /* DetailSettingView.swift in Sources */,
 				D7CC05332BFB3BF900C0B10A /* DestinationDetailView.swift in Sources */,
 				D7CC04FA2BFB352700C0B10A /* LocalConversation.swift in Sources */,
 				D7CC05352BFB419900C0B10A /* DestinationsView.swift in Sources */,
@@ -812,6 +813,7 @@
 				D7CC04FF2BFB352700C0B10A /* ResourceManager.swift in Sources */,
 				D7CC05002BFB352700C0B10A /* Extension.swift in Sources */,
 				D7CC05012BFB352700C0B10A /* WebContentView.swift in Sources */,
+				0D05CB7B2D01DCF80077CAA1 /* DetailSettingView.swift in Sources */,
 				D7CC05022BFB352700C0B10A /* NavDeviceTTS.m in Sources */,
 				D7CC05042BFB352700C0B10A /* Logging.m in Sources */,
 				D7CC05052BFB352700C0B10A /* RootView.swift in Sources */,
