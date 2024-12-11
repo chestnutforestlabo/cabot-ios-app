@@ -508,11 +508,11 @@ class CaBotServiceActions {
             let priority = request.priority
             let bias = !tts.isSpeaking || (delegate.getSpeechPriority() == .Robot && force)
             _ = service.activityLog(category: "ble speech request speaking", text: String(line), memo: "force=\(force)")
-            tts.speak(String(line), force: force, priority: .parse(force:force, priority:priority, priorityBias:bias)) { code in
-                if code > 0 {
-                    _ = service.activityLog(category: "ble speech request completed", text: String(line), memo: "force=\(force),return_code=\(code)")
-                } else {
-                    _ = service.activityLog(category: "ble speech request canceled", text: String(line), memo: "force=\(force),return_code=\(code)")
+            tts.speak(String(line), force: force, priority: .parse(force:force, priority:priority, priorityBias:bias)) { code, length in
+                if code == .Completed {
+                    _ = service.activityLog(category: "ble speech request completed", text: String(line), memo: "force=\(force),return_code=\(code),length=(length)")
+                } else if code == .Canceled {
+                    _ = service.activityLog(category: "ble speech request canceled", text: String(line), memo: "force=\(force),return_code=\(code),length=(length)")
                 }
             }
         }

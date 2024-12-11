@@ -76,10 +76,11 @@ class CaBotTTS : TTSProtocol {
 
     private let _tts = PriorityQueueTTS.shared
     private var _progressHandlers = [UUID : ProgressHandler]()
+    private var _progressCounters = [UUID : Int]()
     private var _lastSpokenEntryUUID: UUID? = nil
 
 
-    func speak(_ text: String?, forceSelfvoice: Bool, force: Bool, priority: SpeechPriority = .Normal, timeout sec : TimeInterval? = nil, tag:SpeakTag? = nil, callback: @escaping (Int32) -> Void, progress: ((NSRange) -> Void)? = nil) {
+    func speak(_ text: String?, forceSelfvoice: Bool, force: Bool, priority: SpeechPriority = .Normal, timeout sec : TimeInterval? = nil, tag:SpeakTag? = nil, callback: @escaping (Reason, Int) -> Void, progress: ((NSRange) -> Void)? = nil) {
         guard self.delegate?.getModeType() == .Normal else { return }
         
         // - pendding - fix voiceover
@@ -99,16 +100,16 @@ class CaBotTTS : TTSProtocol {
         self.delegate?.activityLog(category: "app speech speaking", text: text ?? "", memo: "force=\(force)")
 
 
-        self._speak(text == nil ? "" : text!, priority:priority, timeout :sec, tag: tag, completionHandler: { uuid, utext, code in
-            if code > 0 {
+        self._speak(text == nil ? "" : text!, priority:priority, timeout :sec, tag: tag, completionHandler: { uuid, utext, code, length in
+            if code == .Completed {
                 self.delegate?.activityLog(category: "app speech completed", text: text ?? "", memo: "force=\(force),code=\(code)")
-            } else {
+            } else if code == .Canceled {
                 self.delegate?.activityLog(category: "app speech canceled", text: text ?? "", memo: "force=\(force),code=\(code)")
             }
-            callback(code)
+            callback(code, length)
             //print("code=\(code), text=\(text)")
-            if code >= 0, let text = utext {
-                self.delegate?.share(user_info: SharedInfo(type: .SpeakProgress, value: text, flag1: true, flag2: voiceover, length: Int(code)))
+            if code != .Canceled, let text = utext {
+                self.delegate?.share(user_info: SharedInfo(type: .SpeakProgress, value: text, flag1: true, flag2: voiceover, length: length))
                 self._lastSpokenEntryUUID = nil
             }
         }, progressHandler: { uuid, text, count, range in
@@ -117,7 +118,7 @@ class CaBotTTS : TTSProtocol {
             }
             if let text = text {
                 print(count, self._lastSpokenEntryUUID, uuid, text, range)
-                if self._lastSpokenEntryUUID != uuid {
+                if count == 0 || self._lastSpokenEntryUUID != uuid {
                     self.delegate?.share(user_info: SharedInfo(type: .Speak, value: text, flag1: true, flag2: voiceover, location: range.location))
                     self._lastSpokenEntryUUID = uuid
                 }
@@ -127,12 +128,12 @@ class CaBotTTS : TTSProtocol {
         })
     }
 
-    func speakForAdvanced(_ text:String?, force: Bool, tag:SpeakTag? = nil, callback: @escaping (Int32) -> Void) {
+    func speakForAdvanced(_ text:String?, force: Bool, tag:SpeakTag? = nil, callback: @escaping (Reason, Int) -> Void) {
         if force {
             self._tts.cancel(at: .immediate)
         }
-        self._speak(text == nil ? "" : text!, priority:.parse(force:force, mode:.Advanced), tag: tag, completionHandler: { uuid, utext, code in
-            callback(code)
+        self._speak(text == nil ? "" : text!, priority:.parse(force:force, mode:.Advanced), tag: tag, completionHandler: { uuid, utext, code, length in
+            callback(code, length)
         }, progressHandler: { uuid, text, count, range in
         })
     }
@@ -141,7 +142,7 @@ class CaBotTTS : TTSProtocol {
         self._tts.stop(true)
     }
 
-    func speak(_ text: String?, force: Bool, priority: CaBotTTS.SpeechPriority, timeout sec : TimeInterval? = nil, tag:SpeakTag? = nil, callback: @escaping (Int32) -> Void) {
+    func speak(_ text: String?, force: Bool, priority: CaBotTTS.SpeechPriority, timeout sec : TimeInterval? = nil, tag:SpeakTag? = nil, callback: @escaping (Reason, Int) -> Void) {
         self.speak(text, forceSelfvoice: false, force: force, priority: priority, timeout: sec, tag: tag, callback: callback)
     }
 
@@ -151,12 +152,12 @@ class CaBotTTS : TTSProtocol {
     }
     
     func speak(_ text:String?, priority: SpeechPriority, timeout sec : TimeInterval? = nil, tag: SpeakTag? = nil, callback: @escaping ()->Void) {
-        self.speak(text, priority:priority, timeout:sec, tag:tag ) { _ in
+        self.speak(text, priority:priority, timeout:sec, tag:tag ) { _, _ in
             callback()
         }
     }
 
-    func speak(_ text: String?, priority: SpeechPriority, timeout sec : TimeInterval?, tag: SpeakTag? = nil, callback: @escaping (Int32) -> Void) {
+    func speak(_ text: String?, priority: SpeechPriority, timeout sec : TimeInterval?, tag: SpeakTag? = nil, callback: @escaping (Reason, Int) -> Void) {
         self.speak(text, forceSelfvoice: false, force: false, priority:priority, timeout: sec, tag: tag, callback: callback)
     }
 
@@ -231,7 +232,7 @@ class TTSHelper {
         let tts = CaBotTTS(voice: voice.AVvoice)
         tts.rate = rate
 
-        tts.speak(CustomLocalizedString("Hello Suitcase!", lang: voice.AVvoice.language), forceSelfvoice:true, force:true, priority:.High ) {_ in
+        tts.speak(CustomLocalizedString("Hello Suitcase!", lang: voice.AVvoice.language), forceSelfvoice:true, force:true, priority:.High ) { _, _ in
         }
     }
 }
@@ -270,9 +271,36 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
             }
         }
     }
-    
-    func _speak( _ text:String, priority:SpeechPriority, timeout sec : TimeInterval? = nil, tag:SpeakTag? = nil, completionHandler:@escaping (UUID, String?, Int32)->Void, progressHandler: ((UUID, String?,Int,NSRange)->Void)? = nil ) {
-        
+    public enum Reason {
+        case Canceled
+        case Paused
+        case Completed
+
+        public init( reason: CompletionReason) {
+            switch reason {
+            case .Canceled:
+                self = .Canceled
+            case .Paused:
+                self = .Paused
+            case .Completed:
+                self = .Completed
+            }
+        }
+
+        var completionReason : CompletionReason {
+            switch self {
+            case .Canceled:
+                return .Canceled
+            case .Paused:
+                return .Paused
+            case .Completed:
+                return .Completed
+            }
+        }
+    }
+
+    func _speak( _ text:String, priority:SpeechPriority, timeout sec : TimeInterval? = nil, tag:SpeakTag? = nil, completionHandler:@escaping (UUID, String?, Reason, Int)->Void, progressHandler: ((UUID, String?,Int,NSRange)->Void)? = nil ) {
+
         
         let entry = TokenizerEntry( separators:separators, priority:priority.queuePriority, timeout_sec: (sec ?? 90.0), tag: (tag?.tag ?? Tag.Default) ) { [weak self] entry, token, reason in
             
@@ -280,9 +308,9 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
                 self?._progressHandlers[entry.uuid] = nil
             }
             
-            let compLen = Int32((reason != .Canceled ? token?.text?.count : nil) ?? -1)
+            let compLen = Int((reason != .Canceled ? token?.text?.count : nil) ?? -1)
             Debug(log:"<TTS> complate token:\(token?.text ?? "") reason:\(reason)")
-            completionHandler( entry.uuid, token?.text, compLen )
+            completionHandler( entry.uuid, token?.text, Reason(reason: reason), compLen)
         }
         try! entry.append(text: text)
         entry.close()
@@ -318,8 +346,8 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
     func progress(queue: PriorityQueueTTS, entry: QueueEntry) {
         guard let token = entry.token else { return }
         
-        Debug(log:"<TTS> progress token:\(token.text ?? "") pos:\(token.bufferedRange.range.location) len:\(token.bufferedRange.range.length)")
-        
+        Debug(log:"<TTS> progress token:\(token.text ?? "") pos:\(token.bufferedRange.range.location) count:\(token.bufferedRange.progressCount) len:\(token.bufferedRange.range.length)")
+
         _progressHandlers[entry.uuid]?( entry.uuid, token.text, token.bufferedRange.progressCount, token.bufferedRange.range );
     }
     

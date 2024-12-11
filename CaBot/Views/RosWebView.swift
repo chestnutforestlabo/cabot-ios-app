@@ -54,40 +54,44 @@ struct RosWebView: View, LocalizationStatusDelegate {
 
     var body: some View {
         localization.delegate = self
-        return VStack {
-            Button(action: {
-                isConfirming = true
-            }, label: {
-                if (localizationStatus == 2) {
-                    Label(LocalizedStringKey("Restart Localization"), systemImage: "arrow.clockwise")
-                } else {
-                    Label(LocalizedStringKey("Restarting Localization"), systemImage: "arrow.clockwise")
-                }
-            })
-            .disabled(localizationStatus != 2)
-            .confirmationDialog(Text("Restart Localization"), isPresented: $isConfirming) {
-                Button {
-                    localizationStatus = 0
-                    modelData.systemManageCommand(command: .restart_localization)
-                } label: {
-                    Text("Restart Localization")
-                }
-                Button("Cancel", role: .cancel) {
-                }
-            } message: {
-                Text("RESTART_LOCALIZATION_MESSAGE")
-            }
-            LocalWebView(address: address, port: port, handler: localization, reload: $shouldRefresh)
-        }
+        return LocalWebView(address: address, port: port, handler: localization, reload: $shouldRefresh)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            Button {
-                reload()
-            } label: {
-                Image(systemName: "arrow.clockwise")
-                Text("Reload")
+            ToolbarItem(placement: .bottomBar) {
+                Button(action: {
+                    isConfirming = true
+                }, label: {
+                    if (localizationStatus == 2) {
+                        Image(systemName: "mappin.and.ellipse")
+                        Text("Restart Localization")
+                    } else {
+                        Image(systemName: "mappin.and.ellipse")
+                        Text("Restarting Localization")
+                    }
+                })
+                .disabled(localizationStatus != 2)
+                .confirmationDialog(Text("Restart Localization"), isPresented: $isConfirming) {
+                    Button {
+                        localizationStatus = 0
+                        modelData.systemManageCommand(command: .restart_localization)
+                    } label: {
+                        Text("Restart Localization")
+                    }
+                    Button("Cancel", role: .cancel) {
+                    }
+                } message: {
+                    Text("RESTART_LOCALIZATION_MESSAGE")
+                }
             }
-            .accessibilityLabel("Reload")
+            ToolbarItem(placement: .bottomBar) {
+                Button {
+                    reload()
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                    Text("Reload")
+                }
+                .accessibilityLabel("Reload")
+            }
         }
     }
 

@@ -312,7 +312,7 @@ class TourManager: TourProtocol {
                             }
 
                         
-                            if decoded.currentDestination == "" {
+                            if decoded.destinations.count > 0 && decoded.currentDestination == "" {
                                 model.needToStartAnnounce(wait: true)
                             }
                         } catch {

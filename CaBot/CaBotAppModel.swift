@@ -1013,7 +1013,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             NavUtil.showModalWaiting(withMessage: CustomLocalizedString("processing...", lang: self.resourceLang))
         }
         if self.fallbackService.summon(destination: destination) || self.noSuitcaseDebug {
-            self.speak(CustomLocalizedString("Sending the command to the suitcase", lang: self.resourceLang), priority:.Required) {}
+            self.speak(CustomLocalizedString("Sending the command to the suitcase", lang: self.resourceLang), priority:.Required) { _, _ in }
             DispatchQueue.main.async {
                 print("hide modal waiting")
                 NavUtil.hideModalWaiting()
@@ -1027,7 +1027,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             DispatchQueue.main.async {
                 let message = CustomLocalizedString("Suitcase may not be connected", lang: self.resourceLang)
 
-                self.speak(message, priority:.Required) {}
+                self.speak(message, priority:.Required) { _, _ in }
             }
             return false
         }
@@ -1051,7 +1051,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
     }
 
-    func speak(_ text:String, priority: CaBotTTS.SpeechPriority, timeout sec : TimeInterval? = nil, tag: SpeakTag? = nil, callback: @escaping () -> Void) {
+    func speak(_ text:String, priority: CaBotTTS.SpeechPriority, timeout sec : TimeInterval? = nil, tag: SpeakTag? = nil, callback: @escaping (CaBotTTS.Reason, Int) -> Void) {
         if (preview) {
             print("previewing speak - \(text)")
         } else {
@@ -1067,7 +1067,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if(self.modeType == .Normal){
             self.tts.rate = self.userSpeechRate
             self.tts.voice = self.userVoice?.AVvoice
-            self.tts.speak(CustomLocalizedString("Hello Suitcase!", lang: self.resourceLang), force:true, priority:priority ?? .High, timeout:sec, tag: .Sample(erase:true)) {_ in
+            self.tts.speak(CustomLocalizedString("Hello Suitcase!", lang: self.resourceLang), force:true, priority:priority ?? .High, timeout:sec, tag: .Sample(erase:true)) {_, _ in
             }
         } else {
             if(mode == .User){
@@ -1077,7 +1077,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 self.tts.rate = self.attendSpeechRate
                 self.tts.voice = self.attendVoice?.AVvoice
             }
-            self.tts.speakForAdvanced(CustomLocalizedString("Hello Suitcase!", lang: self.resourceLang), force:true, tag: .Sample(erase:true)) {_ in
+            self.tts.speakForAdvanced(CustomLocalizedString("Hello Suitcase!", lang: self.resourceLang), force:true, tag: .Sample(erase:true)) {_, _ in
             }
         }
 
@@ -1093,7 +1093,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent()
         self.shouldNoAnnounceToPushRightButton = true
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            self.speak(CustomLocalizedString("You can proceed by pressing the right button of the suitcase handle", lang: self.resourceLang), priority: .Required, timeout: nil) {
+            self.speak(CustomLocalizedString("You can proceed by pressing the right button of the suitcase handle", lang: self.resourceLang), priority: .Normal, timeout: nil) { _, _ in
             }
         }
     }
@@ -1201,7 +1201,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                         let announce = CustomLocalizedString("Going to %@", lang: self.resourceLang, dest.title.pron)
                         + (dest.startMessage.text ?? "")
                         if(isStartMessageSpeaking){
-                            self.tts.speak(announce, forceSelfvoice: false, force: true, priority: .High, timeout: nil, tag: .Next(erase:true), callback: {code in }, progress: {range in
+                            self.tts.speak(announce, forceSelfvoice: false, force: true, priority: .High, timeout: nil, tag: .Next(erase:true), callback: {_, _ in }, progress: {range in
                                 if range.location == 0{
                                     self.willSpeakArriveMessage = true
                                 }
@@ -1235,7 +1235,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             DispatchQueue.main.async {
                 let message = CustomLocalizedString("Suitcase may not be connected", lang: self.resourceLang)
 
-                self.speak(message, priority:.Required) {}
+                self.speak(message, priority:.Required) { _, _ in }
             }
             return false
         }
@@ -1269,7 +1269,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if self.suitcaseConnected != saveSuitcaseConnected {
             let text = centralConnected ? CustomLocalizedString("Suitcase has been connected", lang: self.resourceLang) :
             CustomLocalizedString("Suitcase has been disconnected", lang: self.resourceLang)
-            self.tts.speak(text, force: true, priority:.Normal) {_ in }
+            self.tts.speak(text, force: true, priority:.Normal) { _, _ in }
 
             if self.suitcaseConnected {
                 if self.modeType != .Normal{
@@ -1340,7 +1340,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             if tourManager.proceedToNextDestination() {
                 self.playAudio(file: self.detailSettingModel.startSound)
             }else {
-                self.speak(CustomLocalizedString("No destination is selected", lang: self.resourceLang), priority:.Required, timeout:nil) {
+                self.speak(CustomLocalizedString("No destination is selected", lang: self.resourceLang), priority:.Required, timeout:nil) { _, _ in
                 }
             }
             break
@@ -1378,8 +1378,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     delay = 3.0
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                    self.speak(arrivedMsg, priority:.High, timeout: nil ) {}
-                    self.speak(announce, priority:.Normal, timeout: nil, tag: .Next(erase:false) ) {
+                    self.speak(arrivedMsg, priority:.High, timeout: nil ) { _, _ in }
+                    self.speak(announce, priority:.Normal, timeout: nil, tag: .Next(erase:false) ) { code, length in
+                        guard code != .Paused else { return }
                         // if user pressed the next button while reading announce, skip open content
                         if self.tourManager.currentDestination == nil {
                             if let contentURL = cd.content?.url,
@@ -1493,7 +1494,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 if self.shouldNoAnnounceToPushRightButton == false && self.willSpeakArriveMessage == false{
                     if tourManager.hasDestination {
                         let announce = CustomLocalizedString("PRESS_RIGHT_BUTTON", lang: self.resourceLang)
-                        self.speak(announce, priority:.Required){}
+                        self.speak(announce, priority:.Required){ _, _ in }
                         self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent()
                         self.shouldNoAnnounceToPushRightButton = true
                     }
@@ -1549,7 +1550,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                         var text = userInfo.value
                         let startIndex = text.index(text.startIndex, offsetBy: userInfo.location)
                         text = String(text[startIndex...])
-                        tts.speakForAdvanced(text, force: userInfo.flag1) { _ in
+                        tts.speakForAdvanced(text, force: userInfo.flag1) { _, _ in
                         }
                     }
                 }

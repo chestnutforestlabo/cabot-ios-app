@@ -208,7 +208,7 @@ class ResourceDownload {
         DispatchQueue.main.async {
             NSLog("Error message read out loud")
             let message = CustomLocalizedString("Retry Alert", lang: modelData.resourceLang)
-            modelData.speak(message, priority: .Required) {}
+            modelData.speak(message, priority: .Required) { _, _ in }
         }
     }
     

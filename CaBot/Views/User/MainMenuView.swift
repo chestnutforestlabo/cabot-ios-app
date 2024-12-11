@@ -246,7 +246,7 @@ struct ArrivedActionMenus: View {
             if let count = ad.arriveMessages?.count {
                 if let text = ad.arriveMessages?[count-1] {
                     Button(action: {
-                        modelData.speak(text.text, priority:.Required) {}
+                        modelData.speak(text.text, priority:.Required) { _, _ in }
                     }) {
                         Label{
                             Text("Repeat the message")
