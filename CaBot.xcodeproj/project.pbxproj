@@ -38,7 +38,6 @@
 		30E50DD7269F784A00729ABD /* OnboardGrantAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DD5269F784A00729ABD /* OnboardGrantAccess.swift */; };
 		30E50DD8269F784A00729ABD /* MainMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DD6269F784A00729ABD /* MainMenuView.swift */; };
 		30E50DDB269F7E3800729ABD /* CaBot.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DD9269F7E3800729ABD /* CaBot.xcdatamodeld */; };
-		30E50DDD269FCBC200729ABD /* ResourceSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DDC269FCBC200729ABD /* ResourceSelectView.swift */; };
 		30E50DDF26A0B21200729ABD /* ConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DDE26A0B21200729ABD /* ConversationView.swift */; };
 		30E50DE226A0BA5200729ABD /* DestinationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DE126A0BA5200729ABD /* DestinationsView.swift */; };
 		30E50DE826A0BBE900729ABD /* ToursView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DE726A0BBE900729ABD /* ToursView.swift */; };
@@ -93,7 +92,6 @@
 		D7CC050F2BFB352700C0B10A /* CaBotServiceCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306069B529A686D9001FB5DB /* CaBotServiceCommon.swift */; };
 		D7CC05102BFB352700C0B10A /* SystemStatusDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308FCE2B27E42B7B009FCC7B /* SystemStatusDetailView.swift */; };
 		D7CC05112BFB352700C0B10A /* SpokenTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E8F5A1F2BA4D33800E5D547 /* SpokenTextView.swift */; };
-		D7CC05122BFB352700C0B10A /* ResourceSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DDC269FCBC200729ABD /* ResourceSelectView.swift */; };
 		D7CC05132BFB352700C0B10A /* CaBotServiceBLE.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E29F070228B55FC00CA7DD6 /* CaBotServiceBLE.swift */; };
 		D7CC05142BFB352700C0B10A /* TourManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E50DCB269F672800729ABD /* TourManager.swift */; };
 		D7CC05152BFB352700C0B10A /* BatteryStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308FCE2D27E62B30009FCC7B /* BatteryStatusView.swift */; };
@@ -118,8 +116,6 @@
 		D7F6BE6E2C2A57C300CD8258 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7F6BE6D2C2A57C300CD8258 /* SettingView.swift */; };
 		E46C82642C18081100917AB3 /* ResourceDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46C82632C18081100917AB3 /* ResourceDownload.swift */; };
 		E46C82652C18081100917AB3 /* ResourceDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46C82632C18081100917AB3 /* ResourceDownload.swift */; };
-		E493D8792C2279F700691097 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = E493D8782C2279F700691097 /* ZIPFoundation */; };
-		E493D87B2C227A0D00691097 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = E493D87A2C227A0D00691097 /* ZIPFoundation */; };
 		E561455F2A6E02A8005CF82F /* RosWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E561455E2A6E02A8005CF82F /* RosWebView.swift */; };
 /* End PBXBuildFile section */
 
@@ -186,7 +182,6 @@
 		30E50DD5269F784A00729ABD /* OnboardGrantAccess.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnboardGrantAccess.swift; sourceTree = "<group>"; };
 		30E50DD6269F784A00729ABD /* MainMenuView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainMenuView.swift; sourceTree = "<group>"; };
 		30E50DDA269F7E3800729ABD /* CaBot.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CaBot.xcdatamodel; sourceTree = "<group>"; };
-		30E50DDC269FCBC200729ABD /* ResourceSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceSelectView.swift; sourceTree = "<group>"; };
 		30E50DDE26A0B21200729ABD /* ConversationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationView.swift; sourceTree = "<group>"; };
 		30E50DE126A0BA5200729ABD /* DestinationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DestinationsView.swift; sourceTree = "<group>"; };
 		30E50DE726A0BBE900729ABD /* ToursView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToursView.swift; sourceTree = "<group>"; };
@@ -246,7 +241,6 @@
 				308FCE2A27E12844009FCC7B /* Gzip in Frameworks */,
 				0967677F29371BA0005CFA58 /* SocketIO in Frameworks */,
 				3009AC3126AA3F4000370873 /* HLPDialog in Frameworks */,
-				E493D87B2C227A0D00691097 /* ZIPFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -284,7 +278,6 @@
 				D7CC051E2BFB352700C0B10A /* Gzip in Frameworks */,
 				D7CC051F2BFB352700C0B10A /* SocketIO in Frameworks */,
 				D7CC05202BFB352700C0B10A /* HLPDialog in Frameworks */,
-				E493D8792C2279F700691097 /* ZIPFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -321,7 +314,6 @@
 				D7CC05312BFB3B1A00C0B10A /* User */,
 				30E50DD3269F77CE00729ABD /* RootView.swift */,
 				30E50DD5269F784A00729ABD /* OnboardGrantAccess.swift */,
-				30E50DDC269FCBC200729ABD /* ResourceSelectView.swift */,
 				308FCE2D27E62B30009FCC7B /* BatteryStatusView.swift */,
 				308FCE2B27E42B7B009FCC7B /* SystemStatusDetailView.swift */,
 				308FCE2F27E81B7E009FCC7B /* StatusLabelStyle.swift */,
@@ -498,7 +490,6 @@
 				308FCE2927E12844009FCC7B /* Gzip */,
 				0967677E29371BA0005CFA58 /* SocketIO */,
 				306069B329A5E45D001FB5DB /* NavigationBackport */,
-				E493D87A2C227A0D00691097 /* ZIPFoundation */,
 				A97F30DE2CDDC9FA00BE5C43 /* PriorityQueueTTS */,
 			);
 			productName = CaBot;
@@ -584,7 +575,6 @@
 				D7CC04ED2BFB352700C0B10A /* Gzip */,
 				D7CC04EF2BFB352700C0B10A /* SocketIO */,
 				D7CC04F12BFB352700C0B10A /* NavigationBackport */,
-                E493D8782C2279F700691097 /* ZIPFoundation */,
 				A97F30E02CDDCA0D00BE5C43 /* PriorityQueueTTS */,
 			);
 			productName = CaBot;
@@ -636,7 +626,6 @@
 				0967677D29371B9F005CFA58 /* XCRemoteSwiftPackageReference "socket" */,
 				306069B229A5E45D001FB5DB /* XCRemoteSwiftPackageReference "NavigationBackport" */,
 				7EDE7C9229B5733D00A65829 /* XCRemoteSwiftPackageReference "swift-argument-parser" */,
-				E493D8772C2279B200691097 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 				A97F30DD2CDDC9FA00BE5C43 /* XCRemoteSwiftPackageReference "PriorityQueueTTS" */,
 			);
 			productRefGroup = 7E29F00A228B548100CA7DD6 /* Products */;
@@ -787,7 +776,6 @@
 				306069B629A686D9001FB5DB /* CaBotServiceCommon.swift in Sources */,
 				308FCE2C27E42B7B009FCC7B /* SystemStatusDetailView.swift in Sources */,
 				7E8F5A202BA4D33800E5D547 /* SpokenTextView.swift in Sources */,
-				30E50DDD269FCBC200729ABD /* ResourceSelectView.swift in Sources */,
 				7E29F072228B55FC00CA7DD6 /* CaBotServiceBLE.swift in Sources */,
 				30E50DCC269F672800729ABD /* TourManager.swift in Sources */,
 				308FCE2E27E62B30009FCC7B /* BatteryStatusView.swift in Sources */,
@@ -859,7 +847,6 @@
 				D7CC050F2BFB352700C0B10A /* CaBotServiceCommon.swift in Sources */,
 				D7CC05102BFB352700C0B10A /* SystemStatusDetailView.swift in Sources */,
 				D7CC05112BFB352700C0B10A /* SpokenTextView.swift in Sources */,
-				D7CC05122BFB352700C0B10A /* ResourceSelectView.swift in Sources */,
 				D7CC05132BFB352700C0B10A /* CaBotServiceBLE.swift in Sources */,
 				D7CC05142BFB352700C0B10A /* TourManager.swift in Sources */,
 				D7CC05152BFB352700C0B10A /* BatteryStatusView.swift in Sources */,
@@ -1455,14 +1442,6 @@
 				version = 0.7.1;
 			};
 		};
-		E493D8772C2279B200691097 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/weichsel/ZIPFoundation.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.9.19;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1545,16 +1524,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D7CC04F22BFB352700C0B10A /* XCRemoteSwiftPackageReference "NavigationBackport" */;
 			productName = NavigationBackport;
-		};
-		E493D8782C2279F700691097 /* ZIPFoundation */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E493D8772C2279B200691097 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
-			productName = ZIPFoundation;
-		};
-		E493D87A2C227A0D00691097 /* ZIPFoundation */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E493D8772C2279B200691097 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
-			productName = ZIPFoundation;
 		};
 /* End XCSwiftPackageProductDependency section */
 

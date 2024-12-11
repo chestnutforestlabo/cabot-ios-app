@@ -114,11 +114,12 @@ struct ConversationView: UIViewControllerRepresentable {
 
 }
 
-struct ConversationView_Previews: PreviewProvider {
-    static var previews: some View {
-        let modelData = CaBotAppModel()
 
-        let resource = modelData.resourceManager.resources[0]
-        ConversationView(src: resource.conversationSource!)
-    }
-}
+//struct ConversationView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        let modelData = CaBotAppModel()
+//
+//        let resource = modelData.resourceManager.resources[0]
+//        ConversationView(src: resource.conversationSource!)
+//    }
+//}

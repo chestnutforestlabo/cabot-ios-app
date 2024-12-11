@@ -40,15 +40,12 @@ enum GrantState {
 
 enum DisplayedScene {
     case Onboard
-    case ResourceSelect
     case App
 
     func text(lang: String) -> Text {
         switch self {
         case .Onboard:
             return Text(CustomLocalizedString("", lang: lang))
-        case .ResourceSelect:
-            return Text(CustomLocalizedString("SELECT_RESOURCE", lang: lang))
         case .App:
 #if ATTEND
             return Text(CustomLocalizedString("ATTEND_MENU", lang: lang))
@@ -336,27 +333,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 self.displayedScene = .App
             }
         }
-        if self.displayedScene == .ResourceSelect {
-            guard let value = UserDefaults.standard.value(forKey: ResourceSelectView.resourceSelectedKey) as? Bool else { return }
-            if value {
-                displayedScene = .App
-            }
-        }
     }
     @Published var displayedScene: DisplayedScene = .Onboard
     var authRequestedByUser: Bool = false
-
-    @Published var resource: Resource? = nil {
-        didSet {
-            if let resource = resource {
-                NSLog("resource.identifier = \(resource.identifier)")
-                UserDefaults.standard.setValue(resource.identifier, forKey: selectedResourceKey)
-                UserDefaults.standard.synchronize()
-                self.updateVoice()
-                self.updateTTS()
-            }
-        }
-    }
 
     @Published var selectedLanguage: String = "en" {
         willSet {
@@ -366,19 +345,26 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             slientForChange = false
         }
         didSet {
-            self.resource?.lang = selectedLanguage
             NSLog("selectedLanguage = \(selectedLanguage)")
             UserDefaults.standard.setValue(selectedLanguage, forKey: selectedResourceLangKey)
-            _ = self.fallbackService.manage(command: .lang, param: resource?.lang)
-            self.tts.lang = resource?.lang
+            _ = self.fallbackService.manage(command: .lang, param: selectedLanguage)
+            I18N.shared.set(lang: selectedLanguage)
+            self.tts.lang = selectedLanguage
             self.updateVoice()
             self.updateTTS()
+        }
+    }
+    var languages: [String] = ["en", "ja"]
+
+    var selectedLocale: Locale {
+        get {
+            Locale(identifier: self.selectedLanguage)
         }
     }
 
     var resourceLang: String {
         get {
-            return resource?.lang ?? selectedLanguage
+            return selectedLanguage
         }
     }
 
@@ -392,7 +378,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var attendVoice: Voice? = nil {
         didSet {
             if let id = attendVoice?.AVvoice.identifier {
-                let key = "\(selectedVoiceKey)_\(resource?.locale.identifier ?? "en-US")"
+                let key = "\(selectedVoiceKey)_\(selectedLanguage)"
                 UserDefaults.standard.setValue(id, forKey: key)
                 UserDefaults.standard.synchronize()
             }
@@ -418,7 +404,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
         didSet {
             if let id = userVoice?.AVvoice.identifier {
-                let key = "\(selectedVoiceKey)_\(resource?.locale.identifier ?? "en-US")"
+                let key = "\(selectedVoiceKey)_\(selectedLanguage)"
                 UserDefaults.standard.setValue(id, forKey: key)
                 UserDefaults.standard.synchronize()
             }
@@ -438,6 +424,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             UserDefaults.standard.synchronize()
         }
     }
+
+    @Published var serverIsReady: Bool = false
 
     var suitcaseFeatures: SuitcaseFeatures = SuitcaseFeatures()
 
@@ -475,39 +463,34 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func initTTS()
     {
-        if let resource = self.resource {
-            let key = "\(selectedVoiceKey)_\(resource.locale.identifier)"
-            if let id = UserDefaults.standard.value(forKey: key) as? String {
-                self.userVoice = TTSHelper.getVoice(by: id)
-            } else {
-                self.userVoice = TTSHelper.getVoices(by: resource.locale)[0]
-            }
-            if let id = UserDefaults.standard.value(forKey: key) as? String {
-                self.attendVoice = TTSHelper.getVoice(by: id)
-            } else {
-                self.attendVoice = TTSHelper.getVoices(by: resource.locale)[0]
-            }
+        let key = "\(selectedVoiceKey)_\(selectedLanguage)"
+        if let id = UserDefaults.standard.value(forKey: key) as? String {
+            self.userVoice = TTSHelper.getVoice(by: id)
+        } else {
+            self.userVoice = TTSHelper.getVoices(by: selectedLocale)[0]
+        }
+        if let id = UserDefaults.standard.value(forKey: key) as? String {
+            self.attendVoice = TTSHelper.getVoice(by: id)
+        } else {
+            self.attendVoice = TTSHelper.getVoices(by: selectedLocale)[0]
         }
 
         self.updateTTS()
     }
 
     func updateVoice() {
-        if let resource = self.resource {
-            let key = "\(selectedVoiceKey)_\(resource.locale.identifier)"
-
-            if(voiceSetting == .User){
-                if let id = UserDefaults.standard.value(forKey: key) as? String {
-                    self.userVoice = TTSHelper.getVoice(by: id)
-                } else {
-                    self.userVoice = TTSHelper.getVoices(by: resource.locale)[0]
-                }
-            } else if(voiceSetting == .Attend) {
-                if let id = UserDefaults.standard.value(forKey: key) as? String {
-                    self.attendVoice = TTSHelper.getVoice(by: id)
-                } else {
-                    self.attendVoice = TTSHelper.getVoices(by: resource.locale)[0]
-                }
+        let key = "\(selectedVoiceKey)_\(selectedLanguage)"
+        if(voiceSetting == .User){
+            if let id = UserDefaults.standard.value(forKey: key) as? String {
+                self.userVoice = TTSHelper.getVoice(by: id)
+            } else {
+                self.userVoice = TTSHelper.getVoices(by: selectedLocale)[0]
+            }
+        } else if(voiceSetting == .Attend) {
+            if let id = UserDefaults.standard.value(forKey: key) as? String {
+                self.attendVoice = TTSHelper.getVoice(by: id)
+            } else {
+                self.attendVoice = TTSHelper.getVoices(by: selectedLocale)[0]
             }
         }
     }
@@ -624,7 +607,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var showingSystemStatusMenu: Bool = false
     @Published var batteryStatus: BatteryStatus = BatteryStatus()
     @Published var touchStatus: TouchStatus = TouchStatus()
-    @Published var resourceDownload: ResourceDownload
     @Published var userInfo: UserInfoBuffer
 
     private var addressCandidate: AddressCandidate
@@ -639,7 +621,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private var lastUpdated: Int64 = 0
     let logList: LogReportModel = LogReportModel()
     let preview: Bool
-    let resourceManager: ResourceManager
     var tourManager: TourManager
     let dialogViewHelper: DialogViewHelper
     private let feedbackGenerator = UINotificationFeedbackGenerator()
@@ -664,11 +645,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.bleService = bleService
         self.tcpService = tcpService
         self.fallbackService = FallbackService(services: [bleService, tcpService])
-        self.resourceManager = ResourceManager(preview: preview)
         self.tourManager = TourManager(setting: self.detailSettingModel)
         self.dialogViewHelper = DialogViewHelper()
         self.locationManager =  CLLocationManager()
-        self.resourceDownload = ResourceDownload()
         self.userInfo = UserInfoBuffer(modelData: nil)
 
         // initialize connection type
@@ -770,13 +749,31 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         })
     }
 
+    var backgroundQueue: DispatchQueue?
+
     func updateNetworkConfig() {
-        NSLog("updateNetworkConfig \([primaryAddr, secondaryAddr])")
+        NSLog("updateNetworkConfig \([self.primaryAddr, self.secondaryAddr])")
         let current = self.addressCandidate.getCurrent()
-        if current != primaryAddr && current != secondaryAddr {
+        if current != self.primaryAddr && current != self.secondaryAddr {
             self.tcpService.stop()
         }
-        self.addressCandidate.update(addresses: [primaryAddr, secondaryAddr])
+        self.addressCandidate.update(addresses: [self.primaryAddr, self.secondaryAddr])
+
+
+        if backgroundQueue == nil {
+            backgroundQueue = DispatchQueue.init(label: "Network Queue")
+        }
+        backgroundQueue?.async {
+            if let _ = try? DownloadManager.shared.fetchData(from: "features-start", currentAddress: self.getCurrentAddress()) {
+                DispatchQueue.main.async {
+                    self.serverIsReady = true
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.serverIsReady = false
+                }
+            }
+        }
     }
 
     func getCurrentAddress() -> String {
@@ -1582,7 +1579,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             }
         }
         if userInfo.type == .OverrideDestination {
-            func traverseDest(src: Source) {
+            func traverseDest() {
                 do {
                     let floorDestinations = try Directory.downloadDirectoryJson(currentAddress: self.getCurrentAddress())
                     for floorDest in floorDestinations {
@@ -1604,12 +1601,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                         }
                     }
                 } catch {
-                    NSLog("\(src) cannot be loaded")
+                    NSLog("cannot be loaded")
                 }
             }
-            if let src = resource?.destinationsSource {
-                traverseDest(src: src)
-            }
+            traverseDest()
         }
         if userInfo.type == .Skip {
             skipDestination()

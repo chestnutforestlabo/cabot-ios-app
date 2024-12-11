@@ -36,10 +36,6 @@ struct RootView: View {
                     OnboardGrantAccess()
                         .environmentObject(modelData)
                         .heartbeat("OnboardGrantAccess")
-                case .ResourceSelect:
-                    ResourceSelectView()
-                        .environmentObject(modelData)
-                        .heartbeat("ResourceSelectView")
                 case .App:
                     MainMenuView()
                         .environmentObject(modelData)
@@ -94,27 +90,15 @@ struct RootView: View {
                              })
             }
         }
-        .environment(\.locale, modelData.resource?.locale ?? .init(identifier: modelData.resourceLang))
+        .environment(\.locale, modelData.selectedLocale)
     }
 }
 
 struct RootView_Previews: PreviewProvider {
     static var previews: some View {
-        previewApp
         previewContent
-        previewSelect
         previewOnboard
         previewAdvanced
-    }
-
-    static var previewApp: some View {
-        let modelData = CaBotAppModel()
-        modelData.displayedScene = .ResourceSelect
-        modelData.suitcaseConnected = false
-        modelData.resource = modelData.resourceManager.resource(by: "place0")
-
-        return RootView()
-            .environmentObject(modelData)
     }
 
     static var previewContent: some View {
@@ -126,16 +110,6 @@ struct RootView_Previews: PreviewProvider {
         return RootView()
             .environmentObject(modelData)
 
-    }
-
-    static var previewSelect: some View {
-        let modelData = CaBotAppModel()
-        modelData.displayedScene = .ResourceSelect
-        modelData.suitcaseConnected = false
-        modelData.resource = nil
-
-        return RootView()
-            .environmentObject(modelData)
     }
 
     static var previewOnboard: some View {

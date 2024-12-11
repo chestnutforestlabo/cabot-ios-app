@@ -36,11 +36,9 @@ struct SettingView: View {
     var body: some View {
         return Form {
             Section(header: Text("Settings")){
-                if let resource = modelData.resource {
-                    Picker("LANGUAGE", selection: $modelData.selectedLanguage) {
-                        ForEach(resource.languages, id: \.self) { language in
-                            Text(language).tag(language)
-                        }
+                Picker("LANGUAGE", selection: $modelData.selectedLanguage) {
+                    ForEach(modelData.languages, id: \.self) { language in
+                        Text(language).tag(language)
                     }
                 }
 

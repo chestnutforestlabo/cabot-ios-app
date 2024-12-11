@@ -355,38 +355,20 @@ struct MainMenus: View {
     @EnvironmentObject var modelData: CaBotAppModel
 
     var body: some View {
-        if let cm = modelData.resource {
+        if modelData.serverIsReady {
             Section(header: Text("Navigation")) {
-                if let src = cm.destinationsSource {
-                    NavigationLink(
-                        destination: DestinationsFloorView()
-                            .environmentObject(modelData).heartbeat("DestinationsView"),
-                        label: {
-                            Text("SELECT_DESTINATION")
-                        })
-                }
+                NavigationLink(
+                    destination: DestinationsFloorView()
+                        .environmentObject(modelData).heartbeat("DestinationsView"),
+                    label: {
+                        Text("SELECT_DESTINATION")
+                    })
                 NavigationLink(
                     destination: ToursView()
                         .environmentObject(modelData).heartbeat("ToursView"),
                     label: {
                         Text("SELECT_TOUR")
                     })
-            }
-
-
-            if cm.customeMenus.count > 0 {
-                Section(header: Text("Others")) {
-                    ForEach (cm.customeMenus, id: \.self) {
-                        menu in
-
-                        if let url = menu.script.url {
-                            Button(menu.title) {
-                                let jsHelper = JSHelper(withScript: url)
-                                _ = jsHelper.call(menu.function, withArguments: [])
-                            }
-                        }
-                    }
-                }
             }
         }
     }
@@ -548,10 +530,6 @@ struct ContentView_Previews: PreviewProvider {
         modelData.serverTCPVersion = CaBotServiceBLE.CABOT_BLE_VERSION
         modelData.modeType = .Normal
 
-        if let r = modelData.resourceManager.resource(by: "Test data") {
-            modelData.resource = r
-        }
-
         return MainMenuView()
             .environmentObject(modelData)
             .environment(\.locale, .init(identifier: "en"))
@@ -678,19 +656,14 @@ struct ContentView_Previews: PreviewProvider {
         modelData.menuDebug = true
         modelData.noSuitcaseDebug = true
 
-        if let r = modelData.resourceManager.resource(by: "place0") {
-            modelData.resource = r
-            if r.toursSource != nil {
-                do{
-                    let tours = try Tour.loadTourDataPreview()
-                    if  tours.indices.contains(1){
-                        modelData.tourManager.set(tour: tours[0])
-                        _ = modelData.tourManager.proceedToNextDestination()
-                    }
-                }catch {
-                    NSLog("Error loading tours for preview: \(error)")
-                }
+        do{
+            let tours = try Tour.loadTourDataPreview()
+            if  tours.indices.contains(1){
+                modelData.tourManager.set(tour: tours[0])
+                _ = modelData.tourManager.proceedToNextDestination()
             }
+        }catch {
+            NSLog("Error loading tours for preview: \(error)")
         }
 
         return MainMenuView()
@@ -701,18 +674,13 @@ struct ContentView_Previews: PreviewProvider {
     static var preview_tour2: some View {
         let modelData = CaBotAppModel()
 
-        if let r = modelData.resourceManager.resource(by: "place0") {
-            modelData.resource = r
-            if r.toursSource != nil {
-                do{
-                    let tours = try Tour.loadTourDataPreview()
-                    if  tours.indices.contains(1){
-                        modelData.tourManager.set(tour: tours[0])
-                    }
-                }catch {
-                    NSLog("Error loading tours for preview: \(error)")
-                }
+        do{
+            let tours = try Tour.loadTourDataPreview()
+            if  tours.indices.contains(1){
+                modelData.tourManager.set(tour: tours[0])
             }
+        }catch {
+            NSLog("Error loading tours for preview: \(error)")
         }
 
         return MainMenuView()
@@ -723,18 +691,13 @@ struct ContentView_Previews: PreviewProvider {
     static var preview_tour3: some View {
         let modelData = CaBotAppModel()
 
-        if let r = modelData.resourceManager.resource(by: "place0") {
-            modelData.resource = r
-            if r.toursSource != nil {
-                do{
-                    let tours = try Tour.loadTourDataPreview()
-                    if  tours.indices.contains(1){
-                        modelData.tourManager.set(tour: tours[1])
-                    }
-                }catch {
-                    NSLog("Error loading tours for preview: \(error)")
-                }
+        do{
+            let tours = try Tour.loadTourDataPreview()
+            if  tours.indices.contains(1){
+                modelData.tourManager.set(tour: tours[1])
             }
+        }catch {
+            NSLog("Error loading tours for preview: \(error)")
         }
 
         return MainMenuView()
@@ -745,18 +708,13 @@ struct ContentView_Previews: PreviewProvider {
     static var preview_tour4: some View {
         let modelData = CaBotAppModel()
 
-        if let r = modelData.resourceManager.resource(by: "place0") {
-            modelData.resource = r
-            if r.toursSource != nil {
-                do{
-                    let tours = try Tour.loadTourDataPreview()
-                    if  tours.indices.contains(1){
-                        modelData.tourManager.set(tour: tours[1])
-                    }
-                }catch {
-                    NSLog("Error loading tours for preview: \(error)")
-                }
+        do{
+            let tours = try Tour.loadTourDataPreview()
+            if  tours.indices.contains(1){
+                modelData.tourManager.set(tour: tours[1])
             }
+        }catch {
+            NSLog("Error loading tours for preview: \(error)")
         }
 
         return MainMenuView()
@@ -767,8 +725,6 @@ struct ContentView_Previews: PreviewProvider {
     static var preview: some View {
         let modelData = CaBotAppModel()
 
-        modelData.resource = modelData.resourceManager.resource(by: "place0")
-
         return MainMenuView()
             .environmentObject(modelData)
             .previewDisplayName("preview")
@@ -777,8 +733,6 @@ struct ContentView_Previews: PreviewProvider {
 
     static var preview_ja: some View {
         let modelData = CaBotAppModel()
-
-        modelData.resource = modelData.resourceManager.resource(by: "place0")
 
         return MainMenuView()
             .environment(\.locale, .init(identifier: "ja"))

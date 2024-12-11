@@ -291,81 +291,77 @@ class TourManager: TourProtocol {
                 }
                 else if (_tourSaveData.id == "TourManager") {
                     // load destinations
-                    if let src = model.resource?.destinationsSource {
-                        do {
-                            let floorDestinations: [Directory.FloorDestination] = try Directory.downloadDirectoryJson(currentAddress: model.getCurrentAddress())
-                            let allDestinations: [Destination] = floorDestinations.flatMap { $0.destinations }
+                    do {
+                        let floorDestinations: [Directory.FloorDestination] = try Directory.downloadDirectoryJson(currentAddress: model.getCurrentAddress())
+                        let allDestinations: [Destination] = floorDestinations.flatMap { $0.destinations }
 
-                            for destination in allDestinations {
-                                if decoded.currentDestination == (destination.value ?? destination.ref?.value ?? "") {
-                                    addToFirst(destination: destination)
-                                    let _ = proceedToNextDestination(isStartMessageSpeaking: false)
-                                }
+                        for destination in allDestinations {
+                            if decoded.currentDestination == (destination.value ?? destination.ref?.value ?? "") {
+                                addToFirst(destination: destination)
+                                let _ = proceedToNextDestination(isStartMessageSpeaking: false)
                             }
-
-                            for decodedDestination in decoded.destinations {
-                                for destination in allDestinations {
-                                    if decodedDestination == (destination.value ?? destination.ref?.value ?? "") {
-                                        addToLast(destination: destination)
-                                    }
-                                }
-                            }
-
-                        
-                            if decoded.destinations.count > 0 && decoded.currentDestination == "" {
-                                model.needToStartAnnounce(wait: true)
-                            }
-                        } catch {
-                            NSLog("Error loading destinations: \(error)")
                         }
+
+                        for decodedDestination in decoded.destinations {
+                            for destination in allDestinations {
+                                if decodedDestination == (destination.value ?? destination.ref?.value ?? "") {
+                                    addToLast(destination: destination)
+                                }
+                            }
+                        }
+
+
+                        if decoded.destinations.count > 0 && decoded.currentDestination == "" {
+                            model.needToStartAnnounce(wait: true)
+                        }
+                    } catch {
+                        NSLog("Error loading destinations: \(error)")
                     }
                 }
                 else{
                     // load tour
-                    if let src = model.resource?.toursSource {
-                        do {
-                            let tours = try Tour.load(currentAddress: model.getCurrentAddress())
-                            for tour in tours {
-                                if tour.id == decoded.id {
-                                    set(tour: tour)
-                                    if(_tourSaveData.currentDestination != ""){
-                                        for d in destinations {
-                                            if d.value ?? d.ref?.value != _tourSaveData.currentDestination {
-                                                var _ = pop()
+                    do {
+                        let tours = try Tour.load(currentAddress: model.getCurrentAddress())
+                        for tour in tours {
+                            if tour.id == decoded.id {
+                                set(tour: tour)
+                                if(_tourSaveData.currentDestination != ""){
+                                    for d in destinations {
+                                        if d.value ?? d.ref?.value != _tourSaveData.currentDestination {
+                                            var _ = pop()
+                                        }
+                                        else{
+                                            var _ = proceedToNextDestination(isStartMessageSpeaking: false)
+                                            break
+                                        }
+                                    }
+                                }
+                                else{
+                                    if(_tourSaveData.destinations.count > 0){
+                                        for d in destinations{
+                                            if(destinations.count > 0){
+                                                if(destinations[0].value ?? destinations[0].ref?.value != _tourSaveData.destinations[0]){
+                                                    var _ = pop()
+                                                }
                                             }
                                             else{
-                                                var _ = proceedToNextDestination(isStartMessageSpeaking: false)
                                                 break
                                             }
                                         }
+                                        model.needToStartAnnounce(wait: true)
                                     }
                                     else{
-                                        if(_tourSaveData.destinations.count > 0){
-                                            for d in destinations{
-                                                if(destinations.count > 0){
-                                                    if(destinations[0].value ?? destinations[0].ref?.value != _tourSaveData.destinations[0]){
-                                                        var _ = pop()
-                                                    }
-                                                }
-                                                else{
-                                                    break
-                                                }
-                                            }
-                                            model.needToStartAnnounce(wait: true)
-                                        }
-                                        else{
-                                            clearAllDestinations()
-                                        }
+                                        clearAllDestinations()
                                     }
-                                    
-                                    return
                                 }
+
+                                return
                             }
-                        } catch {
-                            NSLog("\(src) cannot be loaded")
                         }
+                    } catch {
+                        NSLog("cannot be loaded")
                     }
-                    
+
                 }
             }
         }

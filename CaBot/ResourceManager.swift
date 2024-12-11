@@ -615,7 +615,7 @@ class DownloadManager {
         }
 
         task.resume()
-        semaphore.wait()
+        semaphore.wait(timeout: .now()+1.0)
 
         guard let data = dataReceived else {
             throw MetadataError.contentLoadError
@@ -1435,92 +1435,4 @@ class Feature : Decodable,  Hashable {
             throw MetadataError.contentLoadError
         }
     }
-}
-
-class ResourceManager {
-    public static let shared: ResourceManager = ResourceManager(preview: false)
-
-    private var _resources: [Resource] = []
-    private var _resourceMap: [String: Resource] = [:]
-    var resources: [Resource] {
-        get {
-            return _resources
-        }
-    }
-
-    let preview: Bool
-
-    init(preview: Bool) {
-        self.preview = preview
-        updateResources()
-    }
-
-    public func resolveContentURL(url: URL) -> URL? {
-        let abs = url.absoluteString
-        if abs.starts(with: "content://") == false {
-            return nil
-        }
-
-        let path = abs[abs.index(abs.startIndex, offsetBy: 10)...]
-        return getResourceRoot().appendingPathComponent(String(path))
-    }
-
-    public func updateResources() {
-        _resources = listAllResources()
-        _resourceMap = [:]
-
-        for resource in resources {
-            _resourceMap[resource.id] = resource
-        }
-    }
-
-    public func resource(by identifier: String) -> Resource? {
-        NSLog("resource by identifier=\(identifier)")
-        for resource in resources {
-            NSLog("iterating resource.identifier = \(resource.identifier)")
-            if resource.identifier == identifier {
-                return resource
-            }
-        }
-        return nil
-    }
-
-    func getResourceRoot() -> URL {
-        if preview {
-            let path = Bundle.main.resourceURL
-            return path!.appendingPathComponent("PreviewResource")
-
-        } else {
-            guard let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
-                fatalError("Could not find the document directory.")
-            }
-            return path
-        }
-    }
-
-    private func listAllResources() -> [Resource] {
-        var list: [Resource] = []
-
-        let resourceRoot = getResourceRoot()
-
-        let fm = FileManager.default
-        let enumerator: FileManager.DirectoryEnumerator? = fm.enumerator(at: resourceRoot, includingPropertiesForKeys: [.isDirectoryKey], options: [], errorHandler: nil)
-
-        while let dir = enumerator?.nextObject() as? URL {
-            if fm.fileExists(atPath: dir.appendingPathComponent(Resource.METADATA_FILE_NAME).path) {
-                do {
-                    let model = try Resource(at: dir)
-                    list.append(model)
-                } catch (let error) {
-                    NSLog(error.localizedDescription)
-                }
-            }
-        }
-
-        return list.sorted { r1, r2 in
-            r1.name < r2.name
-        }
-    }
-
-
 }
