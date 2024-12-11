@@ -1378,7 +1378,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                     self.speak(arrivedMsg, priority:.High, timeout: nil ) { _, _ in }
                     self.speak(announce, priority:.Normal, timeout: nil, tag: .Next(erase:false) ) { code, length in
-                        guard code == .Completed else { return }
+                        guard code != .Paused else { return }
                         // if user pressed the next button while reading announce, skip open content
                         if self.tourManager.currentDestination == nil {
                             if let contentURL = cd.content?.url,
