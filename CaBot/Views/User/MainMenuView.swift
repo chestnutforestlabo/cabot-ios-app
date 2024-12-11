@@ -359,7 +359,7 @@ struct MainMenus: View {
             Section(header: Text("Navigation")) {
                 if let src = cm.destinationsSource {
                     NavigationLink(
-                        destination: DestinationsFloorView(src: src)
+                        destination: DestinationsFloorView()
                             .environmentObject(modelData).heartbeat("DestinationsView"),
                         label: {
                             Text("SELECT_DESTINATION")
@@ -680,10 +680,15 @@ struct ContentView_Previews: PreviewProvider {
 
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
-            if let url = r.toursSource {
-                if let tours = try? Tour.load() {
-                    modelData.tourManager.set(tour: tours[0])
-                    _ = modelData.tourManager.proceedToNextDestination()
+            if r.toursSource != nil {
+                do{
+                    let tours = try Tour.loadTourDataPreview()
+                    if  tours.indices.contains(1){
+                        modelData.tourManager.set(tour: tours[0])
+                        _ = modelData.tourManager.proceedToNextDestination()
+                    }
+                }catch {
+                    NSLog("Error loading tours for preview: \(error)")
                 }
             }
         }
@@ -698,9 +703,14 @@ struct ContentView_Previews: PreviewProvider {
 
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
-            if let url = r.toursSource {
-                if let tours = try? Tour.load() {
-                    modelData.tourManager.set(tour: tours[0])
+            if r.toursSource != nil {
+                do{
+                    let tours = try Tour.loadTourDataPreview()
+                    if  tours.indices.contains(1){
+                        modelData.tourManager.set(tour: tours[0])
+                    }
+                }catch {
+                    NSLog("Error loading tours for preview: \(error)")
                 }
             }
         }
@@ -715,9 +725,14 @@ struct ContentView_Previews: PreviewProvider {
 
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
-            if let url = r.toursSource {
-                if let tours = try? Tour.load() {
-                    modelData.tourManager.set(tour: tours[1])
+            if r.toursSource != nil {
+                do{
+                    let tours = try Tour.loadTourDataPreview()
+                    if  tours.indices.contains(1){
+                        modelData.tourManager.set(tour: tours[1])
+                    }
+                }catch {
+                    NSLog("Error loading tours for preview: \(error)")
                 }
             }
         }
@@ -732,9 +747,14 @@ struct ContentView_Previews: PreviewProvider {
 
         if let r = modelData.resourceManager.resource(by: "place0") {
             modelData.resource = r
-            if let url = r.toursSource {
-                if let tours = try? Tour.load() {
-                    modelData.tourManager.set(tour: tours[1])
+            if r.toursSource != nil {
+                do{
+                    let tours = try Tour.loadTourDataPreview()
+                    if  tours.indices.contains(1){
+                        modelData.tourManager.set(tour: tours[1])
+                    }
+                }catch {
+                    NSLog("Error loading tours for preview: \(error)")
                 }
             }
         }

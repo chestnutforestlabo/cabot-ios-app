@@ -47,7 +47,7 @@ struct ToursView: View {
     
     private func loadTours() {
         do {
-            tours = try Tour.load()
+            tours = try Tour.load(currentAddress: modelData.getCurrentAddress())
         } catch {
             NSLog("Error loading tours: \(error)")
         }
@@ -58,11 +58,24 @@ struct ToursView: View {
 struct ToursView_Previews: PreviewProvider {
     static var previews: some View {
         let modelData = CaBotAppModel()
+        var previewTours: [Tour] = []
+        do {
+            previewTours = try Tour.loadTourDataPreview()
+        } catch {
+            NSLog("Error loading tours for preview: \(error)")
+        }
 
-        let resource = modelData.resourceManager.resource(by: "Test data")!
-        let tours = resource.toursSource!
-
-        return ToursView()
-            .environmentObject(modelData)
+        return Form {
+            Section(header: Text("SELECT_TOUR")) {
+                ForEach(previewTours, id: \.id) { tour in
+                    NavigationLink(
+                        destination: StaticTourDetailView(tour: tour).heartbeat("StaticTourDetailView"),
+                        label: {
+                            Text(tour.title.text)
+                        })
+                }
+            }
+        }
+        .environmentObject(modelData)
     }
 }

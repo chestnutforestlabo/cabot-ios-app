@@ -1,0 +1,68 @@
+{
+    "sections": [
+        {
+            "title": "Search by Floor",
+            "items": [
+                {
+                    "title": "5F",
+                    "content": {
+                        "sections": [
+                            {
+                                "title": "5",
+                                "items": [
+                                    {
+                                        "subtitle": "Others - 5F",
+                                        "titlePron": "Destination1",
+                                        "subtitlePron": "Others - 5F",
+                                        "title": "Destination1",
+                                        "nodeID": "Node_ID_FOR_A",
+                                        "forDemonstration": "false"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "P",
+                                "items": [
+                                    {
+                                        "subtitle": "Others - 5F",
+                                        "titlePron": "Destination2",
+                                        "subtitlePron": "Others - 5F",
+                                        "title": "Destination12",
+                                        "nodeID": "Node_ID_FOR_B",
+                                        "forDemonstration": "false"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "T",
+                                "items": [
+                                    {
+                                        "subtitle": "Others - 5F",
+                                        "titlePron": "Destination3",
+                                        "subtitlePron": "Others - 5F",
+                                        "title": "Destination3",
+                                        "nodeID": "Node_ID_FOR_C",
+                                        "forDemonstration": "true"
+                                    },
+                                    {
+                                        "subtitle": "Others - 5F",
+                                        "titlePron": "Destination4",
+                                        "subtitlePron": "Others - 5F",
+                                        "title": "Destination4",
+                                        "nodeID": "Node_ID_FOR_D",
+                                        "forDemonstration": "true"
+                                    }
+                                ]
+                            }
+                        ],
+                        "showSectionIndex": true
+                    }
+                }
+            ]
+        },
+        {
+            "title": "Nearby Facility"
+        }
+    ],
+    "showSectionIndex": false
+}

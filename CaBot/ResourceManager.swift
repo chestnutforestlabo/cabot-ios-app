@@ -569,150 +569,114 @@ struct Reference: CustomStringConvertible {
 /// - content: <Source> file including a web content to show in the browser
 /// - waitingDestination: <WaitingDestination>
 /// ```
-struct Root: Decodable {
-    let sections: [FloorSection]
-    
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        sections = try container.decodeIfPresent([FloorSection].self, forKey: .sections) ?? []
-    }
-    
-    private enum CodingKeys: String, CodingKey {
-        case sections
-    }
-}
+class Directory {
+    struct DirectoryRoot: Decodable {
+        let sections: [FloorSection]
 
-struct FloorSection: Decodable {
-    let title: I18NText
-    let items: [Item]
-    
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        title = I18NText.decode(decoder: decoder, baseKey: "title")
-        items = try container.decodeIfPresent([Item].self, forKey: .items) ?? []
-    }
-    
-    private enum CodingKeys: String, CodingKey {
-        case title, items
-    }
-}
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            sections = try container.decodeIfPresent([FloorSection].self, forKey: .sections) ?? []
+        }
 
-struct Item: Decodable {
-    let title: I18NText
-    let content: ItemsContent?
-    
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        title = I18NText.decode(decoder: decoder, baseKey: "title")
-        content = try container.decodeIfPresent(ItemsContent.self, forKey: .content)
-    }
-    
-    private enum CodingKeys: String, CodingKey {
-        case title, content
-    }
-}
-
-struct ItemsContent: Decodable {
-    let sections: [NestedSection]
-    let showSectionIndex: Bool
-    
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        sections = try container.decodeIfPresent([NestedSection].self, forKey: .sections) ?? []
-        showSectionIndex = try container.decodeIfPresent(Bool.self, forKey: .showSectionIndex) ?? false
-    }
-    
-    private enum CodingKeys: String, CodingKey {
-        case sections, showSectionIndex
-    }
-}
-
-struct NestedSection: Decodable {
-    let title: I18NText
-    let items: [NestedItem]
-    
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        title = I18NText.decode(decoder: decoder, baseKey: "title")
-        items = try container.decodeIfPresent([NestedItem].self, forKey: .items) ?? []
-    }
-    
-    private enum CodingKeys: String, CodingKey {
-        case title, items
-    }
-}
-
-struct NestedItem: Decodable {
-    let subtitle: String
-    let titlePron: String
-    let subtitlePron: String
-    let title: I18NText
-    let nodeID: String
-    let forDemonstration: Bool
-    
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        subtitle = try container.decodeIfPresent(String.self, forKey: .subtitle) ?? "Unknown"
-        titlePron = try container.decodeIfPresent(String.self, forKey: .titlePron) ?? "Unknown"
-        subtitlePron = try container.decodeIfPresent(String.self, forKey: .subtitlePron) ?? "Unknown"
-        title = I18NText.decode(decoder: decoder, baseKey: "title")
-        nodeID = try container.decodeIfPresent(String.self, forKey: .nodeID) ?? "No ID"
-        if let forDemonstrationString = try container.decodeIfPresent(String.self, forKey: .forDemonstration) {
-            forDemonstration = (forDemonstrationString.lowercased() == "true")
-        } else {
-            forDemonstration = false
+        private enum CodingKeys: String, CodingKey {
+            case sections
         }
     }
-    
-    private enum CodingKeys: String, CodingKey {
-        case subtitle, titlePron, subtitlePron, title, nodeID, forDemonstration
-    }
-}
 
-func downloadDirectoryJson(modelData: CaBotAppModel) throws -> [FloorDestination] {
-    let fileConfigName = "config.json"
-    
-    guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
-        throw MetadataError.contentLoadError
-    }
-    let fileConfigURL = documentsDirectory.appendingPathComponent(fileConfigName)
-    
-    let configUrlString =  URL(string: "http://\(modelData.getCurrentAddress()):9090/map/api/config")
-   
-    guard let url = configUrlString else {
-        throw MetadataError.contentLoadError
-    }
-    var downloadedFloorDestinations: [FloorDestination] = []
-    
-    let semaphore = DispatchSemaphore(value: 0)
-    
-    var dataReceived: Data?
-    var downloadError: Error?
-    let task = URLSession.shared.dataTask(with: url) { data, response, error in
-        if let error = error {
-            downloadError = error
-            semaphore.signal()
-            return
+    struct FloorSection: Decodable {
+        let title: I18NText
+        let items: [Item]
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            title = I18NText.decode(decoder: decoder, baseKey: "title")
+            items = try container.decodeIfPresent([Item].self, forKey: .items) ?? []
         }
-        dataReceived = data
-        semaphore.signal()
+
+        private enum CodingKeys: String, CodingKey {
+            case title, items
+        }
     }
-    
-    task.resume()
-    semaphore.wait()
-    
-    if let error = downloadError {
-        throw error
+
+    struct Item: Decodable {
+        let title: I18NText
+        let content: ItemsContent?
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            title = I18NText.decode(decoder: decoder, baseKey: "title")
+            content = try container.decodeIfPresent(ItemsContent.self, forKey: .content)
+        }
+        private enum CodingKeys: String, CodingKey {
+            case title, content
+        }
     }
-    
-    guard let data = dataReceived else {
-        throw MetadataError.contentLoadError
+
+
+    struct ItemsContent: Decodable {
+        let sections: [NestedSection]
+        let showSectionIndex: Bool
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            sections = try container.decodeIfPresent([NestedSection].self, forKey: .sections) ?? []
+            showSectionIndex = try container.decodeIfPresent(Bool.self, forKey: .showSectionIndex) ?? false
+        }
+        private enum CodingKeys: String, CodingKey {
+            case sections, showSectionIndex
+        }
     }
-    
-    do {
-        try data.write(to: fileConfigURL)
-        let configData = try Data(contentsOf: fileConfigURL)
-        
+
+    struct NestedSection: Decodable {
+        let title: I18NText
+        let items: [NestedItem]
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            title = I18NText.decode(decoder: decoder, baseKey: "title")
+            items = try container.decodeIfPresent([NestedItem].self, forKey: .items) ?? []
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case title, items
+        }
+    }
+
+    struct NestedItem: Decodable {
+        let subtitle: String
+        let titlePron: String
+        let subtitlePron: String
+        let title: I18NText
+        let nodeID: String
+        let forDemonstration: Bool
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            subtitle = try container.decodeIfPresent(String.self, forKey: .subtitle) ?? "Unknown"
+            titlePron = try container.decodeIfPresent(String.self, forKey: .titlePron) ?? "Unknown"
+            subtitlePron = try container.decodeIfPresent(String.self, forKey: .subtitlePron) ?? "Unknown"
+            title = I18NText.decode(decoder: decoder, baseKey: "title")
+            nodeID = try container.decodeIfPresent(String.self, forKey: .nodeID) ?? "No ID"
+            if let forDemonstrationString = try container.decodeIfPresent(String.self, forKey: .forDemonstration) {
+                forDemonstration = (forDemonstrationString.lowercased() == "true")
+            } else {
+                forDemonstration = false
+            }
+        }
+        private enum CodingKeys: String, CodingKey {
+            case subtitle, titlePron, subtitlePron, title, nodeID, forDemonstration
+        }
+    }
+
+
+    static func downloadDirectoryJson(downloadURL: String) throws -> [FloorDestination] {
+        let fileConfigName = "config.json"
+        let fileDirectoryName = "directory.json"
+        guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            throw MetadataError.contentLoadError
+        }
+        let fileConfigURL = documentsDirectory.appendingPathComponent(fileConfigName)
+
+        let configData = try fetchData(from: "config", currentAddress:downloadURL , isConfig: true)
+        try configData.write(to: fileConfigURL)
         struct InitialLocation: Codable {
             let lat: Double
             let lng: Double
@@ -733,45 +697,126 @@ func downloadDirectoryJson(modelData: CaBotAppModel) throws -> [FloorDestination
         let dist = 5000
         let user = "user-id"
         
-        let fileDirectoryFileName = "directory.json"
         
-        let fileDirectoryURL = documentsDirectory.appendingPathComponent(fileDirectoryFileName)
-        let directoryUrlString = URL(string: "http://\(modelData.getCurrentAddress()):9090/query/directory?user=\(user)&lat=\(lat)&lng=\(lng)&dist=\(dist)")
-        guard let directoryUrl = directoryUrlString else {
+        let directoryData = try fetchData(from: "directory", currentAddress:downloadURL, isConfig: false, lat: lat, lng: lng,dist:dist,user:user)
+        try directoryData.write(to: documentsDirectory.appendingPathComponent(fileDirectoryName))
+
+        let directoryDataDecoded = try JSONDecoder().decode(DirectoryRoot.self, from: directoryData)
+        return try processDirectoryData(directoryDataDecoded, currentAddress:downloadURL)
+    }
+
+    static func fetchData(from resource: String, currentAddress: String, isConfig: Bool, lat: Double = 0.0, lng: Double = 0.0,dist:Int=0,user:String="") throws -> Data {
+
+        let baseURL = isConfig ? "http://\(currentAddress):9090/map/api/config" : "http://\(currentAddress):9090/query/directory?user=\(user)&lat=\(lat)&lng=\(lng)&dist=\(dist)"
+        guard let url = URL(string: baseURL) else {
             throw MetadataError.contentLoadError
         }
-        
-        var directoryDataReceived: Data?
-        var directoryDownloadError: Error?
-        let directoryTask = URLSession.shared.dataTask(with: directoryUrl) { data, response, error in
+
+        var dataReceived: Data?
+        let semaphore = DispatchSemaphore(value: 0)
+
+        let task = URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error {
-                directoryDownloadError = error
+                NSLog("Error fetching data: \(error.localizedDescription)")
                 semaphore.signal()
                 return
             }
-            directoryDataReceived = data
+            dataReceived = data
             semaphore.signal()
         }
         
-        directoryTask.resume()
         
+        task.resume()
         semaphore.wait()
         
-        if let error = directoryDownloadError {
-            throw error
-        }
-        
-        guard let directoryData = directoryDataReceived else {
+        guard let data = dataReceived else {
             throw MetadataError.contentLoadError
         }
         
-        try directoryData.write(to: fileDirectoryURL)
-        let decoder = JSONDecoder()
-        let directoryDataDecoded = try decoder.decode(Root.self, from: directoryData)
+        return data
+    }
+
+    static func processDirectoryData(_ directoryDataDecoded: DirectoryRoot, currentAddress: String) throws -> [FloorDestination] {
+        let tours = try Tour.load(currentAddress:currentAddress)
+        let features = try Feature.loadFeature(currentAddress:currentAddress)
+        return try extractFloorDestinations(directoryDataDecoded: directoryDataDecoded, tours: tours, features: features)
+    }
+
+    static func createDestination(from subItem: NestedItem, itemTitle: I18NText, tours: [Tour], features: [Feature]) throws -> Destination? {
+
+        guard let feature = features.first(where: { $0.properties.ent1Node == subItem.nodeID }) else {
+            return nil
+        }
+
+        let destination = Destination(
+            floorTitle: itemTitle,
+            title: I18NText(text: feature.properties.names, pron: [:]),
+            value: subItem.nodeID,
+            pron: nil,
+            file: nil,
+            summaryMessage: I18NText(text: [:], pron: [:]),
+            startMessage: I18NText(text: [:], pron: [:]),
+            arriveMessages: [],
+            content: nil,
+            waitingDestination: nil,
+            subtour: nil,
+            forDemonstration: subItem.forDemonstration
+        )
+
+        for tour in tours {
+            if let tourDestination = tour.destinations.first(where: {
+                $0.matchedDestinationRef?.value ?? $0.ref == subItem.nodeID
+            }) {
+                destination.summaryMessage = tourDestination.summaryMessage?.text ?? I18NText(text: [:], pron: [:])
+                destination.startMessage = tourDestination.startMessage?.text ?? I18NText(text: [:], pron: [:])
+                destination.arriveMessages = tourDestination.arriveMessages.map { $0.text }
+                let arrivalAngleString = tourDestination.matchedDestinationRef?.arrivalAngle.map { "@" + String($0) } ?? ""
+                destination.value = subItem.nodeID+arrivalAngleString
+            }
+        }
+
+        return destination
+    }
+
+    static func downloadDirectoryJsonForPreview() throws -> [FloorDestination] {
+        let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
+        let fileDirectoryURL = path.appendingPathComponent("directory.json")
+        let data: Data
+        do {
+            data = try Data(contentsOf: fileDirectoryURL)
+        } catch {
+            NSLog("Failed to read file: \(error.localizedDescription)")
+            throw MetadataError.contentLoadError
+        }
         
-        let tours = try Tour.load()
-        let features = try Feature.loadFeature()
         
+        
+        let directoryDataDecoded: DirectoryRoot
+        do {
+            directoryDataDecoded = try JSONDecoder().decode(DirectoryRoot.self, from: data)
+        } catch {
+            NSLog("Failed to decode JSON: \(error)")
+            throw MetadataError.contentLoadError
+        }
+
+
+        let tours: [Tour]
+        let features: [Feature]
+
+        do {
+            tours = try Tour.loadTourDataPreview()
+            features = try Feature.loadFeaturePreview()
+        } catch {
+            NSLog("Failed to load tour or feature data: \(error)")
+            throw MetadataError.contentLoadError
+        }
+
+        return try extractFloorDestinations(directoryDataDecoded: directoryDataDecoded, tours: tours, features: features)
+    }
+
+    private static func extractFloorDestinations(directoryDataDecoded: DirectoryRoot, tours: [Tour], features: [Feature]) throws -> [FloorDestination] {
+        var downloadedFloorDestinations: [FloorDestination] = []
+
         for section in directoryDataDecoded.sections {
             for item in section.items {
                 var destinations: [Destination] = []
@@ -794,56 +839,18 @@ func downloadDirectoryJson(modelData: CaBotAppModel) throws -> [FloorDestination
 
 
         
-    } catch {
-        NSLog("Error: \(error.localizedDescription)")
+        return downloadedFloorDestinations
     }
-    
-    return downloadedFloorDestinations
-}
 
-func createDestination(from subItem: NestedItem, itemTitle: I18NText, tours: [Tour], features: [Feature]) throws -> Destination? {
-    var destination: Destination?
 
-    for feature in features {
-        if feature.properties.ent1Node == subItem.nodeID {
-            destination = Destination(
-                floorTitle: itemTitle,
-                title: I18NText(text: feature.properties.names, pron: [:]),
-                value: subItem.nodeID,
-                pron: nil,
-                file: nil,
-                summaryMessage: I18NText(text: [:], pron: [:]),
-                startMessage: I18NText(text: [:], pron: [:]),
-                arriveMessages: [],
-                content: nil,
-                waitingDestination: nil,
-                subtour: nil,
-                forDemonstration: subItem.forDemonstration
-            )
+    class FloorDestination{
+        let floorTitle: I18NText
+        let destinations: [Destination]
 
-            for tour in tours {
-                if let tourDestination = tour.destinations.first(where: {
-                    $0.matchedDestinationRef?.value ?? $0.ref == subItem.nodeID
-                }) {
-                    destination?.summaryMessage = tourDestination.summaryMessage?.text ?? I18NText(text: [:], pron: [:])
-                    destination?.startMessage = tourDestination.startMessage?.text ?? I18NText(text: [:], pron: [:])
-                    destination?.arriveMessages = tourDestination.arriveMessages.map { $0.text }
-                }
-            }
-            break
+        init(floorTitle: I18NText, destinations: [Destination] = []) {
+            self.floorTitle = floorTitle
+            self.destinations = destinations
         }
-    }
-
-    return destination
-}
-
-class FloorDestination{
-    let floorTitle: I18NText
-    let destinations: [Destination]
-
-    init(floorTitle: I18NText, destinations: [Destination] = []) {
-        self.floorTitle = floorTitle
-        self.destinations = destinations
     }
 }
 
@@ -874,7 +881,7 @@ class Destination:  Hashable {
     let i18n:I18N
     let floorTitle: I18NText
     let title: I18NText
-    let value:String?
+    var value:String?
     let file:Source?
     var summaryMessage: I18NText
     var startMessage:I18NText
@@ -979,7 +986,6 @@ struct DestinationJSON: Decodable {
     let ref: String
     let refTitle: String
     var matchedDestinationRef: DestinationRef?
-   // var matchedMessage: Message?
     var summaryMessage: Message?
     var startMessage: Message?
     var arriveMessages: [Message]
@@ -1223,10 +1229,34 @@ class Tour: Decodable, Hashable{
     }
     
     // MARK: - Static Methods
-    static func load() throws -> [Tour] {
+    static func load(currentAddress: String) throws -> [Tour] {
         do {
-            let fileURL = getTourDataJSON().appendingPathComponent("app-resource/tourdata.json")
-            let data = try Data(contentsOf: fileURL)
+            var url: URL
+            url = URL(string: "http://\(currentAddress):9090/map/cabot/tourdata.json")!
+            var dataReceived: Data?
+            let semaphore = DispatchSemaphore(value: 0)
+
+            let task = URLSession.shared.dataTask(with: url) { data, response, error in
+                if let error = error {
+                    NSLog("Error fetching data: \(error.localizedDescription)")
+                    semaphore.signal()
+                    return
+                }
+                dataReceived = data
+                semaphore.signal()
+            }
+
+            task.resume()
+            semaphore.wait()
+
+            guard let data = dataReceived else {
+                throw MetadataError.contentLoadError
+            }
+
+            let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            let tourDataFileURL = documentsDirectory.appendingPathComponent("tourdata.json")
+            try data.write(to: tourDataFileURL)
+
             let root = try JSONDecoder().decode(Root.self, from: data)
             allDestinationsRef = root.destinations
             allMessages = root.messages
@@ -1237,49 +1267,56 @@ class Tour: Decodable, Hashable{
                 tour.matchMessage()
             }
             
-            let features = try Feature.loadFeature()
-            
-            for tourIndex in 0..<root.tours.count {
-                let tour = root.tours[tourIndex]
-                for destIndex in 0..<tour.destinations.count {
-                    var destination = tour.destinations[destIndex]
-                    if let matchedD = destination.matchedDestinationRef {
-                        if let matchedFeature = features.first(where: { $0.properties.ent1Node == matchedD.value }) {
-                            _ = I18NText(
-                                text: matchedFeature.properties.names,
-                                pron: [:]
-                            )
-                            destination.title = I18NText(text: matchedFeature.properties.names, pron: [:])
-                            root.tours[tourIndex].destinations[destIndex] = destination
-                        } else {
-                            NSLog("No matching Feature found")
-                        }
-                    } else {
-                        NSLog("No matched DestinationD found")
-                        let refParts = destination.ref.split(separator: "#")
-                        let refToUse = refParts.count > 1 ? String(refParts[0]) : destination.ref
-                        if let matchedFeature = features.first(where: { $0.properties.ent1Node == refToUse })
-                        {
-                            _ = I18NText(
-                                text: matchedFeature.properties.names,
-                                pron: [:]
-                            )
-                            destination.title = I18NText(text: matchedFeature.properties.names, pron: [:])
-                            root.tours[tourIndex].destinations[destIndex] = destination
-                        }
-                    }
-                }
-            }
+            let features = try Feature.loadFeature(currentAddress:currentAddress)
+            processTours(root: root, features: features)
             return root.tours
         } catch {
             throw MetadataError.contentLoadError
         }
     }
-    private static func getTourDataJSON() -> URL {
-        guard let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            fatalError("Could not find the document directory.")
+
+    static func loadTourDataPreview() throws -> [Tour] {
+        do {
+            let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
+            let fileURL = path.appendingPathComponent("tourdata.json")
+            let data = try Data(contentsOf: fileURL)
+            let root = try JSONDecoder().decode(Root.self, from: data)
+            allDestinationsRef = root.destinations
+            allMessages = root.messages
+
+            for tour in root.tours {
+                tour.matchDestinationsRef()
+                tour.matchMessage()
+            }
+            let features = try Feature.loadFeaturePreview()
+            processTours(root: root, features: features)
+            return root.tours
+        } catch {
+            throw MetadataError.contentLoadError
         }
-        return path
+    }
+    private static func processTours(root: Root, features: [Feature]) {
+        for tourIndex in 0..<root.tours.count {
+            let tour = root.tours[tourIndex]
+            for destIndex in 0..<tour.destinations.count {
+                var destination = tour.destinations[destIndex]
+                if let matchedD = destination.matchedDestinationRef {
+                    if let matchedFeature = features.first(where: { $0.properties.ent1Node == matchedD.value }) {
+                        destination.title = I18NText(text: matchedFeature.properties.names, pron: [:])
+                    } else {
+                        NSLog("No matching Feature found")
+                    }
+                } else {
+                    NSLog("No matched DestinationD found")
+                    let refParts = destination.ref.split(separator: "#")
+                    let refToUse = refParts.count > 1 ? String(refParts[0]) : destination.ref
+                    if let matchedFeature = features.first(where: { $0.properties.ent1Node == refToUse }) {
+                        destination.title = I18NText(text: matchedFeature.properties.names, pron: [:])
+                    }
+                }
+                root.tours[tourIndex].destinations[destIndex] = destination
+            }
+        }
     }
 }
 
@@ -1349,23 +1386,81 @@ class Feature : Decodable,  Hashable {
     }
     
     // MARK: - ReadJSON
-    class func loadFeature() throws -> [Feature] {
+    class func loadFeature(currentAddress: String) throws -> [Feature] {
         do {
-            let featureJsonFileName = "app-resource/features.json"
-            let fileURL = getFacilityDataJSON().appendingPathComponent(featureJsonFileName)
-            
-            let data = try Data(contentsOf: fileURL)
+            let fileConfigName = "config.json"
+            guard let documentsFeature = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+                throw MetadataError.contentLoadError
+            }
+
+            let configData = try Directory.fetchData(from: "config", currentAddress:currentAddress , isConfig: true)
+
+            struct InitialLocation: Codable {
+                let lat: Double
+                let lng: Double
+                let floor: Int
+            }
+
+            struct Config: Codable {
+                let DO_NOT_USE_SAVED_CENTER: String
+                let INITIAL_LOCATION: InitialLocation
+                let MAP_SERVICE: String
+                let MAP_SERVICE_USE_HTTP: String
+            }
+
+            let config = try JSONDecoder().decode(Config.self, from: configData)
+            let lat = config.INITIAL_LOCATION.lat
+            let lng = config.INITIAL_LOCATION.lng
+            let dist = 2000
+            let user = "vender_identifier"
+
+            let baseURL = "http://\(currentAddress):9090/map/routesearch?action=features&lat=\(lat)&lng=\(lng)&user=\(user)&dist=\(dist)"
+            guard let url = URL(string: baseURL) else {
+                throw MetadataError.contentLoadError
+            }
+
+
+            var dataReceived: Data?
+            let semaphore = DispatchSemaphore(value: 0)
+
+            let task = URLSession.shared.dataTask(with: url) { data, response, error in
+                if let error = error {
+                    NSLog("Error fetching data: \(error.localizedDescription)")
+                    semaphore.signal()
+                    return
+                }
+                dataReceived = data
+                semaphore.signal()
+            }
+
+            task.resume()
+            semaphore.wait()
+
+            guard let data = dataReceived else {
+                throw MetadataError.contentLoadError
+            }
+
+
+            let featuresFileURL = documentsFeature.appendingPathComponent("features.json")
+            try data.write(to: featuresFileURL)
+
             let features = try JSONDecoder().decode([Feature].self, from: data)
             return features
         } catch {
             throw MetadataError.contentLoadError
         }
     }
-    private static func getFacilityDataJSON() -> URL {
-        guard let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            fatalError("Could not find the document directory.")
+
+    class func loadFeaturePreview() throws -> [Feature] {
+        do {
+            let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
+            let fileURL = path.appendingPathComponent("features.json")
+            let data = try Data(contentsOf: fileURL)
+            let features = try JSONDecoder().decode([Feature].self, from: data)
+            return features
+        } catch {
+            throw MetadataError.contentLoadError
         }
-        return path
     }
 }
 

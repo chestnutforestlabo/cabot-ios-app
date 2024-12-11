@@ -289,30 +289,34 @@ class TourManager: TourProtocol {
                     NSLog("Tour save data not found")
                     return
                 }
-                else if(_tourSaveData.id == "TourManager"){
+                else if (_tourSaveData.id == "TourManager") {
                     // load destinations
                     if let src = model.resource?.destinationsSource {
-                        let floorDestinations: [FloorDestination] = try! downloadDirectoryJson(modelData: model)
-                        let allDestinations: [Destination] = floorDestinations.flatMap { $0.destinations }
+                        do {
+                            let floorDestinations: [Directory.FloorDestination] = try Directory.downloadDirectoryJson(downloadURL: model.getCurrentAddress())
+                            let allDestinations: [Destination] = floorDestinations.flatMap { $0.destinations }
 
-                        for destination in allDestinations {
-                             if decoded.currentDestination == (destination.value ?? destination.ref?.value ?? "") {
-                                 addToFirst(destination: destination)
-                                 let _ = proceedToNextDestination(isStartMessageSpeaking: false)
-                             }
-                         }
-                        
-                        for decodedDestination in decoded.destinations {
                             for destination in allDestinations {
-                                if decodedDestination == (destination.value ?? destination.ref?.value ?? "") {
-                                    addToLast(destination: destination)
+                                if decoded.currentDestination == (destination.value ?? destination.ref?.value ?? "") {
+                                    addToFirst(destination: destination)
+                                    let _ = proceedToNextDestination(isStartMessageSpeaking: false)
                                 }
                             }
-                        }
+
+                            for decodedDestination in decoded.destinations {
+                                for destination in allDestinations {
+                                    if decodedDestination == (destination.value ?? destination.ref?.value ?? "") {
+                                        addToLast(destination: destination)
+                                    }
+                                }
+                            }
 
                         
-                        if(decoded.currentDestination == ""){
-                            model.needToStartAnnounce(wait: true)
+                            if decoded.currentDestination == "" {
+                                model.needToStartAnnounce(wait: true)
+                            }
+                        } catch {
+                            NSLog("Error loading destinations: \(error)")
                         }
                     }
                 }
@@ -320,7 +324,7 @@ class TourManager: TourProtocol {
                     // load tour
                     if let src = model.resource?.toursSource {
                         do {
-                            let tours = try Tour.load()
+                            let tours = try Tour.load(currentAddress: model.getCurrentAddress())
                             for tour in tours {
                                 if tour.id == decoded.id {
                                     set(tour: tour)

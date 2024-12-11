@@ -27,7 +27,6 @@ struct DestinationsView: View {
     @State private var isConfirming = false
     @State private var targetDestination: Destination?
 
-    var src: Source
     var destination: Destination?
     var destinations: [Destination] = []
 
@@ -38,103 +37,103 @@ struct DestinationsView: View {
         return Form {
             Section(
                 header: header) {
-                ForEach(destinations, id: \.self) { destination in
-                    if destination.forDemonstration {
-                        EmptyView()
-                    } else if let src = destination.file {
-                        NavigationLink(
-                            destination: DestinationsView(src: src, destination: destination)
-                                .environmentObject(modelData).heartbeat("DestinationsView(\(destination.title.text))"),
-                            label: {
-                                Text(destination.title.text)
-                                    .accessibilityLabel(destination.title.pron)
-                            })
-                    } else {
-                        HStack {
-                            Button(action: {
-                                if modelData.tourManager.hasDestination {
-                                    targetDestination = destination
-                                    isConfirming = true
-                                        
-                                } else {
-                                    // if there is no destination, start immediately
-                                    tourManager.addToLast(destination: destination)
-                                    modelData.needToStartAnnounce(wait: true)
-                                    NavigationUtil.popToRootView()
-                                }
-                            }){
-                                VStack(alignment: .leading) {
+                    ForEach(destinations, id: \.self) { destination in
+                        if destination.forDemonstration {
+                            EmptyView()
+                        } else if let src = destination.file {
+                            NavigationLink(
+                                destination: DestinationsView( destination: destination)
+                                    .environmentObject(modelData).heartbeat("DestinationsView(\(destination.title.text))"),
+                                label: {
                                     Text(destination.title.text)
-                                        .font(.body)
                                         .accessibilityLabel(destination.title.pron)
-                                        .multilineTextAlignment(.leading)
-                                        .accessibilityHint(Text("DOUBLETAP_TO_ADD_A_DESTINATION"))
-                                    if destination.summaryMessage.text != ""{
-                                        Text(destination.summaryMessage.text)
-                                            .font(.caption)
+                                })
+                        } else {
+                            HStack {
+                                Button(action: {
+                                    if modelData.tourManager.hasDestination {
+                                        targetDestination = destination
+                                        isConfirming = true
+
+                                    } else {
+                                        // if there is no destination, start immediately
+                                        tourManager.addToLast(destination: destination)
+                                        modelData.needToStartAnnounce(wait: true)
+                                        NavigationUtil.popToRootView()
+                                    }
+                                }){
+                                    VStack(alignment: .leading) {
+                                        Text(destination.title.text)
+                                            .font(.body)
+                                            .accessibilityLabel(destination.title.pron)
                                             .multilineTextAlignment(.leading)
+                                            .accessibilityHint(Text("DOUBLETAP_TO_ADD_A_DESTINATION"))
+                                        if destination.summaryMessage.text != ""{
+                                            Text(destination.summaryMessage.text)
+                                                .font(.caption)
+                                                .multilineTextAlignment(.leading)
+                                        }
                                     }
                                 }
-                            }
-                            .buttonStyle(.borderless)
-                            .confirmationDialog(Text("ADD_A_DESTINATION"), isPresented: $isConfirming, presenting: targetDestination) {
-                            detail in
-                                Button {
-                                    if let dest = targetDestination {
-                                        modelData.clearAll()
-                                        tourManager.addToLast(destination: dest)
+                                .buttonStyle(.borderless)
+                                .confirmationDialog(Text("ADD_A_DESTINATION"), isPresented: $isConfirming, presenting: targetDestination) {
+                                    detail in
+                                    Button {
+                                        if let dest = targetDestination {
+                                            modelData.clearAll()
+                                            tourManager.addToLast(destination: dest)
+                                            targetDestination = nil
+                                            NavigationUtil.popToRootView()
+                                        }
+                                    } label: {
+                                        Text("CLEAR_ALL_THEN_ADD")
+                                    }
+                                    Button {
+                                        if let dest = targetDestination {
+                                            tourManager.stopCurrent()
+                                            tourManager.addToFirst(destination: dest)
+                                            targetDestination = nil
+                                            NavigationUtil.popToRootView()
+                                        }
+                                    } label: {
+                                        Text("ADD_TO_FIRST")
+                                    }
+                                    Button {
+                                        if let dest = targetDestination {
+                                            tourManager.addToLast(destination: dest)
+                                            targetDestination = nil
+                                            NavigationUtil.popToRootView()
+                                        }
+                                    } label: {
+                                        Text("ADD_TO_LAST")
+                                    }
+                                    Button("Cancel", role: .cancel) {
                                         targetDestination = nil
-                                        NavigationUtil.popToRootView()
                                     }
-                                } label: {
-                                    Text("CLEAR_ALL_THEN_ADD")
+                                } message: { detail in
+                                    let message = LocalizedStringKey("ADD_A_DESTINATION_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
+                                    Text(message)
                                 }
-                                Button {
-                                    if let dest = targetDestination {
-                                        tourManager.stopCurrent()
-                                        tourManager.addToFirst(destination: dest)
-                                        targetDestination = nil
-                                        NavigationUtil.popToRootView()
+                                Spacer()
+                                if destination.startMessage.text != "" {
+                                    ZStack{
+                                        Image(systemName: "info.circle")
+                                            .accessibilityLabel(Text("Details"))
+                                            .accessibilityRemoveTraits(.isImage)
+                                            .accessibilityAddTraits(.isButton)
+                                            .accessibilityHint(Text("DOUBLETAP_TO_VIEW_DETAILS"))
+                                            .foregroundColor(.blue)
+                                        NavigationLink(
+                                            destination: DestinationDetailView(destination: destination).environmentObject(modelData).heartbeat("DestinationDetailView")
+                                        ){EmptyView()}
+                                            .frame(width: 0, height: 0)
+                                            .opacity(0)
                                     }
-                                } label: {
-                                    Text("ADD_TO_FIRST")
-                                }
-                                Button {
-                                    if let dest = targetDestination {
-                                        tourManager.addToLast(destination: dest)
-                                        targetDestination = nil
-                                        NavigationUtil.popToRootView()
-                                    }
-                                } label: {
-                                    Text("ADD_TO_LAST")
-                                }
-                                Button("Cancel", role: .cancel) {
-                                    targetDestination = nil
-                                }
-                            } message: { detail in
-                                let message = LocalizedStringKey("ADD_A_DESTINATION_MESSAGE \(modelData.tourManager.destinationCount, specifier: "%d")")
-                                Text(message)
-                            }
-                            Spacer()
-                            if destination.startMessage.text != "" {
-                                ZStack{
-                                    Image(systemName: "info.circle")
-                                        .accessibilityLabel(Text("Details"))
-                                        .accessibilityRemoveTraits(.isImage)
-                                        .accessibilityAddTraits(.isButton)
-                                        .accessibilityHint(Text("DOUBLETAP_TO_VIEW_DETAILS"))
-                                        .foregroundColor(.blue)
-                                    NavigationLink(
-                                        destination: DestinationDetailView(destination: destination).environmentObject(modelData).heartbeat("DestinationDetailView")
-                                    ){EmptyView()}
-                                    .frame(width: 0, height: 0)
-                                    .opacity(0)
                                 }
                             }
                         }
                     }
                 }
-            }
         }
         .listStyle(PlainListStyle())
     }
@@ -145,9 +144,8 @@ struct DestinationsFloorView: View {
     @EnvironmentObject var modelData: CaBotAppModel
     @State private var isConfirming = false
     @State private var targetDestination: Destination?
-    @State private var floorDestinations: [FloorDestination] = []
+    @State private var floorDestinations: [Directory.FloorDestination] = []
 
-    var src: Source
     var destination: Destination?
 
     var body: some View {
@@ -161,7 +159,6 @@ struct DestinationsFloorView: View {
                 ForEach(floorDestinations, id: \.floorTitle.text) { floorDestination in
                     NavigationLink(
                         destination: DestinationsView(
-                            src: src,
                             destination: destination,
                             destinations: floorDestination.destinations
                         )
@@ -177,35 +174,31 @@ struct DestinationsFloorView: View {
         .listStyle(PlainListStyle())
         .onAppear {
             if floorDestinations.isEmpty {
-                floorDestinations = try! downloadDirectoryJson(modelData: modelData)
+                do {
+                    floorDestinations = try Directory.downloadDirectoryJson(downloadURL: modelData.getCurrentAddress())
+                } catch {
+                    floorDestinations = []
+                }
             }
         }
     }
 }
 
 struct DestinationsView_Previews: PreviewProvider {
+
     static var previews: some View {
-        preview2
-        preview1
-    }
-
-    static var preview1: some View {
         let modelData = CaBotAppModel()
+        var floorDestinationsForPreviews: [Directory.FloorDestination] = []
+        do {
+            floorDestinationsForPreviews = try Directory.downloadDirectoryJsonForPreview()
+        } catch {
+            NSLog("Error loading tours for preview: \(error)")
+        }
 
-        let resource = modelData.resourceManager.resource(by: "Test data")!
-
-        return DestinationsView(src: resource.destinationsSource!)
-            .environmentObject(modelData)
-    }
-
-    static var preview2: some View {
-        let modelData = CaBotAppModel()
-
-        let resource = modelData.resourceManager.resource(by: "Test data")!
-
-        let floorDestinations = try! downloadDirectoryJson(modelData: modelData)
-
-        return DestinationsView(src: floorDestinations[0].destinations[0].file!)
-            .environmentObject(modelData)
+        return DestinationsView(
+            destination: floorDestinationsForPreviews.first?.destinations.first,
+            destinations: floorDestinationsForPreviews.first?.destinations ?? []
+        )
+        .environmentObject(modelData)
     }
 }

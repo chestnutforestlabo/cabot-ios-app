@@ -32,7 +32,7 @@ struct DestinationDetailView: View {
         let tourManager = modelData.tourManager
         Form {
             Section(header: Text(destination.title.text)) {
-                if  destination.startMessage.text != "" {
+                if destination.startMessage.text != "" {
                     Text(destination.startMessage.text)
                 }
                 if let arriveMessages = destination.arriveMessages{
@@ -58,7 +58,7 @@ struct DestinationDetailView: View {
                     }
                 }
                 .confirmationDialog(Text("ADD_A_DESTINATION"), isPresented: $isConfirming, presenting: targetDestination) {
-                detail in
+                    detail in
                     Button {
                         if let dest = targetDestination {
                             modelData.clearAll()
@@ -104,12 +104,14 @@ struct DestinationDetailView_Previews: PreviewProvider {
     static var previews: some View {
         let modelData = CaBotAppModel()
 
-        let resource = modelData.resourceManager.resource(by: "Test data")!
-        let destinations = try! downloadDirectoryJson(modelData: modelData)
-        let destination = destinations[0]
-        let destinations2 = try! downloadDirectoryJson(modelData: modelData)
+        var floorDestinationsForPreviews: [Directory.FloorDestination] = []
+        do {
+            floorDestinationsForPreviews = try Directory.downloadDirectoryJsonForPreview()
+        } catch {
+            NSLog("Failed to download directory JSON")
+        }
 
-        DestinationDetailView(destination: destinations2[0].destinations[0])
+        return DestinationDetailView(destination: floorDestinationsForPreviews[0].destinations[0])
             .environmentObject(modelData)
     }
 }

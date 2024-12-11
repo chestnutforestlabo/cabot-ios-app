@@ -86,13 +86,15 @@ struct DestinationDetailView: View {
 struct DestinationDetailView_Previews: PreviewProvider {
     static var previews: some View {
         let modelData = CaBotAppModel()
+        var floorDestinationsForPreviews: [Directory.FloorDestination] = []
+        do {
+            floorDestinationsForPreviews = try Directory.downloadDirectoryJsonForPreview()
+        } catch {
+            NSLog("Failed to download directory JSON")
+        }
 
-        let resource = modelData.resourceManager.resource(by: "Test data")!
-        let destinations = try! downloadDirectoryJson(modelData: modelData)
-        let destination = destinations[0]
-        let destinations2 = try! downloadDirectoryJson(modelData: modelData)
 
-        DestinationDetailView(destination: destinations2[0].destinations[0])
+        return DestinationDetailView(destination: floorDestinationsForPreviews[0].destinations[0])
             .environmentObject(modelData)
     }
 }
