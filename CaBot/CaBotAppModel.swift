@@ -260,8 +260,8 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
 }
 
 class AddressCandidate {
-    let addresses: [String]
-    private var index:Int = 1
+    var addresses: [String]
+    private var index:Int = 0
     init(addresses: [String]) {
         self.addresses = addresses
     }
@@ -271,6 +271,9 @@ class AddressCandidate {
     func getNext() -> String {
         index += 1
         return getCurrent()
+    }
+    func update(addresses: [String]) {
+        self.addresses = addresses
     }
 }
 
@@ -565,14 +568,18 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         didSet {
             UserDefaults.standard.setValue(primaryAddr, forKey: primaryAddrKey)
             UserDefaults.standard.synchronize()
-            updateNetworkConfig()
+            if oldValue != primaryAddr {
+                updateNetworkConfig()
+            }
         }
     }
     @Published var secondaryAddr: String = "" {
         didSet {
             UserDefaults.standard.setValue(secondaryAddr, forKey: secondaryAddrKey)
             UserDefaults.standard.synchronize()
-            updateNetworkConfig()
+            if oldValue != secondaryAddr {
+                updateNetworkConfig()
+            }
         }
     }
     let socketPort: String = "5000"
@@ -765,7 +772,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func updateNetworkConfig() {
-        self.addressCandidate = AddressCandidate(addresses: [primaryAddr, secondaryAddr])
+        NSLog("updateNetworkConfig \([primaryAddr, secondaryAddr])")
+        let current = self.addressCandidate.getCurrent()
+        if current != primaryAddr && current != secondaryAddr {
+            self.tcpService.stop()
+        }
+        self.addressCandidate.update(addresses: [primaryAddr, secondaryAddr])
     }
 
     func getCurrentAddress() -> String {
