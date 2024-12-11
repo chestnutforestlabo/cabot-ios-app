@@ -375,7 +375,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     var resourceLang: String {
         get {
-            resource?.lang ?? DEFAULT_LANG
+            return resource?.lang ?? selectedLanguage
         }
     }
 
@@ -682,9 +682,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.tts.delegate = self
         self.logList.delegate = self
 
-        if let selectedIdentifier = UserDefaults.standard.value(forKey: selectedResourceKey) as? String {
-            self.resource = resourceManager.resource(by: selectedIdentifier)
-        }
         if let selectedLanguage = UserDefaults.standard.value(forKey: selectedResourceLangKey) as? String {
             self.selectedLanguage = selectedLanguage
             self.updateVoice()

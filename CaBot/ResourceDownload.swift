@@ -93,7 +93,9 @@ class ResourceDownload {
                 DispatchQueue.main.async {
                     modelData.resourceManager.updateResources()
                     if modelData.resourceManager.resources.count > 0 {
-                        modelData.resource = modelData.resourceManager.resources[0]
+                        let resource = modelData.resourceManager.resources[0]
+                        resource.langOverride = modelData.selectedLanguage
+                        modelData.resource = resource
                     }
                 }
                 NSLog("MD5 hash matched: \(newHashValue) === \(String(describing: storedHashValue))")
@@ -196,7 +198,9 @@ class ResourceDownload {
             DispatchQueue.main.async {
                 modelData.resourceManager.updateResources()
                 if modelData.resourceManager.resources.count > 0 {
-                    modelData.resource = modelData.resourceManager.resources[0]
+                    let resource = modelData.resourceManager.resources[0]
+                    resource.langOverride = modelData.selectedLanguage
+                    modelData.resource = resource
                 }
             }
         } catch {
