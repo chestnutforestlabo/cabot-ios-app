@@ -105,11 +105,11 @@ struct RootView_Previews: PreviewProvider {
         let modelData = CaBotAppModel()
         modelData.displayedScene = .App
         modelData.isContentPresenting = true
-        modelData.contentURL = URL(string: "content://place0/test.html")!
+        modelData.contentURL = URL(string: "content://place0/test.html")!  // TODO
 
         return RootView()
             .environmentObject(modelData)
-
+            .previewDisplayName("Show Content")
     }
 
     static var previewOnboard: some View {
@@ -118,14 +118,16 @@ struct RootView_Previews: PreviewProvider {
 
         return RootView()
             .environmentObject(modelData)
+            .previewDisplayName(".Onboard")
     }
 
     static var previewAdvanced: some View {
         let modelData = CaBotAppModel()
         modelData.suitcaseConnected = true
-        modelData.modeType = .Advanced
+        modelData.displayedScene = .App
 
         return RootView()
             .environmentObject(modelData)
+            .previewDisplayName(".App")
     }
 }
