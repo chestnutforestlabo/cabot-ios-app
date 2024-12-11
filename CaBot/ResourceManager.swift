@@ -1393,7 +1393,7 @@ class Feature : Decodable,  Hashable {
                 throw MetadataError.contentLoadError
             }
 
-            let configData = try Directory.fetchData(from: "config", currentAddress:currentAddress , isConfig: true)
+            let configData = try Directory.fetchData(from: "config", currentAddress: currentAddress, isConfig: true)
 
             struct InitialLocation: Codable {
                 let lat: Double
@@ -1412,7 +1412,31 @@ class Feature : Decodable,  Hashable {
             let lat = config.INITIAL_LOCATION.lat
             let lng = config.INITIAL_LOCATION.lng
             let dist = 2000
-            let user = "vender_identifier"
+            let user = UIDevice.current.identifierForVendor?.uuidString ?? "default_user_identifier"
+            let startURL = "http://\(currentAddress):9090/map/routesearch?action=start&lat=\(lat)&lng=\(lng)&user=\(user)&dist=\(dist)"
+            guard let startRequestURL = URL(string: startURL) else {
+                throw MetadataError.contentLoadError
+            }
+
+            var startDataReceived: Data?
+            let semaphoreStart = DispatchSemaphore(value: 0)
+
+            let startTask = URLSession.shared.dataTask(with: startRequestURL) { data, response, error in
+                if let error = error {
+                    NSLog("Error fetching start data: \(error.localizedDescription)")
+                    semaphoreStart.signal()
+                    return
+                }
+                startDataReceived = data
+                semaphoreStart.signal()
+            }
+
+            startTask.resume()
+            semaphoreStart.wait()
+
+            guard let _ = startDataReceived else {
+                throw MetadataError.contentLoadError
+            }
 
             let baseURL = "http://\(currentAddress):9090/map/routesearch?action=features&lat=\(lat)&lng=\(lng)&user=\(user)&dist=\(dist)"
             guard let url = URL(string: baseURL) else {
@@ -1439,7 +1463,6 @@ class Feature : Decodable,  Hashable {
             guard let data = dataReceived else {
                 throw MetadataError.contentLoadError
             }
-
 
             let featuresFileURL = documentsFeature.appendingPathComponent("features.json")
             try data.write(to: featuresFileURL)
