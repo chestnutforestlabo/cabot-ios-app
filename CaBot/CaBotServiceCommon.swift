@@ -53,6 +53,7 @@ struct SharedInfo: Codable {
         case ChangeTouchMode
     }
     init(type: InfoType, value: String, flag1: Bool = false, flag2: Bool = false, location: Int = 0, length: Int = 0) {
+        self.info_id = Int64(Date().timeIntervalSince1970*1000000000.0)
         self.type = type
         self.value = value
         self.flag1 = flag1
@@ -60,6 +61,7 @@ struct SharedInfo: Codable {
         self.location = location
         self.length = length
     }
+    let info_id: Int64?
     let type: InfoType
     let value: String
     let flag1: Bool
@@ -492,6 +494,7 @@ class CaBotServiceActions {
     private var lastSpeakRequestID: Int64 = 0
     private var lastNavigationEventRequestID: Int64 = 0
     private var lastLogResponseID: Int64 = 0
+    private var lastShareID: Int64 = 0
 
     func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, tts: CaBotTTS, request: SpeakRequest) {
         guard delegate.getModeType() == .Normal else { return } // only for Normal mode
@@ -570,6 +573,10 @@ class CaBotServiceActions {
     }
 
     func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, user_info: SharedInfo) {
+        if let info_id = user_info.info_id {
+            guard lastShareID < info_id else { return }
+            lastShareID = info_id
+        }
         DispatchQueue.main.async {
             delegate.cabot(service: service, userInfo: user_info)
         }
