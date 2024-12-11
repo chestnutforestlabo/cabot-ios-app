@@ -293,7 +293,7 @@ class TourManager: TourProtocol {
                     // load destinations
                     if let src = model.resource?.destinationsSource {
                         do {
-                            let floorDestinations: [Directory.FloorDestination] = try Directory.downloadDirectoryJson(downloadURL: model.getCurrentAddress())
+                            let floorDestinations: [Directory.FloorDestination] = try Directory.downloadDirectoryJson(currentAddress: model.getCurrentAddress())
                             let allDestinations: [Destination] = floorDestinations.flatMap { $0.destinations }
 
                             for destination in allDestinations {

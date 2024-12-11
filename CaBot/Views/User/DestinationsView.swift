@@ -175,7 +175,7 @@ struct DestinationsFloorView: View {
         .onAppear {
             if floorDestinations.isEmpty {
                 do {
-                    floorDestinations = try Directory.downloadDirectoryJson(downloadURL: modelData.getCurrentAddress())
+                    floorDestinations = try Directory.downloadDirectoryJson(currentAddress: modelData.getCurrentAddress())
                 } catch {
                     floorDestinations = []
                 }

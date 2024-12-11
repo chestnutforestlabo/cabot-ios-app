@@ -50,7 +50,7 @@ struct ConversationView: UIViewControllerRepresentable {
                 
                 if let src = owner.dsrc {
                     do {
-                        let floorDestinations = try Directory.downloadDirectoryJson(downloadURL: owner.modelData.getCurrentAddress())
+                        let floorDestinations = try Directory.downloadDirectoryJson(currentAddress: owner.modelData.getCurrentAddress())
                         if let matchedDestination = floorDestinations
                             .flatMap({ $0.destinations })
                             .first(where: { $0.value == toID }) {

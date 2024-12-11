@@ -569,6 +569,76 @@ struct Reference: CustomStringConvertible {
 /// - content: <Source> file including a web content to show in the browser
 /// - waitingDestination: <WaitingDestination>
 /// ```
+class DownloadManager {
+    static let shared = DownloadManager()
+
+    private init() {}
+
+    static let configFileName = "config.json"
+    static let directoryFileName = "directory.json"
+    static let tourdataFileName = "tourdata.json"
+    static let featuresFileName = "features.json"
+
+    func fetchData(from resource: String, currentAddress: String, lat: Double = 0.0, lng: Double = 0.0, dist: Int = 0, user: String = "") throws -> Data {
+        let baseURL: String
+
+        switch resource {
+        case "config":
+            baseURL = "http://\(currentAddress):9090/map/api/config"
+        case "directory":
+            baseURL = "http://\(currentAddress):9090/query/directory?user=\(user)&lat=\(lat)&lng=\(lng)&dist=\(dist)"
+        case "tourdata":
+            baseURL = "http://\(currentAddress):9090/map/cabot/tourdata.json"
+        case "features-start":
+            baseURL = "http://\(currentAddress):9090/map/routesearch?action=start&lat=\(lat)&lng=\(lng)&user=\(user)&dist=\(dist)"
+        case "features":
+            baseURL = "http://\(currentAddress):9090/map/routesearch?action=features&lat=\(lat)&lng=\(lng)&user=\(user)&dist=\(dist)"
+        default:
+            throw MetadataError.contentLoadError
+        }
+
+        guard let url = URL(string: baseURL) else {
+            throw MetadataError.contentLoadError
+        }
+
+        var dataReceived: Data?
+        let semaphore = DispatchSemaphore(value: 0)
+
+        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                NSLog("Error fetching data: \(error.localizedDescription)")
+                semaphore.signal()
+                return
+            }
+            dataReceived = data
+            semaphore.signal()
+        }
+
+        task.resume()
+        semaphore.wait()
+
+        guard let data = dataReceived else {
+            throw MetadataError.contentLoadError
+        }
+
+        return data
+    }
+
+    func fetchDataPreview(for resource: String) throws -> Data {
+        let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
+        let fileURL = path.appendingPathComponent("\(resource).json")
+        return try Data(contentsOf: fileURL)
+    }
+
+    func saveData(_ data: Data, to fileName: String) throws {
+        guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            throw MetadataError.contentLoadError
+        }
+        let fileURL = documentsDirectory.appendingPathComponent(fileName)
+        try data.write(to: fileURL)
+    }
+}
+
 class Directory {
     struct DirectoryRoot: Decodable {
         let sections: [FloorSection]
@@ -667,16 +737,9 @@ class Directory {
     }
 
 
-    static func downloadDirectoryJson(downloadURL: String) throws -> [FloorDestination] {
-        let fileConfigName = "config.json"
-        let fileDirectoryName = "directory.json"
-        guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            throw MetadataError.contentLoadError
-        }
-        let fileConfigURL = documentsDirectory.appendingPathComponent(fileConfigName)
-
-        let configData = try fetchData(from: "config", currentAddress:downloadURL , isConfig: true)
-        try configData.write(to: fileConfigURL)
+    static func downloadDirectoryJson(currentAddress: String) throws -> [FloorDestination] {
+        let configData = try DownloadManager.shared.fetchData(from: "config", currentAddress: currentAddress)
+        try DownloadManager.shared.saveData(configData, to: DownloadManager.configFileName)
         struct InitialLocation: Codable {
             let lat: Double
             let lng: Double
@@ -698,42 +761,11 @@ class Directory {
         let user = "user-id"
         
         
-        let directoryData = try fetchData(from: "directory", currentAddress:downloadURL, isConfig: false, lat: lat, lng: lng,dist:dist,user:user)
-        try directoryData.write(to: documentsDirectory.appendingPathComponent(fileDirectoryName))
+        let directoryData = try DownloadManager.shared.fetchData(from: "directory", currentAddress: currentAddress, lat: lat, lng: lng, dist: dist, user: user)
+        try DownloadManager.shared.saveData(directoryData, to: DownloadManager.directoryFileName)
 
         let directoryDataDecoded = try JSONDecoder().decode(DirectoryRoot.self, from: directoryData)
-        return try processDirectoryData(directoryDataDecoded, currentAddress:downloadURL)
-    }
-
-    static func fetchData(from resource: String, currentAddress: String, isConfig: Bool, lat: Double = 0.0, lng: Double = 0.0,dist:Int=0,user:String="") throws -> Data {
-
-        let baseURL = isConfig ? "http://\(currentAddress):9090/map/api/config" : "http://\(currentAddress):9090/query/directory?user=\(user)&lat=\(lat)&lng=\(lng)&dist=\(dist)"
-        guard let url = URL(string: baseURL) else {
-            throw MetadataError.contentLoadError
-        }
-
-        var dataReceived: Data?
-        let semaphore = DispatchSemaphore(value: 0)
-
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            if let error = error {
-                NSLog("Error fetching data: \(error.localizedDescription)")
-                semaphore.signal()
-                return
-            }
-            dataReceived = data
-            semaphore.signal()
-        }
-        
-        
-        task.resume()
-        semaphore.wait()
-        
-        guard let data = dataReceived else {
-            throw MetadataError.contentLoadError
-        }
-        
-        return data
+        return try processDirectoryData(directoryDataDecoded, currentAddress:currentAddress)
     }
 
     static func processDirectoryData(_ directoryDataDecoded: DirectoryRoot, currentAddress: String) throws -> [FloorDestination] {
@@ -779,11 +811,9 @@ class Directory {
     }
 
     static func downloadDirectoryJsonForPreview() throws -> [FloorDestination] {
-        let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
-        let fileDirectoryURL = path.appendingPathComponent("directory.json")
         let data: Data
         do {
-            data = try Data(contentsOf: fileDirectoryURL)
+            data = try DownloadManager.shared.fetchDataPreview(for: "directory")
         } catch {
             NSLog("Failed to read file: \(error.localizedDescription)")
             throw MetadataError.contentLoadError
@@ -1231,31 +1261,8 @@ class Tour: Decodable, Hashable{
     // MARK: - Static Methods
     static func load(currentAddress: String) throws -> [Tour] {
         do {
-            var url: URL
-            url = URL(string: "http://\(currentAddress):9090/map/cabot/tourdata.json")!
-            var dataReceived: Data?
-            let semaphore = DispatchSemaphore(value: 0)
-
-            let task = URLSession.shared.dataTask(with: url) { data, response, error in
-                if let error = error {
-                    NSLog("Error fetching data: \(error.localizedDescription)")
-                    semaphore.signal()
-                    return
-                }
-                dataReceived = data
-                semaphore.signal()
-            }
-
-            task.resume()
-            semaphore.wait()
-
-            guard let data = dataReceived else {
-                throw MetadataError.contentLoadError
-            }
-
-            let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-            let tourDataFileURL = documentsDirectory.appendingPathComponent("tourdata.json")
-            try data.write(to: tourDataFileURL)
+            let data = try DownloadManager.shared.fetchData(from: "tourdata", currentAddress: currentAddress)
+            try DownloadManager.shared.saveData(data, to: DownloadManager.tourdataFileName)
 
             let root = try JSONDecoder().decode(Root.self, from: data)
             allDestinationsRef = root.destinations
@@ -1277,9 +1284,7 @@ class Tour: Decodable, Hashable{
 
     static func loadTourDataPreview() throws -> [Tour] {
         do {
-            let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
-            let fileURL = path.appendingPathComponent("tourdata.json")
-            let data = try Data(contentsOf: fileURL)
+            let data = try DownloadManager.shared.fetchDataPreview(for: "tourdata")
             let root = try JSONDecoder().decode(Root.self, from: data)
             allDestinationsRef = root.destinations
             allMessages = root.messages
@@ -1388,12 +1393,7 @@ class Feature : Decodable,  Hashable {
     // MARK: - ReadJSON
     class func loadFeature(currentAddress: String) throws -> [Feature] {
         do {
-            let fileConfigName = "config.json"
-            guard let documentsFeature = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
-                throw MetadataError.contentLoadError
-            }
-
-            let configData = try Directory.fetchData(from: "config", currentAddress: currentAddress, isConfig: true)
+            let configData = try DownloadManager.shared.fetchData(from: "config", currentAddress: currentAddress)
 
             struct InitialLocation: Codable {
                 let lat: Double
@@ -1413,61 +1413,13 @@ class Feature : Decodable,  Hashable {
             let lng = config.INITIAL_LOCATION.lng
             let dist = 2000
             let user = UIDevice.current.identifierForVendor?.uuidString ?? "default_user_identifier"
-            let startURL = "http://\(currentAddress):9090/map/routesearch?action=start&lat=\(lat)&lng=\(lng)&user=\(user)&dist=\(dist)"
-            guard let startRequestURL = URL(string: startURL) else {
-                throw MetadataError.contentLoadError
-            }
+            _ = try DownloadManager.shared.fetchData(from: "features-start", currentAddress: currentAddress, lat: lat, lng: lng, dist: dist, user: user)
 
-            var startDataReceived: Data?
-            let semaphoreStart = DispatchSemaphore(value: 0)
+            let featuresData = try DownloadManager.shared.fetchData(from: "features", currentAddress: currentAddress, lat: lat, lng: lng, dist: dist, user: user)
 
-            let startTask = URLSession.shared.dataTask(with: startRequestURL) { data, response, error in
-                if let error = error {
-                    NSLog("Error fetching start data: \(error.localizedDescription)")
-                    semaphoreStart.signal()
-                    return
-                }
-                startDataReceived = data
-                semaphoreStart.signal()
-            }
+            try DownloadManager.shared.saveData(featuresData, to: DownloadManager.featuresFileName)
 
-            startTask.resume()
-            semaphoreStart.wait()
-
-            guard let _ = startDataReceived else {
-                throw MetadataError.contentLoadError
-            }
-
-            let baseURL = "http://\(currentAddress):9090/map/routesearch?action=features&lat=\(lat)&lng=\(lng)&user=\(user)&dist=\(dist)"
-            guard let url = URL(string: baseURL) else {
-                throw MetadataError.contentLoadError
-            }
-
-
-            var dataReceived: Data?
-            let semaphore = DispatchSemaphore(value: 0)
-
-            let task = URLSession.shared.dataTask(with: url) { data, response, error in
-                if let error = error {
-                    NSLog("Error fetching data: \(error.localizedDescription)")
-                    semaphore.signal()
-                    return
-                }
-                dataReceived = data
-                semaphore.signal()
-            }
-
-            task.resume()
-            semaphore.wait()
-
-            guard let data = dataReceived else {
-                throw MetadataError.contentLoadError
-            }
-
-            let featuresFileURL = documentsFeature.appendingPathComponent("features.json")
-            try data.write(to: featuresFileURL)
-
-            let features = try JSONDecoder().decode([Feature].self, from: data)
+            let features = try JSONDecoder().decode([Feature].self, from: featuresData)
             return features
         } catch {
             throw MetadataError.contentLoadError
@@ -1476,9 +1428,7 @@ class Feature : Decodable,  Hashable {
 
     class func loadFeaturePreview() throws -> [Feature] {
         do {
-            let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
-            let fileURL = path.appendingPathComponent("features.json")
-            let data = try Data(contentsOf: fileURL)
+            let data = try DownloadManager.shared.fetchDataPreview(for: "features")
             let features = try JSONDecoder().decode([Feature].self, from: data)
             return features
         } catch {

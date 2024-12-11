@@ -173,7 +173,7 @@ struct DestinationsFloorView: View {
     }
     private func loadFloorDestinations() {
         do {
-            floorDestinations = try Directory.downloadDirectoryJson(downloadURL: modelData.getCurrentAddress())
+            floorDestinations = try Directory.downloadDirectoryJson(currentAddress: modelData.getCurrentAddress())
         } catch {
             NSLog("Error loading tours for preview: \(error)")
         }
