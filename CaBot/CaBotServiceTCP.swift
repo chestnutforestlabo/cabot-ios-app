@@ -283,7 +283,7 @@ class CaBotServiceTCP: NSObject {
             guard let delegate = weakself.delegate else { return }
             do {
                 let decodedData = try JSONDecoder().decode(SharedInfo.self, from: data)
-                NSLog("<Socket on: share> \(decodedData.type)")
+                NSLog("<Socket on: share> \(decodedData)")
                 weakself.actions.handle(service: weakself, delegate: delegate, user_info: decodedData)
             } catch {
                 print(text)
