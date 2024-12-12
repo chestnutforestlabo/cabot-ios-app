@@ -106,7 +106,7 @@ struct DestinationDetailView_Previews: PreviewProvider {
 
         var floorDestinationsForPreviews: [Directory.FloorDestination] = []
         do {
-            floorDestinationsForPreviews = try Directory.downloadDirectoryJsonForPreview()
+            floorDestinationsForPreviews = try Directory.downloadDirectoryJsonForPreview(modeType: .Normal)
         } catch {
             NSLog("Failed to download directory JSON")
         }

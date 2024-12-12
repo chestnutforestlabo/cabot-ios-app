@@ -38,9 +38,7 @@ struct DestinationsView: View {
             Section(
                 header: header) {
                     ForEach(destinations, id: \.self) { destination in
-                        if destination.forDemonstration {
-                            EmptyView()
-                        } else if let src = destination.file {
+                        if let src = destination.file {
                             NavigationLink(
                                 destination: DestinationsView( destination: destination)
                                     .environmentObject(modelData).heartbeat("DestinationsView(\(destination.title.text))"),
@@ -144,7 +142,7 @@ struct DestinationsFloorView: View {
     @EnvironmentObject var modelData: CaBotAppModel
     @State private var isConfirming = false
     @State private var targetDestination: Destination?
-    @State private var floorDestinations: [Directory.FloorDestination] = []
+    @State var floorDestinations: [Directory.FloorDestination] = []
 
     var destination: Destination?
 
@@ -175,7 +173,7 @@ struct DestinationsFloorView: View {
         .onAppear {
             if floorDestinations.isEmpty {
                 do {
-                    floorDestinations = try Directory.downloadDirectoryJson(currentAddress: modelData.getCurrentAddress())
+                    floorDestinations = try Directory.downloadDirectoryJson(currentAddress: modelData.getCurrentAddress(), modeType: modelData.modeType)
                 } catch {
                     floorDestinations = []
                 }
@@ -187,10 +185,15 @@ struct DestinationsFloorView: View {
 struct DestinationsView_Previews: PreviewProvider {
 
     static var previews: some View {
+        floor_previews
+        floor5_item_previews
+    }
+
+    static var floor5_item_previews: some View {
         let modelData = CaBotAppModel()
         var floorDestinationsForPreviews: [Directory.FloorDestination] = []
         do {
-            floorDestinationsForPreviews = try Directory.downloadDirectoryJsonForPreview()
+            floorDestinationsForPreviews = try Directory.downloadDirectoryJsonForPreview(modeType: .Normal)
         } catch {
             NSLog("Error loading tours for preview: \(error)")
         }
@@ -200,5 +203,23 @@ struct DestinationsView_Previews: PreviewProvider {
             destinations: floorDestinationsForPreviews.first?.destinations ?? []
         )
         .environmentObject(modelData)
+        .previewDisplayName("Floor 5")
+    }
+
+    // this should not show Floor 3 because all destinations are for demo
+    static var floor_previews: some View {
+        let modelData = CaBotAppModel()
+        var floorDestinationsForPreviews: [Directory.FloorDestination] = []
+        do {
+            floorDestinationsForPreviews = try Directory.downloadDirectoryJsonForPreview(modeType: .Normal)
+        } catch {
+            NSLog("Error loading tours for preview: \(error)")
+        }
+
+        return DestinationsFloorView(
+            floorDestinations: floorDestinationsForPreviews
+        )
+        .environmentObject(modelData)
+        .previewDisplayName("Floors")
     }
 }

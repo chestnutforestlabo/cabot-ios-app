@@ -641,11 +641,11 @@ class DownloadManager {
 
 class Directory {
     struct DirectoryRoot: Decodable {
-        let sections: [FloorSection]
+        let sections: [DirectorySection]
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            sections = try container.decodeIfPresent([FloorSection].self, forKey: .sections) ?? []
+            sections = try container.decodeIfPresent([DirectorySection].self, forKey: .sections) ?? []
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -653,7 +653,7 @@ class Directory {
         }
     }
 
-    struct FloorSection: Decodable {
+    struct DirectorySection: Decodable {
         let title: I18NText
         let items: [Item]
 
@@ -737,7 +737,7 @@ class Directory {
     }
 
 
-    static func downloadDirectoryJson(currentAddress: String) throws -> [FloorDestination] {
+    static func downloadDirectoryJson(currentAddress: String, modeType: ModeType) throws -> [FloorDestination] {
         let configData = try DownloadManager.shared.fetchData(from: "config", currentAddress: currentAddress)
         try DownloadManager.shared.saveData(configData, to: DownloadManager.configFileName)
         struct InitialLocation: Codable {
@@ -765,13 +765,13 @@ class Directory {
         try DownloadManager.shared.saveData(directoryData, to: DownloadManager.directoryFileName)
 
         let directoryDataDecoded = try JSONDecoder().decode(DirectoryRoot.self, from: directoryData)
-        return try processDirectoryData(directoryDataDecoded, currentAddress:currentAddress)
+        return try processDirectoryData(directoryDataDecoded, currentAddress:currentAddress, modeType: modeType)
     }
 
-    static func processDirectoryData(_ directoryDataDecoded: DirectoryRoot, currentAddress: String) throws -> [FloorDestination] {
+    static func processDirectoryData(_ directoryDataDecoded: DirectoryRoot, currentAddress: String, modeType: ModeType) throws -> [FloorDestination] {
         let tours = try Tour.load(currentAddress:currentAddress)
         let features = try Feature.loadFeature(currentAddress:currentAddress)
-        return try extractFloorDestinations(directoryDataDecoded: directoryDataDecoded, tours: tours, features: features)
+        return try extractFloorDestinations(directoryDataDecoded: directoryDataDecoded, tours: tours, features: features, modeType: modeType)
     }
 
     static func createDestination(from subItem: NestedItem, itemTitle: I18NText, tours: [Tour], features: [Feature]) throws -> Destination? {
@@ -810,7 +810,7 @@ class Directory {
         return destination
     }
 
-    static func downloadDirectoryJsonForPreview() throws -> [FloorDestination] {
+    static func downloadDirectoryJsonForPreview(modeType: ModeType) throws -> [FloorDestination] {
         let data: Data
         do {
             data = try DownloadManager.shared.fetchDataPreview(for: "directory")
@@ -841,10 +841,10 @@ class Directory {
             throw MetadataError.contentLoadError
         }
 
-        return try extractFloorDestinations(directoryDataDecoded: directoryDataDecoded, tours: tours, features: features)
+        return try extractFloorDestinations(directoryDataDecoded: directoryDataDecoded, tours: tours, features: features, modeType: modeType)
     }
 
-    private static func extractFloorDestinations(directoryDataDecoded: DirectoryRoot, tours: [Tour], features: [Feature]) throws -> [FloorDestination] {
+    private static func extractFloorDestinations(directoryDataDecoded: DirectoryRoot, tours: [Tour], features: [Feature], modeType: ModeType) throws -> [FloorDestination] {
         var downloadedFloorDestinations: [FloorDestination] = []
 
         for section in directoryDataDecoded.sections {
@@ -854,7 +854,9 @@ class Directory {
                     for subSection in content.sections {
                         for subItem in subSection.items {
                             if let destination = try createDestination(from: subItem, itemTitle: item.title, tours: tours, features: features) {
-                                destinations.append(destination)
+                                if !destination.forDemonstration || modeType == .Advanced {
+                                    destinations.append(destination)
+                                }
                             }
                         }
                     }

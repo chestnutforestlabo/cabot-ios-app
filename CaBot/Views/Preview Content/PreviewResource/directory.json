@@ -4,6 +4,62 @@
             "title": "Search by Floor",
             "items": [
                 {
+                    "title": "3F (all forDemonstarion=ture)",
+                    "content": {
+                        "sections": [
+                            {
+                                "title": "5",
+                                "items": [
+                                    {
+                                        "subtitle": "Others - 3F",
+                                        "titlePron": "Destination1",
+                                        "subtitlePron": "Others - 3F",
+                                        "title": "Destination1",
+                                        "nodeID": "Node_ID_FOR_A3",
+                                        "forDemonstration": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "P",
+                                "items": [
+                                    {
+                                        "subtitle": "Others - 3F",
+                                        "titlePron": "Destination2",
+                                        "subtitlePron": "Others - 3F",
+                                        "title": "Destination12",
+                                        "nodeID": "Node_ID_FOR_B3",
+                                        "forDemonstration": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "title": "T",
+                                "items": [
+                                    {
+                                        "subtitle": "Others - 3F",
+                                        "titlePron": "Destination3",
+                                        "subtitlePron": "Others - 3F",
+                                        "title": "Destination3",
+                                        "nodeID": "Node_ID_FOR_C3",
+                                        "forDemonstration": "true"
+                                    },
+                                    {
+                                        "subtitle": "Others - 3F",
+                                        "titlePron": "Destination4",
+                                        "subtitlePron": "Others - 3F",
+                                        "title": "Destination4",
+                                        "nodeID": "Node_ID_FOR_D3",
+                                        "forDemonstration": "true"
+                                    }
+                                ]
+                            }
+                        ],
+                        "showSectionIndex": true
+                    }
+                },
+
+                {
                     "title": "5F",
                     "content": {
                         "sections": [

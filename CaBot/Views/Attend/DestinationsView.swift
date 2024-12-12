@@ -137,7 +137,7 @@ struct DestinationsFloorView: View {
     @EnvironmentObject var modelData: CaBotAppModel
     @State private var isConfirming = false
     @State private var targetDestination: Destination?
-    @State private var floorDestinations: [Directory.FloorDestination] = []
+    @State var floorDestinations: [Directory.FloorDestination] = []
 
     var destination: Destination?
 
@@ -173,7 +173,7 @@ struct DestinationsFloorView: View {
     }
     private func loadFloorDestinations() {
         do {
-            floorDestinations = try Directory.downloadDirectoryJson(currentAddress: modelData.getCurrentAddress())
+            floorDestinations = try Directory.downloadDirectoryJson(currentAddress: modelData.getCurrentAddress(), modeType: modelData.modeType)
         } catch {
             NSLog("Error loading tours for preview: \(error)")
         }
@@ -182,18 +182,59 @@ struct DestinationsFloorView: View {
 
 struct DestinationsView_Previews: PreviewProvider {
 
-
-
     static var previews: some View {
-        let modelData = CaBotAppModel()
+        floor_previews
+        floor3_item_previews
+        floor5_item_previews
+    }
 
+    static var floor3_item_previews: some View {
+        let modelData = CaBotAppModel()
         var floorDestinationsForPreviews: [Directory.FloorDestination] = []
         do {
-            floorDestinationsForPreviews = try Directory.downloadDirectoryJsonForPreview()
+            floorDestinationsForPreviews = try Directory.downloadDirectoryJsonForPreview(modeType: .Advanced)
         } catch {
             NSLog("Error loading tours for preview: \(error)")
         }
-        return DestinationsView(destination: floorDestinationsForPreviews.first?.destinations.first,destinations: floorDestinationsForPreviews.first?.destinations ?? [])
-            .environmentObject(modelData)
+
+        return DestinationsView(
+            destination: floorDestinationsForPreviews.first?.destinations.first,
+            destinations: floorDestinationsForPreviews.first?.destinations ?? []
+        )
+        .environmentObject(modelData)
+        .previewDisplayName("Floor 3")
+    }
+
+    static var floor5_item_previews: some View {
+        let modelData = CaBotAppModel()
+        var floorDestinationsForPreviews: [Directory.FloorDestination] = []
+        do {
+            floorDestinationsForPreviews = try Directory.downloadDirectoryJsonForPreview(modeType: .Advanced)
+        } catch {
+            NSLog("Error loading tours for preview: \(error)")
+        }
+
+        return DestinationsView(
+            destination: floorDestinationsForPreviews.last?.destinations.first,
+            destinations: floorDestinationsForPreviews.last?.destinations ?? []
+        )
+        .environmentObject(modelData)
+        .previewDisplayName("Floor 5")
+    }
+
+    static var floor_previews: some View {
+        let modelData = CaBotAppModel()
+        var floorDestinationsForPreviews: [Directory.FloorDestination] = []
+        do {
+            floorDestinationsForPreviews = try Directory.downloadDirectoryJsonForPreview(modeType: .Advanced)
+        } catch {
+            NSLog("Error loading tours for preview: \(error)")
+        }
+
+        return DestinationsFloorView(
+            floorDestinations: floorDestinationsForPreviews
+        )
+        .environmentObject(modelData)
+        .previewDisplayName("Floors")
     }
 }

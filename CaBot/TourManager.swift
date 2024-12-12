@@ -292,7 +292,7 @@ class TourManager: TourProtocol {
                 else if (_tourSaveData.id == "TourManager") {
                     // load destinations
                     do {
-                        let floorDestinations: [Directory.FloorDestination] = try Directory.downloadDirectoryJson(currentAddress: model.getCurrentAddress())
+                        let floorDestinations: [Directory.FloorDestination] = try Directory.downloadDirectoryJson(currentAddress: model.getCurrentAddress(), modeType: model.modeType)
                         let allDestinations: [Destination] = floorDestinations.flatMap { $0.destinations }
 
                         for destination in allDestinations {
