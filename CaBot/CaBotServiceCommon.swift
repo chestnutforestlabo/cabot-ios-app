@@ -493,7 +493,7 @@ class CaBotServiceActions {
     private var lastSpeakRequestID: Int64 = 0
     private var lastNavigationEventRequestID: Int64 = 0
     private var lastLogResponseID: Int64 = 0
-    private var lastShareID: Int64 = 0
+    private var lastUserInfo: SharedInfo = SharedInfo(type: .None, value: "")
 
     func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, tts: CaBotTTS, request: SpeakRequest) {
         guard delegate.getModeType() == .Normal else { return } // only for Normal mode
@@ -568,9 +568,10 @@ class CaBotServiceActions {
     }
 
     func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, user_info: SharedInfo) {
-        if let info_id = user_info.info_id {
-            guard lastShareID < info_id else { return }
-            lastShareID = info_id
+        if let last_info_id = lastUserInfo.info_id,
+           let info_id = user_info.info_id {
+            guard last_info_id < info_id || lastUserInfo.type != user_info.type else { return }
+            lastUserInfo = user_info
         }
         DispatchQueue.main.async {
             delegate.cabot(service: service, userInfo: user_info)
