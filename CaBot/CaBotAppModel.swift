@@ -1047,11 +1047,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func playSample(mode: VoiceMode, priority: CaBotTTS.SpeechPriority? = nil, timeout sec : TimeInterval? = nil ){
         if(self.modeType == .Normal){
-            self.tts.rate = self.userSpeechRate
-            self.tts.voice = self.userVoice?.AVvoice
-            self.tts.speak(CustomLocalizedString("Hello Suitcase!", lang: self.resourceLang), force:false, priority:priority ?? .Required, timeout:sec, tag: .Sample(erase:true)) {_, _ in
+            self.tts.speak(CustomLocalizedString("Hello Suitcase!", lang: self.resourceLang), force:false, priority:priority ?? .Required, timeout:sec, tag: .Sample(erase:true)) {code, _ in
             }
         } else {
+            // override TTS settings by the mode
             if(mode == .User){
                 self.tts.rate = self.userSpeechRate
                 self.tts.voice = self.userVoice?.AVvoice
@@ -1059,11 +1058,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 self.tts.rate = self.attendSpeechRate
                 self.tts.voice = self.attendVoice?.AVvoice
             }
-            self.tts.speakForAdvanced(CustomLocalizedString("Hello Suitcase!", lang: self.resourceLang), force:false, tag: .Sample(erase:true)) {_, _ in
+            self.tts.speakForAdvanced(CustomLocalizedString("Hello Suitcase!", lang: self.resourceLang), force:false, tag: .Sample(erase:true)) {code, _ in
+                if code != .Paused {
+                    // revert the change after speech
+                    self.updateTTS()
+                }
             }
         }
 
-        self.updateTTS()
     }
 
     func playAudio(file: String) {
