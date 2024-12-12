@@ -179,11 +179,6 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
         if let showContentWhenArrive = UserDefaults.standard.value(forKey: showContentWhenArriveKey) as? Bool {
             self.showContentWhenArrive = showContentWhenArrive
         }
-        if let speechPriorityString = UserDefaults.standard.value(forKey: speechPriorityKey) as? String {
-            if let speechPriority = SpeechPriority(rawValue: speechPriorityString) {
-                self.speechPriority = speechPriority
-            }
-        }
     }
 
     @Published var startSound: String = "/System/Library/Audio/UISounds/nano/3rdParty_Success_Haptic.caf" {
@@ -234,13 +229,6 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
     @Published var showContentWhenArrive: Bool = false {
         didSet {
             UserDefaults.standard.setValue(showContentWhenArrive, forKey: showContentWhenArriveKey)
-            UserDefaults.standard.synchronize()
-        }
-    }
-
-    @Published var speechPriority:SpeechPriority = .App {
-        didSet {
-            UserDefaults.standard.setValue(speechPriority.rawValue, forKey: speechPriorityKey)
             UserDefaults.standard.synchronize()
         }
     }
@@ -1636,10 +1624,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(self.userSpeechRate)", flag1: false))
         self.share(user_info: SharedInfo(type: .ChangeHandleSide, value: self.suitcaseFeatures.selectedHandleSide.rawValue))
         self.share(user_info: SharedInfo(type: .ChangeTouchMode, value: self.suitcaseFeatures.selectedTouchMode.rawValue))
-    }
-
-    func getSpeechPriority() -> SpeechPriority {
-        return self.detailSettingModel.speechPriority
     }
 
     func getModeType() -> ModeType {
