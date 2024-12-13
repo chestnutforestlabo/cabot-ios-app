@@ -49,8 +49,11 @@ struct SharedInfo: Codable {
         case ChangeLanguage
         case ChangeUserVoiceRate
         case ChangeUserVoiceType
+        case ChangeHandleSide
+        case ChangeTouchMode
     }
     init(type: InfoType, value: String, flag1: Bool = false, flag2: Bool = false, location: Int = 0, length: Int = 0) {
+        self.info_id = Int64(Date().timeIntervalSince1970*1000000000.0)
         self.type = type
         self.value = value
         self.flag1 = flag1
@@ -58,6 +61,7 @@ struct SharedInfo: Codable {
         self.location = location
         self.length = length
     }
+    let info_id: Int64?
     let type: InfoType
     let value: String
     let flag1: Bool
@@ -87,7 +91,7 @@ protocol CaBotServiceDelegate {
     func caBot(service:any CaBotTransportProtocol, versionMatched:Bool, with:String)
     func cabot(service:any CaBotTransportProtocol, openRequest:URL)
     func cabot(service:any CaBotTransportProtocol, soundRequest:String)
-    func cabot(service:any CaBotTransportProtocol, notification:NavigationNotification)
+    func cabot(service:any CaBotTransportProtocol, notification:NavigationNotification, param:String?)
     func cabot(service:any CaBotTransportProtocol, deviceStatus:DeviceStatus)
     func cabot(service:any CaBotTransportProtocol, systemStatus:SystemStatus)
     func cabot(service:any CaBotTransportProtocol, batteryStatus:BatteryStatus)
@@ -95,7 +99,6 @@ protocol CaBotServiceDelegate {
     func cabot(service:any CaBotTransportProtocol, logList:[LogEntry], status: CaBotLogStatus)
     func cabot(service:any CaBotTransportProtocol, logDetail:LogEntry)
     func cabot(service:any CaBotTransportProtocol, userInfo:SharedInfo)
-    func getSpeechPriority() -> SpeechPriority
     func getModeType() -> ModeType
 }
 
@@ -105,6 +108,8 @@ enum NavigationNotification:String {
     case subtour
     case skip
     case getlanguage
+    case gethandleside
+    case gettouchmode
 }
 
 enum CaBotManageCommand:String {
@@ -113,6 +118,9 @@ enum CaBotManageCommand:String {
     case start
     case stop
     case lang
+    case reqfeatures
+    case handleside
+    case touchmode
     case restart_localization
 }
 
@@ -351,6 +359,8 @@ enum NavigationEventType:String, Decodable {
     case subtour
     case skip
     case getlanguage
+    case gethandleside
+    case gettouchmode
     case unknown
 }
 
@@ -483,6 +493,7 @@ class CaBotServiceActions {
     private var lastSpeakRequestID: Int64 = 0
     private var lastNavigationEventRequestID: Int64 = 0
     private var lastLogResponseID: Int64 = 0
+    private var lastUserInfo: SharedInfo = SharedInfo(type: .None, value: "")
 
     func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, tts: CaBotTTS, request: SpeakRequest) {
         guard delegate.getModeType() == .Normal else { return } // only for Normal mode
@@ -491,25 +502,17 @@ class CaBotServiceActions {
         lastSpeakRequestID = request.request_id
 
         DispatchQueue.main.async {
-            if delegate.getSpeechPriority() == .Robot && request.force {
-                tts.stop()
-            }
             let line = request.text
             let force = request.force
-            if !tts.isSpeaking || (delegate.getSpeechPriority() == .Robot && force) {
-                _ = service.activityLog(category: "ble speech request speaking", text: String(line), memo: "force=\(force)")
-                tts.speak(String(line), force: force) { code in
-                    if code > 0 {
-                        _ = service.activityLog(category: "ble speech request completed", text: String(line), memo: "force=\(force),return_code=\(code)")
-                    } else {
-                        _ = service.activityLog(category: "ble speech request canceled", text: String(line), memo: "force=\(force),return_code=\(code)")
-                    }
+            let priority = request.priority
+            _ = service.activityLog(category: "ble speech request speaking", text: String(line), memo: "force=\(force)")
+            tts.speak(String(line), force: force, priority: .parse(priority:priority)) { code, length in
+                if code == .Completed {
+                    _ = service.activityLog(category: "ble speech request completed", text: String(line), memo: "force=\(force),return_code=\(code),length=(length)")
+                } else if code == .Canceled {
+                    _ = service.activityLog(category: "ble speech request canceled", text: String(line), memo: "force=\(force),return_code=\(code),length=(length)")
                 }
-            } else {
-                NSLog("TTS is busy and skip speaking: \(line)")
-                _ = service.activityLog(category: "ble speech request skipped", text: String(line), memo: "TTS is busy")
             }
-
         }
     }
 
@@ -521,9 +524,9 @@ class CaBotServiceActions {
 
         DispatchQueue.main.async {
             switch(request.type) {
-            case .next, .arrived, .subtour, .skip, .getlanguage:
+            case .next, .arrived, .subtour, .skip, .getlanguage, .gethandleside, .gettouchmode:
                 if let note = NavigationNotification(rawValue: request.type.rawValue) {
-                    delegate.cabot(service: service, notification: note)
+                    delegate.cabot(service: service, notification: note, param: request.param)
                 } else {
                     NSLog("Unknown navigation notification type %@", request.type.rawValue)
                 }
@@ -565,6 +568,11 @@ class CaBotServiceActions {
     }
 
     func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, user_info: SharedInfo) {
+        if let last_info_id = lastUserInfo.info_id,
+           let info_id = user_info.info_id {
+            guard last_info_id < info_id || lastUserInfo.type != user_info.type else { return }
+            lastUserInfo = user_info
+        }
         DispatchQueue.main.async {
             delegate.cabot(service: service, userInfo: user_info)
         }
@@ -579,7 +587,7 @@ actor LogPack {
     private var last :(at:Date,text:String?)? = nil
     private var packingCount : Int = 0
     
-    init( title:String, threshold:TimeInterval, isLogWithText:Bool = false, maxPacking:Int = 10 ) {
+    init( title:String, threshold:TimeInterval, isLogWithText:Bool = true, maxPacking:Int = 10 ) {
         self.title = title
         self.threshold = threshold
         self.isLogWithText = isLogWithText
@@ -593,18 +601,21 @@ actor LogPack {
     }
     
     private func _log( text:String? = nil ) {
-        let now = Date()
+        var now = Date()
         
         if let (lastAt,lastText) = self.last {
-            if (text != lastText)
-                || (now.timeIntervalSince(lastAt) >= threshold) {
+            if text != lastText {
                 _packlog(lastText)
                 _log( now, text )
             }
             else {
                 packingCount += 1
-                if packingCount >= maxPacking {
+                if (now.timeIntervalSince(lastAt) >= threshold) {
                     _packlog(lastText)
+                } else if packingCount >= maxPacking {
+                    _packlog(lastText)
+                } else {
+                    now = lastAt
                 }
             }
         }

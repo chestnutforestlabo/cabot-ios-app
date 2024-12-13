@@ -287,7 +287,7 @@ struct ArrivedActionMenus: View {
             if let count = ad.arriveMessages?.count {
                 if let text = ad.arriveMessages?[count-1].content {
                     Button(action: {
-                        modelData.speak(text) {}
+                        modelData.speak(text, priority:.Required) { _, _ in }
                     }) {
                         Label{
                             Text("Repeat the message")
@@ -511,6 +511,26 @@ struct StatusMenus: View {
                             .scaledToFit()
                             .foregroundColor(.red)
                             .padding(2)
+                    }
+                }
+                NavigationLink (destination: SettingView(langOverride: modelData.resourceLang)
+                    .environmentObject(modelData)
+                    .onDisappear {
+                        modelData.tcpServiceRestart()
+                    }
+                    .heartbeat("SettingView")
+                ) {
+                    Label {
+                        HStack {
+                            Text(LocalizedStringKey("Handle"))
+                            Text(":")
+                            Text(LocalizedStringKey(modelData.suitcaseFeatures.selectedHandleSide.text))
+                        }
+                    } icon: {
+                        Image(modelData.suitcaseFeatures.selectedHandleSide.imageName)
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundColor(modelData.suitcaseFeatures.selectedHandleSide.color)
                     }
                 }
             }

@@ -280,7 +280,8 @@ class TourManager: TourProtocol {
                         let destinationList = try! Destination.load(at: src)
                         var destinations : [Destination] = destinationList
                         for dList in destinationList {
-                            let destination = try! Destination.load(at: dList.file!)
+                            guard let file = dList.file else { continue }
+                            guard let destination = try? Destination.load(at: file) else { continue }
                             for d in destination{
                                 destinations.append(d)
                                 if decoded.currentDestination == (d.value ?? d.ref?.value ?? "") {
@@ -298,7 +299,7 @@ class TourManager: TourProtocol {
                             }
                         }
                         
-                        if(decoded.currentDestination == ""){
+                        if decoded.destinations.count > 0 && decoded.currentDestination == "" {
                             model.needToStartAnnounce(wait: true)
                         }
                     }

@@ -44,16 +44,22 @@ struct SettingView: View {
                 }
 
                 if let resource = modelData.resource {
-                    Picker("LANGUAGE", selection: $langOverride) {
+                    Picker("LANGUAGE", selection: $modelData.selectedLanguage) {
                         ForEach(resource.languages, id: \.self) { language in
                             Text(language).tag(language)
                         }
-                    }.onChange(of: langOverride) { lang in
-                        modelData.resource?.lang = lang
-                        self.isResourceChanging = true
-                        modelData.resource = modelData.resource
-                        modelData.updateVoice()
-                        modelData.share(user_info: SharedInfo(type: .ChangeLanguage, value: lang))
+                    }
+                }
+
+                Picker(LocalizedStringKey("Handle"), selection: $modelData.suitcaseFeatures.selectedHandleSide) {
+                    ForEach(modelData.suitcaseFeatures.possibleHandleSides, id: \.rawValue) { grip in
+                        Text(LocalizedStringKey(grip.text)).tag(grip)
+                    }
+                }
+
+                Picker(LocalizedStringKey("Touch Mode"), selection: $modelData.suitcaseFeatures.selectedTouchMode) {
+                    ForEach(modelData.suitcaseFeatures.possibleTouchModes, id: \.rawValue) { touch in
+                        Text(LocalizedStringKey(touch.text)).tag(touch)
                     }
                 }
 
@@ -66,10 +72,10 @@ struct SettingView: View {
                 Toggle(isOn: $modelData.isTTSEnabledForAdvanced) {
                     Text("TTS Enabled (Advanced only)")
                 }
-                
+
                 Text("Select Voice Settings")
                     .listRowSeparator(.hidden, edges: .bottom)
-                
+
                 Picker("", selection: $modelData.voiceSetting){
                     Text(LocalizedStringKey("Attend Voice")).tag(VoiceMode.Attend)
                     Text(LocalizedStringKey("User Voice")).tag(VoiceMode.User)
@@ -92,25 +98,20 @@ struct SettingView: View {
                     }
                 }.onChange(of: modelData.attendVoice, perform: { value in
                     if let _ = modelData.attendVoice {
-                        if !isResourceChanging {
-                            modelData.playSample(mode: VoiceMode.Attend)
-                        }
+                        modelData.playSample(mode: VoiceMode.Attend)
                     }
-                }).onTapGesture {
-                    isResourceChanging = false
-                }
+                })
                 .pickerStyle(DefaultPickerStyle())
                 .listRowSeparator(.hidden)
-                
+
                 HStack {
                     Text("Speech Speed")
                         .accessibility(hidden: true)
                     Slider(value: $modelData.attendSpeechRate,
-                            in: 0...1,
-                            step: 0.05,
-                            onEditingChanged: { editing in
-                        timer?.invalidate()
-                        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
+                           in: 0...1,
+                           step: 0.05,
+                           onEditingChanged: { editing in
+                        if editing == false {
                             modelData.playSample(mode: VoiceMode.Attend)
                         }
                     })
@@ -119,7 +120,7 @@ struct SettingView: View {
                     Text(String(format:"%.0f %%", arguments:[modelData.attendSpeechRate*100.0]))
                         .accessibility(hidden: true)
                 }
-                
+
                 HStack{
                     Text("User Voice")
                     if(modelData.voiceSetting == .User){
@@ -133,14 +134,6 @@ struct SettingView: View {
                     ForEach(TTSHelper.getVoices(by: locale), id: \.self) { voice in
                         Text(voice.AVvoice.name).tag(voice as Voice?)
                     }
-                }.onChange(of: modelData.userVoice, perform: { value in
-                    if let voice = modelData.userVoice {
-                        if !isResourceChanging {
-                            modelData.share(user_info: SharedInfo(type: .ChangeUserVoiceType, value: "\(voice.id)"))
-                        }
-                    }
-                }).onTapGesture {
-                    isResourceChanging = false
                 }
                 .pickerStyle(DefaultPickerStyle())
                 .listRowSeparator(.hidden)
@@ -151,13 +144,14 @@ struct SettingView: View {
                            in: 0...1,
                            step: 0.05,
                            onEditingChanged: { editing in
-                            timer?.invalidate()
-                            timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
-                                modelData.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(modelData.userSpeechRate)", flag1: true))
-                            }
+                        if editing == false {
+                            print("Sending ChangeUserVoiceRate")
+                            // let the user app to speak sample voice
+                            modelData.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(modelData.userSpeechRate)", flag1: true))
+                        }
                     })
-                        .accessibility(label: Text("Speech Speed"))
-                        .accessibility(value: Text(String(format:"%.0f %%", arguments:[modelData.userSpeechRate*100.0])))
+                    .accessibility(label: Text("Speech Speed"))
+                    .accessibility(value: Text(String(format:"%.0f %%", arguments:[modelData.userSpeechRate*100.0])))
                     Text(String(format:"%.0f %%", arguments:[modelData.userSpeechRate*100.0]))
                         .accessibility(hidden: true)
                 }
@@ -207,12 +201,12 @@ struct SettingView_Previews: PreviewProvider {
         preview
         preview_ja
     }
-    
+
     static var preview: some View {
         let modelData = CaBotAppModel()
-        
+
         modelData.teamID = "test"
-        
+
         return SettingView(langOverride: "en-US")
             .environmentObject(modelData)
             .environment(\.locale, Locale.init(identifier: "en-US"))
@@ -220,9 +214,9 @@ struct SettingView_Previews: PreviewProvider {
     }
     static var preview_ja: some View {
         let modelData = CaBotAppModel()
-        
+
         modelData.teamID = "test"
-        
+
         return SettingView(langOverride: "ja-JP")
             .environmentObject(modelData)
             .environment(\.locale, Locale.init(identifier: "ja-JP"))

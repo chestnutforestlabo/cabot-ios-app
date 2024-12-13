@@ -50,11 +50,11 @@ enum DisplayedScene {
         case .ResourceSelect:
             return Text(CustomLocalizedString("SELECT_RESOURCE", lang: lang))
         case .App:
-            #if ATTEND
+#if ATTEND
             return Text(CustomLocalizedString("ATTEND_MENU", lang: lang))
-            #elseif USER
+#elseif USER
             return Text(CustomLocalizedString("MAIN_MENU", lang: lang))
-            #endif
+#endif
         }
     }
 }
@@ -73,6 +73,11 @@ enum VoiceMode: String, CaseIterable{
 enum SpeechPriority: String, CaseIterable {
     case Robot = "Robot"
     case App = "App"
+}
+
+extension SpeakTag {
+    static func Next( erase:Bool = true ) -> Self { return SpeakTag(tag:"Next", erase:erase) }
+    static func Sample( erase:Bool = true ) -> Self { return SpeakTag(tag:"Sample", erase:erase) }
 }
 
 class FallbackService: CaBotServiceProtocol {
@@ -129,7 +134,7 @@ class FallbackService: CaBotServiceProtocol {
         guard let service = getService() else { return false }
         return service.manage(command: command, param: param)
     }
-    
+
     func log_request(request: Dictionary<String, String>) -> Bool {
         guard let service = getService() else { return false }
         return service.log_request(request: request)
@@ -151,7 +156,7 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
     private let enableSubtourOnHandleKey = "enableSubtourOnHandleKey"
     private let showContentWhenArriveKey = "showContentWhenArriveKey"
     private let speechPriorityKey = "speechPriorityKey"
-    
+
     init() {
         if let startSound = UserDefaults.standard.value(forKey: startSoundKey) as? String {
             self.startSound = startSound
@@ -174,13 +179,8 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
         if let showContentWhenArrive = UserDefaults.standard.value(forKey: showContentWhenArriveKey) as? Bool {
             self.showContentWhenArrive = showContentWhenArrive
         }
-        if let speechPriorityString = UserDefaults.standard.value(forKey: speechPriorityKey) as? String {
-            if let speechPriority = SpeechPriority(rawValue: speechPriorityString) {
-                self.speechPriority = speechPriority
-            }
-        }
     }
-        
+
     @Published var startSound: String = "/System/Library/Audio/UISounds/nano/3rdParty_Success_Haptic.caf" {
         didSet {
             UserDefaults.standard.setValue(startSound, forKey: startSoundKey)
@@ -211,31 +211,24 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
             UserDefaults.standard.synchronize()
         }
     }
-    
+
     @Published var browserCloseDelay: Double = 1.2 {
         didSet {
             UserDefaults.standard.setValue(browserCloseDelay, forKey: browserCloseDelayKey)
             UserDefaults.standard.synchronize()
         }
     }
-    
+
     @Published var enableSubtourOnHandle: Bool = false{
         didSet {
             UserDefaults.standard.setValue(enableSubtourOnHandle, forKey: enableSubtourOnHandleKey)
             UserDefaults.standard.synchronize()
         }
     }
-    
+
     @Published var showContentWhenArrive: Bool = false {
         didSet {
             UserDefaults.standard.setValue(showContentWhenArrive, forKey: showContentWhenArriveKey)
-            UserDefaults.standard.synchronize()
-        }
-    }
-    
-    @Published var speechPriority:SpeechPriority = .App {
-        didSet {
-            UserDefaults.standard.setValue(speechPriority.rawValue, forKey: speechPriorityKey)
             UserDefaults.standard.synchronize()
         }
     }
@@ -255,8 +248,8 @@ final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
 }
 
 class AddressCandidate {
-    let addresses: [String]
-    private var index:Int = 1
+    var addresses: [String]
+    private var index:Int = 0
     init(addresses: [String]) {
         self.addresses = addresses
     }
@@ -267,11 +260,14 @@ class AddressCandidate {
         index += 1
         return getCurrent()
     }
+    func update(addresses: [String]) {
+        self.addresses = addresses
+    }
 }
 
 final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, TourManagerDelegate, CLLocationManagerDelegate, CaBotTTSDelegate, LogReportModelDelegate, UNUserNotificationCenterDelegate{
     private let DEFAULT_LANG = "en"
-    
+
     private let selectedResourceKey = "SelectedResourceKey"
     private let selectedResourceLangKey = "selectedResourceLangKey"
     private let selectedVoiceKey = "SelectedVoiceKey"
@@ -288,7 +284,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private let noSuitcaseDebugKey = "noSuitcaseDebugKey"
     private let modeTypeKey = "modeTypeKey"
     private let notificationCenterID = "cabot_state_notification"
-    
+    private let voiceSettingKey = "voiceSettingKey"
+
     let detailSettingModel: DetailSettingModel
 
     @Published var versionMatchedBLE: Bool = false
@@ -318,7 +315,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if (self.bluetoothState == .poweredOn || self.bluetoothState == .poweredOff) &&
             self.notificationState != .Init &&
             self.locationState != .Init
-            {
+        {
             if authRequestedByUser {
                 withAnimation() {
                     self.displayedScene = .ResourceSelect
@@ -340,19 +337,28 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var resource: Resource? = nil {
         didSet {
             if let resource = resource {
-
                 NSLog("resource.identifier = \(resource.identifier)")
                 UserDefaults.standard.setValue(resource.identifier, forKey: selectedResourceKey)
-                if let langOverride = resource.langOverride {
-                    NSLog("resource.langOverride = \(langOverride)")
-                    UserDefaults.standard.setValue(langOverride, forKey: selectedResourceLangKey)
-                }
                 UserDefaults.standard.synchronize()
-                
-                _ = self.fallbackService.manage(command: .lang, param: resource.lang)
-                self.updateVoice()
-                self.updateTTS()
+                updateVoice()
             }
+        }
+    }
+
+    @Published var selectedLanguage: String = "en" {
+        willSet {
+            if silentForChange == false {
+                share(user_info: SharedInfo(type: .ChangeLanguage, value: newValue))
+            }
+            silentForChange = false
+        }
+        didSet {
+            self.resource?.lang = selectedLanguage
+            NSLog("selectedLanguage = \(selectedLanguage)")
+            UserDefaults.standard.setValue(selectedLanguage, forKey: selectedResourceLangKey)
+            _ = self.fallbackService.manage(command: .lang, param: resource?.lang)
+            self.tts.lang = resource?.lang
+            self.updateVoice()
         }
     }
 
@@ -378,54 +384,89 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             }
         }
     }
-    
+
+    @Published var attendSpeechRate: Double = 0.5 {
+        didSet {
+            UserDefaults.standard.setValue(attendSpeechRate, forKey: attendSpeechRateKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
+
     @Published var userVoice: Voice? = nil {
+        willSet {
+            if silentForChange == false {
+                if let id = newValue?.AVvoice.identifier {
+                    print("willSet userVoice \(userVoice) \(id)")
+                    // send flag1=true if Attend mode to let the User app speak sample voice
+                    share(user_info: SharedInfo(type: .ChangeUserVoiceType, value: id, flag1: modeType == .Advanced))
+                }
+            }
+            silentForChange = false
+        }
         didSet {
             if let id = userVoice?.AVvoice.identifier {
                 let key = "\(selectedVoiceKey)_\(resource?.locale.identifier ?? "en-US")"
                 UserDefaults.standard.setValue(id, forKey: key)
                 UserDefaults.standard.synchronize()
+                self.updateTTS()
             }
         }
     }
-    
-    #if ATTEND
-    @Published var voiceSetting: VoiceMode = .Attend {
+
+    @Published var userSpeechRate: Double = 0.5 {
+        willSet {
+            if silentForChange == false {
+                print("willSet userSpeechRate \(userSpeechRate) \(newValue)")
+                // do not send flag1=true here, handled in setting view
+                share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(newValue)", flag1: false))
+            }
+            silentForChange = false
+        }
         didSet {
+            UserDefaults.standard.setValue(userSpeechRate, forKey: speechRateKey)
+            UserDefaults.standard.synchronize()
             self.updateTTS()
         }
     }
-    #elseif USER
+
+    var suitcaseFeatures: SuitcaseFeatures = SuitcaseFeatures()
+
+    var silentForChange: Bool = false
+    func silentUpdate(language: String) {
+        silentForChange = true
+        selectedLanguage = language
+    }
+
+    func silentUpdate(voice: Voice?) {
+        silentForChange = true
+        userVoice = voice
+    }
+
+    func silentUpdate(rate: Double) {
+        silentForChange = true
+        userSpeechRate = rate
+    }
+
+#if ATTEND
+    @Published var voiceSetting: VoiceMode = .Attend {
+        didSet {
+            UserDefaults.standard.setValue(voiceSetting.rawValue, forKey: voiceSettingKey)
+            UserDefaults.standard.synchronize()
+            self.updateTTS()
+        }
+    }
+#elseif USER
     @Published var voiceSetting: VoiceMode = .User {
         didSet {
             self.updateTTS()
         }
     }
-    #endif
-    
-    func initTTS()
-    {
-        if let resource = self.resource {
-            let key = "\(selectedVoiceKey)_\(resource.locale.identifier)"
-            if let id = UserDefaults.standard.value(forKey: key) as? String {
-                self.userVoice = TTSHelper.getVoice(by: id)
-            } else {
-                self.userVoice = TTSHelper.getVoices(by: resource.locale)[0]
-            }
-            if let id = UserDefaults.standard.value(forKey: key) as? String {
-                self.attendVoice = TTSHelper.getVoice(by: id)
-            } else {
-                self.attendVoice = TTSHelper.getVoices(by: resource.locale)[0]
-            }
-        }
-        
-        self.updateTTS()
-    }
-    
+#endif
+
     func updateVoice() {
         if let resource = self.resource {
             let key = "\(selectedVoiceKey)_\(resource.locale.identifier)"
-            
+            self.silentForChange = true
             if(voiceSetting == .User){
                 if let id = UserDefaults.standard.value(forKey: key) as? String {
                     self.userVoice = TTSHelper.getVoice(by: id)
@@ -441,7 +482,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             }
         }
     }
-    
+
     func updateTTS() {
         if(self.voiceSetting == .User){
             self.tts.rate = self.userSpeechRate
@@ -449,20 +490,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         } else if(voiceSetting == .Attend) {
             self.tts.rate = self.attendSpeechRate
             self.tts.voice = self.attendVoice?.AVvoice
-        }
-    }
-
-    @Published var attendSpeechRate: Double = 0.5 {
-        didSet {
-            UserDefaults.standard.setValue(attendSpeechRate, forKey: attendSpeechRateKey)
-            UserDefaults.standard.synchronize()
-        }
-    }
-    
-    @Published var userSpeechRate: Double = 0.5 {
-        didSet {
-            UserDefaults.standard.setValue(userSpeechRate, forKey: speechRateKey)
-            UserDefaults.standard.synchronize()
         }
     }
 
@@ -512,14 +539,18 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         didSet {
             UserDefaults.standard.setValue(primaryAddr, forKey: primaryAddrKey)
             UserDefaults.standard.synchronize()
-            updateNetworkConfig()
+            if oldValue != primaryAddr {
+                updateNetworkConfig()
+            }
         }
     }
     @Published var secondaryAddr: String = "" {
         didSet {
             UserDefaults.standard.setValue(secondaryAddr, forKey: secondaryAddrKey)
             UserDefaults.standard.synchronize()
-            updateNetworkConfig()
+            if oldValue != secondaryAddr {
+                updateNetworkConfig()
+            }
         }
     }
     let socketPort: String = "5000"
@@ -552,7 +583,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var deviceStatus: DeviceStatus = DeviceStatus(){
         didSet{
             isUserAppConnected = deviceStatus.devices.contains { device in
-                    device.type == "User App" && device.level == .OK
+                device.type == "User App" && device.level == .OK
             }
         }
     }
@@ -630,9 +661,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if let selectedIdentifier = UserDefaults.standard.value(forKey: selectedResourceKey) as? String {
             self.resource = resourceManager.resource(by: selectedIdentifier)
         }
-        if let selectedLang = UserDefaults.standard.value(forKey: selectedResourceLangKey) as? String {
-            self.resource?.lang = selectedLang
-            self.updateVoice()
+        if let selectedLanguage = UserDefaults.standard.value(forKey: selectedResourceLangKey) as? String {
+            self.silentForChange = true
+            self.selectedLanguage = selectedLanguage
         }
         if let groupID = UserDefaults.standard.value(forKey: teamIDKey) as? String {
             self.teamID = groupID
@@ -651,13 +682,19 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.attendSpeechRate = attendSpeechRate
         }
         if let speechRate = UserDefaults.standard.value(forKey: speechRateKey) as? Double {
+            self.silentForChange = true
             self.userSpeechRate = speechRate
         }
+        updateVoice()
+        updateTTS()
         if let modeType = UserDefaults.standard.value(forKey: modeTypeKey) as? String {
             self.modeType = ModeType(rawValue: modeType)!
         }
         if let isTTSEnabled = UserDefaults.standard.value(forKey: isTTSEnabledKey) as? Bool {
             self.isTTSEnabledForAdvanced = isTTSEnabled
+        }
+        if let voiceSetting = UserDefaults.standard.value(forKey: voiceSettingKey) as? String {
+            self.voiceSetting = VoiceMode(rawValue: voiceSetting)!
         }
 
         // services
@@ -689,14 +726,30 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             NSLog("\(exception.reason ?? "")")
             NSLog("\(exception.callStackSymbols)")
         }
-        
+
         self.userInfo.modelData = self
-        
-        self.initTTS()
+
+        self.suitcaseFeatures.updater({side, mode in
+            if let side = side {
+                print("willSet selectedHandleSide \(side)")
+                _ = self.fallbackService.share(user_info: SharedInfo(type: .ChangeHandleSide, value: side.rawValue))
+                _ = self.fallbackService.manage(command: .handleside, param: side.rawValue)
+            }
+            if let mode = mode {
+                print("willSet selectedTouchMode \(mode)")
+                _ = self.fallbackService.share(user_info: SharedInfo(type: .ChangeTouchMode, value: mode.rawValue))
+                _ = self.fallbackService.manage(command: .touchmode, param: mode.rawValue)
+            }
+        })
     }
 
     func updateNetworkConfig() {
-        self.addressCandidate = AddressCandidate(addresses: [primaryAddr, secondaryAddr])
+        NSLog("updateNetworkConfig \([primaryAddr, secondaryAddr])")
+        let current = self.addressCandidate.getCurrent()
+        if current != primaryAddr && current != secondaryAddr {
+            self.tcpService.stop()
+        }
+        self.addressCandidate.update(addresses: [primaryAddr, secondaryAddr])
     }
 
     func getCurrentAddress() -> String {
@@ -818,7 +871,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     func requestNotificationAuthorization() {
         self.authRequestedByUser = true
         self.notificationCenter.requestAuthorization(options:[UNAuthorizationOptions.alert,
-                                             UNAuthorizationOptions.sound]) {
+                                                              UNAuthorizationOptions.sound]) {
             (granted, error) in
             DispatchQueue.main.async {
                 self.notificationState = granted ? .Granted : .Denied
@@ -828,10 +881,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func tcpServiceRestart() {
         if !self.tcpService.isSocket() {
-           self.tcpService.start(addressCandidate: addressCandidate, port: socketPort)
+            self.tcpService.start(addressCandidate: addressCandidate, port: socketPort)
         }
     }
- 
+
     // MARK: CaBotTTSDelegate
 
     func activityLog(category: String, text: String, memo: String) {
@@ -843,18 +896,18 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     // MARK: LogReportModelDelegate
-    
+
     func refreshLogList() {
         let request = [
             "type": CaBotLogRequestType.list.rawValue
         ]
         _ = self.fallbackService.log_request(request: request)
     }
-    
+
     func isSuitcaseConnected() -> Bool {
         return self.suitcaseConnected
     }
-    
+
     func requestDetail(log_name: String) {
         let request = [
             "type": CaBotLogRequestType.detail.rawValue,
@@ -862,7 +915,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         ]
         _ = self.fallbackService.log_request(request: request)
     }
-    
+
     func submitLogReport(log_name: String, title: String, detail: String) {
         let request = [
             "type": CaBotLogRequestType.report.rawValue,
@@ -942,7 +995,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             NavUtil.showModalWaiting(withMessage: CustomLocalizedString("processing...", lang: self.resourceLang))
         }
         if self.fallbackService.summon(destination: destination) || self.noSuitcaseDebug {
-            self.speak(CustomLocalizedString("Sending the command to the suitcase", lang: self.resourceLang)) {}
+            self.speak(CustomLocalizedString("Sending the command to the suitcase", lang: self.resourceLang), priority:.Required) { _, _ in }
             DispatchQueue.main.async {
                 print("hide modal waiting")
                 NavUtil.hideModalWaiting()
@@ -956,12 +1009,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             DispatchQueue.main.async {
                 let message = CustomLocalizedString("Suitcase may not be connected", lang: self.resourceLang)
 
-                self.speak(message) {}
+                self.speak(message, priority:.Required) { _, _ in }
             }
             return false
         }
     }
-    
+
     func addSubTour(tour: Tour) -> Void {
         tourManager.addSubTour(tour: tour)
         if tourManager.proceedToNextDestination() {
@@ -976,15 +1029,15 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         tourManager.save()
         self.stopSpeak()
         let announce = CustomLocalizedString("Skip Message %@", lang: self.resourceLang, skip.title.pron)
-        self.tts.speak(announce){
+        self.tts.speak(announce, priority:.Required){
         }
     }
 
-    func speak(_ text:String, callback: @escaping () -> Void) {
+    func speak(_ text:String, priority: CaBotTTS.SpeechPriority, timeout sec : TimeInterval? = nil, tag: SpeakTag? = nil, callback: @escaping (CaBotTTS.Reason, Int) -> Void) {
         if (preview) {
             print("previewing speak - \(text)")
         } else {
-            self.tts.speak(text, callback: callback)
+            self.tts.speak(text, priority: priority, timeout: sec, tag: tag, callback: callback)
         }
     }
 
@@ -992,13 +1045,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.tts.stop(false)
     }
 
-    func playSample(mode: VoiceMode){
+    func playSample(mode: VoiceMode, priority: CaBotTTS.SpeechPriority? = nil, timeout sec : TimeInterval? = nil ){
         if(self.modeType == .Normal){
-            self.tts.rate = self.userSpeechRate
-            self.tts.voice = self.userVoice?.AVvoice
-            self.tts.speak(CustomLocalizedString("Hello Suitcase!", lang: self.resourceLang), force:true) {_ in
+            self.tts.speak(CustomLocalizedString("Hello Suitcase!", lang: self.resourceLang), force:false, priority:priority ?? .Required, timeout:sec, tag: .Sample(erase:true)) {code, _ in
             }
         } else {
+            // override TTS settings by the mode
             if(mode == .User){
                 self.tts.rate = self.userSpeechRate
                 self.tts.voice = self.userVoice?.AVvoice
@@ -1006,11 +1058,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 self.tts.rate = self.attendSpeechRate
                 self.tts.voice = self.attendVoice?.AVvoice
             }
-            self.tts.speakForAdvanced(CustomLocalizedString("Hello Suitcase!", lang: self.resourceLang), force:true) {_ in
+            self.tts.speakForAdvanced(CustomLocalizedString("Hello Suitcase!", lang: self.resourceLang), force:false, tag: .Sample(erase:true)) {code, _ in
+                if code != .Paused {
+                    // revert the change after speech
+                    self.updateTTS()
+                }
             }
         }
-        
-        self.updateTTS()
+
     }
 
     func playAudio(file: String) {
@@ -1022,7 +1077,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent()
         self.shouldNoAnnounceToPushRightButton = true
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            self.speak(CustomLocalizedString("You can proceed by pressing the right button of the suitcase handle", lang: self.resourceLang)) {
+            self.speak(CustomLocalizedString("You can proceed by pressing the right button of the suitcase handle", lang: self.resourceLang), priority: .Normal, timeout: nil) { _, _ in
             }
         }
     }
@@ -1043,6 +1098,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 break
             case .restart_localization:
                 break
+            case .reqfeatures:
+                break
+            case .handleside:
+                break
+            case .touchmode:
+                break
             }
             systemStatus.components.removeAll()
             objectWillChange.send()
@@ -1050,12 +1111,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func debugCabotArrived() {
-        self.cabot(service: self.bleService, notification: .arrived)
+        self.cabot(service: self.bleService, notification: .arrived, param: nil)
     }
 
     func debugCabotSystemStatus(systemStatusFile: String){
         let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
-                .appendingPathComponent(systemStatusFile)
+            .appendingPathComponent(systemStatusFile)
         let fm = FileManager.default
         let data = fm.contents(atPath: path.path)!
         let status = try! JSONDecoder().decode(SystemStatus.self, from: data)
@@ -1064,7 +1125,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func debugCabotDeviceStatus(systemStatusFile: String){
         let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
-                .appendingPathComponent(systemStatusFile)
+            .appendingPathComponent(systemStatusFile)
         let fm = FileManager.default
         let data = fm.contents(atPath: path.path)!
         let status = try! JSONDecoder().decode(DeviceStatus.self, from: data)
@@ -1122,9 +1183,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                         self.willSpeakArriveMessage = true
                         let announce = CustomLocalizedString("Going to %@", lang: self.resourceLang, dest.title.pron)
-                            + (dest.startMessage?.content ?? "")
+                        + (dest.startMessage?.content ?? "")
                         if(isStartMessageSpeaking){
-                            self.tts.speak(announce, forceSelfvoice: false, force: true, callback: {code in }, progress: {range in
+                            self.tts.speak(announce, forceSelfvoice: false, force: true, priority: .High, timeout: nil, tag: .Next(erase:true), callback: {_, _ in }, progress: {range in
                                 if range.location == 0{
                                     self.willSpeakArriveMessage = true
                                 }
@@ -1158,7 +1219,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             DispatchQueue.main.async {
                 let message = CustomLocalizedString("Suitcase may not be connected", lang: self.resourceLang)
 
-                self.speak(message) {}
+                self.speak(message, priority:.Required) { _, _ in }
             }
             return false
         }
@@ -1171,9 +1232,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             bluetoothState = state
         }
 
-        #if targetEnvironment(simulator)
+#if targetEnvironment(simulator)
         bluetoothState = .poweredOn
-        #endif
+#endif
     }
 
     // MARK: CaBotServiceDelegate
@@ -1191,23 +1252,20 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
         if self.suitcaseConnected != saveSuitcaseConnected {
             let text = centralConnected ? CustomLocalizedString("Suitcase has been connected", lang: self.resourceLang) :
-                CustomLocalizedString("Suitcase has been disconnected", lang: self.resourceLang)
-            self.tts.speak(text, force: true) {_ in }
-            
+            CustomLocalizedString("Suitcase has been disconnected", lang: self.resourceLang)
+            self.tts.speak(text, force: true, priority:.Normal) { _, _ in }
+
             if self.suitcaseConnected {
                 if self.modeType != .Normal{
                     self.share(user_info: SharedInfo(type: .RequestUserInfo, value: "", flag1: false)) // do not speak
                 }
                 else if self.modeType == .Normal{
                     tourManager.tourDataLoad(model: self)
-                    self.share(user_info: SharedInfo(type: .Tour, value: self.tourManager.title.text))
-                    self.share(user_info: SharedInfo(type: .CurrentDestination, value: self.tourManager.currentDestination?.title.text ?? ""))
-                    self.share(user_info: SharedInfo(type: .NextDestination, value: self.tourManager.nextDestination?.title.text ?? ""))
-                    self.share(user_info: SharedInfo(type: .Destinations, value: self.tourManager.destinations.map { $0.title.text }.joined(separator: ",")))
-                    self.share(user_info: SharedInfo(type: .ChangeLanguage, value: self.resourceLang))
+                    shareAllUserConfig()
                 }
                 DispatchQueue.main.async {
                     _ = self.fallbackService.manage(command: .lang, param: self.resourceLang)
+                    _ = self.fallbackService.manage(command: .reqfeatures)
                 }
             }
         }
@@ -1245,7 +1303,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
     }
 
-    func cabot(service: any CaBotTransportProtocol, notification: NavigationNotification) {
+    func cabot(service: any CaBotTransportProtocol, notification: NavigationNotification, param:String?) {
         switch(notification){
         case .subtour:
             self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent() - 20
@@ -1266,7 +1324,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             if tourManager.proceedToNextDestination() {
                 self.playAudio(file: self.detailSettingModel.startSound)
             }else {
-                self.speak(CustomLocalizedString("No destination is selected", lang: self.resourceLang)) {
+                self.speak(CustomLocalizedString("No destination is selected", lang: self.resourceLang), priority:.Required, timeout:nil) { _, _ in
                 }
             }
             break
@@ -1275,7 +1333,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 self.playAudio(file: self.detailSettingModel.arrivedSound)
                 tourManager.arrivedCurrent()
 
-                var announce = CustomLocalizedString("You have arrived at %@. ", lang: self.resourceLang, cd.title.pron)
+                let arrivedMsg = CustomLocalizedString("You have arrived at %@. ", lang: self.resourceLang, cd.title.pron)
+                var announce = ""
                 if let count = cd.arriveMessages?.count {
                     for i in 0 ..< count{
                         announce += cd.arriveMessages?[i].content ?? ""
@@ -1294,7 +1353,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                             announce += CustomLocalizedString("Or by pressing the center button to proceed a subtour %@.", lang: self.resourceLang, subtour.introduction.pron)
                         }
                     } else if let subtour = cd.subtour,
-                       tourManager.setting.enableSubtourOnHandle {
+                              tourManager.setting.enableSubtourOnHandle {
                         announce += CustomLocalizedString("Press the center button to proceed a subtour %@.", lang: self.resourceLang, subtour.introduction.pron)
                     }
                 }
@@ -1303,7 +1362,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     delay = 3.0
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                    self.speak(announce) {
+                    self.speak(arrivedMsg, priority:.High, timeout: nil ) { _, _ in }
+                    self.speak(announce, priority:.Normal, timeout: nil, tag: .Next(erase:false) ) { code, length in
+                        guard code != .Paused else { return }
                         // if user pressed the next button while reading announce, skip open content
                         if self.tourManager.currentDestination == nil {
                             if let contentURL = cd.content?.url,
@@ -1323,6 +1384,28 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         case .getlanguage:
             DispatchQueue.main.async {
                 _ = self.fallbackService.manage(command: .lang, param: I18N.shared.langCode)
+            }
+            break
+        case .gethandleside:
+            DispatchQueue.main.async {
+                self.suitcaseFeatures.update(handlesideOptions: param)
+                if !self.suitcaseFeatures.possibleHandleSides.contains(self.suitcaseFeatures.selectedHandleSide) {
+                    if let firstOption = self.suitcaseFeatures.possibleHandleSides.first {
+                        self.suitcaseFeatures.selectedHandleSide = firstOption
+                    }
+                }
+                _ = self.fallbackService.manage(command: .handleside, param: self.suitcaseFeatures.selectedHandleSide.rawValue)
+            }
+            break
+        case .gettouchmode:
+            DispatchQueue.main.async {
+                self.suitcaseFeatures.update(touchmodeOptions: param)
+                if !self.suitcaseFeatures.possibleTouchModes.contains(self.suitcaseFeatures.selectedTouchMode) {
+                    if let firstOption = self.suitcaseFeatures.possibleTouchModes.first {
+                        self.suitcaseFeatures.selectedTouchMode = firstOption
+                    }
+                }
+                _ = self.fallbackService.manage(command: .touchmode, param: self.suitcaseFeatures.selectedTouchMode.rawValue)
             }
             break
         }
@@ -1377,7 +1460,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     func cabot(service: any CaBotTransportProtocol, batteryStatus: BatteryStatus) -> Void {
         self.batteryStatus = batteryStatus
     }
-    
+
     func cabot(service: any CaBotTransportProtocol, touchStatus: TouchStatus) -> Void {
         let prevTouchStatus = self.touchStatus
         if prevTouchStatus.level != touchStatus.level{
@@ -1395,7 +1478,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 if self.shouldNoAnnounceToPushRightButton == false && self.willSpeakArriveMessage == false{
                     if tourManager.hasDestination {
                         let announce = CustomLocalizedString("PRESS_RIGHT_BUTTON", lang: self.resourceLang)
-                        self.speak(announce){}
+                        self.speak(announce, priority:.Required){ _, _ in }
                         self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent()
                         self.shouldNoAnnounceToPushRightButton = true
                     }
@@ -1403,7 +1486,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             }
         }
     }
-    
+
     func cabot(service: any CaBotTransportProtocol, logList: [LogEntry], status: CaBotLogStatus) {
         NSLog("set log list \(logList)")
         self.logList.set(list: logList)
@@ -1416,20 +1499,50 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func cabot(service: any CaBotTransportProtocol, userInfo: SharedInfo) {
+        // User and Attend
+        if userInfo.type == .ChangeLanguage {
+            self.silentUpdate(language: userInfo.value)
+        }
+        if userInfo.type == .ChangeUserVoiceRate {
+            self.silentUpdate(rate: Double(userInfo.value) ?? 0.5)
+            if  modeType == .Normal && userInfo.flag1 {
+                self.playSample(mode: .User)
+            }
+        }
+        if userInfo.type == .ChangeUserVoiceType {
+            self.silentUpdate(voice: TTSHelper.getVoice(by: userInfo.value))
+            if modeType == .Normal && userInfo.flag1 {
+                self.playSample(mode: .User)
+            }
+        }
+        if userInfo.type == .ChangeHandleSide {
+            self.suitcaseFeatures.silentUpdate(side: SuitcaseFeatures.HandleSide(rawValue: userInfo.value) ?? .left)
+        }
+        if userInfo.type == .ChangeTouchMode {
+            self.suitcaseFeatures.silentUpdate(mode: SuitcaseFeatures.TouchMode(rawValue: userInfo.value) ?? .cap)
+        }
+
+        // Only Attend
         if modeType != .Normal {
             self.userInfo.update(userInfo: userInfo)
             if userInfo.type == .Speak {
+                print("Speak share \(userInfo)")
                 if isTTSEnabledForAdvanced {
                     if userInfo.value.isEmpty && userInfo.flag1 { // stop
                         tts.stopSpeakForAdvanced()
                     } else {
-                        tts.speakForAdvanced(userInfo.value, force: userInfo.flag1) { _ in
+                        var text = userInfo.value
+                        let startIndex = text.index(text.startIndex, offsetBy: userInfo.location)
+                        text = String(text[startIndex...])
+                        tts.speakForAdvanced(text, force: userInfo.flag1) { _, _ in
                         }
                     }
                 }
             }
             return
         }
+
+        // only User
         if userInfo.type == .OverrideTour {
             if let src = resource?.toursSource {
                 do {
@@ -1480,40 +1593,23 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             skipDestination()
         }
         if userInfo.type == .RequestUserInfo {
-            self.share(user_info: SharedInfo(type: .Tour, value: self.tourManager.title.text))
-            self.share(user_info: SharedInfo(type: .CurrentDestination, value: self.tourManager.currentDestination?.title.text ?? ""))
-            self.share(user_info: SharedInfo(type: .NextDestination, value: self.tourManager.nextDestination?.title.text ?? ""))
-            self.share(user_info: SharedInfo(type: .Destinations, value: self.tourManager.destinations.map { $0.title.text }.joined(separator: ",")))
-            self.share(user_info: SharedInfo(type: .ChangeLanguage, value: self.resourceLang))
-            self.share(user_info: SharedInfo(type: .ChangeUserVoiceType, value: "\(self.userVoice?.id ?? "")", flag1: userInfo.flag1))
-            self.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(self.userSpeechRate)", flag1: userInfo.flag1))
+            shareAllUserConfig()
         }
         if userInfo.type == .ClearDestinations {
             self.clearAll()
         }
-        if userInfo.type == .ChangeLanguage {
-            self.resource?.lang = userInfo.value
-            self.updateVoice()
-            self.updateTTS()
-        }
-        if userInfo.type == .ChangeUserVoiceRate {
-            self.userSpeechRate = Double(userInfo.value) ?? 0.5
-            self.updateTTS()
-            if userInfo.flag1 {
-                self.playSample(mode: .User)
-            }
-        }
-        if userInfo.type == .ChangeUserVoiceType {
-            self.userVoice = TTSHelper.getVoice(by: userInfo.value)
-            self.updateTTS()
-            if userInfo.flag1 {
-                self.playSample(mode: .User)
-            }
-        }
     }
 
-    func getSpeechPriority() -> SpeechPriority {
-        return self.detailSettingModel.speechPriority
+    func shareAllUserConfig() {
+        self.share(user_info: SharedInfo(type: .Tour, value: self.tourManager.title.text))
+        self.share(user_info: SharedInfo(type: .CurrentDestination, value: self.tourManager.currentDestination?.title.text ?? ""))
+        self.share(user_info: SharedInfo(type: .NextDestination, value: self.tourManager.nextDestination?.title.text ?? ""))
+        self.share(user_info: SharedInfo(type: .Destinations, value: self.tourManager.destinations.map { $0.title.text }.joined(separator: ",")))
+        self.share(user_info: SharedInfo(type: .ChangeLanguage, value: self.resourceLang))
+        self.share(user_info: SharedInfo(type: .ChangeUserVoiceType, value: "\(self.userVoice?.id ?? "")", flag1: false))
+        self.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(self.userSpeechRate)", flag1: false))
+        self.share(user_info: SharedInfo(type: .ChangeHandleSide, value: self.suitcaseFeatures.selectedHandleSide.rawValue))
+        self.share(user_info: SharedInfo(type: .ChangeTouchMode, value: self.suitcaseFeatures.selectedTouchMode.rawValue))
     }
 
     func getModeType() -> ModeType {
@@ -1636,7 +1732,7 @@ class SystemStatusData: NSObject, ObservableObject {
                 return false
             case .Active:
                 return true
-                }
+            }
         }
     }
 }
@@ -1657,11 +1753,11 @@ class LogReportModel: NSObject, ObservableObject {
     @Published var isDetailReady: Bool = false
     var delegate: LogReportModelDelegate? = nil
     var debug: Bool = false
-    
+
     override init() {
         self.log_list = []
     }
-    
+
     func set(list: [LogEntry]){
         self.log_list = list
         self.isListReady = true
@@ -1670,60 +1766,60 @@ class LogReportModel: NSObject, ObservableObject {
     func set(status: CaBotLogStatus) {
         self.status = status
     }
-    
+
     func set(detail: LogEntry) {
         self.selectedLog = detail
         self.originalLog.title = detail.title
         self.originalLog.detail = detail.detail
         self.isDetailReady = true
     }
-    
+
     func clear(){
         self.log_list = []
         self.isListReady = false
     }
-    
+
     func refreshLogList() {
         self.delegate?.refreshLogList()
     }
-    
+
     func requestDetail(log: LogEntry) {
         isDetailReady = false || debug
         self.delegate?.requestDetail(log_name: log.name)
     }
-    
+
     func submit(log: LogEntry) {
         if let title = log.title,
            let detail = log.detail {
             self.delegate?.submitLogReport(log_name: log.name, title: title, detail: detail)
         }
     }
-    
+
     var isSuitcaseConnected: Bool {
         get {
             self.delegate?.isSuitcaseConnected() ?? false
         }
     }
-    
+
     var isOkayToSubmit: Bool {
         get {
             isSuitcaseConnected && status == .OK
         }
     }
-    
+
     var isSubmitDataReady: Bool {
         get {
             selectedLog.title?.count ?? 0 > 0 && selectedLog.detail?.count ?? 0 > 0
         }
     }
-    
+
     var isDetailModified: Bool {
         get {
             originalLog.title != selectedLog.title || originalLog.detail != selectedLog.detail
         }
     }
 }
-    
+
 
 struct PersistenceController {
     static let shared = PersistenceController()
@@ -1754,20 +1850,20 @@ struct PersistenceController {
                 // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
 
                 /*
-                Typical reasons for an error here include:
-                * The parent directory does not exist, cannot be created, or disallows writing.
-                * The persistent store is not accessible, due to permissions or data protection when the device is locked.
-                * The device is out of space.
-                * The store could not be migrated to the current model version.
-                Check the error message to determine what the actual problem was.
-                */
+                 Typical reasons for an error here include:
+                 * The parent directory does not exist, cannot be created, or disallows writing.
+                 * The persistent store is not accessible, due to permissions or data protection when the device is locked.
+                 * The device is out of space.
+                 * The store could not be migrated to the current model version.
+                 Check the error message to determine what the actual problem was.
+                 */
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
         })
     }
 }
 
-class SpeakingText: Hashable {
+class SpeakingText: Hashable, ObservableObject {
     static func == (lhs: SpeakingText, rhs: SpeakingText) -> Bool {
         lhs.text == rhs.text && lhs.date == rhs.date
     }
@@ -1775,11 +1871,11 @@ class SpeakingText: Hashable {
         hasher.combine(text)
         hasher.combine(date)
     }
-    var text: String = ""
+    @Published var text: String = ""
     var date: Date
     var voiceover: Bool
-    var location = 0
-    var length = 0
+    @Published var location = 0
+    @Published var length = 0
     init(text: String, voiceover: Bool) {
         self.text = text
         self.date = Date()
@@ -1852,32 +1948,7 @@ class UserInfoBuffer {
             break
         case .Destinations:
             destinations = userInfo.value.split(separator: ",").map(String.init)
-        case .OverrideTour:
-            // do nothing
-            break
-        case .OverrideDestination:
-            // do nothing
-            break
-        case .Skip:
-            // do nothing
-            break
-        case .RequestUserInfo:
-            // do nothing
-            break
-        case .ClearDestinations:
-            // do nothing
-            break
-        case .ChangeLanguage:
-            modelData?.resource?.lang = userInfo.value
-            modelData?.updateVoice()
-            break
-        case .ChangeUserVoiceRate:
-            modelData?.userSpeechRate = Double(userInfo.value) ?? 0.5
-            modelData?.updateTTS()
-            break
-        case .ChangeUserVoiceType:
-            modelData?.userVoice = TTSHelper.getVoice(by: userInfo.value)
-            modelData?.updateTTS()
+        default:
             break
         }
     }

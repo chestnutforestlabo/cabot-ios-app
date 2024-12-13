@@ -144,10 +144,11 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
         checkLoopCount = 0;
         checkLoopID = setInterval(function() {
             checkLoopCount++;
+            webkit.messageHandlers.callbackHandler.postMessage(`expected_frames="${expected_frames}" checkLoopCount=${checkLoopCount}`);
             if (expected_frames.length == 0) {
                 clearInterval(checkLoopID)
             }
-            if (checkLoopCount > 30) {
+            if (checkLoopCount > 50) {
                 location.reload()
             }
         }, 100);
