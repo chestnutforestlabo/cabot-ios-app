@@ -75,7 +75,7 @@ protocol CaBotServiceProtocol {
     func send(destination: String) -> Bool
     func summon(destination: String) -> Bool
     func manage(command: CaBotManageCommand, param: String?) -> Bool
-    func log_request(request: Dictionary<String, Any>) -> Bool
+    func log_request(request: LogRequest) -> Bool
     func isConnected() -> Bool
     func share(user_info: SharedInfo) -> Bool
 }
@@ -493,6 +493,14 @@ struct LogResponse: Decodable {
     var type: CaBotLogRequestType
     var log_list: [LogEntry]?
     var log: LogEntry?
+}
+
+struct LogRequest: Codable {
+    var type: String
+    var log_name: String? = nil
+    var title: String? = nil
+    var detail: String? = nil
+    var app_log: [String: String]? = nil
 }
 
 class CaBotServiceActions {

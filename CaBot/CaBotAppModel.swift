@@ -135,7 +135,7 @@ class FallbackService: CaBotServiceProtocol {
         return service.manage(command: command, param: param)
     }
 
-    func log_request(request: Dictionary<String, Any>) -> Bool {
+    func log_request(request: LogRequest) -> Bool {
         guard let service = getService() else { return false }
         return service.log_request(request: request)
     }
@@ -898,9 +898,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     // MARK: LogReportModelDelegate
 
     func refreshLogList() {
-        let request = [
-            "type": CaBotLogRequestType.list.rawValue
-        ]
+        var request = LogRequest(type: CaBotLogRequestType.list.rawValue)
         _ = self.fallbackService.log_request(request: request)
     }
 
@@ -909,29 +907,29 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func requestDetail(log_name: String) {
-        let request = [
-            "type": CaBotLogRequestType.detail.rawValue,
-            "log_name": log_name
-        ]
+        var request = LogRequest(
+            type: CaBotLogRequestType.detail.rawValue,
+            log_name: log_name
+        )
         _ = self.fallbackService.log_request(request: request)
     }
 
     func submitLogReport(log_name: String, title: String, detail: String) {
-        let request = [
-            "type": CaBotLogRequestType.report.rawValue,
-            "log_name": log_name,
-            "title": title,
-            "detail": detail
-        ]
+        var request = LogRequest(
+            type: CaBotLogRequestType.report.rawValue,
+            log_name: log_name,
+            title: title,
+            detail: detail
+        )
         _ = self.fallbackService.log_request(request: request)
     }
     
     func submitAppLog(app_log: [String: String], log_name: String) {
-        let request = [
-            "type": CaBotLogRequestType.appLog.rawValue,
-            "log_name": log_name,
-            "app_log": app_log
-        ] as [String : Any]
+        var request = LogRequest(
+            type: CaBotLogRequestType.appLog.rawValue,
+            log_name: log_name,
+            app_log: app_log
+        )
         _ = self.fallbackService.log_request(request: request)
     }
 
