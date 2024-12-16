@@ -24,9 +24,9 @@ import SwiftUI
 
 struct DestinationDetailView: View {
     @EnvironmentObject var modelData: CaBotAppModel
-    @State var destination: Destination
+    @State var destination: any Destination
     @State private var isConfirming = false
-    @State private var targetDestination: Destination?
+    @State private var targetDestination: (any Destination)?
 
     var body: some View {
         Form {
@@ -39,12 +39,14 @@ struct DestinationDetailView: View {
                         Text(arriveMessage.text)
                     }
                 }
+                /* TODO content
                 if let url = destination.content?.url {
                     Button("Show more detail") {
                         modelData.contentURL = url
                         modelData.isContentPresenting = true
                     }
                 }
+                */
                 Button(action: {
                     targetDestination = destination
                     isConfirming = true
@@ -86,9 +88,10 @@ struct DestinationDetailView: View {
 struct DestinationDetailView_Previews: PreviewProvider {
     static var previews: some View {
         let modelData = CaBotAppModel()
+        modelData.modeType = .Advanced
         var floorDestinationsForPreviews: [Directory.FloorDestination] = []
         do {
-            floorDestinationsForPreviews = try Directory.downloadDirectoryJsonForPreview(modeType: .Advanced)
+            floorDestinationsForPreviews = try ResourceManager.shared.load().directory
         } catch {
             NSLog("Failed to download directory JSON")
         }

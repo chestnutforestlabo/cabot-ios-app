@@ -106,7 +106,7 @@ struct DynamicTourDetailView: View {
                     Label(cd.title.text, systemImage: "arrow.triangle.turn.up.right.diamond")
                 }
 
-                ForEach(tour.destinations, id: \.self) { dest in
+                ForEach(tour.destinations, id: \.value) { dest in
                     if let error = dest.error {
                         HStack{
                             Text(dest.title.text)
@@ -133,7 +133,7 @@ struct TourDetailView_Previews: PreviewProvider {
     static func loadTours() -> [Tour] {
         let modelData = CaBotAppModel()
         do {
-            return try Tour.loadTourDataPreview()
+            return try ResourceManager.shared.load().tours
         } catch {
             return []
         }

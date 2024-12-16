@@ -25,28 +25,20 @@ import SwiftUI
 struct DestinationsView: View {
     @EnvironmentObject var modelData: CaBotAppModel
     @State private var isConfirming = false
-    @State private var targetDestination: Destination?
+    @State private var targetDestination: (any Destination)?
 
-    var destination: Destination?
-    var destinations: [Destination] = []
+    var destination: (any Destination)?
+    var destinations: [any Destination] = []
 
     var body: some View {
         let tourManager = modelData.tourManager
         var header: Text?
-        header = Text(destinations.first?.floorTitle.text ?? "SELECT_DESTINATION")
+        //header = Text(destinations.first?.floorTitle.text ?? "SELECT_DESTINATION")
         return Form {
             Section(
                 header: header) {
-                    ForEach(destinations, id: \.self) { destination in
-                        if let src = destination.file {
-                            NavigationLink(
-                                destination: DestinationsView( destination: destination)
-                                    .environmentObject(modelData).heartbeat("DestinationsView(\(destination.title.text))"),
-                                label: {
-                                    Text(destination.title.text)
-                                        .accessibilityLabel(destination.title.pron)
-                                })
-                        } else {
+                    ForEach(destinations, id: \.value) { destination in
+
                             HStack {
                                 Button(action: {
                                     if modelData.tourManager.hasDestination {
@@ -127,7 +119,7 @@ struct DestinationsView: View {
                                             .frame(width: 0, height: 0)
                                             .opacity(0)
                                     }
-                                }
+
                             }
                         }
                     }
@@ -141,10 +133,10 @@ struct DestinationsView: View {
 struct DestinationsFloorView: View {
     @EnvironmentObject var modelData: CaBotAppModel
     @State private var isConfirming = false
-    @State private var targetDestination: Destination?
+    @State private var targetDestination: (any Destination)?
     @State var floorDestinations: [Directory.FloorDestination] = []
 
-    var destination: Destination?
+    var destination: (any Destination)?
 
     var body: some View {
         var header: Text?
@@ -173,7 +165,7 @@ struct DestinationsFloorView: View {
         .onAppear {
             if floorDestinations.isEmpty {
                 do {
-                    floorDestinations = try Directory.downloadDirectoryJson(currentAddress: modelData.getCurrentAddress(), modeType: modelData.modeType)
+                    floorDestinations = try ResourceManager.shared.load().directory
                 } catch {
                     floorDestinations = []
                 }
@@ -191,9 +183,10 @@ struct DestinationsView_Previews: PreviewProvider {
 
     static var floor5_item_previews: some View {
         let modelData = CaBotAppModel()
+        modelData.modeType = .Normal
         var floorDestinationsForPreviews: [Directory.FloorDestination] = []
         do {
-            floorDestinationsForPreviews = try Directory.downloadDirectoryJsonForPreview(modeType: .Normal)
+            floorDestinationsForPreviews = try Directory.loadForPreview()
         } catch {
             NSLog("Error loading tours for preview: \(error)")
         }
@@ -209,9 +202,10 @@ struct DestinationsView_Previews: PreviewProvider {
     // this should not show Floor 3 because all destinations are for demo
     static var floor_previews: some View {
         let modelData = CaBotAppModel()
+        modelData.modeType = .Normal
         var floorDestinationsForPreviews: [Directory.FloorDestination] = []
         do {
-            floorDestinationsForPreviews = try Directory.downloadDirectoryJsonForPreview(modeType: .Normal)
+            floorDestinationsForPreviews = try Directory.loadForPreview()
         } catch {
             NSLog("Error loading tours for preview: \(error)")
         }

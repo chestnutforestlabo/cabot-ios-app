@@ -58,9 +58,11 @@ struct MainMenuView: View {
             return true
         }
         if let ad = modelData.tourManager.arrivedDestination {
+            /* TODO content
             if let _ = ad.content?.url {
                 return true
             }
+             */
             if modelData.tourManager.currentDestination == nil,
                let _ = ad.waitingDestination?.value,
                let _ = ad.waitingDestination?.title {
@@ -259,6 +261,7 @@ struct ArrivedActionMenus: View {
     
     var body: some View {
         if let ad = modelData.tourManager.arrivedDestination {
+            /* TODO content
             if let contentURL = ad.content?.url {
                 Button(action: {
                     modelData.open(content: contentURL)
@@ -270,6 +273,7 @@ struct ArrivedActionMenus: View {
                     })
                 }
             }
+             */
             if modelData.tourManager.currentDestination == nil,
                let _ = ad.waitingDestination?.value,
                let title = ad.waitingDestination?.title {
@@ -375,7 +379,7 @@ struct DestinationMenus: View {
                         }
                     }
                 }
-                ForEach(modelData.tourManager.first(n: maxDestinationNumber-1), id: \.self) {dest in
+                ForEach(modelData.tourManager.first(n: maxDestinationNumber-1), id: \.value) {dest in
                     Label(dest.title.text, systemImage: "mappin.and.ellipse")
                 }
                 if modelData.tourManager.destinations.count > 0 {
@@ -792,7 +796,7 @@ struct ContentView_Previews: PreviewProvider {
         modelData.noSuitcaseDebug = true
 
         do{
-            let tours = try Tour.loadTourDataPreview()
+            let tours = try ResourceManager.shared.loadForPreview().tours
             if  tours.indices.contains(1){
                 modelData.tourManager.set(tour: tours[0])
                 _ = modelData.tourManager.proceedToNextDestination()
@@ -810,7 +814,7 @@ struct ContentView_Previews: PreviewProvider {
         let modelData = CaBotAppModel()
 
         do{
-            let tours = try Tour.loadTourDataPreview()
+            let tours = try ResourceManager.shared.loadForPreview().tours
             if  tours.indices.contains(1){
                 modelData.tourManager.set(tour: tours[0])
             }
@@ -827,7 +831,7 @@ struct ContentView_Previews: PreviewProvider {
         let modelData = CaBotAppModel()
 
         do{
-            let tours = try Tour.loadTourDataPreview()
+            let tours = try ResourceManager.shared.loadForPreview().tours
             if  tours.indices.contains(1){
                 modelData.tourManager.set(tour: tours[1])
             }
@@ -844,7 +848,7 @@ struct ContentView_Previews: PreviewProvider {
         let modelData = CaBotAppModel()
 
         do{
-            let tours = try Tour.loadTourDataPreview()
+            let tours = try ResourceManager.shared.loadForPreview().tours
             if  tours.indices.contains(1){
                 modelData.tourManager.set(tour: tours[1])
             }

@@ -23,24 +23,24 @@
 import Foundation
 
 protocol TourManagerDelegate {
-    func tour(manager: TourManager, destinationChanged: Destination?, isStartMessageSpeaking: Bool)
+    func tour(manager: TourManager, destinationChanged: (any Destination)?, isStartMessageSpeaking: Bool)
     func tourUpdated(manager: TourManager)
 }
 
 class TourManager: TourProtocol {
     var title: I18NText = I18NText(text: [:], pron: [:])
     var id: String = "TourManager"
-    var destinations: [Destination] {
+    var destinations: [any Destination] {
         get {
             _destinations
         }
     }
-    var currentDestination: Destination? {
+    var currentDestination: (any Destination)? {
         get {
             _currentDestination
         }
     }
-    var arrivedDestination: Destination? {
+    var arrivedDestination: (any Destination)? {
         get {
             _arrivedDestination
         }
@@ -50,7 +50,7 @@ class TourManager: TourProtocol {
             return _destinations.count > 0 || _currentDestination != nil
         }
     }
-    var nextDestination: Destination? {
+    var nextDestination: (any Destination)? {
         get {
             return _destinations.first
         }
@@ -79,9 +79,9 @@ class TourManager: TourProtocol {
         }
     }
 
-    private var _destinations: [Destination]
-    private var _currentDestination: Destination?
-    private var _arrivedDestination: Destination?
+    private var _destinations: [any Destination]
+    private var _currentDestination: (any Destination)?
+    private var _arrivedDestination: (any Destination)?
     private var _subtours: [Tour]
     private var _defaultNavigationSetting: NavigationSettingProtocol
     private var _tempNavigationSetting: NavigationSettingProtocol?
@@ -94,17 +94,17 @@ class TourManager: TourProtocol {
         _defaultNavigationSetting = setting
     }
 
-    func first(n: Int) -> [Destination] {
+    func first(n: Int) -> [(any Destination)] {
         return _destinations[0..<min(_destinations.count, n)].map{ $0 }
     }
 
-    func addToLast(destination: Destination) {
+    func addToLast(destination: (any Destination)) {
         _destinations.append(destination)
         delegate?.tourUpdated(manager: self)
         save()
     }
 
-    func addToFirst(destination: Destination) {
+    func addToFirst(destination: (any Destination)) {
         _destinations.insert(destination, at: 0)
         delegate?.tourUpdated(manager: self)
         save()
@@ -117,12 +117,13 @@ class TourManager: TourProtocol {
         //_tempNavigationSetting = tour.setting
         self.id = tour.id
         self.title = tour.title
-        SetDestination(tour:tour)
+        //SetDestination(tour:tour)
         delegate?.tourUpdated(manager: self)
         delegate?.tour(manager: self, destinationChanged: nil, isStartMessageSpeaking: true)
         save()
     }
     
+    /*
     func SetDestination(tour: Tour)
     {
         for d in tour.destinations {
@@ -144,6 +145,7 @@ class TourManager: TourProtocol {
             _destinations.append(destination)
         }
     }
+     */
 
     func cannotStartCurrent() {
         if let cd = _currentDestination {
@@ -197,7 +199,8 @@ class TourManager: TourProtocol {
     func clearSubTour() {
         if let tour = _subtours.popLast() {
             _destinations = _destinations.filter { dest in
-                dest.parent != tour
+                // TODO dest.parent != tour
+                true
             }
         }
         _arrivedDestination = nil
@@ -220,8 +223,8 @@ class TourManager: TourProtocol {
         return true
     }
 
-    func skipDestination() -> Destination {
-        let skip: Destination = _currentDestination ?? pop()
+    func skipDestination() -> (any Destination) {
+        let skip: any Destination = _currentDestination ?? pop()
         if (_currentDestination != nil) {
             clearCurrent()
         } else {
@@ -231,7 +234,7 @@ class TourManager: TourProtocol {
         return skip
     }
 
-    func pop() -> Destination {
+    func pop() -> (any Destination) {
         let dest = _destinations.removeFirst()
         
         
@@ -244,10 +247,11 @@ class TourManager: TourProtocol {
         var data = TourSaveData()
         data.id = id
         for d in destinations {
-            data.destinations.append(d.value ?? d.ref?.value ?? "")
+            data.destinations.append(d.value ?? "") //d.ref?.value ?? "")
         }
-        data.currentDestination = currentDestination?.value ?? currentDestination?.ref?.value ?? ""
-        
+        // TODO data.currentDestination = currentDestination?.value ?? currentDestination?.ref?.value ?? ""
+        data.currentDestination = currentDestination?.value ?? ""
+
         let encoder = JSONEncoder()
         if let encoded = try? encoder.encode(data) {
             UserDefaults.standard.set(encoded, forKey: "tourSaveData")
@@ -262,7 +266,8 @@ class TourManager: TourProtocol {
     }
     
     func update(){
-        _tourSaveData.currentDestination = currentDestination?.value ?? currentDestination?.ref?.value ?? ""
+        // TODO _tourSaveData.currentDestination = currentDestination?.value ?? currentDestination?.ref?.value ?? ""
+        _tourSaveData.currentDestination = currentDestination?.value ?? ""
         UserDefaults.standard.set(_tourSaveData, forKey: "tourSaveData")
     }
     
@@ -292,11 +297,12 @@ class TourManager: TourProtocol {
                 else if (_tourSaveData.id == "TourManager") {
                     // load destinations
                     do {
-                        let floorDestinations: [Directory.FloorDestination] = try Directory.downloadDirectoryJson(currentAddress: model.getCurrentAddress(), modeType: model.modeType)
-                        let allDestinations: [Destination] = floorDestinations.flatMap { $0.destinations }
+                        let floorDestinations: [Directory.FloorDestination] = try ResourceManager.shared.load().directory
+                        let allDestinations: [any Destination] = floorDestinations.flatMap { $0.destinations }
 
                         for destination in allDestinations {
-                            if decoded.currentDestination == (destination.value ?? destination.ref?.value ?? "") {
+                            //TODO if decoded.currentDestination == (destination.value ?? destination.ref?.value ?? "") {
+                            if decoded.currentDestination == (destination.value ?? "") {
                                 addToFirst(destination: destination)
                                 let _ = proceedToNextDestination(isStartMessageSpeaking: false)
                             }
@@ -304,7 +310,8 @@ class TourManager: TourProtocol {
 
                         for decodedDestination in decoded.destinations {
                             for destination in allDestinations {
-                                if decodedDestination == (destination.value ?? destination.ref?.value ?? "") {
+                                // TODO if decodedDestination == (destination.value ?? destination.ref?.value ?? "") {
+                                if decodedDestination == (destination.value ?? "") {
                                     addToLast(destination: destination)
                                 }
                             }
@@ -321,13 +328,14 @@ class TourManager: TourProtocol {
                 else{
                     // load tour
                     do {
-                        let tours = try Tour.load(currentAddress: model.getCurrentAddress())
+                        let tours = try ResourceManager.shared.load().tours
                         for tour in tours {
                             if tour.id == decoded.id {
                                 set(tour: tour)
                                 if(_tourSaveData.currentDestination != ""){
                                     for d in destinations {
-                                        if d.value ?? d.ref?.value != _tourSaveData.currentDestination {
+                                        // TODO if d.value ?? d.ref?.value != _tourSaveData.currentDestination {
+                                        if d.value != _tourSaveData.currentDestination {
                                             var _ = pop()
                                         }
                                         else{
@@ -340,7 +348,8 @@ class TourManager: TourProtocol {
                                     if(_tourSaveData.destinations.count > 0){
                                         for d in destinations{
                                             if(destinations.count > 0){
-                                                if(destinations[0].value ?? destinations[0].ref?.value != _tourSaveData.destinations[0]){
+                                                // TODO if(destinations[0].value ?? destinations[0].ref?.value != _tourSaveData.destinations[0]){
+                                                if(destinations[0].value != _tourSaveData.destinations[0]){
                                                     var _ = pop()
                                                 }
                                             }

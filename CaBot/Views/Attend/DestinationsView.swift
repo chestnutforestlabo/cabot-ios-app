@@ -25,27 +25,19 @@ import SwiftUI
 struct DestinationsView: View {
     @EnvironmentObject var modelData: CaBotAppModel
     @State private var isConfirming = false
-    @State private var targetDestination: Destination?
+    @State private var targetDestination: (any Destination)?
 
-    var destination: Destination?
-    var destinations: [Destination] = []
+    var destination: (any Destination)?
+    var destinations: [any Destination] = []
 
     var body: some View {
         var header: Text?
-        header = Text(destinations.first?.floorTitle.text ?? "SELECT_DESTINATION")
+        // TODO
+        // header = Text(destinations.first?.floorTitle.text ?? "SELECT_DESTINATION")
         return Form {
             Section(
                 header: header) {
-                ForEach(destinations, id: \.self) { destination in
-                    if let src = destination.file {
-                        NavigationLink(
-                            destination: DestinationsView(destination: destination)
-                                .environmentObject(modelData).heartbeat("DestinationsView(\(destination.title.text))"),
-                            label: {
-                                Text(destination.title.text)
-                                    .accessibilityLabel(destination.title.pron)
-                            })
-                    } else {
+                ForEach(destinations, id: \.value) { destination in
                         HStack {
                             Button(action: {
                                 if (modelData.userInfo.destinations.count > 0) {
@@ -125,7 +117,6 @@ struct DestinationsView: View {
                                 }
                             }
                         }
-                    }
                 }
             }
         }
@@ -136,10 +127,10 @@ struct DestinationsView: View {
 struct DestinationsFloorView: View {
     @EnvironmentObject var modelData: CaBotAppModel
     @State private var isConfirming = false
-    @State private var targetDestination: Destination?
+    @State private var targetDestination: (any Destination)?
     @State var floorDestinations: [Directory.FloorDestination] = []
 
-    var destination: Destination?
+    var destination: (any Destination)?
 
     var body: some View {
         var header: Text?
@@ -173,7 +164,7 @@ struct DestinationsFloorView: View {
     }
     private func loadFloorDestinations() {
         do {
-            floorDestinations = try Directory.downloadDirectoryJson(currentAddress: modelData.getCurrentAddress(), modeType: modelData.modeType)
+            floorDestinations = try ResourceManager.shared.load().directory
         } catch {
             NSLog("Error loading tours for preview: \(error)")
         }
@@ -190,9 +181,10 @@ struct DestinationsView_Previews: PreviewProvider {
 
     static var floor3_item_previews: some View {
         let modelData = CaBotAppModel()
+        modelData.modeType = .Advanced
         var floorDestinationsForPreviews: [Directory.FloorDestination] = []
         do {
-            floorDestinationsForPreviews = try Directory.downloadDirectoryJsonForPreview(modeType: .Advanced)
+            floorDestinationsForPreviews = try Directory.loadForPreview()
         } catch {
             NSLog("Error loading tours for preview: \(error)")
         }
@@ -207,9 +199,10 @@ struct DestinationsView_Previews: PreviewProvider {
 
     static var floor5_item_previews: some View {
         let modelData = CaBotAppModel()
+        modelData.modeType = .Advanced
         var floorDestinationsForPreviews: [Directory.FloorDestination] = []
         do {
-            floorDestinationsForPreviews = try Directory.downloadDirectoryJsonForPreview(modeType: .Advanced)
+            floorDestinationsForPreviews = try Directory.loadForPreview()
         } catch {
             NSLog("Error loading tours for preview: \(error)")
         }
@@ -224,9 +217,10 @@ struct DestinationsView_Previews: PreviewProvider {
 
     static var floor_previews: some View {
         let modelData = CaBotAppModel()
+        modelData.modeType = .Advanced
         var floorDestinationsForPreviews: [Directory.FloorDestination] = []
         do {
-            floorDestinationsForPreviews = try Directory.downloadDirectoryJsonForPreview(modeType: .Advanced)
+            floorDestinationsForPreviews = try Directory.loadForPreview()
         } catch {
             NSLog("Error loading tours for preview: \(error)")
         }

@@ -664,6 +664,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.connectionType = connectionType
         self.addressCandidate = AddressCandidate(addresses: [""])  // dummy
         super.init()
+        ResourceManager.shared.set(addressCandidate: self.addressCandidate)
+        ResourceManager.shared.set(modeType: self.modeType)
 
         self.tts.delegate = self
         self.logList.delegate = self
@@ -764,7 +766,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             backgroundQueue = DispatchQueue.init(label: "Network Queue")
         }
         backgroundQueue?.async {
-            if let _ = try? DownloadManager.shared.fetchData(from: "features-start", currentAddress: self.getCurrentAddress()) {
+            if let _ = try? ResourceManager.shared.initServer() {
                 DispatchQueue.main.async {
                     self.serverIsReady = true
                 }
@@ -1159,7 +1161,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         userInfo.clear()
     }
 
-    func share(destination: Destination, clear: Bool = true, addFirst: Bool = false) {
+    func share(destination: any Destination, clear: Bool = true, addFirst: Bool = false) {
         if let value = destination.value {
             self.share(user_info: SharedInfo(type: .OverrideDestination, value: value, flag1: clear, flag2: addFirst))
             userInfo.clear()
@@ -1182,7 +1184,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.tourManager.clearAllDestinations()
     }
 
-    func tour(manager: TourManager, destinationChanged destination: Destination?, isStartMessageSpeaking: Bool = true) {
+    func tour(manager: TourManager, destinationChanged destination: (any Destination)?, isStartMessageSpeaking: Bool = true) {
         if let dest = destination {
             if let dest_id = dest.value {
                 if !send(destination: dest_id) {
@@ -1362,10 +1364,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                         announce += cd.arriveMessages?[i].text ?? ""
                     }
                 } else{
+                    /* TODO content
                     if let _ = cd.content?.content,
                        tourManager.setting.showContentWhenArrive {
                         announce += CustomLocalizedString("You can check detail of %@ on the phone. ", lang: self.resourceLang, cd.title.pron)
                     }
+                     */
                     if let next = tourManager.nextDestination {
                         announce += CustomLocalizedString("You can proceed to %@ by pressing the right button of the suitcase handle. ", lang: self.resourceLang, next.title.pron)
                         self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent()
@@ -1388,12 +1392,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     self.speak(announce, priority:.Normal, timeout: nil, tag: .Next(erase:false) ) { code, length in
                         guard code != .Paused else { return }
                         // if user pressed the next button while reading announce, skip open content
+                        /* TODO content
                         if self.tourManager.currentDestination == nil {
                             if let contentURL = cd.content?.url,
                                self.tourManager.setting.showContentWhenArrive {
                                 self.open(content: contentURL)
                             }
                         }
+                         */
                         self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent() - 27
                         self.shouldNoAnnounceToPushRightButton = true
                         self.willSpeakArriveMessage = false
@@ -1567,7 +1573,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         // only User
         if userInfo.type == .OverrideTour {
             do {
-                let tours = try Tour.load(currentAddress: self.getCurrentAddress())
+                let tours = try ResourceManager.shared.loadForPreview().tours
                 for tour in tours {
                     if tour.id == userInfo.value {
                         tourManager.set(tour: tour)
@@ -1582,7 +1588,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             func traverseDest() {
                 do {
                     // need to load by .Advanced mode even if in .Normal mode
-                    let floorDestinations = try Directory.downloadDirectoryJson(currentAddress: self.getCurrentAddress(), modeType: .Advanced)
+                    let floorDestinations = try ResourceManager.shared.loadForPreview().directory
                     for floorDest in floorDestinations {
                         for dest in floorDest.destinations {
                             if let value = dest.value {

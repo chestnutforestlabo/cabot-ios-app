@@ -78,6 +78,7 @@
         {
             "tour_id": "tour_id",
             "title-ja": "ツアーA",
+            "title-en": "tourA",
             "destinations": [
                 {
                     "ref": "Node_ID_FOR_A#tourA",
@@ -96,8 +97,7 @@
                     "#ref": "ポイント４"
                 }
             ],
-            "default_var": "tourA",
-            "title-en": "tourA"
+            "default_var": "tourA"
         }
     ]
 }
