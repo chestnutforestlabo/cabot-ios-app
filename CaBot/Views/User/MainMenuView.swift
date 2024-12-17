@@ -245,6 +245,9 @@ struct DestinationMenus: View {
                         }
                     }
                 }
+                if let tour = modelData.tourManager.currentTour {
+                    Label(tour.title.text, systemImage: "list.bullet.rectangle.portrait")
+                }
                 ForEach(modelData.tourManager.first(n: maxDestinationNumber-1), id: \.value) {dest in
                     Label(dest.title.text, systemImage: "mappin.and.ellipse")
                 }

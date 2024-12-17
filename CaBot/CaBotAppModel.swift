@@ -1919,6 +1919,7 @@ class UserInfoBuffer {
         selectedTour = nil
         currentDestination = nil
         nextDestination = nil
+        destinations = []
         speakingText = []
     }
 

@@ -81,7 +81,13 @@ class TourManager: TourProtocol {
             _tourSaveData
         }
     }
+    var currentTour: Tour? {
+        get {
+            _tour
+        }
+    }
 
+    private var _tour: Tour?
     private var _destinations: [any Destination]
     private var _currentDestination: (any Destination)?
     private var _arrivedDestination: (any Destination)?
@@ -114,6 +120,7 @@ class TourManager: TourProtocol {
     }
 
     func set(tour: Tour) {
+        _tour = tour
         _destinations.removeAll()
         _currentDestination = nil
         _arrivedDestination = nil
@@ -169,6 +176,7 @@ class TourManager: TourProtocol {
         _destinations.removeAll()
         _currentDestination = nil
         _arrivedDestination = nil
+        _tour = nil
         id = TourManager.defaultTourID
         title = I18NText(text: [:], pron: [:])
         delegate?.tourUpdated(manager: self)
@@ -229,6 +237,7 @@ class TourManager: TourProtocol {
     func getTourSaveData() -> TourSaveData {
         var data = TourSaveData()
         if destinations.count == 0 && data.currentDestination == "" {
+            _tour = nil
             id = TourManager.defaultTourID
         }
         data.id = id
@@ -285,6 +294,7 @@ class TourManager: TourProtocol {
         _destinations.removeAll()
         _currentDestination = nil
         _arrivedDestination = nil
+        _tour =  nil
         id = TourManager.defaultTourID
         if let data = UserDefaults.standard.data(forKey: TourManager.tourDataStoreKey) {
             let decoder = JSONDecoder()
@@ -293,6 +303,7 @@ class TourManager: TourProtocol {
                 print("restore \(decoded)")
 
                 id = _tourSaveData.id
+                _tour = TourData.getTour(by: _tourSaveData.id)
                 if let _ = try? ResourceManager.shared.load() {
                     if _tourSaveData.currentDestination != "" {
                         if let dest = ResourceManager.shared.getDestination(by: _tourSaveData.currentDestination) {
