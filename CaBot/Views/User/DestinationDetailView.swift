@@ -107,14 +107,14 @@ struct DestinationDetailView_Previews: PreviewProvider {
         let modelData = CaBotAppModel()
         modelData.modeType = .Normal
 
-        var floorDestinationsForPreviews: [Directory.FloorDestination] = []
+        var floorDestinationsForPreviews: Directory.DirectorySections
         do {
             floorDestinationsForPreviews = try Directory.loadForPreview()
+            return AnyView(DestinationDetailView(destination: floorDestinationsForPreviews.sections[0].items[0])
+                .environmentObject(modelData))
         } catch {
             NSLog("Failed to download directory JSON")
         }
-
-        return DestinationDetailView(destination: floorDestinationsForPreviews[0].destinations[0])
-            .environmentObject(modelData)
+        return AnyView(EmptyView())
     }
 }

@@ -1588,9 +1588,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             func traverseDest() {
                 do {
                     // need to load by .Advanced mode even if in .Normal mode
-                    let floorDestinations = try ResourceManager.shared.loadForPreview().directory
-                    for floorDest in floorDestinations {
-                        for dest in floorDest.destinations {
+                    let sections = try ResourceManager.shared.loadForPreview().directory
+                    for floorDest in sections.sections {
+                        for dest in floorDest.items {
                             if let value = dest.value {
                                 if value == userInfo.value {
                                     if userInfo.flag1 {

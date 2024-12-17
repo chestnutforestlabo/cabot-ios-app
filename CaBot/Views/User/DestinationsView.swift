@@ -134,40 +134,41 @@ struct DestinationsFloorView: View {
     @EnvironmentObject var modelData: CaBotAppModel
     @State private var isConfirming = false
     @State private var targetDestination: (any Destination)?
-    @State var floorDestinations: [Directory.FloorDestination] = []
+    @State var sections: [Directory.DirectorySection] = []
 
     var destination: (any Destination)?
 
     var body: some View {
-        var header: Text?
-        header = Text("SELECT_DESTINATION")
-        
         return Form {
-            Section(
-                header: header
-            ) {
-                ForEach(floorDestinations, id: \.floorTitle.text) { floorDestination in
-                    NavigationLink(
-                        destination: DestinationsView(
-                            destination: destination,
-                            destinations: floorDestination.destinations
-                        )
-                        .environmentObject(modelData),
-                        label: {
-                            Text(floorDestination.floorTitle.text)
-                                .accessibilityLabel(floorDestination.floorTitle.pron)
+            ForEach(sections, id: \.self) {section in
+                Section(
+                    header: Text(section.title.text)
+                ) {
+                    ForEach(section.items, id: \.title.text) { item in
+                        if let content = item.content {
+                            NavigationLink(
+                                destination: DestinationsFloorView(
+                                    sections: content.sections)
+                                .tag(item.title.text)
+                                .environmentObject(modelData),
+                                label: {
+                                    Text(item.title.text)
+                                        .accessibilityLabel(section.title.pron)
+                                }
+                            )
+                        } else {
+                            Text(item.title.text)
                         }
-                    )
+                    }
                 }
             }
         }
         .listStyle(PlainListStyle())
         .onAppear {
-            if floorDestinations.isEmpty {
+            if sections.isEmpty {
                 do {
-                    floorDestinations = try ResourceManager.shared.load().directory
+                    sections = try ResourceManager.shared.load().directory.sections
                 } catch {
-                    floorDestinations = []
                 }
             }
         }
@@ -184,16 +185,16 @@ struct DestinationsView_Previews: PreviewProvider {
     static var floor5_item_previews: some View {
         let modelData = CaBotAppModel()
         modelData.modeType = .Normal
-        var floorDestinationsForPreviews: [Directory.FloorDestination] = []
+        var floorDestinationsForPreviews: [Directory.DirectorySection] = []
         do {
-            floorDestinationsForPreviews = try Directory.loadForPreview()
+            floorDestinationsForPreviews = try Directory.loadForPreview().sections
         } catch {
             NSLog("Error loading tours for preview: \(error)")
         }
 
         return DestinationsView(
-            destination: floorDestinationsForPreviews.first?.destinations.first,
-            destinations: floorDestinationsForPreviews.first?.destinations ?? []
+            destination: floorDestinationsForPreviews.first?.items.first,
+            destinations: floorDestinationsForPreviews.first?.items ?? []
         )
         .environmentObject(modelData)
         .previewDisplayName("Floor 5")
@@ -203,15 +204,15 @@ struct DestinationsView_Previews: PreviewProvider {
     static var floor_previews: some View {
         let modelData = CaBotAppModel()
         modelData.modeType = .Normal
-        var floorDestinationsForPreviews: [Directory.FloorDestination] = []
+        var floorDestinationsForPreviews: [Directory.DirectorySection] = []
         do {
-            floorDestinationsForPreviews = try Directory.loadForPreview()
+            floorDestinationsForPreviews = try Directory.loadForPreview().sections
         } catch {
             NSLog("Error loading tours for preview: \(error)")
         }
 
         return DestinationsFloorView(
-            floorDestinations: floorDestinationsForPreviews
+            sections: floorDestinationsForPreviews
         )
         .environmentObject(modelData)
         .previewDisplayName("Floors")

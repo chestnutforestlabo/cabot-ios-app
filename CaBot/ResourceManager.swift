@@ -146,7 +146,7 @@ class ResourceManager {
 
     struct Result {
         var tours: [Tour]
-        var directory: [Directory.FloorDestination]
+        var directory: Directory.DirectorySections
     }
 
     func load() throws -> Result {
@@ -830,7 +830,7 @@ class Feature : Decodable,  Hashable {
 
 
 class Directory {
-    struct DirectoryRoot: Decodable {
+    struct DirectorySections: Decodable {
         let sections: [DirectorySection]
 
         init(from decoder: Decoder) throws {
@@ -843,14 +843,17 @@ class Directory {
         }
     }
 
-    struct DirectorySection: Decodable {
+    struct DirectorySection: Decodable, Hashable {
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(title.text)
+        }
         let title: I18NText
-        let items: [Item]
+        let items: [SectionItem]
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             title = I18NText.decode(decoder: decoder, baseKey: "title")
-            items = try container.decodeIfPresent([Item].self, forKey: .items) ?? []
+            items = try container.decodeIfPresent([SectionItem].self, forKey: .items) ?? []
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -858,50 +861,54 @@ class Directory {
         }
     }
 
-    struct Item: Decodable {
-        let title: I18NText
-        let content: ItemsContent?
-        init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            title = I18NText.decode(decoder: decoder, baseKey: "title")
-            content = try container.decodeIfPresent(ItemsContent.self, forKey: .content)
+    struct SectionItem: Destination, Decodable {
+        
+        static func == (lhs: Directory.SectionItem, rhs: Directory.SectionItem) -> Bool {
+            lhs.nodeID == rhs.nodeID
         }
-        private enum CodingKeys: String, CodingKey {
-            case title, content
-        }
-    }
-
-
-    struct ItemsContent: Decodable {
-        let sections: [NestedSection]
-        let showSectionIndex: Bool
-        init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            sections = try container.decodeIfPresent([NestedSection].self, forKey: .sections) ?? []
-            showSectionIndex = try container.decodeIfPresent(Bool.self, forKey: .showSectionIndex) ?? false
-        }
-        private enum CodingKeys: String, CodingKey {
-            case sections, showSectionIndex
-        }
-    }
-
-    struct NestedSection: Decodable {
-        let title: I18NText
-        let items: [NestedItem]
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             title = I18NText.decode(decoder: decoder, baseKey: "title")
-            items = try container.decodeIfPresent([NestedItem].self, forKey: .items) ?? []
+            content = try container.decodeIfPresent(DirectorySections.self, forKey: .content)
+
+            if content == nil {
+                subtitle = try container.decodeIfPresent(String.self, forKey: .subtitle) ?? "Unknown"
+                titlePron = try container.decodeIfPresent(String.self, forKey: .titlePron) ?? "Unknown"
+                subtitlePron = try container.decodeIfPresent(String.self, forKey: .subtitlePron) ?? "Unknown"
+                nodeID = try container.decodeIfPresent(String.self, forKey: .nodeID) ?? "No ID"
+
+                if let nodeID = nodeID {
+                    if let feature = Features.getFeature(by: NodeRef(node_id: nodeID, variation: nil)) {
+                        title = feature.properties.name
+                    } else {
+                        title = I18NText.decode(decoder: decoder, baseKey: "title")
+                    }
+
+                    if let forDemonstrationString = try container.decodeIfPresent(String.self, forKey: .forDemonstration) {
+                        forDemonstration = (forDemonstrationString.lowercased() == "true")
+                    } else {
+                        forDemonstration = false
+                    }
+                    startMessage = I18NText.empty()
+                    summaryMessage = I18NText.empty()
+                    if let message = TourData.getMessage(by: nodeID) {
+                        if let startMessage = message.startMessage {
+                            self.startMessage = startMessage
+                        }
+                        self.arriveMessages = message.arriveMessages
+                        if let summary = message.summary {
+                            self.summaryMessage = summary
+                        }
+                    }
+                }
+            }
         }
 
         private enum CodingKeys: String, CodingKey {
-            case title, items
+            case content, subtitle, titlePron, subtitlePron, title, nodeID, forDemonstration
         }
-    }
 
-    // TODO conform to Destination
-    struct NestedItem: Destination, Decodable {
         // Conforming to Hashable
         func hash(into hasher: inout Hasher) {
             hasher.combine(nodeID)
@@ -913,64 +920,23 @@ class Directory {
             }
         }
 
-        var summaryMessage: I18NText
-
-        var startMessage: I18NText
-
-        var arriveMessages: [I18NText]?
-
-        var waitingDestination: WaitingDestination?
-
-        var subtour: Tour?
-
-        var error: String?
-
-        var warning: String?
-
-        let subtitle: String
-        let titlePron: String
-        let subtitlePron: String
-        let title: I18NText
-        let nodeID: String
-        let forDemonstration: Bool
-
-        init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            subtitle = try container.decodeIfPresent(String.self, forKey: .subtitle) ?? "Unknown"
-            titlePron = try container.decodeIfPresent(String.self, forKey: .titlePron) ?? "Unknown"
-            subtitlePron = try container.decodeIfPresent(String.self, forKey: .subtitlePron) ?? "Unknown"
-            nodeID = try container.decodeIfPresent(String.self, forKey: .nodeID) ?? "No ID"
-
-            if let feature = Features.getFeature(by: NodeRef(node_id: nodeID, variation: nil)) {
-                title = feature.properties.name
-            } else {
-                title = I18NText.decode(decoder: decoder, baseKey: "title")
-            }
-
-            if let forDemonstrationString = try container.decodeIfPresent(String.self, forKey: .forDemonstration) {
-                forDemonstration = (forDemonstrationString.lowercased() == "true")
-            } else {
-                forDemonstration = false
-            }
-            startMessage = I18NText.empty()
-            summaryMessage = I18NText.empty()
-            if let message = TourData.getMessage(by: nodeID) {
-                if let startMessage = message.startMessage {
-                    self.startMessage = startMessage
-                }
-                self.arriveMessages = message.arriveMessages
-                if let summary = message.summary {
-                    summaryMessage = summary
-                }
-            }
-        }
-        private enum CodingKeys: String, CodingKey {
-            case subtitle, titlePron, subtitlePron, title, nodeID, forDemonstration
-        }
+        var title: I18NText = I18NText.empty()
+        var content: DirectorySections? = nil
+        var summaryMessage: I18NText = I18NText.empty()
+        var startMessage: I18NText = I18NText.empty()
+        var arriveMessages: [I18NText]? = nil
+        var waitingDestination: WaitingDestination? = nil
+        var subtour: Tour? = nil
+        var error: String? = nil
+        var warning: String? = nil
+        var subtitle: String? = nil
+        var titlePron: String? = nil
+        var subtitlePron: String? = nil
+        var nodeID: String? = nil
+        var forDemonstration: Bool = false
     }
 
-    fileprivate static func load() throws -> [FloorDestination] {
-    //static func downloadDirectoryJson(currentAddress: String, modeType: ModeType) throws -> [FloorDestination] {
+    fileprivate static func load() throws -> DirectorySections {
         let configData = try ResourceManager.shared.fetchData(from: .config)
         try ResourceManager.shared.saveData(configData, to: ResourceManager.configFileName)
         struct InitialLocation: Codable {
@@ -997,56 +963,11 @@ class Directory {
         let directoryData = try ResourceManager.shared.fetchData(from: .directory, lat: lat, lng: lng, dist: dist, user: user)
         try ResourceManager.shared.saveData(directoryData, to: ResourceManager.directoryFileName)
 
-        let directoryDataDecoded = try JSONDecoder().decode(DirectoryRoot.self, from: directoryData)
-        return extractFloorDestinations(directoryDataDecoded: directoryDataDecoded)
+        let directoryDataDecoded = try JSONDecoder().decode(DirectorySections.self, from: directoryData)
+        return directoryDataDecoded
     }
 
-    /*
-    static func createDestination(from subItem: NestedItem, itemTitle: I18NText, tours: [Tour], features: [Feature]) throws -> Destination? {
-
-        guard let feature = features.first(where: { $0.properties.ent1Node == subItem.nodeID }) else {
-            return nil
-        }
-
-        let destination = Destination(
-            floorTitle: itemTitle,
-            title: I18NText(text: feature.properties.names, pron: [:]),
-            value: subItem.nodeID,
-            pron: nil,
-            file: nil,
-            summaryMessage: I18NText(text: [:], pron: [:]),
-            startMessage: I18NText(text: [:], pron: [:]),
-            arriveMessages: [],
-            content: nil,
-            waitingDestination: nil,
-            subtour: nil,
-            forDemonstration: subItem.forDemonstration
-        )
-        for tour in tours {
-            if let tourDestination = tour.destinations.first(where: {
-                if let dref = $0.matchedDestinationRef {
-                    if (dref.value == "EDITOR_node_1659493619566") {
-                        print("hello")
-                    }
-                    if let variation = dref.variation, variation.isEmpty {
-                        return dref.value == subItem.nodeID
-                    }
-                }
-                return false
-            }) {
-                destination.summaryMessage = tourDestination.summaryMessage?.text ?? I18NText(text: [:], pron: [:])
-                destination.startMessage = tourDestination.startMessage?.text ?? I18NText(text: [:], pron: [:])
-                destination.arriveMessages = tourDestination.arriveMessages.map { $0.text }
-                let arrivalAngleString = tourDestination.matchedDestinationRef?.arrivalAngle.map { "@" + String($0) } ?? ""
-                destination.value = subItem.nodeID+arrivalAngleString
-            }
-        }
-
-        return destination
-    }
-    */
-
-    static func loadForPreview() throws -> [FloorDestination] {
+    static func loadForPreview() throws -> DirectorySections {
         let data: Data
         do {
             data = try ResourceManager.shared.fetchDataPreview(for: .directory)
@@ -1054,50 +975,15 @@ class Directory {
             NSLog("Failed to read file: \(error.localizedDescription)")
             throw MetadataError.contentLoadError
         }
-        let directoryDataDecoded: DirectoryRoot
+        let directoryDataDecoded: DirectorySections
         do {
-            directoryDataDecoded = try JSONDecoder().decode(DirectoryRoot.self, from: data)
+            directoryDataDecoded = try JSONDecoder().decode(DirectorySections.self, from: data)
         } catch {
             NSLog("Failed to decode JSON: \(error)")
             throw MetadataError.contentLoadError
         }
-        return try extractFloorDestinations(directoryDataDecoded: directoryDataDecoded)
+        return directoryDataDecoded
     }
-
-    private static func extractFloorDestinations(directoryDataDecoded: DirectoryRoot) -> [FloorDestination] {
-        var downloadedFloorDestinations: [FloorDestination] = []
-
-        for section in directoryDataDecoded.sections {
-            for item in section.items {
-                var destinations: [any Destination] = []
-                if let content = item.content {
-                    for subSection in content.sections {
-                        for subItem in subSection.items {
-                            print("subItem \(subItem.title.text) \(subItem.forDemonstration)")
-                            if !subItem.forDemonstration || ResourceManager.shared.modeType == .Advanced {
-                                destinations.append(subItem)
-                            }
-                            /*
-                            if let destination = try createDestination(from: subItem, itemTitle: item.title, tours: tours, features: features) {
-                             if !destination.forDemonstration || modeType == .Advanced {
-                                    destinations.append(destination)
-                                }
-                            }
-                             */
-                        }
-                    }
-                }
-
-                if !destinations.isEmpty {
-                    let floorDestination = FloorDestination(floorTitle: item.title, destinations: destinations)
-                    downloadedFloorDestinations.append(floorDestination)
-                }
-            }
-        }
-
-        return downloadedFloorDestinations
-    }
-
 
     class FloorDestination{
         let floorTitle: I18NText
