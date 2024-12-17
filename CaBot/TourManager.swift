@@ -219,10 +219,7 @@ class TourManager: TourProtocol {
 
     func pop() -> (any Destination) {
         let dest = _destinations.removeFirst()
-        
-        
         save()
-        
         return dest
     }
     
@@ -235,7 +232,13 @@ class TourManager: TourProtocol {
         // TODO data.currentDestination = currentDestination?.value ?? currentDestination?.ref?.value ?? ""
         data.currentDestination = currentDestination?.value ?? ""
 
+        if destinations.count == 0 && data.currentDestination == "" {
+            data.id = ""
+            id = ""
+        }
+
         let encoder = JSONEncoder()
+        print("restore save \(data)")
         if let encoded = try? encoder.encode(data) {
             UserDefaults.standard.set(encoded, forKey: "tourSaveData")
             NSLog("--- Save tour data ---")
@@ -276,39 +279,26 @@ class TourManager: TourProtocol {
             let decoder = JSONDecoder()
             if let decoded = try? decoder.decode(TourSaveData.self, from: data) {
                 _tourSaveData = decoded
-                
+                print("restore \(decoded)")
+
                 if(_tourSaveData.id == ""){
                     NSLog("Tour save data not found")
                     return
                 }
                 else if (_tourSaveData.id == "TourManager") {
-                    // load destinations
                     do {
-                        let sections: Directory.Sections = try ResourceManager.shared.load().directory
-                        let allDestinations = sections.allDestinations()
-
-                        for destination in allDestinations {
-                            //TODO if decoded.currentDestination == (destination.value ?? destination.ref?.value ?? "") {
-                            print("tourDataLoad \(destination.value), \(decoded.currentDestination)")
-                            if let value = destination.value,
-                               decoded.currentDestination == value {
+                        let _ = try ResourceManager.shared.load()
+                        if !decoded.currentDestination.isEmpty {
+                            if let destination = Directory.getDestination(by: decoded.currentDestination) {
                                 addToFirst(destination: destination)
                                 let _ = proceedToNextDestination(isStartMessageSpeaking: false)
                             }
                         }
-
                         for decodedDestination in decoded.destinations {
-                            for destination in allDestinations {
-                                // TODO if decodedDestination == (destination.value ?? destination.ref?.value ?? "") {
-                                print("tourDataLoad \(destination.value) \(destination.title.text), \(decodedDestination)")
-                                if let value = destination.value,
-                                   decodedDestination == value {
-                                    addToLast(destination: destination)
-                                }
+                            if let destination = Directory.getDestination(by: decodedDestination) {
+                                addToLast(destination: destination)
                             }
                         }
-
-
                         if decoded.destinations.count > 0 && decoded.currentDestination == "" {
                             model.needToStartAnnounce(wait: true)
                         }

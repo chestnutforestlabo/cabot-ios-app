@@ -1574,45 +1574,32 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         // only User
         if userInfo.type == .OverrideTour {
             do {
-                let tours = try ResourceManager.shared.loadForPreview().tours
-                for tour in tours {
-                    if tour.id == userInfo.value {
-                        tourManager.set(tour: tour)
-                        needToStartAnnounce(wait: true)
-                    }
+                let _ = try ResourceManager.shared.load()
+                if let tour = TourData.getTour(by: userInfo.value) {
+                    tourManager.set(tour: tour)
+                    needToStartAnnounce(wait: true)
                 }
             } catch {
                 NSLog("cannot be loaded")
             }
         }
         if userInfo.type == .OverrideDestination {
-            func traverseDest() {
-                do {
-                    // need to load by .Advanced mode even if in .Normal mode
-                    let sections = try ResourceManager.shared.loadForPreview().directory
-                    for floorDest in sections.sections {
-                        for dest in floorDest.items {
-                            if let value = dest.value {
-                                if value == userInfo.value {
-                                    if userInfo.flag1 {
-                                        self.clearAll()
-                                        tourManager.addToLast(destination: dest)
-                                    }else if userInfo.flag2 {
-                                        tourManager.addToFirst(destination: dest)
-                                    } else {
-                                        tourManager.addToLast(destination: dest)
-                                    }
-                                    needToStartAnnounce(wait: true)
-                                    return
-                                }
-                            }
-                        }
+            do {
+                let _ = try ResourceManager.shared.load()
+                if let dest = Directory.getDestination(by: userInfo.value) {
+                    if userInfo.flag1 {
+                        self.clearAll()
+                        tourManager.addToLast(destination: dest)
+                    }else if userInfo.flag2 {
+                        tourManager.addToFirst(destination: dest)
+                    } else {
+                        tourManager.addToLast(destination: dest)
                     }
-                } catch {
-                    NSLog("cannot be loaded")
+                    needToStartAnnounce(wait: true)
                 }
+            } catch {
+                NSLog("cannot be loaded")
             }
-            traverseDest()
         }
         if userInfo.type == .Skip {
             skipDestination()

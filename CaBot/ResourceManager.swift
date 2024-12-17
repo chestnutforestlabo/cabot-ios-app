@@ -388,8 +388,9 @@ struct TourData: Decodable {
     let destinations: [DestinationRef]
     let messages: [Message]
     static var refIndex: [String: Messages] = [:]
+    static var tourIndex: [String: Tour] = [:]
 
-    func buildIndex() {
+    static func buildIndex(messages: [Message]) {
         TourData.refIndex.removeAll()
         for message in messages {
             if TourData.refIndex[message.parent] == nil{
@@ -403,6 +404,16 @@ struct TourData: Decodable {
         return refIndex[ref.description]
     }
 
+    static func buildIndex(tours: [Tour]) {
+        for tour in tours {
+            tourIndex[tour.id] = tour
+        }
+    }
+
+    static func getTour(by id: String) -> Tour? {
+        return tourIndex[id]
+    }
+
     enum CodingKeys: CodingKey {
         case tours
         case destinations
@@ -412,15 +423,16 @@ struct TourData: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.messages = try container.decode([Message].self, forKey: .messages)
+        TourData.buildIndex(messages: self.messages)
         self.destinations = try container.decode([DestinationRef].self, forKey: .destinations)
         self.tours = try container.decode([Tour].self, forKey: .tours)
+        TourData.buildIndex(tours: self.tours)
     }
 
     fileprivate static func load() throws -> TourData {
         do {
             let data = try ResourceManager.shared.fetchData(from: .tourdata)
             let tourdata = try JSONDecoder().decode(TourData.self, from: data)
-            tourdata.buildIndex()
             return tourdata
         } catch {
             throw MetadataError.contentLoadError
@@ -431,7 +443,6 @@ struct TourData: Decodable {
         do {
             let data = try ResourceManager.shared.fetchDataPreview(for: .tourdata)
             let root = try JSONDecoder().decode(TourData.self, from: data)
-            root.buildIndex()
             return root
         } catch {
             throw MetadataError.contentLoadError
@@ -642,6 +653,19 @@ class Features {
     private static var features: [Feature] = []
     private static var refIndex: [String: Feature] = [:]
 
+    static func buildIndex() {
+        TourData.refIndex.removeAll()
+        for feature in features {
+            for entrance in feature.properties.entrances {
+                refIndex[entrance] = feature
+            }
+        }
+    }
+
+    static func getFeature(by ref: NodeRef) -> Feature? {
+        return refIndex[ref.node_id]
+    }
+
     fileprivate static func load() throws -> [Feature] {
         do {
             let featuresData = try ResourceManager.shared.fetchData(from: .features)
@@ -662,19 +686,6 @@ class Features {
         } catch {
             throw MetadataError.contentLoadError
         }
-    }
-
-    static func buildIndex() {
-        TourData.refIndex.removeAll()
-        for feature in features {
-            for entrance in feature.properties.entrances {
-                refIndex[entrance] = feature
-            }
-        }
-    }
-
-    static func getFeature(by ref: NodeRef) -> Feature? {
-        return refIndex[ref.node_id]
     }
 }
 
@@ -877,16 +888,33 @@ class Directory {
         var nodeID: String? = nil
         var forDemonstration: Bool = false
     }
+    
+    static var sections: Directory.Sections = Directory.Sections()
+    static var valueIndex: [String: any Destination] = [:]
+
+    static func buildIndex() {
+        for dest in sections.allDestinations() {
+            if let value = dest.value {
+                valueIndex[value] = dest
+            }
+        }
+    }
+
+    static func getDestination(by value: String) -> (any Destination)? {
+        valueIndex[value]
+    }
 
     fileprivate static func load() throws -> Sections {
         let directoryData = try ResourceManager.shared.fetchData(from: .directory)
-        let directoryDataDecoded = try JSONDecoder().decode(Sections.self, from: directoryData)
-        return directoryDataDecoded
+        Directory.sections = try JSONDecoder().decode(Sections.self, from: directoryData)
+        Directory.buildIndex()
+        return Directory.sections
     }
 
     static func loadForPreview() throws -> Sections {
         let data = try ResourceManager.shared.fetchDataPreview(for: .directory)
         let directoryDataDecoded = try JSONDecoder().decode(Sections.self, from: data)
+        Directory.buildIndex()
         return directoryDataDecoded
     }
 
