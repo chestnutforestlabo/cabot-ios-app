@@ -117,35 +117,18 @@ class TourManager: TourProtocol {
         //_tempNavigationSetting = tour.setting
         self.id = tour.id
         self.title = tour.title
-        //SetDestination(tour:tour)
+        SetDestination(tour:tour)
         delegate?.tourUpdated(manager: self)
         delegate?.tour(manager: self, destinationChanged: nil, isStartMessageSpeaking: true)
         save()
     }
     
-    /*
     func SetDestination(tour: Tour)
     {
         for d in tour.destinations {
-            let arrivalAngleString = d.matchedDestinationRef?.arrivalAngle.map { "@" + String($0) } ?? ""
-            let valueString = d.matchedDestinationRef?.value ?? d.ref
-            let destination = Destination(
-                floorTitle: I18NText(text: [:], pron: [:]),
-                title: d.title,
-                value: valueString+arrivalAngleString,
-                pron: "porn",
-                file: nil,
-                summaryMessage: d.summaryMessage?.text ?? I18NText(text: [:], pron: [:]),
-                startMessage: d.startMessage?.text ?? I18NText(text: [:], pron: [:]),
-                arriveMessages: d.arriveMessages.map { $0.text } ,
-                content: nil,
-                waitingDestination: nil,
-                subtour: nil, forDemonstration: false
-            )
-            _destinations.append(destination)
+            _destinations.append(d)
         }
     }
-     */
 
     func cannotStartCurrent() {
         if let cd = _currentDestination {
@@ -285,6 +268,10 @@ class TourManager: TourProtocol {
     }
     
     func tourDataLoad(model: CaBotAppModel){
+        _destinations.removeAll()
+        _currentDestination = nil
+        _arrivedDestination = nil
+        id = "TourManager"
         if let data = UserDefaults.standard.data(forKey: "tourSaveData") {
             let decoder = JSONDecoder()
             if let decoded = try? decoder.decode(TourSaveData.self, from: data) {
@@ -298,11 +285,13 @@ class TourManager: TourProtocol {
                     // load destinations
                     do {
                         let sections: Directory.Sections = try ResourceManager.shared.load().directory
-                        let allDestinations: [any Destination] = sections.sections.flatMap { $0.items }
+                        let allDestinations = sections.allDestinations()
 
                         for destination in allDestinations {
                             //TODO if decoded.currentDestination == (destination.value ?? destination.ref?.value ?? "") {
-                            if decoded.currentDestination == (destination.value ?? "") {
+                            print("tourDataLoad \(destination.value), \(decoded.currentDestination)")
+                            if let value = destination.value,
+                               decoded.currentDestination == value {
                                 addToFirst(destination: destination)
                                 let _ = proceedToNextDestination(isStartMessageSpeaking: false)
                             }
@@ -311,7 +300,9 @@ class TourManager: TourProtocol {
                         for decodedDestination in decoded.destinations {
                             for destination in allDestinations {
                                 // TODO if decodedDestination == (destination.value ?? destination.ref?.value ?? "") {
-                                if decodedDestination == (destination.value ?? "") {
+                                print("tourDataLoad \(destination.value) \(destination.title.text), \(decodedDestination)")
+                                if let value = destination.value,
+                                   decodedDestination == value {
                                     addToLast(destination: destination)
                                 }
                             }

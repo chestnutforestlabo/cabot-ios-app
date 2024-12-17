@@ -45,7 +45,7 @@ struct StaticTourDetailView: View {
                     }
                 }) {
                     Label {
-                        Text("SEND_TOUR")
+                        Text("ADD_TOUR")
                     } icon: {
                         Image(systemName: "arrow.triangle.turn.up.right.diamond")
                     }

@@ -107,7 +107,14 @@ class ResourceManager {
         }
     }
 
-    private init() {}
+    private let session: URLSession
+
+    private init() {
+        let config = URLSessionConfiguration.default
+        config.requestCachePolicy = .reloadIgnoringLocalCacheData // Ignore local cache
+        config.urlCache = nil // Disable URLCache entirely
+        session = URLSession(configuration: config)
+    }
 
     fileprivate func fetchData(from resource: Resource, lat: Double? = nil, lng: Double? = nil, dist: Int = 2000, user: String? = nil) throws -> Data {
         guard let currentAddress = addressCandidate?.getCurrent() else { throw MetadataError.contentLoadError }
@@ -137,7 +144,7 @@ class ResourceManager {
         var dataReceived: Data?
         let semaphore = DispatchSemaphore(value: 0)
 
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+        let task = session.dataTask(with: url) { data, response, error in
             if let error = error {
                 NSLog("Error fetching data: \(error.localizedDescription)")
                 semaphore.signal()
@@ -148,7 +155,7 @@ class ResourceManager {
         }
 
         task.resume()
-        _ = semaphore.wait(timeout: .now()+1.0)
+        _ = semaphore.wait(timeout: .now() + 3.0)
 
         guard let data = dataReceived else {
             throw MetadataError.contentLoadError
@@ -392,16 +399,29 @@ struct TourData: Decodable {
         }
     }
 
-    static func getMessage(by ref: String) -> Messages? {
-        return refIndex[ref]
+    static func getMessage(by ref: NodeRef) -> Messages? {
+        return refIndex[ref.description]
+    }
+
+    enum CodingKeys: CodingKey {
+        case tours
+        case destinations
+        case messages
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.messages = try container.decode([Message].self, forKey: .messages)
+        self.destinations = try container.decode([DestinationRef].self, forKey: .destinations)
+        self.tours = try container.decode([Tour].self, forKey: .tours)
     }
 
     fileprivate static func load() throws -> TourData {
         do {
             let data = try ResourceManager.shared.fetchData(from: .tourdata)
-            let root = try JSONDecoder().decode(TourData.self, from: data)
-            root.buildIndex()
-            return root
+            let tourdata = try JSONDecoder().decode(TourData.self, from: data)
+            tourdata.buildIndex()
+            return tourdata
         } catch {
             throw MetadataError.contentLoadError
         }
@@ -442,24 +462,8 @@ class Tour: Decodable, Hashable{
         id = try container.decode(String.self, forKey: .id)
         destinations = try container.decode([TourDestination].self, forKey: .destinations)
         defaultVar = try container.decodeIfPresent(String.self, forKey: .defaultVar)
+        title = I18NText.decode(decoder: decoder, baseKey: "title")
 
-        var titleText: [String: String] = [:]
-        let additionalKeysContainer = try decoder.container(keyedBy: DynamicCodingKeys.self)
-        let allKeys = additionalKeysContainer.allKeys
-
-        for key in allKeys {
-            if key.stringValue.hasPrefix("title-") {
-                do {
-                    if let value = try additionalKeysContainer.decodeIfPresent(String.self, forKey: key) {
-                        let languageCode = String(key.stringValue.dropFirst(6))
-                        titleText[languageCode] = value
-                    }
-                } catch {
-                    NSLog("Error decoding key \(key.stringValue): \(error)")
-                }
-            }
-        }
-        title = I18NText(text: titleText, pron: [:])
         introduction = I18NText(text: [:], pron: [:])
         error = nil
     }
@@ -488,9 +492,25 @@ class Tour: Decodable, Hashable{
     }
 }
 
-struct NodeRef: Decodable, Hashable {
+struct NodeRef: Decodable, Hashable, CustomStringConvertible {
     var node_id: String
     var variation: String?
+
+    var description: String {
+        if let variation = variation {
+            "\(node_id)#\(variation)"
+        } else {
+            node_id
+        }
+    }
+
+    static func == (lhs: NodeRef, rhs: NodeRef) -> Bool {
+        return lhs.description == rhs.description
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(description)
+    }
 
     init(node_id: String, variation: String?) {
         self.node_id = node_id
@@ -508,23 +528,31 @@ struct NodeRef: Decodable, Hashable {
         let node_id = String(parts[0])
         let variation = parts.count > 1 ? String(parts[1]) : nil
         return (node_id, variation)
-    }    
-
-    // Conforming to Hashable
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(node_id)
-        hasher.combine(variation)
     }
 }
 
-class TourDestination: Decodable {
+class TourDestination: Destination, Decodable {
+    static func == (lhs: TourDestination, rhs: TourDestination) -> Bool {
+        lhs.ref == rhs.ref
+    }
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(ref)
+    }
+
+    var value: String?
+    var summaryMessage: I18NText = I18NText.empty()
+    var startMessage: I18NText = I18NText.empty()
+    var arriveMessages: [I18NText]? = nil
+    var waitingDestination: WaitingDestination? = nil
+    var subtour: Tour?
+    var error: String?
+    var warning: String?
+    var forDemonstration: Bool = false
+
     let ref: NodeRef
     let refTitle: String
     var matchedDestinationRef: DestinationRef?
-    var summaryMessage: Message?
-    var startMessage: Message?
-    var arriveMessages: [Message]
-    var title: I18NText
+    var title: I18NText = I18NText.empty()
 
     enum CodingKeys: String, CodingKey {
         case ref
@@ -535,11 +563,16 @@ class TourDestination: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         ref = try container.decode(NodeRef.self, forKey: .ref)
         refTitle = try container.decode(String.self, forKey: .refTitle)
-        matchedDestinationRef = nil
-        summaryMessage = nil
-        startMessage = nil
-        arriveMessages = []
-        title = Features.getFeature(by: ref)?.properties.name ?? I18NText(text: [:], pron: [:])
+        value = ref.node_id
+        if let messages = TourData.getMessage(by: ref) {
+            self.startMessage = messages.startMessage ?? I18NText.empty()
+            self.arriveMessages = messages.arriveMessages
+            self.summaryMessage = messages.summary ?? I18NText.empty()
+        }
+        
+        if let feature = Features.getFeature(by: ref) {
+            title = feature.properties.name ?? I18NText.empty()
+        }
     }
 }
 
@@ -724,6 +757,10 @@ class Directory {
         var showSections: Bool {
             return showSectionIndex || Double(itemCount) / Double(sections.count) > 1.5
         }
+
+        func allDestinations() -> [any Destination] {
+            sections.flatMap { $0.items.flatMap { $0.allDestinations() } }
+        }
     }
 
     struct Section: Decodable, Hashable {
@@ -770,6 +807,13 @@ class Directory {
             self.forDemonstration && ResourceManager.shared.modeType != .Advanced
         }
 
+        func allDestinations() -> [any Destination] {
+            if let content = content {
+                return content.allDestinations()
+            }
+            return [self]
+        }
+
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             title = I18NText.decode(decoder: decoder, baseKey: "title")
@@ -795,7 +839,7 @@ class Directory {
                     }
                     startMessage = I18NText.empty()
                     summaryMessage = I18NText.empty()
-                    if let message = TourData.getMessage(by: nodeID) {
+                    if let message = TourData.getMessage(by: NodeRef(node_id: nodeID, variation: nil)) {
                         if let startMessage = message.startMessage {
                             self.startMessage = startMessage
                         }
@@ -811,7 +855,6 @@ class Directory {
         private enum CodingKeys: String, CodingKey {
             case content, subtitle, titlePron, subtitlePron, title, nodeID, forDemonstration
         }
-
 
         var value: String? {
             get {

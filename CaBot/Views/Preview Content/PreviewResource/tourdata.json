@@ -78,7 +78,7 @@
         {
             "tour_id": "tour_id",
             "title-ja": "ツアーA",
-            "title-en": "tourA",
+            "title-en": "tour B",
             "destinations": [
                 {
                     "ref": "Node_ID_FOR_A#tourA",
@@ -98,6 +98,30 @@
                 }
             ],
             "default_var": "tourA"
+        },
+        {
+            "tour_id": "tour_id2",
+            "title-ja": "ツアーB",
+            "title-en": "tour B",
+            "destinations": [
+                {
+                    "ref": "Node_ID_FOR_A#tourB",
+                    "#ref": "ポイント１"
+                },
+                {
+                    "ref": "Node_ID_FOR_B#tourB",
+                    "#ref": "ポイント２"
+                },
+                {
+                    "ref": "Node_ID_FOR_C#tourB",
+                    "#ref": "ポイント３"
+                },
+                {
+                    "ref": "Node_ID_FOR_D#tourB",
+                    "#ref": "ポイント４"
+                }
+            ],
+            "default_var": "tourB"
         }
     ]
 }
