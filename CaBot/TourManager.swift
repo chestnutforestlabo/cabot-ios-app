@@ -25,6 +25,7 @@ import Foundation
 protocol TourManagerDelegate {
     func tour(manager: TourManager, destinationChanged: (any Destination)?, isStartMessageSpeaking: Bool)
     func tourUpdated(manager: TourManager)
+    func needToStartAnnounce(wait: Bool)
 }
 
 class TourManager: TourProtocol {
@@ -224,8 +225,8 @@ class TourManager: TourProtocol {
         save()
         return dest
     }
-    
-    func save(){
+
+    func getTourSaveData() -> TourSaveData {
         var data = TourSaveData()
         if destinations.count == 0 && data.currentDestination == "" {
             id = TourManager.defaultTourID
@@ -249,7 +250,11 @@ class TourManager: TourProtocol {
                 data.currentDestination = ""
             }
         }
+        return data
+    }
 
+    func save(){
+        var data = getTourSaveData()
         let encoder = JSONEncoder()
         print("restore save \(data)")
         if let encoded = try? encoder.encode(data) {
@@ -276,7 +281,7 @@ class TourManager: TourProtocol {
         }
     }
     
-    func tourDataLoad(model: CaBotAppModel){
+    func tourDataLoad() {
         _destinations.removeAll()
         _currentDestination = nil
         _arrivedDestination = nil
@@ -290,25 +295,18 @@ class TourManager: TourProtocol {
                 id = _tourSaveData.id
                 if let _ = try? ResourceManager.shared.load() {
                     if _tourSaveData.currentDestination != "" {
-                        if let dest = TourData.getTourDestination(by: _tourSaveData.currentDestination) {
-                            addToFirst(destination: dest)
-                            let _ = proceedToNextDestination(isStartMessageSpeaking: false)
-                        }
-                        else if let dest = Directory.getDestination(by: _tourSaveData.currentDestination) {
+                        if let dest = ResourceManager.shared.getDestination(by: _tourSaveData.currentDestination) {
                             addToFirst(destination: dest)
                             let _ = proceedToNextDestination(isStartMessageSpeaking: false)
                         }
                     }
                     for destination in _tourSaveData.destinations {
-                        if let dest = TourData.getTourDestination(by: destination) {
-                            addToLast(destination: dest)
-                        }
-                        else if let dest = Directory.getDestination(by: destination) {
+                        if let dest = ResourceManager.shared.getDestination(by: destination) {
                             addToLast(destination: dest)
                         }
                     }
                     if decoded.destinations.count > 0 && decoded.currentDestination == "" {
-                        model.needToStartAnnounce(wait: true)
+                        delegate?.needToStartAnnounce(wait: true)
                     }
                 }
             }

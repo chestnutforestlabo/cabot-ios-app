@@ -37,9 +37,6 @@ struct SharedInfo: Codable {
         case Speak
         case SpeakProgress
         case Tour
-        case CurrentDestination
-        case NextDestination
-        case Destinations
         // Advanced / Debug -> Normal
         case OverrideTour
         case OverrideDestination

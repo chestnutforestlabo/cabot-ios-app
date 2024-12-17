@@ -107,9 +107,9 @@ struct UserInfoDestinations: View {
                 }
             }
             Section(header: Text("Tour")) {
-                ForEach(modelData.userInfo.destinations, id: \.self) { destination in
+                ForEach(modelData.userInfo.destinations, id: \.value) { destination in
                     Label {
-                        Text(destination)
+                        Text(destination.title.text)
                     } icon: {
                         Image(systemName: "mappin.and.ellipse")
                     }
@@ -121,103 +121,93 @@ struct UserInfoDestinations: View {
 
 struct UserInfoView: View {
     @EnvironmentObject var modelData: CaBotAppModel
-    
+
     var body: some View {
-        let grayOutOpacity = (modelData.isUserAppConnected && modelData.suitcaseConnected) ? 1.0 : 0.1
         Section(header: Text("User App Info")) {
-            if modelData.suitcaseConnected && !modelData.isUserAppConnected {
-                Label {
-                    Text("USER_APP_NOT_CONNECTED").foregroundColor(.red)
-                } icon: {
-                    Image(systemName: "xmark.circle").foregroundColor(.red)
+            Label {
+                if let tour = modelData.userInfo.selectedTour {
+                    Text(tour.title.text)
+                } else {
+                    if (modelData.userInfo.destinations.count == 0) {
+                        Text("PLACEHOLDER_TOUR_TITLE").foregroundColor(.gray)
+                    } else {
+                        Text("CUSTOMIZED_TOUR")
+                    }
+                }
+            } icon: {
+                Image(systemName: "list.bullet.rectangle.portrait")
+            }
+            Label {
+                if let dest = modelData.userInfo.currentDestination {
+                    Text(dest.title.text)
+                } else if let dest = modelData.userInfo.nextDestination {
+                    Text(dest.title.text)
+                } else {
+                    Text("PLACEHOLDER_DESTINATION_TITLE").foregroundColor(.gray)
+                }
+                if modelData.systemStatus.level == .Active{
+                    Spacer()
+                    HStack {
+                        Image(systemName: modelData.touchStatus.level.icon)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 24, height: 24)
+                    }
+                    .foregroundColor(modelData.touchStatus.level.color)
+                }
+            } icon: {
+                if modelData.userInfo.currentDestination != nil {
+                    Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                } else {
+                    Image(systemName: "mappin.and.ellipse")
                 }
             }
-            Group {
-                Label {
-                    if (modelData.userInfo.selectedTour.isEmpty) {
-                        if (modelData.userInfo.destinations.count == 0) {
-                            Text("PLACEHOLDER_TOUR_TITLE").foregroundColor(.gray)
-                        } else {
-                            Text("CUSTOMIZED_TOUR")
+            if modelData.userInfo.nextDestination != nil {
+                Button(action: {
+                    modelData.share(user_info: SharedInfo(type: .Skip, value: ""))
+                }) {
+                    Label{
+                        if let dest = modelData.userInfo.currentDestination {
+                            Text("Skip Label \(dest.title.text)")
+                        } else if let dest = modelData.userInfo.nextDestination {
+                            Text("Skip Label \(dest.title.text)")
                         }
-                    } else {
-                        Text(modelData.userInfo.selectedTour)
+                    } icon: {
+                        Image(systemName: "arrow.right.to.line")
                     }
-                } icon: {
-                    Image(systemName: "list.bullet.rectangle.portrait")
                 }
-                Label {
-                    if modelData.userInfo.currentDestination != "" {
-                        Text(modelData.userInfo.currentDestination)
-                    } else if modelData.userInfo.nextDestination != "" {
-                        Text(modelData.userInfo.nextDestination)
-                    } else {
-                        Text("PLACEHOLDER_DESTINATION_TITLE").foregroundColor(.gray)
-                    }
-                    if modelData.systemStatus.level == .Active{
+            }
+            if (modelData.userInfo.destinations.count > 1) {
+                NavigationLink(destination: UserInfoDestinations().environmentObject(modelData).heartbeat("UserInfoDestinations"), label: {
+                    HStack {
                         Spacer()
-                        HStack {
-                            Image(systemName: modelData.touchStatus.level.icon)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 24, height: 24)
-                        }
-                        .foregroundColor(modelData.touchStatus.level.color)
+                        Text("See detail")
                     }
+                })
+            }
+            if modelData.userInfo.speakingText.count == 0 {
+                Label {
+                    Text("PLACEHOLDER_SPEAKING_TEXT").foregroundColor(.gray)
                 } icon: {
-                    if modelData.userInfo.currentDestination != "" {
-                        Image(systemName: "arrow.triangle.turn.up.right.diamond")
-                    } else {
-                        Image(systemName: "mappin.and.ellipse")
-                    }
+                    Image(systemName: "text.bubble")
                 }
-                if modelData.userInfo.nextDestination != "" {
-                    Button(action: {
-                        modelData.share(user_info: SharedInfo(type: .Skip, value: ""))
-                    }) {
-                        Label{
-                            if modelData.userInfo.currentDestination != ""{
-                                Text("Skip Label \(modelData.userInfo.currentDestination)")
-                            }else{
-                                Text("Skip Label \(modelData.userInfo.nextDestination)")
-                            }
-                        } icon: {
-                            Image(systemName: "arrow.right.to.line")
-                        }
-                    }
+            } else if modelData.userInfo.speakingText.count > 1 {
+                ForEach(modelData.userInfo.speakingText[..<2], id: \.self) { text in
+                    SpokenTextView.showText(text: text)
                 }
-                if (modelData.userInfo.destinations.count >= 1) {
-                    NavigationLink(destination: UserInfoDestinations().environmentObject(modelData).heartbeat("UserInfoDestinations"), label: {
+                if modelData.userInfo.speakingText.count > 2 {
+                    NavigationLink(destination: SpokenTextView().environmentObject(modelData).heartbeat("SpokenTextView"), label: {
                         HStack {
                             Spacer()
-                            Text("See detail")
+                            Text("See history")
                         }
                     })
                 }
-                if modelData.userInfo.speakingText.count == 0 {
-                    Label {
-                        Text("PLACEHOLDER_SPEAKING_TEXT").foregroundColor(.gray)
-                    } icon: {
-                        Image(systemName: "text.bubble")
-                    }
-                } else if modelData.userInfo.speakingText.count > 1 {
-                    ForEach(modelData.userInfo.speakingText[..<2], id: \.self) { text in
-                        SpokenTextView.showText(text: text)
-                    }
-                    if modelData.userInfo.speakingText.count > 2 {
-                        NavigationLink(destination: SpokenTextView().environmentObject(modelData).heartbeat("SpokenTextView"), label: {
-                            HStack {
-                                Spacer()
-                                Text("See history")
-                            }
-                        })
-                    }
-                } else {
-                    ForEach(modelData.userInfo.speakingText, id: \.self) { text in
-                        SpokenTextView.showText(text: text)
-                    }
+            } else {
+                ForEach(modelData.userInfo.speakingText, id: \.self) { text in
+                    SpokenTextView.showText(text: text)
                 }
-            }.opacity(grayOutOpacity)
+            }
         }
     }
 }

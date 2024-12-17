@@ -58,7 +58,12 @@ class ResourceManager {
         return true
     }
 
+    private let loadSemaphore = DispatchSemaphore(value: 1)
     public func load() throws -> Result {
+        loadSemaphore.wait()
+        defer {
+            loadSemaphore.signal()
+        }
         do {
             // need to load in this order to build structure correctly
             // make suer the server is initialized with the user ID
@@ -82,6 +87,16 @@ class ResourceManager {
         let tourData = try TourData.loadForPreview()
         let directory = try Directory.loadForPreview()
         return Result(tours: tourData.tours, directory: directory)
+    }
+
+    public func getDestination(by ref: String) -> (any Destination)? {
+        if let dest = TourData.getTourDestination(by: ref) {
+            return dest
+        }
+        else if let dest = Directory.getDestination(by: ref) {
+            return dest
+        }
+        return nil
     }
 
     private var addressCandidate: AddressCandidate?
@@ -1017,6 +1032,22 @@ struct TourSaveData: Codable {
         self.id = ""
         self.destinations = []
         self.currentDestination = ""
+    }
+
+    func toJson() -> Data {
+        let encoder = JSONEncoder()
+        if let jsonData = try? encoder.encode(self) {
+            return jsonData
+        }
+        return Data()
+    }
+
+    func toJsonString() -> String {
+        let jsonData = toJson()
+        if let json = String(data: jsonData, encoding: .utf8) {
+            return json
+        }
+        return ""
     }
 }
 
