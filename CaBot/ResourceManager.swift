@@ -54,7 +54,7 @@ class ResourceManager {
     public func initServer() throws -> Bool {
         let configData = try ResourceManager.shared.fetchData(from: .config)
         self.config = try JSONDecoder().decode(Config.self, from: configData)
-        let featuresData = try ResourceManager.shared.fetchData(from: .features_start)
+        let _ = try ResourceManager.shared.fetchData(from: .features_start)
         return true
     }
 
@@ -73,12 +73,12 @@ class ResourceManager {
             return Result(tours: tourData.tours, directory: directory)
         } catch {
             print("Error")
-            throw MetadataError.contentLoadError
+            throw ResourceManagerError.contentLoadError
         }
     }
 
     public func loadForPreview() throws -> Result {
-        let features = try Features.loadForPreview()
+        let _ = try Features.loadForPreview()
         let tourData = try TourData.loadForPreview()
         let directory = try Directory.loadForPreview()
         return Result(tours: tourData.tours, directory: directory)
@@ -117,7 +117,7 @@ class ResourceManager {
     }
 
     fileprivate func fetchData(from resource: Resource, lat: Double? = nil, lng: Double? = nil, dist: Int = 2000, user: String? = nil) throws -> Data {
-        guard let currentAddress = addressCandidate?.getCurrent() else { throw MetadataError.contentLoadError }
+        guard let currentAddress = addressCandidate?.getCurrent() else { throw ResourceManagerError.contentLoadError }
         let lat = lat ?? config?.initialLocation.lat ?? 0
         let lng = lng ?? config?.initialLocation.lng ?? 0
         let user = user ?? UIDevice.current.identifierForVendor?.uuidString ?? "default_user_identifier"
@@ -138,7 +138,7 @@ class ResourceManager {
         }
 
         guard let url = URL(string: baseURL) else {
-            throw MetadataError.contentLoadError
+            throw ResourceManagerError.contentLoadError
         }
 
         var dataReceived: Data?
@@ -158,7 +158,7 @@ class ResourceManager {
         _ = semaphore.wait(timeout: .now() + 3.0)
 
         guard let data = dataReceived else {
-            throw MetadataError.contentLoadError
+            throw ResourceManagerError.contentLoadError
         }
         try saveData(data, to: resource.file_name)
 
@@ -173,18 +173,16 @@ class ResourceManager {
 
     private func saveData(_ data: Data, to fileName: String) throws {
         guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            throw MetadataError.contentLoadError
+            throw ResourceManagerError.contentLoadError
         }
         let fileURL = documentsDirectory.appendingPathComponent(fileName)
         try data.write(to: fileURL)
     }
 }
 
-// TODO Rename
-enum MetadataError: Error {
+enum ResourceManagerError: Error {
     case noName
     case contentLoadError
-    case nestedReferenceError
 }
 
 class I18N {
@@ -389,6 +387,7 @@ struct TourData: Decodable {
     let messages: [Message]
     static var refIndex: [String: Messages] = [:]
     static var tourIndex: [String: Tour] = [:]
+    static var destIndex: [String: TourDestination] = [:]
 
     static func buildIndex(messages: [Message]) {
         TourData.refIndex.removeAll()
@@ -407,11 +406,18 @@ struct TourData: Decodable {
     static func buildIndex(tours: [Tour]) {
         for tour in tours {
             tourIndex[tour.id] = tour
+            for destination in tour.destinations {
+                destIndex[destination.ref.description] = destination
+            }
         }
     }
 
     static func getTour(by id: String) -> Tour? {
         return tourIndex[id]
+    }
+
+    static func getTourDestination(by ref: String) -> TourDestination? {
+        return destIndex[ref]
     }
 
     enum CodingKeys: CodingKey {
@@ -435,7 +441,7 @@ struct TourData: Decodable {
             let tourdata = try JSONDecoder().decode(TourData.self, from: data)
             return tourdata
         } catch {
-            throw MetadataError.contentLoadError
+            throw ResourceManagerError.contentLoadError
         }
     }
 
@@ -445,7 +451,7 @@ struct TourData: Decodable {
             let root = try JSONDecoder().decode(TourData.self, from: data)
             return root
         } catch {
-            throw MetadataError.contentLoadError
+            throw ResourceManagerError.contentLoadError
         }
     }
 }
@@ -673,7 +679,7 @@ class Features {
             buildIndex()
             return Features.features
         } catch {
-            throw MetadataError.contentLoadError
+            throw ResourceManagerError.contentLoadError
         }
     }
 
@@ -684,7 +690,7 @@ class Features {
             buildIndex()
             return Features.features
         } catch {
-            throw MetadataError.contentLoadError
+            throw ResourceManagerError.contentLoadError
         }
     }
 }
@@ -983,103 +989,17 @@ struct WaitingDestination: Decodable, Equatable {
 /// - waitingDestination: <WaitingDestination>
 /// ```
 protocol Destination: Hashable {
-    //var i18n:I18N
-    // floorTitle: I18NText
     var title: I18NText { get }
     var value: String? { get }
-    //let file:Source?
     var summaryMessage: I18NText { get }
     var startMessage:I18NText { get }
     var arriveMessages: [I18NText]? { get }
-    //let content:Source?
     var waitingDestination: WaitingDestination? { get }
     var subtour:Tour? { get }
     var error:String? { get }
     var warning:String? { get }
-    //let ref:Reference?
-    //let refDest:Destination?
-    //var parent: Tour? = nil
-    //let debug:Bool
     var forDemonstration: Bool { get }
 }
-/*
-class Destination:  Hashable {
-    static func == (lhs: Destination, rhs: Destination) -> Bool {
-        if let lhsfile = lhs.file,
-           let rhsfile = rhs.file {
-            return lhsfile.type == rhsfile.type && lhsfile.src == rhsfile.src
-        }
-        if let lhsvalue = lhs.value,
-           let rhsvalue = rhs.value {
-            return lhsvalue == rhsvalue
-        }
-        return false
-    }
-
-    func hash(into hasher: inout Hasher) {
-        if let file = file {
-            hasher.combine(file.type)
-            hasher.combine(file.src)
-        }
-        if let value = value {
-            hasher.combine(value)
-        }
-    }
-
-    let i18n:I18N
-    let floorTitle: I18NText
-    let title: I18NText
-    var value:String?
-    let file:Source?
-    var summaryMessage: I18NText
-    var startMessage:I18NText
-    var arriveMessages: [I18NText]?
-    let content:Source?
-    let waitingDestination:WaitingDestination?
-    let subtour:Tour?
-    let error:String?
-    let warning:String?
-    let ref:Reference?
-    let refDest:Destination?
-    var parent: Tour? = nil
-    let debug:Bool
-    let forDemonstration:Bool
-
-    enum CodingKeys: String, CodingKey {
-        case title
-        case ref
-        case value
-        case pron
-        case file
-        case summaryMessage
-        case startMessage
-        case arriveMessages
-        case content
-        case waitingDestination
-        case subtour
-        case debug
-    }
-    init(floorTitle: I18NText,title: I18NText,value: String?, pron: String?, file: Source?, summaryMessage: I18NText, startMessage: I18NText,arriveMessages: [I18NText], content: Source?, waitingDestination: WaitingDestination?, subtour: Tour?,forDemonstration:Bool) {
-        self.i18n = I18N.shared
-        self.title = title
-        self.floorTitle = floorTitle
-        self.value = value
-        self.file = file
-        self.summaryMessage = summaryMessage
-        self.startMessage = startMessage
-        self.arriveMessages = arriveMessages
-        self.content = content
-        self.waitingDestination = waitingDestination
-        self.subtour = subtour
-        self.error = nil
-        self.warning = nil
-        self.ref = nil
-        self.refDest = nil
-        self.debug = false
-        self.forDemonstration = forDemonstration
-    }
-}
-*/
 
 protocol TourProtocol {
     var title: I18NText { get }
