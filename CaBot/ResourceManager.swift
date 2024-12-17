@@ -24,12 +24,70 @@ import Foundation
 
 
 class ResourceManager {
-    static let shared = ResourceManager()
-    private var addressCandidate: AddressCandidate?
+    public static let shared = ResourceManager()
     public var modeType: ModeType = .Normal
+
+    public func set(addressCandidate: AddressCandidate) {
+        self.addressCandidate = addressCandidate
+    }
+    public func set(modeType: ModeType) {
+        self.modeType = modeType
+    }
+
+    public enum Resource: String {
+        case config
+        case directory
+        case tourdata
+        case features_start
+        case features
+
+        var file_name: String {
+            "\(self.rawValue).json"
+        }
+    }
+
+    public struct Result {
+        var tours: [Tour]
+        var directory: Directory.DirectorySections
+    }
+
+    public func initServer() throws -> Bool {
+        let configData = try ResourceManager.shared.fetchData(from: .config)
+        self.config = try JSONDecoder().decode(Config.self, from: configData)
+        let featuresData = try ResourceManager.shared.fetchData(from: .features_start)
+        return true
+    }
+
+    public func load() throws -> Result {
+        do {
+            // need to load in this order to build structure correctly
+            // make suer the server is initialized with the user ID
+            let _ = try initServer()
+            // features are not depending on other data, so load it first
+            let _ = try Features.load()
+            // tour data depends on features, it provides messages
+            let tourData = try TourData.load()
+            // directory depends on features and messages
+            let directory = try Directory.load()
+
+            return Result(tours: tourData.tours, directory: directory)
+        } catch {
+            print("Error")
+            throw MetadataError.contentLoadError
+        }
+    }
+
+    public func loadForPreview() throws -> Result {
+        let features = try Features.loadForPreview()
+        let tourData = try TourData.loadForPreview()
+        let directory = try Directory.loadForPreview()
+        return Result(tours: tourData.tours, directory: directory)
+    }
+
+    private var addressCandidate: AddressCandidate?
     private var config: Config?
 
-    struct Config: Codable {
+    private struct Config: Codable {
         struct InitialLocation: Codable {
             let lat: Double
             let lng: Double
@@ -49,40 +107,9 @@ class ResourceManager {
         }
     }
 
-    public func set(addressCandidate: AddressCandidate) {
-        self.addressCandidate = addressCandidate
-    }
-    public func set(modeType: ModeType) {
-        self.modeType = modeType
-    }
-
     private init() {}
 
-    enum Resource: String {
-        case config
-        case directory
-        case tourdata
-        case features_start
-        case features
-
-        var previewFile: String {
-            "\(self.rawValue).json"
-        }
-    }
-
-    static let configFileName = "config.json"
-    static let directoryFileName = "directory.json"
-    static let tourdataFileName = "tourdata.json"
-    static let featuresFileName = "features.json"
-
-    func initServer() throws -> Bool {
-        let configData = try ResourceManager.shared.fetchData(from: .config)
-        self.config = try JSONDecoder().decode(Config.self, from: configData)
-        let featuresData = try ResourceManager.shared.fetchData(from: .features_start)
-        return true
-    }
-
-    func fetchData(from resource: Resource, lat: Double? = nil, lng: Double? = nil, dist: Int = 2000, user: String? = nil) throws -> Data {
+    fileprivate func fetchData(from resource: Resource, lat: Double? = nil, lng: Double? = nil, dist: Int = 2000, user: String? = nil) throws -> Data {
         guard let currentAddress = addressCandidate?.getCurrent() else { throw MetadataError.contentLoadError }
         let lat = lat ?? config?.initialLocation.lat ?? 0
         let lng = lng ?? config?.initialLocation.lng ?? 0
@@ -94,7 +121,7 @@ class ResourceManager {
         case .config:
             baseURL = "http://\(currentAddress):9090/map/api/config"
         case .directory:
-            baseURL = "http://\(currentAddress):9090/query/directory?user=\(user)&lat=\(lat)&lng=\(lng)&dist=\(dist)"
+            baseURL = "http://\(currentAddress):9090/query/directory?user=\(user)&lat=\(lat)&lng=\(lng)&dist=\(dist)&lang=\(I18N.shared.langCode)"
         case .tourdata:
             baseURL = "http://\(currentAddress):9090/map/cabot/tourdata.json"
         case .features_start:
@@ -126,79 +153,24 @@ class ResourceManager {
         guard let data = dataReceived else {
             throw MetadataError.contentLoadError
         }
+        try saveData(data, to: resource.file_name)
 
         return data
     }
 
-    func fetchDataPreview(for resource: Resource) throws -> Data {
+    fileprivate func fetchDataPreview(for resource: Resource) throws -> Data {
         let path = Bundle.main.resourceURL!.appendingPathComponent("PreviewResource")
-        let fileURL = path.appendingPathComponent(resource.previewFile)
+        let fileURL = path.appendingPathComponent(resource.file_name)
         return try Data(contentsOf: fileURL)
     }
 
-    func saveData(_ data: Data, to fileName: String) throws {
+    private func saveData(_ data: Data, to fileName: String) throws {
         guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
             throw MetadataError.contentLoadError
         }
         let fileURL = documentsDirectory.appendingPathComponent(fileName)
         try data.write(to: fileURL)
     }
-
-    struct Result {
-        var tours: [Tour]
-        var directory: Directory.DirectorySections
-    }
-
-    func load() throws -> Result {
-        do {
-            try initServer()
-            let features = try Features.load()
-            let tourData = try TourData.load()
-            let directory = try Directory.load()
-            //processTours(root: tourData, features: features)
-
-            return Result(tours: tourData.tours, directory: directory)
-        } catch {
-            print("Error")
-            throw MetadataError.contentLoadError
-        }
-    }
-
-    func loadForPreview() throws -> Result {
-        let features = try Features.loadForPreview()
-        let tourData = try TourData.loadForPreview()
-        let directory = try Directory.loadForPreview()
-        //processTours(root: tourData, features: features)
-
-        return Result(tours: tourData.tours, directory: directory)
-    }
-    
-    /*
-    private func processTours(root: TourData, features: [Feature]) {
-
-        for tourIndex in 0..<root.tours.count {
-            let tour = root.tours[tourIndex]
-            for destIndex in 0..<tour.destinations.count {
-                var destination = tour.destinations[destIndex]
-                if let matchedD = destination.matchedDestinationRef {
-                    if let matchedFeature = features.first(where: { $0.properties.ent1Node == matchedD.value }) {
-                        destination.title = I18NText(text: matchedFeature.properties.names, pron: [:])
-                    } else {
-                        NSLog("No matching Feature found")
-                    }
-                } else {
-                    NSLog("No matched DestinationD found")
-                    let refParts = destination.ref.split(separator: "#")
-                    let refToUse = refParts.count > 1 ? String(refParts[0]) : destination.ref
-                    if let matchedFeature = features.first(where: { $0.properties.ent1Node == refToUse }) {
-                        destination.title = I18NText(text: matchedFeature.properties.names, pron: [:])
-                    }
-                }
-                root.tours[tourIndex].destinations[destIndex] = destination
-            }
-        }
-    }
-     */
 }
 
 // TODO Rename
@@ -417,16 +389,7 @@ struct TourData: Decodable {
     fileprivate static func load() throws -> TourData {
         do {
             let data = try ResourceManager.shared.fetchData(from: .tourdata)
-            try ResourceManager.shared.saveData(data, to: ResourceManager.tourdataFileName)
             let root = try JSONDecoder().decode(TourData.self, from: data)
-            //let features = try Feature.loadFeature()
-            //allDestinationsRef = root.destinations
-            //allMessages = root.messages
-            //for tour in root.tours {
-                //tour.matchDestinationsRef()
-                //tour.matchMessage()
-            //}
-            //processTours(root: root, features: features)
             root.buildIndex()
             return root
         } catch {
@@ -438,15 +401,6 @@ struct TourData: Decodable {
         do {
             let data = try ResourceManager.shared.fetchDataPreview(for: .tourdata)
             let root = try JSONDecoder().decode(TourData.self, from: data)
-            //allDestinationsRef = root.destinations
-            //allMessages = root.messages
-
-            //for tour in root.tours {
-            //    tour.matchDestinationsRef()
-            //    tour.matchMessage()
-            //}
-            //let features = try Feature.loadFeaturePreview()
-            //processTours(root: root, features: features)
             root.buildIndex()
             return root
         } catch {
@@ -471,23 +425,6 @@ class Tour: Decodable, Hashable{
         case destinations
         case defaultVar = "default_var"
     }
-
-
-    // MARK: - Static Properties
-    /*
-    private static var _allDestinationsRef: [DestinationRef] = []
-    private static var _allMessages: [Message] = []
-
-    static var allDestinationsRef: [DestinationRef] {
-        get { return _allDestinationsRef }
-        set { _allDestinationsRef = newValue }
-    }
-
-    static var allMessages: [Message] {
-        get { return _allMessages }
-        set { _allMessages = newValue }
-    }
-*/
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -539,67 +476,6 @@ class Tour: Decodable, Hashable{
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
-
-    // TODO resolve in TourData class
-    /*
-    // MARK: - Private Methods
-    private func matchDestinationsRef() {
-
-        var destinationsRefIndex: [String: DestinationRef] = [:]
-        for ref in Tour.allDestinationsRef {
-            destinationsRefIndex[ref.value] = ref
-        }
-
-        for index in 0..<destinations.count {
-            let destination = destinations[index]
-            let refParts = destination.ref.split(separator: "#")
-
-            if refParts.count == 2 {
-                let value = String(refParts[0])
-                let variation = String(refParts[1])
-
-                if let matched = destinationsRefIndex[value], matched.variation == variation || matched.variation == nil {
-                    destinations[index].matchedDestinationRef = matched
-                }
-            } else {
-
-                if let matched = destinationsRefIndex[destination.ref] {
-                    destinations[index].matchedDestinationRef = matched
-                }
-            }
-        }
-    }
-
-    private func matchMessage() {
-
-        var destinationIndex: [String: Int] = [:]
-        for (index, destination) in destinations.enumerated() {
-            destinationIndex[destination.ref] = index
-        }
-
-        for message in Tour.allMessages {
-            guard let index = destinationIndex[message.parent], !message.parent.isEmpty else {
-                continue
-            }
-
-            var destination = destinations[index]
-
-            switch message.type {
-            case "startMessage":
-                destination.startMessage = message
-            case "summary":
-                destination.summaryMessage = message
-            case "arriveMessage":
-                destination.arriveMessages = [message]
-            default:
-                break
-            }
-
-
-            destinations[index] = destination
-        }
-    }
-     */
 }
 
 struct NodeRef: Decodable, Hashable {
@@ -655,18 +531,6 @@ class TourDestination: Decodable {
         arriveMessages = []
         title = Features.getFeature(by: ref)?.properties.name ?? I18NText(text: [:], pron: [:])
     }
-    
-    /*
-    init(ref: String, refTitle: String, title: I18NText) {
-        self.ref = ref
-        self.refTitle = refTitle
-        self.matchedDestinationRef = nil
-        summaryMessage = nil
-        startMessage = nil
-        arriveMessages = []
-        self.title = title
-    }
-     */
 }
 
 struct DestinationRef: Decodable {
@@ -715,14 +579,6 @@ struct Message: Decodable {
         }
         self.text = I18NText(text: textDict, pron: [:])
     }
-    
-    /*
-    init(type: String, parent: String) {
-        self.type = type
-        self.parent = parent
-        self.text = I18NText(text: [:], pron: [:])
-    }
-     */
 
     struct DynamicCodingKeys: CodingKey {
         var stringValue: String
@@ -746,7 +602,6 @@ class Features {
     fileprivate static func load() throws -> [Feature] {
         do {
             let featuresData = try ResourceManager.shared.fetchData(from: .features)
-            try ResourceManager.shared.saveData(featuresData, to: ResourceManager.featuresFileName)
             Features.features = try JSONDecoder().decode([Feature].self, from: featuresData)
             buildIndex()
             return Features.features
@@ -938,7 +793,6 @@ class Directory {
 
     fileprivate static func load() throws -> DirectorySections {
         let configData = try ResourceManager.shared.fetchData(from: .config)
-        try ResourceManager.shared.saveData(configData, to: ResourceManager.configFileName)
         struct InitialLocation: Codable {
             let lat: Double
             let lng: Double
@@ -961,8 +815,6 @@ class Directory {
 
 
         let directoryData = try ResourceManager.shared.fetchData(from: .directory, lat: lat, lng: lng, dist: dist, user: user)
-        try ResourceManager.shared.saveData(directoryData, to: ResourceManager.directoryFileName)
-
         let directoryDataDecoded = try JSONDecoder().decode(DirectorySections.self, from: directoryData)
         return directoryDataDecoded
     }
