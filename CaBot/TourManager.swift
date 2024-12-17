@@ -297,7 +297,7 @@ class TourManager: TourProtocol {
                 else if (_tourSaveData.id == "TourManager") {
                     // load destinations
                     do {
-                        let sections: Directory.DirectorySections = try ResourceManager.shared.load().directory
+                        let sections: Directory.Sections = try ResourceManager.shared.load().directory
                         let allDestinations: [any Destination] = sections.sections.flatMap { $0.items }
 
                         for destination in allDestinations {

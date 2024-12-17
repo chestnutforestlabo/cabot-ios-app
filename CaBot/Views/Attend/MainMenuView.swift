@@ -403,7 +403,7 @@ struct MainMenus: View {
     var body: some View {
         Section(header: Text("Navigation")) {
             NavigationLink(
-                destination: DestinationsFloorView()
+                destination: DestinationsView()
                     .environmentObject(modelData).heartbeat("DestinationsView"),
                 label: {
                     Text("SELECT_DESTINATION")

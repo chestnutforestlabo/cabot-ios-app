@@ -26,132 +26,30 @@ struct DestinationsView: View {
     @EnvironmentObject var modelData: CaBotAppModel
     @State private var isConfirming = false
     @State private var targetDestination: (any Destination)?
-
-    var destination: (any Destination)?
-    var destinations: [any Destination] = []
+    @State var sections: Directory.Sections = Directory.Sections()
 
     var body: some View {
-        var header: Text?
-        // TODO
-        // header = Text(destinations.first?.floorTitle.text ?? "SELECT_DESTINATION")
+        let tourManager = modelData.tourManager
         return Form {
-            Section(
-                header: header) {
-                ForEach(destinations, id: \.value) { destination in
-                        HStack {
-                            Button(action: {
-                                if (modelData.userInfo.destinations.count > 0) {
-                                    targetDestination = destination
-                                    isConfirming = true
-                                } else {
-                                    // if there is no destination, start immediately
-                                    modelData.share(destination: destination, clear: false)
-                                    modelData.needToStartAnnounce(wait: true)
-                                    NavigationUtil.popToRootView()
-                                }
-                            }){
-                                VStack(alignment: .leading) {
-                                    Text(destination.title.text)
-                                        .font(.body)
-                                        .accessibilityLabel(destination.title.pron)
-                                        .multilineTextAlignment(.leading)
-                                        .accessibilityHint(Text("DOUBLETAP_TO_ADD_A_DESTINATION"))
-                                    if destination.summaryMessage.text != ""{
-                                        Text(destination.summaryMessage.text)
-                                            .font(.caption)
-                                            .multilineTextAlignment(.leading)
-                                    }
-                                }
-                            }
-                            .buttonStyle(.borderless)
-                            .confirmationDialog(Text("ADD_A_DESTINATION"), isPresented: $isConfirming, presenting: targetDestination) {
-                            detail in
-                                Button {
-                                    if let destination = targetDestination {
-                                        modelData.share(destination: destination)
-                                        NavigationUtil.popToRootView()
-                                        targetDestination = nil
-                                    }
-                                } label: {
-                                    Text("CLEAR_ALL_THEN_ADD")
-                                }
-                                Button {
-                                    if let destination = targetDestination {
-                                        modelData.share(destination: destination, clear: false, addFirst: true)
-                                        NavigationUtil.popToRootView()
-                                        targetDestination = nil
-                                    }
-                                } label: {
-                                    Text("ADD_TO_FIRST")
-                                }
-                                Button {
-                                    if let destination = targetDestination {
-                                        modelData.share(destination: destination, clear: false)
-                                        NavigationUtil.popToRootView()
-                                        targetDestination = nil
-                                    }
-                                } label: {
-                                    Text("ADD_TO_LAST")
-                                }
-                                Button("Cancel", role: .cancel) {
-                                    targetDestination = nil
-                                }
-                            } message: { detail in
-                                let message = LocalizedStringKey("ADD_A_DESTINATION_MESSAGE \(modelData.userInfo.destinations.count, specifier: "%d")")
-                                Text(message)
-                            }
-                            Spacer()
-                            if destination.startMessage.text != "" {
-                                ZStack{
-                                    Image(systemName: "info.circle")
-                                        .accessibilityLabel(Text("Details"))
-                                        .accessibilityRemoveTraits(.isImage)
-                                        .accessibilityAddTraits(.isButton)
-                                        .accessibilityHint(Text("DOUBLETAP_TO_VIEW_DETAILS"))
-                                        .foregroundColor(.blue)
-                                    NavigationLink(
-                                        destination: DestinationDetailView(destination: destination).environmentObject(modelData).heartbeat("DestinationsView(\(destination.title.text))")
-                                    ){EmptyView()}
-                                    .frame(width: 0, height: 0)
-                                    .opacity(0)
+            if sections.showSections {
+                ForEach(sections.sections, id: \.self) {section in
+                    if section.itemCount > 0 {
+                        Section(
+                            header: Text(section.title.text)
+                        ) {
+                            ForEach(section.items, id: \.self) { item in
+                                if !item.hidden {
+                                    contentView(for: item, in: section)
                                 }
                             }
                         }
+                    }
                 }
-            }
-        }
-        .listStyle(PlainListStyle())
-    }
-}
-
-struct DestinationsFloorView: View {
-    @EnvironmentObject var modelData: CaBotAppModel
-    @State private var isConfirming = false
-    @State private var targetDestination: (any Destination)?
-    @State var sections: [Directory.DirectorySection] = []
-
-    var destination: (any Destination)?
-
-    var body: some View {
-        return Form {
-            ForEach(sections, id: \.self) {section in
-                Section(
-                    header: Text(section.title.text)
-                ) {
-                    ForEach(section.items, id: \.title.text) { item in
-                        if let content = item.content {
-                            NavigationLink(
-                                destination: DestinationsFloorView(
-                                    sections: content.sections)
-                                .tag(item.title.text)
-                                .environmentObject(modelData),
-                                label: {
-                                    Text(item.title.text)
-                                        .accessibilityLabel(section.title.pron)
-                                }
-                            )
-                        } else {
-                            Text(item.title.text)
+            } else {
+                ForEach(sections.sections, id: \.self) {section in
+                    ForEach(section.items, id: \.self) { item in
+                        if !item.hidden {
+                            contentView(for: item, in: section)
                         }
                     }
                 }
@@ -159,15 +57,118 @@ struct DestinationsFloorView: View {
         }
         .listStyle(PlainListStyle())
         .onAppear {
-            if sections.isEmpty {
+            if sections.itemCount == 0 {
                 do {
-                    sections = try ResourceManager.shared.load().directory.sections
+                    sections = try ResourceManager.shared.load().directory
                 } catch {
                 }
             }
         }
     }
+
+    @ViewBuilder
+    func contentView(for item: Directory.SectionItem, in section: Directory.Section) -> some View {
+        let tourManager = modelData.tourManager
+
+        // SectionItem contains sections (content)
+        if let content = item.content {
+            if content.itemCount > 0 {
+                NavigationLink(
+                    destination: DestinationsView(sections: content)
+                        .tag(item.title.text)
+                        .environmentObject(modelData)
+                ) {
+                    Text(item.title.text)
+                        .accessibilityLabel(section.title.pron)
+                }
+            } else {
+                // Empty Section
+            }
+        // SectionItem is a destination
+        } else {
+            HStack {
+                Button(action: {
+                    if (modelData.userInfo.destinations.count > 0) {
+                        targetDestination = item
+                        isConfirming = true
+                    } else {
+                        // if there is no destination, start immediately
+                        modelData.share(destination: item, clear: false)
+                        modelData.needToStartAnnounce(wait: true)
+                        NavigationUtil.popToRootView()
+                    }
+                }){
+                    VStack(alignment: .leading) {
+                        Text(item.title.text)
+                            .font(.body)
+                            .accessibilityLabel(item.title.pron)
+                            .multilineTextAlignment(.leading)
+                            .accessibilityHint(Text("DOUBLETAP_TO_ADD_A_DESTINATION"))
+                        if item.summaryMessage.text != ""{
+                            Text(item.summaryMessage.text)
+                                .font(.caption)
+                                .multilineTextAlignment(.leading)
+                        }
+                    }
+                }
+                .buttonStyle(.borderless)
+                .confirmationDialog(Text("ADD_A_DESTINATION"), isPresented: $isConfirming, presenting: targetDestination) {
+                detail in
+                    Button {
+                        if let destination = targetDestination {
+                            modelData.share(destination: destination)
+                            NavigationUtil.popToRootView()
+                            targetDestination = nil
+                        }
+                    } label: {
+                        Text("CLEAR_ALL_THEN_ADD")
+                    }
+                    Button {
+                        if let destination = targetDestination {
+                            modelData.share(destination: destination, clear: false, addFirst: true)
+                            NavigationUtil.popToRootView()
+                            targetDestination = nil
+                        }
+                    } label: {
+                        Text("ADD_TO_FIRST")
+                    }
+                    Button {
+                        if let destination = targetDestination {
+                            modelData.share(destination: destination, clear: false)
+                            NavigationUtil.popToRootView()
+                            targetDestination = nil
+                        }
+                    } label: {
+                        Text("ADD_TO_LAST")
+                    }
+                    Button("Cancel", role: .cancel) {
+                        targetDestination = nil
+                    }
+                } message: { detail in
+                    let message = LocalizedStringKey("ADD_A_DESTINATION_MESSAGE \(modelData.userInfo.destinations.count, specifier: "%d")")
+                    Text(message)
+                }
+                Spacer()
+                if item.startMessage.text != "" {
+                    ZStack{
+                        Image(systemName: "info.circle")
+                            .accessibilityLabel(Text("Details"))
+                            .accessibilityRemoveTraits(.isImage)
+                            .accessibilityAddTraits(.isButton)
+                            .accessibilityHint(Text("DOUBLETAP_TO_VIEW_DETAILS"))
+                            .foregroundColor(.blue)
+                        NavigationLink(
+                            destination: DestinationDetailView(destination: item).environmentObject(modelData).heartbeat("DestinationsView(\(item.title.text))")
+                        ){EmptyView()}
+                        .frame(width: 0, height: 0)
+                        .opacity(0)
+                    }
+                }
+            }
+        }
+    }
 }
+
 
 struct DestinationsView_Previews: PreviewProvider {
 
@@ -180,7 +181,7 @@ struct DestinationsView_Previews: PreviewProvider {
     static var floor3_item_previews: some View {
         let modelData = CaBotAppModel()
         modelData.modeType = .Advanced
-        var floorDestinationsForPreviews: [Directory.DirectorySection] = []
+        var floorDestinationsForPreviews: [Directory.Section] = []
         do {
             floorDestinationsForPreviews = try Directory.loadForPreview().sections
         } catch {
@@ -188,8 +189,7 @@ struct DestinationsView_Previews: PreviewProvider {
         }
 
         return DestinationsView(
-            destination: floorDestinationsForPreviews.first?.items.first,
-            destinations: floorDestinationsForPreviews.first?.items ?? []
+            sections: floorDestinationsForPreviews.first?.items.first?.content ?? Directory.Sections()
         )
         .environmentObject(modelData)
         .previewDisplayName("Floor 3")
@@ -198,7 +198,7 @@ struct DestinationsView_Previews: PreviewProvider {
     static var floor5_item_previews: some View {
         let modelData = CaBotAppModel()
         modelData.modeType = .Advanced
-        var floorDestinationsForPreviews: [Directory.DirectorySection] = []
+        var floorDestinationsForPreviews: [Directory.Section] = []
         do {
             floorDestinationsForPreviews = try Directory.loadForPreview().sections
         } catch {
@@ -206,8 +206,7 @@ struct DestinationsView_Previews: PreviewProvider {
         }
 
         return DestinationsView(
-            destination: floorDestinationsForPreviews.first?.items.first,
-            destinations: floorDestinationsForPreviews.first?.items ?? []
+            sections: floorDestinationsForPreviews.first?.items.last?.content ?? Directory.Sections()
         )
         .environmentObject(modelData)
         .previewDisplayName("Floor 5")
@@ -216,17 +215,18 @@ struct DestinationsView_Previews: PreviewProvider {
     static var floor_previews: some View {
         let modelData = CaBotAppModel()
         modelData.modeType = .Advanced
-        var floorDestinationsForPreviews: [Directory.DirectorySection] = []
+        var floorDestinationsForPreviews: Directory.Sections = Directory.Sections()
         do {
-            floorDestinationsForPreviews = try Directory.loadForPreview().sections
+            floorDestinationsForPreviews = try Directory.loadForPreview()
         } catch {
             NSLog("Error loading tours for preview: \(error)")
         }
 
-        return DestinationsFloorView(
+        return DestinationsView(
             sections: floorDestinationsForPreviews
         )
         .environmentObject(modelData)
         .previewDisplayName("Floors")
     }
 }
+

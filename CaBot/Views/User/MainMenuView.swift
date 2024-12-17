@@ -362,7 +362,7 @@ struct MainMenus: View {
         if modelData.serverIsReady {
             Section(header: Text("Navigation")) {
                 NavigationLink(
-                    destination: DestinationsFloorView()
+                    destination: DestinationsView()
                         .environmentObject(modelData).heartbeat("DestinationsView"),
                     label: {
                         Text("SELECT_DESTINATION")

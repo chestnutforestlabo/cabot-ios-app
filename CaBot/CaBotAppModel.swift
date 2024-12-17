@@ -584,6 +584,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         didSet {
             UserDefaults.standard.setValue(modeType.rawValue, forKey: modeTypeKey)
             UserDefaults.standard.synchronize()
+            ResourceManager.shared.modeType = modeType
         }
     }
 

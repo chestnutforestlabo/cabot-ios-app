@@ -48,7 +48,7 @@ class ResourceManager {
 
     public struct Result {
         var tours: [Tour]
-        var directory: Directory.DirectorySections
+        var directory: Directory.Sections
     }
 
     public func initServer() throws -> Bool {
@@ -251,12 +251,22 @@ class KeyedI18NText: Equatable {
     }
 }
 
-class I18NText: Equatable {
+class I18NText: Equatable, Hashable {
     private var _text: [String: String] = [:]
     private var _pron: [String: String] = [:]
 
     static func == (lhs: I18NText, rhs: I18NText) -> Bool {
         return lhs._text == rhs._text && lhs._pron == rhs._pron
+    }
+    func hash(into hasher: inout Hasher) {
+        for item in _text {
+            hasher.combine(item.key)
+            hasher.combine(item.value)
+        }
+        for item in _pron {
+            hasher.combine(item.key)
+            hasher.combine(item.value)
+        }
     }
 
     init(text: [String: String], pron: [String: String]) {
@@ -685,25 +695,52 @@ class Feature : Decodable,  Hashable {
 
 
 class Directory {
-    struct DirectorySections: Decodable {
-        let sections: [DirectorySection]
+    struct Sections: Decodable {
+        let sections: [Section]
+        let showSectionIndex: Bool
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            sections = try container.decodeIfPresent([DirectorySection].self, forKey: .sections) ?? []
+            sections = try container.decodeIfPresent([Section].self, forKey: .sections) ?? []
+            showSectionIndex = try container.decodeIfPresent(Bool.self, forKey: .showSectionIndex) ?? false
+        }
+
+        init() {
+            sections = []
+            showSectionIndex = false
         }
 
         private enum CodingKeys: String, CodingKey {
             case sections
+            case showSectionIndex
+        }
+
+        var itemCount: Int {
+            get {
+                sections.reduce(0) { r, section in r + section.itemCount }
+            }
+        }
+
+        var showSections: Bool {
+            return showSectionIndex || Double(itemCount) / Double(sections.count) > 1.5
         }
     }
 
-    struct DirectorySection: Decodable, Hashable {
+    struct Section: Decodable, Hashable {
         func hash(into hasher: inout Hasher) {
-            hasher.combine(title.text)
+            hasher.combine(title)
+            for item in items {
+                hasher.combine(item)
+            }
         }
         let title: I18NText
         let items: [SectionItem]
+
+        var itemCount: Int {
+            get {
+                items.reduce(0) {r, item in r + (item.hidden ? 0 : 1) }
+            }
+        }
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -719,13 +756,24 @@ class Directory {
     struct SectionItem: Destination, Decodable {
         
         static func == (lhs: Directory.SectionItem, rhs: Directory.SectionItem) -> Bool {
-            lhs.nodeID == rhs.nodeID
+            lhs.title == rhs.title && lhs.nodeID == rhs.nodeID
+        }
+        // Conforming to Hashable
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(title)
+            if let nodeID = nodeID {
+                hasher.combine(nodeID)
+            }
+        }
+
+        public var hidden: Bool {
+            self.forDemonstration && ResourceManager.shared.modeType != .Advanced
         }
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             title = I18NText.decode(decoder: decoder, baseKey: "title")
-            content = try container.decodeIfPresent(DirectorySections.self, forKey: .content)
+            content = try container.decodeIfPresent(Sections.self, forKey: .content)
 
             if content == nil {
                 subtitle = try container.decodeIfPresent(String.self, forKey: .subtitle) ?? "Unknown"
@@ -764,10 +812,6 @@ class Directory {
             case content, subtitle, titlePron, subtitlePron, title, nodeID, forDemonstration
         }
 
-        // Conforming to Hashable
-        func hash(into hasher: inout Hasher) {
-            hasher.combine(nodeID)
-        }
 
         var value: String? {
             get {
@@ -776,7 +820,7 @@ class Directory {
         }
 
         var title: I18NText = I18NText.empty()
-        var content: DirectorySections? = nil
+        var content: Sections? = nil
         var summaryMessage: I18NText = I18NText.empty()
         var startMessage: I18NText = I18NText.empty()
         var arriveMessages: [I18NText]? = nil
@@ -791,49 +835,15 @@ class Directory {
         var forDemonstration: Bool = false
     }
 
-    fileprivate static func load() throws -> DirectorySections {
-        let configData = try ResourceManager.shared.fetchData(from: .config)
-        struct InitialLocation: Codable {
-            let lat: Double
-            let lng: Double
-            let floor: Int
-        }
-
-        struct Config: Codable {
-            let DO_NOT_USE_SAVED_CENTER: String
-            let INITIAL_LOCATION: InitialLocation
-            let MAP_SERVICE: String
-            let MAP_SERVICE_USE_HTTP: String
-        }
-
-        let config = try JSONDecoder().decode(Config.self, from: configData)
-
-        let lat = config.INITIAL_LOCATION.lat
-        let lng = config.INITIAL_LOCATION.lng
-        let dist = 5000
-        let user = "user-id"
-
-
-        let directoryData = try ResourceManager.shared.fetchData(from: .directory, lat: lat, lng: lng, dist: dist, user: user)
-        let directoryDataDecoded = try JSONDecoder().decode(DirectorySections.self, from: directoryData)
+    fileprivate static func load() throws -> Sections {
+        let directoryData = try ResourceManager.shared.fetchData(from: .directory)
+        let directoryDataDecoded = try JSONDecoder().decode(Sections.self, from: directoryData)
         return directoryDataDecoded
     }
 
-    static func loadForPreview() throws -> DirectorySections {
-        let data: Data
-        do {
-            data = try ResourceManager.shared.fetchDataPreview(for: .directory)
-        } catch {
-            NSLog("Failed to read file: \(error.localizedDescription)")
-            throw MetadataError.contentLoadError
-        }
-        let directoryDataDecoded: DirectorySections
-        do {
-            directoryDataDecoded = try JSONDecoder().decode(DirectorySections.self, from: data)
-        } catch {
-            NSLog("Failed to decode JSON: \(error)")
-            throw MetadataError.contentLoadError
-        }
+    static func loadForPreview() throws -> Sections {
+        let data = try ResourceManager.shared.fetchDataPreview(for: .directory)
+        let directoryDataDecoded = try JSONDecoder().decode(Sections.self, from: data)
         return directoryDataDecoded
     }
 

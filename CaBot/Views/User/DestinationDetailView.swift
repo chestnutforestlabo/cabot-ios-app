@@ -107,7 +107,7 @@ struct DestinationDetailView_Previews: PreviewProvider {
         let modelData = CaBotAppModel()
         modelData.modeType = .Normal
 
-        var floorDestinationsForPreviews: Directory.DirectorySections
+        var floorDestinationsForPreviews: Directory.Sections
         do {
             floorDestinationsForPreviews = try Directory.loadForPreview()
             return AnyView(DestinationDetailView(destination: floorDestinationsForPreviews.sections[0].items[0])
