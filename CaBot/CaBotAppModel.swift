@@ -1176,10 +1176,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.activityLog(category: "tour-text", text: manager.title.text, memo: manager.title.pron)
         let data = manager.getTourSaveData()
         self.share(user_info: SharedInfo(type: .Tour, value: data.toJsonString()))
-        //self.share(user_info: SharedInfo(type: .Tour, value: manager.title.text))
-        //self.share(user_info: SharedInfo(type: .CurrentDestination, value: manager.currentDestination?.title.text ?? ""))
-        //self.share(user_info: SharedInfo(type: .NextDestination, value: manager.nextDestination?.title.text ?? ""))
-        //self.share(user_info: SharedInfo(type: .Destinations, value: manager.destinations.map { $0.title.text }.joined(separator: ",")))
     }
 
     func clearAll(){
@@ -1618,9 +1614,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     func shareAllUserConfig() {
         let data = tourManager.getTourSaveData()
         self.share(user_info: SharedInfo(type: .Tour, value: data.toJsonString()))
-        //self.share(user_info: SharedInfo(type: .CurrentDestination, value: self.tourManager.currentDestination?.title.text ?? ""))
-        //self.share(user_info: SharedInfo(type: .NextDestination, value: self.tourManager.nextDestination?.title.text ?? ""))
-        //self.share(user_info: SharedInfo(type: .Destinations, value: self.tourManager.destinations.map { $0.title.text }.joined(separator: ",")))
         self.share(user_info: SharedInfo(type: .ChangeLanguage, value: self.resourceLang))
         self.share(user_info: SharedInfo(type: .ChangeUserVoiceType, value: "\(self.userVoice?.id ?? "")", flag1: false))
         self.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(self.userSpeechRate)", flag1: false))
@@ -1959,20 +1952,15 @@ class UserInfoBuffer {
             break
         case .Tour:
             clear()
-            print("user share \(userInfo)")
             if let data = userInfo.value.data(using: .utf8) {
-                print("user share \(data)")
                 if let saveData = try? JSONDecoder().decode(TourSaveData.self, from: data) {
-                    print("user share decode \(saveData)")
                     do {
-                        print("user share loading")
                         let _ = try ResourceManager.shared.load()
-                        print("user share loaded")
                         selectedTour = TourData.getTour(by: saveData.id)
                         currentDestination = ResourceManager.shared.getDestination(by: saveData.currentDestination)
                         var first = true
                         for destination in saveData.destinations {
-                            if let dest = ResourceManager.shared.getDestination(by: saveData.currentDestination) {
+                            if let dest = ResourceManager.shared.getDestination(by: destination) {
                                 if first {
                                     first = false
                                     nextDestination = dest
