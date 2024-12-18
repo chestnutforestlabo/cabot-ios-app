@@ -425,7 +425,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
     }
 
-    @Published var serverIsReady: Bool = false
+    enum ServerStatus {
+        case Init
+        case NotReady
+        case Loading
+        case Ready
+    }
+
+    @Published var serverIsReady: ServerStatus = .Init
 
     var suitcaseFeatures: SuitcaseFeatures = SuitcaseFeatures()
 
@@ -752,7 +759,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         })
     }
 
-    var backgroundQueue: DispatchQueue?
 
     func updateNetworkConfig() {
         NSLog("updateNetworkConfig \([self.primaryAddr, self.secondaryAddr])")
@@ -761,22 +767,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.tcpService.stop()
         }
         self.addressCandidate.update(addresses: [self.primaryAddr, self.secondaryAddr])
-
-
-        if backgroundQueue == nil {
-            backgroundQueue = DispatchQueue.init(label: "Network Queue")
-        }
-        backgroundQueue?.async {
-            if let _ = try? ResourceManager.shared.load() {
-                DispatchQueue.main.async {
-                    self.serverIsReady = true
-                }
-            } else {
-                DispatchQueue.main.async {
-                    self.serverIsReady = false
-                }
-            }
-        }
     }
 
     func getCurrentAddress() -> String {
@@ -1261,6 +1251,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     // MARK: CaBotServiceDelegate
+    private var backgroundQueue: DispatchQueue?
 
     func caBot(service: any CaBotTransportProtocol, centralConnected: Bool) {
         guard self.preview == false else {return}
@@ -1279,17 +1270,38 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.tts.speak(text, force: true, priority:.Normal) { _, _ in }
 
             if self.suitcaseConnected {
-                if self.modeType != .Normal{
-                    self.share(user_info: SharedInfo(type: .RequestUserInfo, value: "", flag1: false)) // do not speak
-                }
-                else if self.modeType == .Normal{
-                    tourManager.tourDataLoad()
-                    shareAllUserConfig()
-                }
+                loadFromServer()
+            }
+        }
+    }
+
+    func loadFromServer() {
+        DispatchQueue.main.async {
+            self.serverIsReady = .Loading
+        }
+        if backgroundQueue == nil {
+            backgroundQueue = DispatchQueue.init(label: "Network Queue")
+        }
+        backgroundQueue?.async {
+            if let _ = try? ResourceManager.shared.load() {
                 DispatchQueue.main.async {
-                    _ = self.fallbackService.manage(command: .lang, param: self.resourceLang)
-                    _ = self.fallbackService.manage(command: .reqfeatures)
+                    self.serverIsReady = .Ready
+                    if self.modeType != .Normal{
+                        self.share(user_info: SharedInfo(type: .RequestUserInfo, value: "", flag1: false)) // do not speak
+                    }
+                    else if self.modeType == .Normal{
+                        self.tourManager.tourDataLoad()
+                        self.shareAllUserConfig()
+                    }
                 }
+            } else {
+                DispatchQueue.main.async {
+                    self.serverIsReady = .NotReady
+                }
+            }
+            DispatchQueue.main.async {
+                _ = self.fallbackService.manage(command: .lang, param: self.resourceLang)
+                _ = self.fallbackService.manage(command: .reqfeatures)
             }
         }
     }
@@ -1573,7 +1585,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         // only User
         if userInfo.type == .OverrideTour {
             do {
-                let _ = try ResourceManager.shared.load()
+                //let _ = try ResourceManager.shared.load()
                 if let tour = TourData.getTour(by: userInfo.value) {
                     tourManager.set(tour: tour)
                     needToStartAnnounce(wait: true)
@@ -1584,7 +1596,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
         if userInfo.type == .OverrideDestination {
             do {
-                let _ = try ResourceManager.shared.load()
+                //let _ = try ResourceManager.shared.load()
                 if let dest = Directory.getDestination(by: userInfo.value) {
                     if userInfo.flag1 {
                         self.clearAll()
@@ -1956,7 +1968,7 @@ class UserInfoBuffer {
             if let data = userInfo.value.data(using: .utf8) {
                 if let saveData = try? JSONDecoder().decode(TourSaveData.self, from: data) {
                     do {
-                        let _ = try ResourceManager.shared.load()
+                        //let _ = try ResourceManager.shared.load()
                         selectedTour = TourData.getTour(by: saveData.id)
                         currentDestination = ResourceManager.shared.getDestination(by: saveData.currentDestination)
                         var first = true

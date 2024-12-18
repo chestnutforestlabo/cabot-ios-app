@@ -58,12 +58,32 @@ class ResourceManager {
         return true
     }
 
-    private let loadSemaphore = DispatchSemaphore(value: 1)
-    public func load() throws -> Result {
+    public var isServerDataReady: Bool {
+        get {
+            lastResult != nil
+        }
+    }
+
+    public func invalidate() {
         loadSemaphore.wait()
         defer {
             loadSemaphore.signal()
         }
+        lastResult = nil
+    }
+
+    private var lastResult: Result? = nil
+    private let loadSemaphore = DispatchSemaphore(value: 1)
+    public func load() throws -> Result {
+        if let lastResult {
+            print("loading cache")
+            return lastResult
+        }
+        loadSemaphore.wait()
+        defer {
+            loadSemaphore.signal()
+        }
+        print("loading")
         do {
             // need to load in this order to build structure correctly
             // make suer the server is initialized with the user ID
@@ -74,12 +94,14 @@ class ResourceManager {
             let tourData = try TourData.load()
             // directory depends on features and messages
             let directory = try Directory.load()
-
-            return Result(tours: tourData.tours, directory: directory)
+            lastResult = Result(tours: tourData.tours, directory: directory)
+            if let lastResult {
+                return lastResult
+            }
         } catch {
             print("Error")
-            throw ResourceManagerError.contentLoadError
         }
+        throw ResourceManagerError.contentLoadError
     }
 
     public func loadForPreview() throws -> Result {
@@ -123,7 +145,6 @@ class ResourceManager {
     }
 
     private let session: URLSession
-
     private init() {
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .reloadIgnoringLocalCacheData // Ignore local cache
@@ -827,7 +848,6 @@ class Directory {
         static func == (lhs: Directory.SectionItem, rhs: Directory.SectionItem) -> Bool {
             lhs.title == rhs.title && lhs.nodeID == rhs.nodeID
         }
-        // Conforming to Hashable
         func hash(into hasher: inout Hasher) {
             hasher.combine(title)
             if let nodeID = nodeID {
@@ -1080,337 +1100,3 @@ class NavigationSetting: Decodable, NavigationSettingProtocol {
         }
     }
 }
-
-/*
-import Yams
-
-
-enum SourceType: String, Decodable {
-    case local
-    case remote
-}
-
-extension CodingUserInfoKey {
-    static let src = CodingUserInfoKey(rawValue: "src")!
-    static let i18n = CodingUserInfoKey(rawValue: "i18n")!
-    static let refCount = CodingUserInfoKey(rawValue: "refCount")!
-    static let error = CodingUserInfoKey(rawValue: "error")!
-}
-
-func yamlPath(_ path: [CodingKey]) -> String{
-    var ret:String = ""
-    for e in path {
-        if let index = e.intValue {
-            ret += "[\(index)]"
-        } else {
-            ret += "/[\(e.stringValue)]"
-        }
-    }
-    return ret
-}
-
-struct Source: Decodable, Hashable, CustomStringConvertible {
-    static func == (lhs: Source, rhs: Source) -> Bool {
-        return lhs.base == rhs.base && lhs.type == rhs.type && lhs.src == rhs.src
-    }
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(base)
-        hasher.combine(type)
-        hasher.combine(src)
-    }
-    var description: String {
-        var exists = "not exists"
-        if let content = self.content {
-            exists = "content length=\(content.count)"
-        }
-        return "\(self.src) - (\(exists))"
-    }
-    
-    var warn: String? {
-        get {
-            let warn = BufferedInfo()
-            if let content = self.content {
-                if let lang = LanguageDetector(string: content).detect() {
-                    if lang != i18n.langCode {
-                        warn.add(info: "Different language detected: \(lang) - expected \(i18n.langCode)")
-                    }
-                }
-            }
-            return warn.summary()
-        }
-    }
-    
-    var error: String? {
-        get {
-            let error = BufferedInfo()
-            if let _ = self.content {
-            } else {
-                error.add(info: "Content not found")
-            }
-            return error.summary()
-        }
-    }
-    
-    let base: URL?
-    let type: SourceType
-    let _src: String
-    var src: String {
-        get {
-            return String(format:_src, i18n.langCode)
-        }
-    }
-    let i18n: I18N
-
-    var url: URL? {
-        get {
-            switch(type) {
-            case .local:
-                let langSrc = String(format: src, i18n.langCode)
-                return base?.appendingPathComponent(langSrc)
-            case .remote:
-                return URL(string:src)
-            }
-        }
-    }
-
-    var content: String? {
-        get {
-            guard let url = url  else { return nil }
-            guard let text = try? String(contentsOf: url) else { return nil }
-            return text.replacingOccurrences(of: "\r\n", with: "\n")
-        }
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case type
-        case src
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        i18n = decoder.userInfo[.i18n] as! I18N
-        type = try container.decode(SourceType.self, forKey: .type)
-        _src = try container.decode(String.self, forKey: .src)
-        base = (decoder.userInfo[.src] as? URL)?.deletingLastPathComponent()
-    }
-
-    init(base: URL?, type:SourceType, src:String, i18n:I18N) {
-        self.base = base
-        self.type = type
-        self._src = src
-        self.i18n = i18n
-    }
-}
-
-struct CustomMenu: Decodable, Hashable {
-    static func == (lhs: CustomMenu, rhs: CustomMenu) -> Bool {
-        lhs.id == rhs.id
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-
-    let title: String
-    let id: String
-    let script: Source
-    let function: String
-}
-
-struct Metadata: Decodable{
-    let identifier: String
-    let name: I18NText
-    let i18n: I18N
-    let langCode: String
-    let conversation: Source?
-    let destinationAll: Source?
-    let destinations: Source?
-    let tours: Source?
-    let custom_menus: [CustomMenu]?
-
-    static func load(at url: URL) throws -> Metadata {
-        do {
-            let str = try String(contentsOf: url)
-            var userInfo:[CodingUserInfoKey : Any] = [:]
-            userInfo[.src] = url
-            userInfo[.i18n] = I18N.shared
-            let yamlDecoder = YAMLDecoder()
-            return try yamlDecoder.decode(Metadata.self, from: str, userInfo: userInfo)
-        } catch let error as YamlError {
-            throw MetadataError.yamlParseError(error: error)
-        }
-    }
-
-    enum CodingKeys: CodingKey {
-        case name
-        case language
-        case i18n
-        case conversation
-        case destinationAll
-        case destinations
-        case tours
-        case custom_menus
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-
-        // needs to have I18N instance
-        let i18n = decoder.userInfo[.i18n] as! I18N
-        self.i18n = i18n
-        if let language = try? container.decodeIfPresent(String.self, forKey: .language) {
-            i18n.set(lang: language)
-        }
-        self.langCode = i18n.langCode
-
-        self.name = I18NText.decode(decoder: decoder, baseKey: CodingKeys.name.stringValue)
-        self.identifier = self.name.text
-        self.conversation = try? container.decodeIfPresent(Source.self, forKey: .conversation)
-        self.destinationAll = try? container.decodeIfPresent(Source.self, forKey: .destinationAll)
-        self.destinations = try? container.decodeIfPresent(Source.self, forKey: .destinations)
-        self.tours = try? container.decodeIfPresent(Source.self, forKey: .tours)
-        self.custom_menus = try? container.decodeIfPresent([CustomMenu].self, forKey: .custom_menus)
-    }
-}
-
-class Resource: Hashable {
-    let base: URL
-    var langOverride: String?
-
-    init(at url: URL) throws {
-        base = url
-        metadata = try Metadata.load(at: url.appendingPathComponent(Resource.METADATA_FILE_NAME))
-    }
-
-    static func == (lhs: Resource, rhs: Resource) -> Bool {
-        lhs.id == rhs.id
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-
-    static let METADATA_FILE_NAME: String = "_metadata.yaml"
-
-    private let metadata: Metadata
-
-    var identifier:String {
-        get {
-            metadata.identifier
-        }
-    }
-
-    var name:String {
-        get {
-            metadata.name.text
-        }
-    }
-
-    var id:String {
-        get {
-            base.path
-        }
-    }
-
-    var lang: String {
-        get {
-            self.langOverride ?? metadata.langCode
-        }
-        set {
-            self.langOverride = newValue
-            I18N.shared.set(lang: newValue)  // TODO unify language model
-        }
-    }
-
-    var locale: Locale {
-        return Locale.init(identifier: self.lang)
-    }
-
-    var conversationSource: Source? {
-        get {
-            if let c = metadata.conversation {
-                return c
-            }
-            return nil
-        }
-    }
-    
-    var destinationAllSource: Source? {
-        get {
-            if let d = metadata.destinationAll {
-                return d
-            }
-            return nil
-        }
-    }
-
-    var destinationsSource: Source? {
-        get {
-            if let d = metadata.destinations {
-                return d
-            }
-            return nil
-        }
-    }
-
-    var toursSource: Source? {
-        get {
-            if let t = metadata.tours {
-                return t
-            }
-            return nil
-        }
-    }
-
-    var customeMenus: [CustomMenu] {
-        get {
-            if let cm = metadata.custom_menus {
-                return cm
-            }
-            return []
-        }
-    }
-
-    var languages: [String] {
-        get {
-            var languages:[String] = []
-            for lang in metadata.name.languages {
-                if lang != "Base" {
-                    languages.append(lang)
-                }
-            }
-
-            if languages.contains(where: {lang in lang == metadata.langCode}) == false {
-                languages.append(metadata.langCode)
-            }
-            return languages
-        }
-    }
-}
-
-
-
-struct Reference: CustomStringConvertible {
-    let file: String
-    let value: String
-
-    static func from(ref: String) -> Reference? {
-        if let index = ref.firstIndex(of: "/") {
-            let file = String(ref[..<index])
-            let value = String(ref[ref.index(index, offsetBy: 1)...])
-            return Reference(file: file, value:value)
-        }
-        return nil
-    }
-
-    var description: String {
-        return "\(file)/\(value)"
-    }
-}
-
-
-
-
-
-
-*/

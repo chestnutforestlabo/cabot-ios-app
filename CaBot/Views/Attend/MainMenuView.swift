@@ -29,8 +29,6 @@ struct MainMenuView: View {
 
     var body: some View {
         Form {
-            ResourceDownloadRetryUIView()
-                .environmentObject(modelData)
             UserInfoView()
                 .environmentObject(modelData)
             if modelData.noSuitcaseDebug {
@@ -43,7 +41,7 @@ struct MainMenuView: View {
             }
             MainMenus()
                 .environmentObject(modelData)
-                .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
+                .disabled((!modelData.suitcaseConnected && !modelData.menuDebug) || modelData.serverIsReady != .Ready)
             StatusMenus()
                 .environmentObject(modelData)
             MapMenus()

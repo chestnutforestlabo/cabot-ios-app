@@ -38,16 +38,21 @@ struct MainMenuView: View {
             }
             DestinationMenus()
                 .environmentObject(modelData)
-            ResourceDownloadRetryUIView()
-                .environmentObject(modelData)
             MainMenus()
                 .environmentObject(modelData)
-                .disabled(!modelData.suitcaseConnected && !modelData.menuDebug)
+                .disabled((!modelData.suitcaseConnected && !modelData.menuDebug) || modelData.serverIsReady != .Ready)
             StatusMenus()
                 .environmentObject(modelData)
             SettingMenus()
                 .environmentObject(modelData)
         }
+        .disabled(modelData.serverIsReady == .Loading)
+        .overlay(Group {
+            if modelData.serverIsReady == .Loading {
+                ProgressView("Loading...")
+                    .progressViewStyle(CircularProgressViewStyle())
+            }
+        }, alignment: .center)
     }
 
     func hasAnyAction() -> Bool {
@@ -270,21 +275,26 @@ struct MainMenus: View {
     @EnvironmentObject var modelData: CaBotAppModel
 
     var body: some View {
-        if modelData.serverIsReady {
-            Section(header: Text("Navigation")) {
-                NavigationLink(
-                    destination: DestinationsView()
-                        .environmentObject(modelData).heartbeat("DestinationsView"),
-                    label: {
-                        Text("SELECT_DESTINATION")
-                    })
-                NavigationLink(
-                    destination: ToursView()
-                        .environmentObject(modelData).heartbeat("ToursView"),
-                    label: {
-                        Text("SELECT_TOUR")
-                    })
+        Section(header: Text("Navigation"), footer: Group {
+            if modelData.serverIsReady == .NotReady {
+                Text("Retry Alert")
+                    .font(.body)
+                    .foregroundColor(.red)
+                    .lineLimit(1)
             }
+        }) {
+            NavigationLink(
+                destination: DestinationsView()
+                    .environmentObject(modelData).heartbeat("DestinationsView"),
+                label: {
+                    Text("SELECT_DESTINATION")
+                })
+            NavigationLink(
+                destination: ToursView()
+                    .environmentObject(modelData).heartbeat("ToursView"),
+                label: {
+                    Text("SELECT_TOUR")
+                })
         }
     }
 }

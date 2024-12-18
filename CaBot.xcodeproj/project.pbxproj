@@ -112,8 +112,6 @@
 		D7D7A6FB2BFECB490072ADF6 /* TourDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7D7A6FA2BFECB490072ADF6 /* TourDetailView.swift */; };
 		D7E54B522C0CD03A002FE3C4 /* MainMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E54B512C0CD03A002FE3C4 /* MainMenuView.swift */; };
 		D7F6BE6E2C2A57C300CD8258 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7F6BE6D2C2A57C300CD8258 /* SettingView.swift */; };
-		E46C82642C18081100917AB3 /* ResourceDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46C82632C18081100917AB3 /* ResourceDownload.swift */; };
-		E46C82652C18081100917AB3 /* ResourceDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46C82632C18081100917AB3 /* ResourceDownload.swift */; };
 		E561455F2A6E02A8005CF82F /* RosWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E561455E2A6E02A8005CF82F /* RosWebView.swift */; };
 /* End PBXBuildFile section */
 
@@ -222,7 +220,6 @@
 		D7D7A6FA2BFECB490072ADF6 /* TourDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TourDetailView.swift; sourceTree = "<group>"; };
 		D7E54B512C0CD03A002FE3C4 /* MainMenuView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainMenuView.swift; sourceTree = "<group>"; };
 		D7F6BE6D2C2A57C300CD8258 /* SettingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
-		E46C82632C18081100917AB3 /* ResourceDownload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceDownload.swift; sourceTree = "<group>"; };
 		E561455E2A6E02A8005CF82F /* RosWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RosWebView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -369,7 +366,6 @@
 				30E99DA3266B2216001ACAAA /* BeaconSampler.swift */,
 				30E50DCB269F672800729ABD /* TourManager.swift */,
 				3096BF1726A5D0990066F256 /* TTSHelper.swift */,
-				E46C82632C18081100917AB3 /* ResourceDownload.swift */,
 			);
 			path = CaBot;
 			sourceTree = "<group>";
@@ -764,7 +760,6 @@
 				E561455F2A6E02A8005CF82F /* RosWebView.swift in Sources */,
 				30E50DD8269F784A00729ABD /* MainMenuView.swift in Sources */,
 				7EDF3C4229D4776D00AD1115 /* I18NExtension.swift in Sources */,
-				E46C82642C18081100917AB3 /* ResourceDownload.swift in Sources */,
 				3096BF1826A5D0990066F256 /* TTSHelper.swift in Sources */,
 				308FCE1D27D8F4D3009FCC7B /* SystemStatusView.swift in Sources */,
 				30E50DDB269F7E3800729ABD /* CaBot.xcdatamodeld in Sources */,
@@ -831,7 +826,6 @@
 				D7CC05042BFB352700C0B10A /* Logging.m in Sources */,
 				D7CC05052BFB352700C0B10A /* RootView.swift in Sources */,
 				D7CC05062BFB352700C0B10A /* NavUtil.m in Sources */,
-				E46C82652C18081100917AB3 /* ResourceDownload.swift in Sources */,
 				D7D7A6FB2BFECB490072ADF6 /* TourDetailView.swift in Sources */,
 				D7F6BE6E2C2A57C300CD8258 /* SettingView.swift in Sources */,
 				D7CC05092BFB352700C0B10A /* RosWebView.swift in Sources */,
