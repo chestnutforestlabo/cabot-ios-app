@@ -121,13 +121,14 @@ class ResourceManager {
         return nil
     }
 
-    public func loadContent(path: String?) -> URL? {
+    public func contentURL(path: String?) -> URL? {
         guard let path else { return nil }
         guard path.range(of: "^[A-Za-z]", options: .regularExpression) != nil else {
             return nil
         }
+        let replacedPath = path.replacingOccurrences(of: "%@", with: I18N.shared.langCode)
         guard let addressCandidate else { return nil }
-        guard let url = URL(string: "http://\(addressCandidate.getCurrent()):9090/map/\(path)") else {
+        guard let url = URL(string: "http://\(addressCandidate.getCurrent()):9090/map/\(replacedPath)") else {
             return nil
         }
 
@@ -147,6 +148,7 @@ class ResourceManager {
         if resultData != nil {
             return url
         }
+        NSLog("Could not load content at \(path) -> \(url)")
         return nil
     }
 
@@ -666,7 +668,7 @@ class TourDestination: Destination, Decodable {
         // TODO use ref not ref.description
         let destRef = TourData.getDestinationRef(by: ref.description)
         arrivalAngle = destRef?.arrivalAngle
-        content = ResourceManager.shared.loadContent(path: destRef?.content)
+        content = ResourceManager.shared.contentURL(path: destRef?.content)
         if let value = destRef?.waitingDestination {
             waitingDestination = WaitingDestination(value: value, arrivalAngle: destRef?.waitingDestinationAngle)
         }
@@ -951,7 +953,7 @@ class Directory {
                     }
                     if let destRef = TourData.getDestinationRef(by: nodeID) {
                         arrivalAngle = destRef.arrivalAngle
-                        content = ResourceManager.shared.loadContent(path: destRef.content)
+                        content = ResourceManager.shared.contentURL(path: destRef.content)
                         if let value = destRef.waitingDestination {
                             waitingDestination = WaitingDestination(value: value, arrivalAngle: destRef.arrivalAngle)
                         }
