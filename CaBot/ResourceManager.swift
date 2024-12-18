@@ -876,8 +876,14 @@ class Directory {
             }
         }
 
+        var sectionCount: Int {
+            get {
+                sections.reduce(0) { r, section in r + ((section.itemCount > 0) ? 1 : 0)}
+            }
+        }
+
         var showSections: Bool {
-            return showSectionIndex || Double(itemCount) / Double(sections.count) > 1.5
+            return Double(itemCount) / Double(sectionCount) > 1.5
         }
 
         func allDestinations() -> [any Destination] {
