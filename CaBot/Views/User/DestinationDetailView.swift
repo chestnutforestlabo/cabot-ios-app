@@ -40,14 +40,12 @@ struct DestinationDetailView: View {
                         Text(arriveMessage.text)
                     }
                 }
-                /*
-                if let url = destination.content?.url {
+                if let url = destination.content {
                     Button("Show more detail") {
                         modelData.contentURL = url
                         modelData.isContentPresenting = true
                     }
                 }
-                 */
                 Button("Add to destinations") {
                     if modelData.tourManager.hasDestination {
                         targetDestination = destination
