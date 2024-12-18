@@ -121,6 +121,35 @@ class ResourceManager {
         return nil
     }
 
+    public func loadContent(path: String?) -> URL? {
+        guard let path else { return nil }
+        guard path.range(of: "^[A-Za-z]", options: .regularExpression) != nil else {
+            return nil
+        }
+        guard let addressCandidate else { return nil }
+        guard let url = URL(string: "http://\(addressCandidate.getCurrent()):9090/map/\(path)") else {
+            return nil
+        }
+
+        var resultData: Data? = nil
+        let semaphore = DispatchSemaphore(value: 0)
+
+        let task = self.session.dataTask(with: url) { data, response, error in
+            defer { semaphore.signal() }
+            if let data = data,
+               let httpResponse = response as? HTTPURLResponse,
+               httpResponse.statusCode == 200 {
+                resultData = data
+            }
+        }
+        task.resume()
+        semaphore.wait()  // Wait until the network call finishes
+        if resultData != nil {
+            return url
+        }
+        return nil
+    }
+
     private var addressCandidate: AddressCandidate?
     private var config: Config?
 
@@ -610,7 +639,7 @@ class TourDestination: Destination, Decodable {
 
     var value: String
     var arrivalAngle: Int?
-    var content: String?
+    var content: URL?
     var summaryMessage: I18NText? = nil
     var startMessage: I18NText? = nil
     var arriveMessages: [I18NText]? = nil
@@ -637,7 +666,7 @@ class TourDestination: Destination, Decodable {
         // TODO use ref not ref.description
         let destRef = TourData.getDestinationRef(by: ref.description)
         arrivalAngle = destRef?.arrivalAngle
-        content = destRef?.content
+        content = ResourceManager.shared.loadContent(path: destRef?.content)
         if let value = destRef?.waitingDestination {
             waitingDestination = WaitingDestination(value: value, arrivalAngle: destRef?.waitingDestinationAngle)
         }
@@ -922,7 +951,7 @@ class Directory {
                     }
                     if let destRef = TourData.getDestinationRef(by: nodeID) {
                         arrivalAngle = destRef.arrivalAngle
-                        content = destRef.content
+                        content = ResourceManager.shared.loadContent(path: destRef.content)
                         if let value = destRef.waitingDestination {
                             waitingDestination = WaitingDestination(value: value, arrivalAngle: destRef.arrivalAngle)
                         }
@@ -975,7 +1004,7 @@ class Directory {
         }
         var arrivalAngle: Int?
         var title: I18NText = I18NText.empty()
-        var content: String?
+        var content: URL?
         var summaryMessage: I18NText? = nil
         var startMessage: I18NText? = nil
         var arriveMessages: [I18NText]? = nil
@@ -1078,7 +1107,7 @@ struct WaitingDestination: Destination {
         }
     }
     var arrivalAngle: Int?
-    var content: String?
+    var content: URL?
     var summaryMessage: I18NText?
     var startMessage: I18NText?
     var arriveMessages: [I18NText]?
@@ -1109,7 +1138,7 @@ protocol Destination: Hashable {
     //var pron: I18NText { get }
     var value: String { get }
     var arrivalAngle: Int? { get }
-    var content: String? { get }
+    var content: URL? { get }
     var summaryMessage: I18NText? { get }
     var startMessage: I18NText? { get }
     var arriveMessages: [I18NText]? { get }

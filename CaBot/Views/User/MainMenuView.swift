@@ -60,11 +60,9 @@ struct MainMenuView: View {
             return true
         }
         if let ad = modelData.tourManager.arrivedDestination {
-            /* TODO content
-            if let _ = ad.content?.url {
+            if let _ = ad.content {
                 return true
             }
-             */
             if modelData.tourManager.currentDestination == nil,
                let _ = ad.waitingDestination?.value,
                let _ = ad.waitingDestination?.title {
@@ -133,8 +131,7 @@ struct ArrivedActionMenus: View {
     
     var body: some View {
         if let ad = modelData.tourManager.arrivedDestination {
-            /* TODO content
-            if let contentURL = ad.content?.url {
+            if let contentURL = ad.content {
                 Button(action: {
                     modelData.open(content: contentURL)
                 }) {
@@ -145,7 +142,6 @@ struct ArrivedActionMenus: View {
                     })
                 }
             }
-             */
             if modelData.tourManager.currentDestination == nil,
                let _ = ad.waitingDestination?.value,
                let title = ad.waitingDestination?.title {

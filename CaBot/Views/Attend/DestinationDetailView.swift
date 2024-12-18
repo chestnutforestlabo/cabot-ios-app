@@ -39,14 +39,12 @@ struct DestinationDetailView: View {
                         Text(arriveMessage.text)
                     }
                 }
-                /* TODO content
-                if let url = destination.content?.url {
+                if let url = destination.content {
                     Button("Show more detail") {
                         modelData.contentURL = url
                         modelData.isContentPresenting = true
                     }
                 }
-                */
                 Button(action: {
                     targetDestination = destination
                     isConfirming = true

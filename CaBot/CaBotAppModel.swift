@@ -1372,12 +1372,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                         announce += cd.arriveMessages?[i].text ?? ""
                     }
                 } else{
-                    /* TODO content
-                    if let _ = cd.content?.content,
+                    if let _ = cd.content,
                        tourManager.setting.showContentWhenArrive {
                         announce += CustomLocalizedString("You can check detail of %@ on the phone. ", lang: self.resourceLang, cd.title.pron)
                     }
-                     */
                     if let next = tourManager.nextDestination {
                         announce += CustomLocalizedString("You can proceed to %@ by pressing the right button of the suitcase handle. ", lang: self.resourceLang, next.title.pron)
                         self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent()
@@ -1400,14 +1398,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     self.speak(announce, priority:.Normal, timeout: nil, tag: .Next(erase:false) ) { code, length in
                         guard code != .Paused else { return }
                         // if user pressed the next button while reading announce, skip open content
-                        /* TODO content
                         if self.tourManager.currentDestination == nil {
-                            if let contentURL = cd.content?.url,
+                            if let contentURL = cd.content,
                                self.tourManager.setting.showContentWhenArrive {
                                 self.open(content: contentURL)
                             }
                         }
-                         */
                         self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent() - 27
                         self.shouldNoAnnounceToPushRightButton = true
                         self.willSpeakArriveMessage = false
