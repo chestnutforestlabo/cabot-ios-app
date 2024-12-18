@@ -412,13 +412,17 @@ class I18NText: Equatable, Hashable {
             for key in container.allKeys.filter({ key in
                 key.stringValue.hasPrefix(baseKey)
             }) {
-                let separators = CharacterSet(charactersIn: "-_")
+                let separators = CharacterSet(charactersIn: "-_:")
                 let items = key.stringValue.components(separatedBy: separators)
                 if items.count == 1 { // title
                     main["Base"] = try container.decode(String.self, forKey: key)
                 }
                 else if items.count == 2 {
-                    main[String(items[1])] = try container.decode(String.self, forKey: key)
+                    if items[1] == "hira" { // special case for Japanese hiragana
+                        pron["ja"] = try container.decode(String.self, forKey: key)
+                    } else {
+                        main[String(items[1])] = try container.decode(String.self, forKey: key)
+                    }
                 }
                 else if items.count == 3 && items[2] == "pron" {
                     pron[String(items[1])] = try container.decode(String.self, forKey: key)
@@ -734,15 +738,7 @@ struct Message: Decodable {
         parent = try container.decode(String.self, forKey: .parent)
         let allValues = try decoder.container(keyedBy: DynamicCodingKeys.self)
         var textDict: [String: String] = [:]
-        for key in allValues.allKeys {
-            if key.stringValue.hasPrefix("text:") {
-                let newKey = String(key.stringValue.dropFirst(5))
-                if let value = try? allValues.decodeIfPresent(String.self, forKey: key) {
-                    textDict[newKey] = value
-                }
-            }
-        }
-        self.text = I18NText(text: textDict, pron: [:])
+        self.text = I18NText.decode(decoder: decoder, baseKey: "text")
     }
 
     struct DynamicCodingKeys: CodingKey {
