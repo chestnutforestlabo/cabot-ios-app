@@ -330,6 +330,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             if silentForChange == false {
                 share(user_info: SharedInfo(type: .ChangeLanguage, value: newValue))
             }
+            ResourceManager.shared.invalidate()
+            self.loadFromServer()
             silentForChange = false
         }
         didSet {
@@ -1261,12 +1263,24 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.tts.speak(text, force: true, priority:.Normal) { _, _ in }
 
             if self.suitcaseConnected {
-                loadFromServer()
+                loadFromServer() {
+                    if self.modeType != .Normal{
+                        self.share(user_info: SharedInfo(type: .RequestUserInfo, value: "", flag1: false)) // do not speak
+                    }
+                    else if self.modeType == .Normal{
+                        self.tourManager.tourDataLoad()
+                        self.shareAllUserConfig()
+                    }
+                }
+                DispatchQueue.main.async {
+                    _ = self.fallbackService.manage(command: .lang, param: self.resourceLang)
+                    _ = self.fallbackService.manage(command: .reqfeatures)
+                }
             }
         }
     }
 
-    func loadFromServer() {
+    func loadFromServer(callback: (() -> Void)? = nil) {
         DispatchQueue.main.async {
             self.serverIsReady = .Loading
         }
@@ -1277,22 +1291,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             if let _ = try? ResourceManager.shared.load() {
                 DispatchQueue.main.async {
                     self.serverIsReady = .Ready
-                    if self.modeType != .Normal{
-                        self.share(user_info: SharedInfo(type: .RequestUserInfo, value: "", flag1: false)) // do not speak
-                    }
-                    else if self.modeType == .Normal{
-                        self.tourManager.tourDataLoad()
-                        self.shareAllUserConfig()
-                    }
+                    callback?()
                 }
             } else {
                 DispatchQueue.main.async {
                     self.serverIsReady = .NotReady
                 }
-            }
-            DispatchQueue.main.async {
-                _ = self.fallbackService.manage(command: .lang, param: self.resourceLang)
-                _ = self.fallbackService.manage(command: .reqfeatures)
             }
         }
     }
