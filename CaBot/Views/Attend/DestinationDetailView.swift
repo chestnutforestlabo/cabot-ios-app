@@ -31,8 +31,8 @@ struct DestinationDetailView: View {
     var body: some View {
         Form {
             Section(header: Text(destination.title.text)) {
-                if destination.startMessage.text != "" {
-                    Text(destination.startMessage.text)
+                if let startMessage = destination.startMessage {
+                    Text(startMessage.text)
                 }
                 if let arriveMessages = destination.arriveMessages{
                     ForEach(arriveMessages, id: \.text) { arriveMessage in

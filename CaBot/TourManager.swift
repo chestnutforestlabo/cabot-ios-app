@@ -245,9 +245,7 @@ class TourManager: TourProtocol {
             if let tourDestination = d as? TourDestination {
                 data.destinations.append(tourDestination.ref.description)
             } else {
-                if let value = d.value {
-                    data.destinations.append(value)
-                }
+                data.destinations.append(d.value)
             }
         }
         if let tourDestination = currentDestination as? TourDestination {

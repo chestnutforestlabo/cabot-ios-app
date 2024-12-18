@@ -78,16 +78,18 @@ struct RootView: View {
             })
             .alert(isPresented: $modelData.isConfirmingSummons) {
                 let ad = modelData.tourManager.arrivedDestination
-                let destination = ad!.waitingDestination!.value
-                let title = ad!.waitingDestination!.title
+                let destination = ad?.waitingDestination?.value
+                let title = ad?.waitingDestination?.title ?? I18NText.empty()
                 return Alert(title: Text("Let the suitcase wait"),
                              message: Text(LocalizedStringKey("Let the suitcase wait message \(title.text)")),
                              primaryButton: .default(Text("No")) {
-                                // noop
-                             },
+                    // noop
+                },
                              secondaryButton: .destructive(Text("Yes")){
-                                _ = modelData.summon(destination: destination)
-                             })
+                    if let destination {
+                        _ = modelData.summon(destination: destination)
+                    }
+                })
             }
         }
         .environment(\.locale, modelData.selectedLocale)

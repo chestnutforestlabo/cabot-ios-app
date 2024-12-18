@@ -71,7 +71,7 @@ struct DestinationsView: View {
     func contentView(for item: Directory.SectionItem, in section: Directory.Section) -> some View {
         let tourManager = modelData.tourManager
         // SectionItem contains sections (content)
-        if let content = item.content {
+        if let content = item.sectionContent {
             if content.itemCount > 0 {
                 NavigationLink(
                     destination: DestinationsView(sections: content)
@@ -104,8 +104,8 @@ struct DestinationsView: View {
                             .multilineTextAlignment(.leading)
                             .accessibilityHint("DOUBLETAP_TO_ADD_A_DESTINATION")
 
-                        if !item.summaryMessage.text.isEmpty {
-                            Text(item.summaryMessage.text)
+                        if let summaryMessage = item.summaryMessage {
+                            Text(summaryMessage.text)
                                 .font(.caption)
                                 .multilineTextAlignment(.leading)
                         }
@@ -151,7 +151,7 @@ struct DestinationsView: View {
                     Text(message)
                 }
                 Spacer()
-                if item.startMessage.text != "" {
+                if item.startMessage != nil || item.arriveMessages != nil {
                     ZStack{
                         Image(systemName: "info.circle")
                             .accessibilityLabel(Text("Details"))
@@ -190,7 +190,7 @@ struct DestinationsView_Previews: PreviewProvider {
         }
         
         return DestinationsView(
-            sections: floorDestinationsForPreviews.first?.items.first?.content ?? Directory.Sections()
+            sections: floorDestinationsForPreviews.first?.items.first?.sectionContent ?? Directory.Sections()
         )
         .environmentObject(modelData)
         .previewDisplayName("Floor 3")
@@ -207,7 +207,7 @@ struct DestinationsView_Previews: PreviewProvider {
         }
 
         return DestinationsView(
-            sections: floorDestinationsForPreviews.first?.items.last?.content ?? Directory.Sections()
+            sections: floorDestinationsForPreviews.first?.items.last?.sectionContent ?? Directory.Sections()
         )
         .environmentObject(modelData)
         .previewDisplayName("Floor 5")

@@ -1153,10 +1153,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func share(destination: any Destination, clear: Bool = true, addFirst: Bool = false) {
-        if let value = destination.value {
-            self.share(user_info: SharedInfo(type: .OverrideDestination, value: value, flag1: clear, flag2: addFirst))
-            userInfo.clear()
-        }
+        self.share(user_info: SharedInfo(type: .OverrideDestination, value: destination.value, flag1: clear, flag2: addFirst))
+        userInfo.clear()
     }
 
     // MARK: TourManagerDelegate
@@ -1175,39 +1173,38 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func tour(manager: TourManager, destinationChanged destination: (any Destination)?, isStartMessageSpeaking: Bool = true) {
         if let dest = destination {
-            if let dest_id = dest.value {
-                if !send(destination: dest_id) {
-                    manager.cannotStartCurrent()
-                } else {
-                    // cancel all announcement
-                    var delay = self.tts.isSpeaking ? 1.0 : 0
+            let dest_id = dest.value
+            if !send(destination: dest_id) {
+                manager.cannotStartCurrent()
+            } else {
+                // cancel all announcement
+                var delay = self.tts.isSpeaking ? 1.0 : 0
 
-                    self.stopSpeak()
-                    if self.isContentPresenting {
-                        self.isContentPresenting = false
-                        delay = self.detailSettingModel.browserCloseDelay
-                    }
-                    if UIAccessibility.isVoiceOverRunning {
-                        delay = 3
-                    }
-                    // wait at least 1.0 seconds if tts was speaking
-                    // wait 1.0 ~ 2.0 seconds if browser was open.
-                    // hopefully closing browser and reading the content by voice over will be ended by then
-                    DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                        self.willSpeakArriveMessage = true
-                        let announce = CustomLocalizedString("Going to %@", lang: self.resourceLang, dest.title.pron)
-                        + (dest.startMessage.text ?? "")
-                        if(isStartMessageSpeaking){
-                            self.tts.speak(announce, forceSelfvoice: false, force: true, priority: .High, timeout: nil, tag: .Next(erase:true), callback: {_, _ in }, progress: {range in
-                                if range.location == 0{
-                                    self.willSpeakArriveMessage = true
-                                }
-                            })
-                        }
+                self.stopSpeak()
+                if self.isContentPresenting {
+                    self.isContentPresenting = false
+                    delay = self.detailSettingModel.browserCloseDelay
+                }
+                if UIAccessibility.isVoiceOverRunning {
+                    delay = 3
+                }
+                // wait at least 1.0 seconds if tts was speaking
+                // wait 1.0 ~ 2.0 seconds if browser was open.
+                // hopefully closing browser and reading the content by voice over will be ended by then
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                    self.willSpeakArriveMessage = true
+                    let announce = CustomLocalizedString("Going to %@", lang: self.resourceLang, dest.title.pron)
+                    + (dest.startMessage?.text ?? "")
+                    if(isStartMessageSpeaking){
+                        self.tts.speak(announce, forceSelfvoice: false, force: true, priority: .High, timeout: nil, tag: .Next(erase:true), callback: {_, _ in }, progress: {range in
+                            if range.location == 0{
+                                self.willSpeakArriveMessage = true
+                            }
+                        })
                     }
                 }
-                self.activityLog(category: "destination-text", text: dest.title.text, memo: dest.title.pron)
             }
+            self.activityLog(category: "destination-text", text: dest.title.text, memo: dest.title.pron)
         } else {
             _ = send(destination: "__cancel__")
         }

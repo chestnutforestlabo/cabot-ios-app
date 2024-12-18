@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021  Carnegie Mellon University
+ * Copyright (c) 2021, 2024  Carnegie Mellon University
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -423,6 +423,7 @@ struct TourData: Decodable {
     let messages: [Message]
     static var refIndex: [String: Messages] = [:]
     static var tourIndex: [String: Tour] = [:]
+    static var destRefIndex: [String: DestinationRef] = [:]
     static var destIndex: [String: TourDestination] = [:]
 
     static func buildIndex(messages: [Message]) {
@@ -437,6 +438,20 @@ struct TourData: Decodable {
 
     static func getMessage(by ref: NodeRef) -> Messages? {
         return refIndex[ref.description]
+    }
+
+    static func buildIndex(destinations: [DestinationRef]) {
+        for destination in destinations {
+            var key = destination.value
+            if let variation = destination.variation {
+                key += "#\(variation)"
+            }
+            destRefIndex[key] = destination
+        }
+    }
+
+    static func getDestinationRef(by ref: String) -> DestinationRef? {
+        return destRefIndex[ref]
     }
 
     static func buildIndex(tours: [Tour]) {
@@ -467,6 +482,7 @@ struct TourData: Decodable {
         self.messages = try container.decode([Message].self, forKey: .messages)
         TourData.buildIndex(messages: self.messages)
         self.destinations = try container.decode([DestinationRef].self, forKey: .destinations)
+        TourData.buildIndex(destinations: self.destinations)
         self.tours = try container.decode([Tour].self, forKey: .tours)
         TourData.buildIndex(tours: self.tours)
     }
@@ -592,11 +608,14 @@ class TourDestination: Destination, Decodable {
         hasher.combine(ref)
     }
 
-    var value: String?
-    var summaryMessage: I18NText = I18NText.empty()
-    var startMessage: I18NText = I18NText.empty()
+    var value: String
+    var arrivalAngle: Int?
+    var content: String?
+    var summaryMessage: I18NText? = nil
+    var startMessage: I18NText? = nil
     var arriveMessages: [I18NText]? = nil
-    var waitingDestination: WaitingDestination? = nil
+    var waitingDestination: (any Destination)? = nil
+    var waitingDestinationAngle: Int?
     var subtour: Tour?
     var error: String?
     var warning: String?
@@ -604,7 +623,6 @@ class TourDestination: Destination, Decodable {
 
     let ref: NodeRef
     let refTitle: String
-    var matchedDestinationRef: DestinationRef?
     var title: I18NText = I18NText.empty()
 
     enum CodingKeys: String, CodingKey {
@@ -615,16 +633,28 @@ class TourDestination: Destination, Decodable {
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         ref = try container.decode(NodeRef.self, forKey: .ref)
+
+        // TODO use ref not ref.description
+        let destRef = TourData.getDestinationRef(by: ref.description)
+        arrivalAngle = destRef?.arrivalAngle
+        content = destRef?.content
+        if let value = destRef?.waitingDestination {
+            waitingDestination = WaitingDestination(value: value, arrivalAngle: destRef?.waitingDestinationAngle)
+        }
+
         refTitle = try container.decode(String.self, forKey: .refTitle)
         value = ref.node_id
+        if let arrivalAngle {
+            value += "@\(arrivalAngle)"
+        }
         if let messages = TourData.getMessage(by: ref) {
-            self.startMessage = messages.startMessage ?? I18NText.empty()
+            self.startMessage = messages.startMessage
             self.arriveMessages = messages.arriveMessages
-            self.summaryMessage = messages.summary ?? I18NText.empty()
+            self.summaryMessage = messages.summary
         }
         
         if let feature = Features.getFeature(by: ref) {
-            title = feature.properties.name ?? I18NText.empty()
+            title = feature.properties.name
         }
     }
 }
@@ -635,12 +665,20 @@ struct DestinationRef: Decodable {
     let title: String
     let variation: String?
     let arrivalAngle: Int?
+    let content: String?
+    let waitingDestination: String?
+    let waitingDestinationAngle: Int?
+    let subtour: String?
 
     enum CodingKeys: String, CodingKey {
         case floor, value
         case title = "#title"
         case variation = "var"
         case arrivalAngle
+        case content
+        case waitingDestination
+        case waitingDestinationAngle
+        case subtour
     }
 }
 
@@ -844,7 +882,6 @@ class Directory {
     }
 
     struct SectionItem: Destination, Decodable {
-        
         static func == (lhs: Directory.SectionItem, rhs: Directory.SectionItem) -> Bool {
             lhs.title == rhs.title && lhs.nodeID == rhs.nodeID
         }
@@ -860,7 +897,7 @@ class Directory {
         }
 
         func allDestinations() -> [any Destination] {
-            if let content = content {
+            if let content = sectionContent {
                 return content.allDestinations()
             }
             return [self]
@@ -869,9 +906,9 @@ class Directory {
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             title = I18NText.decode(decoder: decoder, baseKey: "title")
-            content = try container.decodeIfPresent(Sections.self, forKey: .content)
+            sectionContent = try container.decodeIfPresent(Sections.self, forKey: .content)
 
-            if content == nil {
+            if sectionContent == nil {
                 subtitle = try container.decodeIfPresent(String.self, forKey: .subtitle) ?? "Unknown"
                 titlePron = try container.decodeIfPresent(String.self, forKey: .titlePron) ?? "Unknown"
                 subtitlePron = try container.decodeIfPresent(String.self, forKey: .subtitlePron) ?? "Unknown"
@@ -883,14 +920,20 @@ class Directory {
                     } else {
                         title = I18NText.decode(decoder: decoder, baseKey: "title")
                     }
+                    if let destRef = TourData.getDestinationRef(by: nodeID) {
+                        arrivalAngle = destRef.arrivalAngle
+                        content = destRef.content
+                        if let value = destRef.waitingDestination {
+                            waitingDestination = WaitingDestination(value: value, arrivalAngle: destRef.arrivalAngle)
+                        }
+                        _subtour = destRef.subtour
+                    }
 
                     if let forDemonstrationString = try container.decodeIfPresent(String.self, forKey: .forDemonstration) {
                         forDemonstration = (forDemonstrationString.lowercased() == "true")
                     } else {
                         forDemonstration = false
                     }
-                    startMessage = I18NText.empty()
-                    summaryMessage = I18NText.empty()
                     if let message = TourData.getMessage(by: NodeRef(node_id: nodeID, variation: nil)) {
                         if let startMessage = message.startMessage {
                             self.startMessage = startMessage
@@ -905,28 +948,50 @@ class Directory {
         }
 
         private enum CodingKeys: String, CodingKey {
-            case content, subtitle, titlePron, subtitlePron, title, nodeID, forDemonstration
+            case content
+            case subtitle
+            case titlePron
+            case subtitlePron
+            case title
+            case nodeID
+            case forDemonstration
         }
 
-        var value: String? {
-            get {
-                self.nodeID
-            }
-        }
-
-        var title: I18NText = I18NText.empty()
-        var content: Sections? = nil
-        var summaryMessage: I18NText = I18NText.empty()
-        var startMessage: I18NText = I18NText.empty()
-        var arriveMessages: [I18NText]? = nil
-        var waitingDestination: WaitingDestination? = nil
-        var subtour: Tour? = nil
-        var error: String? = nil
-        var warning: String? = nil
+        var sectionContent: Sections? = nil
         var subtitle: String? = nil
         var titlePron: String? = nil
         var subtitlePron: String? = nil
         var nodeID: String? = nil
+
+        // Destination protocol
+        var value: String {
+            get {
+                var val = self.nodeID ?? ""
+                if let arrivalAngle = self.arrivalAngle {
+                    val += "@\(arrivalAngle)"
+                }
+                return val
+            }
+        }
+        var arrivalAngle: Int?
+        var title: I18NText = I18NText.empty()
+        var content: String?
+        var summaryMessage: I18NText? = nil
+        var startMessage: I18NText? = nil
+        var arriveMessages: [I18NText]? = nil
+        var waitingDestination: (any Destination)?
+        var _subtour: String? = nil
+        var subtour: Tour? {
+            get {
+                if let _subtour = _subtour {
+                    TourData.getTour(by: _subtour)
+                } else {
+                    nil
+                }
+            }
+        }
+        var error: String? = nil
+        var warning: String? = nil
         var forDemonstration: Bool = false
     }
     
@@ -935,9 +1000,7 @@ class Directory {
 
     static func buildIndex() {
         for dest in sections.allDestinations() {
-            if let value = dest.value {
-                valueIndex[value] = dest
-            }
+            valueIndex[dest.value] = dest
         }
     }
 
@@ -979,60 +1042,81 @@ class Directory {
 /// - pron: <String> Reading text for the destination if required other wise title is used for reading
 ///    - the text can be localizable
 /// ```
-struct WaitingDestination: Decodable, Equatable {
+struct WaitingDestination: Destination {
     static func == (lhs: WaitingDestination, rhs: WaitingDestination) -> Bool {
-        return lhs.title == rhs.title && lhs.value == rhs.value
+        return lhs.value == rhs.value
+    }
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(self.value)
     }
 
-    var parentTitle:I18NText?
-    let value:String
-    var title:KeyedI18NText {
+    init(value: String, arrivalAngle: Int? = nil) {
+        self._value = value
+        self.arrivalAngle = arrivalAngle
+        let feature = Features.getFeature(by: NodeRef(node_id: value, variation: nil))
+        self.title = feature?.properties.name ?? I18NText.empty()
+        self.content = nil
+        self.summaryMessage = nil
+        self.startMessage = nil
+        self.arriveMessages = nil
+        self.waitingDestination = nil
+        self.subtour = nil
+        self.error = nil
+        self.warning = nil
+        self.forDemonstration = false
+    }
+
+    var title: I18NText
+    var _value: String
+    var value: String {
         get {
-            return KeyedI18NText(key: "Robot Waiting Spot (%@)", base: parentTitle)
+            var val = self._value
+            if let arrivalAngle = self.arrivalAngle {
+                val += "@\(arrivalAngle)"
+            }
+            return val
         }
     }
-
-    enum CodingKeys: String, CodingKey {
-        case value
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        if let value = try? container.decode(String.self, forKey: .value) {
-            self.value = value
-        } else {
-            self.value = ""
-            //warning.add(info: CustomLocalizedString("file specified by Source(type, src) is deprecated, use just 'src' string instead", lang: i18n.langCode))
-        }
-    }
+    var arrivalAngle: Int?
+    var content: String?
+    var summaryMessage: I18NText?
+    var startMessage: I18NText?
+    var arriveMessages: [I18NText]?
+    var waitingDestination: (any Destination)?
+    var subtour: Tour?
+    var error: String?
+    var warning: String?
+    var forDemonstration: Bool
 }
 
 /// Destination for the navigation
 ///
 /// ```
-/// - ref: <String> if ref is specified with the format (<local file>/<value>), it will copy properties from the destination that has <value> in the <local file>
-///   - if other properties are specified too, it will override
-/// - title: <String> Display text for the destination
-///   - the text can be localizable
-/// - value: <String> Navigation node ID
-/// - pron: <String> Reading text for the destination if required other wise title is used for reading
-///    - the text can be localizable
-/// - file: <Source> file including a list of destinations
-/// - summaryMessage: <Source> file inculding a message text
-/// - startMessage: <Source> file including a message text
-/// - content: <Source> file including a web content to show in the browser
-/// - waitingDestination: <WaitingDestination>
+/// - title: display text for the destination
+/// - pron: reading text for the destination
+/// - value: navigation node ID
+/// - arrivalAngle: navigation arrival angle
+/// - content: relative path to an html file
+/// - summaryMessage: display under the title
+/// - startMessage: will be read when the navigation started
+/// - arriveMessage: will be read when the navigation arrive
+/// - waitingDestination: the location where the robot will wait
+/// - subtour: subtour
+/// - forDemonstration: only shown in Advaned mode if true
 /// ```
 protocol Destination: Hashable {
     var title: I18NText { get }
-    var value: String? { get }
-    var summaryMessage: I18NText { get }
-    var startMessage:I18NText { get }
+    //var pron: I18NText { get }
+    var value: String { get }
+    var arrivalAngle: Int? { get }
+    var content: String? { get }
+    var summaryMessage: I18NText? { get }
+    var startMessage: I18NText? { get }
     var arriveMessages: [I18NText]? { get }
-    var waitingDestination: WaitingDestination? { get }
-    var subtour:Tour? { get }
-    var error:String? { get }
-    var warning:String? { get }
+    var waitingDestination: (any Destination)? { get }
+    var subtour: Tour? { get }
+    var error: String? { get }
+    var warning: String? { get }
     var forDemonstration: Bool { get }
 }
 
