@@ -58,7 +58,7 @@ struct SharedInfo: Codable {
         self.location = location
         self.length = length
     }
-    let info_id: Int64?
+    let info_id: Int64
     let type: InfoType
     let value: String
     let flag1: Bool
@@ -491,7 +491,7 @@ class CaBotServiceActions {
     private var lastSpeakRequestID: Int64 = 0
     private var lastNavigationEventRequestID: Int64 = 0
     private var lastLogResponseID: Int64 = 0
-    private var lastShareID: Int64 = 0
+    private var lastSharedInfo: SharedInfo = SharedInfo(type: .None, value: "")
 
     func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, tts: CaBotTTS, request: SpeakRequest) {
         guard delegate.getModeType() == .Normal else { return } // only for Normal mode
@@ -569,11 +569,14 @@ class CaBotServiceActions {
         }
     }
 
+    private let updateSemaphore = DispatchSemaphore(value: 1)
     func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, user_info: SharedInfo) {
-        if let info_id = user_info.info_id {
-            guard lastShareID < info_id else { return }
-            lastShareID = info_id
+        updateSemaphore.wait()
+        defer {
+            updateSemaphore.signal()
         }
+        guard lastSharedInfo.type != user_info.type || lastSharedInfo.info_id < user_info.info_id else { return }
+        lastSharedInfo = user_info
         DispatchQueue.main.async {
             delegate.cabot(service: service, userInfo: user_info)
         }
