@@ -52,7 +52,9 @@ struct WebContentView: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: WKWebView, context: Context) {
-        uiView.load(URLRequest(url: url))
+        if uiView.url != url {
+            uiView.load(URLRequest(url: url))
+        }
     }
 }
 
