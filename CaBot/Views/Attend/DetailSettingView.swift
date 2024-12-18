@@ -78,17 +78,6 @@ struct DetailSettingView: View {
             
             Section(header: Text("VoiceOver adjustment")) {
                 VStack {
-                    HStack{
-                        Text("Speech Priority")
-                            .accessibility(hidden: true)
-                        Spacer()
-                    }
-                    Picker("", selection: $modelData.speechPriority){
-                        Text(LocalizedStringKey(SpeechPriority.Robot.rawValue)).tag(SpeechPriority.Robot)
-                        Text(LocalizedStringKey(SpeechPriority.App.rawValue)).tag(SpeechPriority.App)
-                    }.pickerStyle(SegmentedPickerStyle())
-                }
-                VStack {
                     Text("Delay after closing browser")
                         .accessibility(hidden: true)
                         .frame(maxWidth: .infinity, alignment: .leading)

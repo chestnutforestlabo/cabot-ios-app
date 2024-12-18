@@ -96,7 +96,6 @@ protocol CaBotServiceDelegate {
     func cabot(service:any CaBotTransportProtocol, logList:[LogEntry], status: CaBotLogStatus)
     func cabot(service:any CaBotTransportProtocol, logDetail:LogEntry)
     func cabot(service:any CaBotTransportProtocol, userInfo:SharedInfo)
-    func getSpeechPriority() -> SpeechPriority
     func getModeType() -> ModeType
 }
 
@@ -500,15 +499,11 @@ class CaBotServiceActions {
         lastSpeakRequestID = request.request_id
 
         DispatchQueue.main.async {
-            if delegate.getSpeechPriority() == .Robot && request.force {
-                tts.stop()
-            }
             let line = request.text
             let force = request.force
             let priority = request.priority
-            let bias = !tts.isSpeaking || (delegate.getSpeechPriority() == .Robot && force)
             _ = service.activityLog(category: "ble speech request speaking", text: String(line), memo: "force=\(force)")
-            tts.speak(String(line), force: force, priority: .parse(force:force, priority:priority, priorityBias:bias)) { code, length in
+            tts.speak(String(line), force: force, priority: .parse(priority:priority)) { code, length in
                 if code == .Completed {
                     _ = service.activityLog(category: "ble speech request completed", text: String(line), memo: "force=\(force),return_code=\(code),length=(length)")
                 } else if code == .Canceled {

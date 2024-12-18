@@ -100,8 +100,7 @@ struct SettingView: View {
                            in: 0...1,
                            step: 0.05,
                            onEditingChanged: { editing in
-                        timer?.invalidate()
-                        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
+                        if editing == false {
                             modelData.playSample(mode: VoiceMode.Attend)
                         }
                     })
@@ -134,6 +133,11 @@ struct SettingView: View {
                            in: 0...1,
                            step: 0.05,
                            onEditingChanged: { editing in
+                        if editing == false {
+                            print("Sending ChangeUserVoiceRate")
+                            // let the user app to speak sample voice
+                            modelData.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(modelData.userSpeechRate)", flag1: true))
+                        }
                     })
                     .accessibility(label: Text("Speech Speed"))
                     .accessibility(value: Text(String(format:"%.0f %%", arguments:[modelData.userSpeechRate*100.0])))

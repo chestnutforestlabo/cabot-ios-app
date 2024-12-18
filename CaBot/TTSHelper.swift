@@ -132,7 +132,7 @@ class CaBotTTS : TTSProtocol {
         if force {
             self._tts.cancel(at: .immediate)
         }
-        self._speak(text == nil ? "" : text!, priority:.parse(force:force, mode:.Advanced), tag: tag, completionHandler: { uuid, utext, code, length in
+        self._speak(text == nil ? "" : text!, priority: .Required, tag: tag, completionHandler: { uuid, utext, code, length in
             callback(code, length)
         }, progressHandler: { uuid, text, count, range in
         })
@@ -358,13 +358,8 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
 
 extension CaBotTTS.SpeechPriority {
     
-    static func parse( force: Bool? = nil, priority: Int32? = nil, priorityBias: Bool = false, mode: ModeType = .Normal ) -> Self {
-        
-        // now, `mode`, `priorityBias` is not use. (for using priority bias)
-        if force == true, priority == nil {
-            return .High
-        }
-        
+    static func parse(priority: Int32? = nil) -> Self {
+
         if let priority {
             switch priority {
             case _ where priority <= 25:
