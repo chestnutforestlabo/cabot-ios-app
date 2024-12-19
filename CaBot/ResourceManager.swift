@@ -926,7 +926,7 @@ class Directory {
         }
 
         public var hidden: Bool {
-            self.forDemonstration && ResourceManager.shared.modeType != .Advanced
+            (self.forDemonstration && ResourceManager.shared.modeType != .Advanced) || sectionContent?.itemCount ?? 1 == 0
         }
 
         func allDestinations() -> [any Destination] {
