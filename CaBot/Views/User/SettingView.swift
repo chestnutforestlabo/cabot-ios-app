@@ -88,8 +88,7 @@ struct SettingView: View {
                            in: 0...1,
                            step: 0.05,
                            onEditingChanged: { editing in
-                        timer?.invalidate()
-                        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
+                        if editing == false {
                             modelData.playSample(mode: .User)
                         }
                     })
