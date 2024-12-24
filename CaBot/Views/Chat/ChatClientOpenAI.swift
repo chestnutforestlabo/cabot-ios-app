@@ -39,6 +39,7 @@ class ChatClientOpenAI: ChatClient {
     var history: LimitedArray<ChatItem>
     var queryResultCancellable : AnyCancellable? = nil
     var queryResultCache :String = ""
+    var metadata: [String: String]
 
     init(config:ChatConfiguration, callback: @escaping ChatClientCallback) {
         self.callback = callback
@@ -51,29 +52,19 @@ class ChatClientOpenAI: ChatClient {
         )
         self.client = OpenAI(configuration: configuration)
         self.history = LimitedArray<ChatItem>( limit: config.historySize )
+        self.metadata = [
+            "request_id": "dummy",
+            "conversation_id": UUID().uuidString,
+            "terminal_id": "dummy",
+            "suitcase_id": "dummy",
+            "lang": "JP", // TBD
+            "tour_recommendation_filter": "all" // TBD
+        ]
     }
     func send(message: String) {
-        var query = ChatQuery(
-            messages: [
-                .init(role: .system, content: "Please give only a response to the user input in 20 words.")!,
-                .init(role: .user, content: message, name: "User")!
-            ],
-            model: model
-        )
-        if message.isEmpty {
-            query = ChatQuery(
-                messages: [
-                    .init(role: .system, content: "Please greet to the user in 20 words.", name: "System")!
-                ],
-                model: model,
-                metadata: [
-                    "request_id": "dummy",
-                    "conversation_id": "dummy",
-                    "terminal_id": "dummy",
-                    "suitcase_id": "dummy",
-                ]
-            )
-        }
+        var messages: [ChatQuery.ChatCompletionMessageParam] =
+            message.isEmpty ? [] : [.init(role: .user, content: message)!]
+        let query = ChatQuery(messages: messages, model: "dummy", metadata: self.metadata)
         print(query)
         history.append(.query(query))
         self.pub = PassthroughSubject<String, Error>()
