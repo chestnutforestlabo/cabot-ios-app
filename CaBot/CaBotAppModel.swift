@@ -139,6 +139,12 @@ class FallbackService: CaBotServiceProtocol {
         guard let service = getService() else { return false }
         return service.log_request(request: request)
     }
+    
+    func send_log(log_info: LogRequest, app_log: [String:String]?) -> Bool {
+        guard let service = getService() else { return false }
+        NSLog("fallback send_log \(log_info)")
+        return service.send_log(log_info: log_info, app_log: app_log)
+    }
 
     func share(user_info: SharedInfo) -> Bool {
         guard let service = getService() else { return false }
@@ -924,13 +930,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         _ = self.fallbackService.log_request(request: request)
     }
     
-    func submitAppLog(app_log: [String: String], log_name: String) {
-        var request = LogRequest(
+    func submitAppLog(app_log: [String:String], log_name: String) {
+        NSLog("submitAppLog")
+        var log_info = LogRequest(
             type: CaBotLogRequestType.appLog.rawValue,
-            log_name: log_name,
-            app_log: app_log
+            log_name: log_name
         )
-        _ = self.fallbackService.log_request(request: request)
+        _ = self.fallbackService.send_log(log_info: log_info, app_log: app_log)
     }
 
     // MARK: LocationManagerDelegate
@@ -1558,6 +1564,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             if let firstLog = firstLog {
                 appLogs.insert(firstLog, at: 0)
             }
+            
+            let appLogURLs = appLogs.map { documentsURL.appendingPathComponent($0) }
             
             let contents = appLogs.compactMap { fileName -> String? in
                 guard let content = try? String(contentsOfFile: documentsURL.path + "/" + fileName, encoding: .utf8) else {

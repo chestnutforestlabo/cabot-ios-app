@@ -201,6 +201,10 @@ class CaBotServiceBLE: NSObject {
 }
 
 extension CaBotServiceBLE: CaBotServiceProtocol {
+    func send_log(log_info: LogRequest, app_log: [String:String]?) -> Bool {
+        return false
+    }
+    
     // MARK: CaBotServiceProtocol
 
     public func activityLog(category: String = "", text: String = "", memo: String = "") -> Bool{
