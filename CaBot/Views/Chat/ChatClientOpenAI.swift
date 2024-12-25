@@ -39,7 +39,7 @@ class ChatClientOpenAI: ChatClient {
     var history: LimitedArray<ChatItem>
     var queryResultCancellable : AnyCancellable? = nil
     var queryResultCache :String = ""
-    var metadata: [String: String]
+    var metadata: AnyCodable
 
     init(config:ChatConfiguration, callback: @escaping ChatClientCallback) {
         self.callback = callback
@@ -52,20 +52,31 @@ class ChatClientOpenAI: ChatClient {
         )
         self.client = OpenAI(configuration: configuration)
         self.history = LimitedArray<ChatItem>( limit: config.historySize )
-        self.metadata = [
+        self.metadata = AnyCodable([
             "request_id": "dummy",
             "conversation_id": UUID().uuidString,
             "terminal_id": "dummy",
             "suitcase_id": "dummy",
             "lang": "JP", // TBD
-            "tour_recommendation_filter": "all" // TBD
-        ]
+            "tour_recommendation_filter": "all", // TBD
+            "current_location" : [
+                "lng": 139.45,
+                "lat": 35.6,
+                "floor": 1
+            ]
+        ])
     }
     func send(message: String) {
         var messages: [ChatQuery.ChatCompletionMessageParam] =
             message.isEmpty ? [] : [.init(role: .user, content: message)!]
         let query = ChatQuery(messages: messages, model: "dummy", metadata: self.metadata)
-        print(query)
+
+        if let data = try? JSONEncoder().encode(query) {
+            if let str = String(data: data, encoding: .utf8) {
+                NSLog("send query: \(str)")
+            }
+        }
+
         history.append(.query(query))
         self.pub = PassthroughSubject<String, Error>()
         self.prepareSinkForHistory()
