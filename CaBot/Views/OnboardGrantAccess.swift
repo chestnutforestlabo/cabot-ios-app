@@ -144,7 +144,6 @@ struct OnboardGrantAccess_Previews: PreviewProvider {
 
         OnboardGrantAccess()
             .environmentObject(modelData)
-            .previewDevice("iPhone 12 Pro")
             .previewDisplayName("Normal")
     }
 }
