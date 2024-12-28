@@ -75,6 +75,7 @@ protocol CaBotServiceProtocol {
     func log_request(request: Dictionary<String, String>) -> Bool
     func isConnected() -> Bool
     func share(user_info: SharedInfo) -> Bool
+    func camera_image_request() -> Bool
 }
 
 protocol CaBotTransportProtocol: CaBotServiceProtocol {
@@ -480,6 +481,13 @@ struct LogResponse: Decodable {
     var type: CaBotLogRequestType
     var log_list: [LogEntry]?
     var log: LogEntry?
+}
+
+struct CurrentLocation: Decodable {
+    var lat: Double
+    var lng: Double
+    var floor: Int
+    var yaw: Double
 }
 
 class CaBotServiceActions {

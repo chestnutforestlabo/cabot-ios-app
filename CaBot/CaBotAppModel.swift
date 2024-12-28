@@ -142,6 +142,11 @@ class FallbackService: CaBotServiceProtocol {
         guard let service = getService() else { return false }
         return service.share(user_info: user_info)
     }
+
+    func camera_image_request() -> Bool {
+        guard let service = getService() else { return false }
+        return service.camera_image_request()
+    }
 }
 
 final class DetailSettingModel: ObservableObject, NavigationSettingProtocol {
@@ -970,6 +975,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             "detail": detail
         ]
         _ = self.fallbackService.log_request(request: request)
+    }
+
+    func requestCameraImage() {
+        _ = self.fallbackService.camera_image_request()
     }
 
     // MARK: LocationManagerDelegate

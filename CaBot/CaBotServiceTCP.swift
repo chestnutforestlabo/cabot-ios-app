@@ -41,6 +41,7 @@ class CaBotServiceTCP: NSObject {
     private let deviceStatusLogPack = LogPack(title:"<Socket on: device_status>", threshold:7.0, maxPacking:4)
     private let systemStatusLogPack = LogPack(title:"<Socket on: system_status>", threshold:7.0, maxPacking:4)
     private let touchLogPack = LogPack(title:"<Socket on: touch>", threshold:3.0, maxPacking:80)
+    private let locationLogPack = LogPack(title:"<Socket on: location>", threshold:7.0, maxPacking:10)
 
     var delegate:CaBotServiceDelegate?
 
@@ -291,6 +292,26 @@ class CaBotServiceTCP: NSObject {
                 NSLog(error.localizedDescription)
             }
         }
+        socket.on("location"){[weak self] dt, ack in
+            guard let text = dt[0] as? String else { return }
+            guard let data = String(text).data(using:.utf8) else { return }
+            guard let weakself = self else { return }
+            guard let delegate = weakself.delegate else { return }
+            do {
+                let currentLocation = try JSONDecoder().decode(CurrentLocation.self, from: data)
+                weakself.locationLogPack.log(text:"\(currentLocation)")
+            } catch {
+                print(text)
+                NSLog(error.localizedDescription)
+            }
+        }
+        socket.on("camera_image"){[weak self] dt, ack in
+            guard let text = dt[0] as? String else { return }
+            guard let data = String(text).data(using:.utf8) else { return }
+            guard let weakself = self else { return }
+            guard let delegate = weakself.delegate else { return }
+            NSLog("<Socket on: camera_image> \(text.count) bytes")
+        }
         socket.connect(timeoutAfter: 2.0) { [weak self] in
             guard let weakself = self else { return }
             weakself.stop()
@@ -410,5 +431,11 @@ extension CaBotServiceTCP: CaBotServiceProtocol {
         } catch {
         }
         return false
+    }
+
+    func camera_image_request() -> Bool {
+        NSLog("camera_image_request")
+        self.emit("camera_image_request", true)
+        return true
     }
 }
