@@ -773,6 +773,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 _ = self.fallbackService.manage(command: .touchmode, param: mode.rawValue)
             }
         })
+
+        // Chat
+        self.chatModel.delegate = self
     }
 
 
@@ -975,10 +978,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             "detail": detail
         ]
         _ = self.fallbackService.log_request(request: request)
-    }
-
-    func requestCameraImage() {
-        _ = self.fallbackService.camera_image_request()
     }
 
     // MARK: LocationManagerDelegate
@@ -1670,6 +1669,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func getModeType() -> ModeType {
         return modeType
+    }
+
+    func requestCameraImage() {
+        _ = self.fallbackService.camera_image_request()
     }
 }
 

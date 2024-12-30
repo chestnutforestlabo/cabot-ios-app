@@ -36,6 +36,7 @@ class ChatViewModel: ObservableObject  {
     var config: ChatConfiguration = ChatConfiguration()
     private var map: [String: ChatMessage] = [:]
     private var map2: [String: PassthroughSubject<String, Error>] = [:]
+    var delegate:CaBotServiceDelegate?
 
     func toggleChat() {
         if self.stt?.recognizing == true {
@@ -88,5 +89,9 @@ class ChatViewModel: ObservableObject  {
                 print("timeout")
             }
         )
+    }
+
+    func requestCameraImage() {
+        delegate?.requestCameraImage()
     }
 }

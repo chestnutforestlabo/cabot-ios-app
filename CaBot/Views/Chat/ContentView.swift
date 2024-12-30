@@ -26,7 +26,6 @@ import ChatView
 public struct ContentView: View {
     @StateObject var model: ChatViewModel
     @State var isShowSettings = false
-    @EnvironmentObject var modelData: CaBotAppModel
     @State var isVisible = false
     public var body: some View {
         ChatView(messages: model.messages)
@@ -41,7 +40,6 @@ public struct ContentView: View {
         .frame(height: 200)
         .onAppear() {
             isVisible = true
-            requestCameraImage(2.5)
             startChat()
         }
         .onDisappear() {
@@ -50,18 +48,18 @@ public struct ContentView: View {
     }
     
     func startChat() {
+        func repeatCameraImage(_ interval: Double) {
+            if isVisible {
+                model.requestCameraImage()
+                DispatchQueue.main.asyncAfter(deadline: .now() + interval) {
+                    repeatCameraImage(interval)
+                }
+            }
+        }
+        repeatCameraImage(2.5)
         model.stt = AppleSTT(state: $model.chatState, tts: PriorityQueueTTSWrapper.shared)
         model.chat = ChatClientOpenAI(config:model.config, callback: model.process)
         model.send(message: "")
-    }
-
-    func requestCameraImage(_ interval: Double) {
-        if isVisible {
-            modelData.requestCameraImage()
-            DispatchQueue.main.asyncAfter(deadline: .now() + interval) {
-                requestCameraImage(interval)
-            }
-        }
     }
 }
 

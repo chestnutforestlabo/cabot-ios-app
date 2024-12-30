@@ -98,6 +98,7 @@ protocol CaBotServiceDelegate {
     func cabot(service:any CaBotTransportProtocol, logDetail:LogEntry)
     func cabot(service:any CaBotTransportProtocol, userInfo:SharedInfo)
     func getModeType() -> ModeType
+    func requestCameraImage()
 }
 
 enum NavigationNotification:String {
@@ -483,13 +484,6 @@ struct LogResponse: Decodable {
     var log: LogEntry?
 }
 
-struct CurrentLocation: Decodable {
-    var lat: Double
-    var lng: Double
-    var floor: Int
-    var yaw: Double
-}
-
 class CaBotServiceActions {
     static let shared = CaBotServiceActions()
     private init() {
@@ -680,5 +674,30 @@ struct HeartbeatViewModifier: ViewModifier {
 extension View {
     func heartbeat( _ label:String, period sec:Double = 3.0 ) -> some View {
         modifier(HeartbeatViewModifier(label:label, period:UInt64(sec * 1_000_000_000)))
+    }
+}
+
+struct CurrentLocation: Decodable {
+    var lat: Double
+    var lng: Double
+    var floor: Int
+    var yaw: Double
+}
+
+struct ChatData {
+    static let shared = ChatData()
+    private let locationLogPack = LogPack(title:"<Socket on: location>", threshold:7.0, maxPacking:10)
+
+    @State var lastLocation: CurrentLocation? {
+        didSet {
+            guard let location = lastLocation else {return}
+            locationLogPack.log(text:"\(location)")
+        }
+    }
+    @State var lastCameraImage: String? {
+        didSet {
+            guard let image = lastCameraImage else {return}
+            NSLog("<Socket on: camera_image> \(image.count) bytes")
+        }
     }
 }
