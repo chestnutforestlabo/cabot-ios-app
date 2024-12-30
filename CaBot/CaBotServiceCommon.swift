@@ -684,20 +684,26 @@ struct CurrentLocation: Decodable {
     var yaw: Double
 }
 
-struct ChatData {
+class ChatData {
     static let shared = ChatData()
     private let locationLogPack = LogPack(title:"<Socket on: location>", threshold:7.0, maxPacking:10)
 
-    @State var lastLocation: CurrentLocation? {
+    var lastLocation: CurrentLocation? {
         didSet {
             guard let location = lastLocation else {return}
             locationLogPack.log(text:"\(location)")
         }
     }
-    @State var lastCameraImage: String? {
+
+    var lastCameraImage: String? {
         didSet {
             guard let image = lastCameraImage else {return}
             NSLog("<Socket on: camera_image> \(image.count) bytes")
         }
+    }
+
+    func clear() {
+        lastLocation = nil
+        lastCameraImage = nil
     }
 }

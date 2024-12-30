@@ -39,7 +39,7 @@ class ChatClientOpenAI: ChatClient {
     var history: LimitedArray<ChatItem>
     var queryResultCancellable : AnyCancellable? = nil
     var queryResultCache :String = ""
-    var metadata: AnyCodable
+    var metadata: [String: Any]
 
     init(config:ChatConfiguration, callback: @escaping ChatClientCallback) {
         self.callback = callback
@@ -52,24 +52,28 @@ class ChatClientOpenAI: ChatClient {
         )
         self.client = OpenAI(configuration: configuration)
         self.history = LimitedArray<ChatItem>( limit: config.historySize )
-        self.metadata = AnyCodable([
+        self.metadata = [
             "request_id": "dummy",
             "conversation_id": UUID().uuidString,
             "terminal_id": "dummy",
             "suitcase_id": "dummy",
             "lang": "JP", // TBD
-            "tour_recommendation_filter": "all", // TBD
-            "current_location" : [
-                "lng": 139.45,
-                "lat": 35.6,
-                "floor": 1
-            ]
-        ])
+            "tour_recommendation_filter": "all" // TBD
+        ]
     }
     func send(message: String) {
-        var messages: [ChatQuery.ChatCompletionMessageParam] =
+        let messages: [ChatQuery.ChatCompletionMessageParam] =
             message.isEmpty ? [] : [.init(role: .user, content: message)!]
-        let query = ChatQuery(messages: messages, model: "dummy", metadata: self.metadata)
+        if let loc = ChatData.shared.lastLocation {
+            self.metadata["current_location"] = [
+                "lat": loc.lat,
+                "lng": loc.lng,
+                "floor": loc.floor
+            ]
+        } else {
+            self.metadata.removeValue(forKey: "current_location")
+        }
+        let query = ChatQuery(messages: messages, model: "dummy", metadata: AnyCodable(self.metadata))
 
         if let data = try? JSONEncoder().encode(query) {
             if let str = String(data: data, encoding: .utf8) {
