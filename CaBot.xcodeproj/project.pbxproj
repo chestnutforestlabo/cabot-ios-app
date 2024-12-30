@@ -1454,7 +1454,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/cmu-cabot/OpenAI";
 			requirement = {
-				branch = main;
+				branch = "custom-metadata-anycodable";
 				kind = branch;
 			};
 		};
