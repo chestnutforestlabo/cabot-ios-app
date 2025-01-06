@@ -687,6 +687,8 @@ struct CurrentLocation: Decodable {
 class ChatData {
     static let shared = ChatData()
     private let locationLogPack = LogPack(title:"<Socket on: location>", threshold:7.0, maxPacking:10)
+    var suitcase_id = "unknown"
+    var lang = "en"
 
     var lastLocation: CurrentLocation? {
         didSet {

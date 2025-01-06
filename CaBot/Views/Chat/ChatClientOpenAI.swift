@@ -53,17 +53,32 @@ class ChatClientOpenAI: ChatClient {
         self.client = OpenAI(configuration: configuration)
         self.history = LimitedArray<ChatItem>( limit: config.historySize )
         self.metadata = [
-            "request_id": "dummy",
             "conversation_id": UUID().uuidString,
-            "terminal_id": "dummy",
-            "suitcase_id": "dummy",
-            "lang": "JP", // TBD
+            "terminal_id": UIDevice.current.identifierForVendor?.uuidString ?? "unknown",
+            "suitcase_id": ChatData.shared.suitcase_id,
+            "lang": ChatData.shared.lang,
             "tour_recommendation_filter": "all" // TBD
         ]
     }
     func send(message: String) {
-        let messages: [ChatQuery.ChatCompletionMessageParam] =
-            message.isEmpty ? [] : [.init(role: .user, content: message)!]
+        send(message: message, useVision: false)
+    }
+    func send(message: String, useVision: Bool = false) {
+        // prepare messages
+        var messages: [ChatQuery.ChatCompletionMessageParam] = []
+        if useVision {
+            guard let imageUrl = ChatData.shared.lastCameraImage else {return}
+            var vision: [ChatQuery.ChatCompletionMessageParam.ChatCompletionUserMessageParam.Content.VisionContent] = []
+            vision.append(.init(chatCompletionContentPartImageParam: .init(imageUrl: .init(url: imageUrl, detail: .auto))))
+            if !message.isEmpty {
+                vision.append(.init(chatCompletionContentPartTextParam: .init(text: message)))
+            }
+            messages.append(.init(role: .user, content: vision)!)
+        } else if !message.isEmpty {
+            messages.append(.init(role: .user, content: message)!)
+        }
+        // prepare metadata
+        self.metadata["request_id"] = UUID().uuidString
         if let loc = ChatData.shared.lastLocation {
             self.metadata["current_location"] = [
                 "lat": loc.lat,
@@ -73,6 +88,7 @@ class ChatClientOpenAI: ChatClient {
         } else {
             self.metadata.removeValue(forKey: "current_location")
         }
+        // query
         let query = ChatQuery(messages: messages, model: "dummy", metadata: AnyCodable(self.metadata))
 
         if let data = try? JSONEncoder().encode(query) {
