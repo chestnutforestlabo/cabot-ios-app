@@ -44,6 +44,7 @@ public struct ContentView: View {
         }
         .onDisappear() {
             isVisible = false
+            model.stt?.tts?.stop()
         }
     }
     
