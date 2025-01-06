@@ -43,6 +43,7 @@ class ChatViewModel: ObservableObject  {
             self.stt?.endRecognize()
         }
         else {
+            self.stt?.tts?.stop()
             self.stt?.restartRecognize()
         }
     }
