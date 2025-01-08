@@ -112,6 +112,22 @@ class ChatClientOpenAI: ChatClient {
                 if let content = result.choices[0].delta.content {
                     pub.send(content)
                 }
+                if let toolCalls = result.choices[0].delta.toolCalls {
+                    toolCalls.forEach {tool_call in
+                        if let fn = tool_call.function, let fn_name = fn.name, let fn_args = fn.arguments {
+                            if let args = try? JSONSerialization.jsonObject(with: fn_args.data(using: .utf8)!) as? [String: Any?] {
+                                NSLog("function \(fn_name): \(args)")
+                                if fn_name == "around_description" {
+                                    if args["is_image_required"] as? Bool ?? false {
+                                        DispatchQueue.main.async {
+                                            self.send(message: "", useVision: true)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             case .failure(let error):
                 print(error)
                 break
