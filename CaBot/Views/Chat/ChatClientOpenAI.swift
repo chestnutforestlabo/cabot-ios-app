@@ -114,16 +114,32 @@ class ChatClientOpenAI: ChatClient {
                 }
                 if let toolCalls = result.choices[0].delta.toolCalls {
                     toolCalls.forEach {tool_call in
-                        if let fn = tool_call.function, let fn_name = fn.name, let fn_args = fn.arguments {
-                            if let args = try? JSONSerialization.jsonObject(with: fn_args.data(using: .utf8)!) as? [String: Any?] {
-                                NSLog("function \(fn_name): \(args)")
-                                if fn_name == "around_description" {
-                                    if args["is_image_required"] as? Bool ?? false {
+                        if let fn = tool_call.function, let name = fn.name, let arguments = fn.arguments?.data(using: .utf8) {
+                            switch name {
+                            case "around_description":
+                                if let params = try? JSONDecoder().decode(AroundDescription.self, from: arguments) {
+                                    NSLog("function \(name): \(params)")
+                                    if params.is_image_required {
                                         DispatchQueue.main.async {
                                             self.send(message: "", useVision: true)
                                         }
                                     }
                                 }
+                                break
+                            case "destination_setting":
+                                if let params = try? JSONDecoder().decode(DestinationSetting.self, from: arguments) {
+                                    NSLog("function \(name): \(params)")
+                                    print("destination_manipulations: \(params.destination_manipulations)")
+                                    print("remove_all_destinations: \(params.remove_all_destinations)")
+                                }
+                                break
+                            case "tour_setting":
+                                if let params = try? JSONDecoder().decode(TourSetting.self, from: arguments) {
+                                    NSLog("function \(name): \(params)")
+                                }
+                                break
+                            default:
+                                break
                             }
                         }
                     }
@@ -138,6 +154,29 @@ class ChatClientOpenAI: ChatClient {
         }
     }
     
+    struct AroundDescription: Decodable {
+        var is_image_required: Bool
+    }
+
+    struct TourSetting: Decodable {
+        var tour_id: String
+        var add_idx: Int
+    }
+
+    struct DestinationSetting: Decodable {
+        struct DestinationManipulation: Decodable {
+            struct Manipulation: Decodable {
+                var manipulation_add_idx: Int
+                var manipulation_type: String
+            }
+            var manipulation: Manipulation
+            var index: Int
+            var destination_id: String
+        }
+        var destination_manipulations: [DestinationManipulation]
+        var remove_all_destinations: Bool
+    }
+
     func prepareSinkForHistory() {
         cleanupForHistory()
         guard let pub else { return }

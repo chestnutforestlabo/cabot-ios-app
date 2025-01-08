@@ -61,6 +61,7 @@ public struct ContentView: View {
         repeatCameraImage(2.5)
         model.stt = AppleSTT(state: $model.chatState, tts: PriorityQueueTTSWrapper.shared)
         model.chat = ChatClientOpenAI(config:model.config, callback: model.process)
+        model.messages.removeAll()
         model.send(message: "")
     }
 }
