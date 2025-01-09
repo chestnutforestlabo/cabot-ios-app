@@ -95,4 +95,14 @@ class ChatViewModel: ObservableObject  {
     func requestCameraImage() {
         delegate?.requestCameraImage()
     }
+
+    func addUserImage(base64_text: String) {
+        if let last = self.messages.last {
+            if last.user == .Agent && last.combined_text == "" {
+                self.messages.removeLast()
+            }
+        }
+        // TODO stop STT
+        self.messages.append(ChatMessage(user: .User, text: base64_text))
+    }
 }

@@ -690,6 +690,7 @@ class ChatData {
     var suitcase_id = "unknown"
     var lang = "en"
     var tourManager: TourManager?
+    var viewModel: ChatViewModel?
 
     var lastLocation: CurrentLocation? {
         didSet {

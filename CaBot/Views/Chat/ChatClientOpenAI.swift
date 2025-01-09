@@ -61,18 +61,11 @@ class ChatClientOpenAI: ChatClient {
         ]
     }
     func send(message: String) {
-        send(message: message, useVision: false)
-    }
-    func send(message: String, useVision: Bool = false) {
         // prepare messages
         var messages: [ChatQuery.ChatCompletionMessageParam] = []
-        if useVision {
-            guard let imageUrl = ChatData.shared.lastCameraImage else {return}
-            var vision: [ChatQuery.ChatCompletionMessageParam.ChatCompletionUserMessageParam.Content.VisionContent] = []
-            vision.append(.init(chatCompletionContentPartImageParam: .init(imageUrl: .init(url: imageUrl, detail: .auto))))
-            if !message.isEmpty {
-                vision.append(.init(chatCompletionContentPartTextParam: .init(text: message)))
-            }
+        if message.hasPrefix("data:image") {
+            let vision: [ChatQuery.ChatCompletionMessageParam.ChatCompletionUserMessageParam.Content.VisionContent] =
+                [.init(chatCompletionContentPartImageParam: .init(imageUrl: .init(url: message, detail: .auto)))]
             messages.append(.init(role: .user, content: vision)!)
         } else if !message.isEmpty {
             messages.append(.init(role: .user, content: message)!)
@@ -123,7 +116,9 @@ class ChatClientOpenAI: ChatClient {
                                     NSLog("chat function \(name): \(params)")
                                     if params.is_image_required {
                                         DispatchQueue.main.async {
-                                            self.send(message: "", useVision: true)
+                                            guard let imageUrl = ChatData.shared.lastCameraImage, let viewModel = ChatData.shared.viewModel else {return}
+                                            self.send(message: imageUrl)
+                                            viewModel.addUserImage(base64_text: imageUrl)
                                         }
                                     }
                                 }
