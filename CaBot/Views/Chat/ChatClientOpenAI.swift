@@ -93,18 +93,20 @@ class ChatClientOpenAI: ChatClient {
 
         if let data = try? JSONEncoder().encode(query) {
             if let str = String(data: data, encoding: .utf8) {
-                NSLog("send query: \(str)")
+                NSLog("chat send query: \(str)")
             }
         }
 
         history.append(.query(query))
         self.pub = PassthroughSubject<String, Error>()
         self.prepareSinkForHistory()
+        var error_count = 0, success_count = 0
         client.chatsStream(query: query) { partialResult in
-            print(partialResult);
+            print("chat stream partialResult \(partialResult)")
             guard let pub = self.pub else { return }
             switch partialResult {
             case .success(let result):
+                success_count += 1
                 if !self.callback_called.contains(result.id) {
                     self.callback?(result.id, pub)
                     self.callback_called.insert(result.id)
@@ -118,7 +120,7 @@ class ChatClientOpenAI: ChatClient {
                             switch name {
                             case "around_description":
                                 if let params = try? JSONDecoder().decode(ChatData.AroundDescription.self, from: arguments) {
-                                    NSLog("function \(name): \(params)")
+                                    NSLog("chat function \(name): \(params)")
                                     if params.is_image_required {
                                         DispatchQueue.main.async {
                                             self.send(message: "", useVision: true)
@@ -128,13 +130,13 @@ class ChatClientOpenAI: ChatClient {
                                 break
                             case "destination_setting":
                                 if let params = try? JSONDecoder().decode(ChatData.DestinationSetting.self, from: arguments) {
-                                    NSLog("function \(name): \(params)")
+                                    NSLog("chat function \(name): \(params)")
                                     ChatData.shared.onDestinationSetting(params)
                                 }
                                 break
                             case "tour_setting":
                                 if let params = try? JSONDecoder().decode(ChatData.TourSetting.self, from: arguments) {
-                                    NSLog("function \(name): \(params)")
+                                    NSLog("chat function \(name): \(params)")
                                     ChatData.shared.onTourSetting(params)
                                 }
                                 break
@@ -145,12 +147,20 @@ class ChatClientOpenAI: ChatClient {
                     }
                 }
             case .failure(let error):
-                print(error)
+                error_count += 1
+                print("chat stream failure \(error)")
                 break
             }
         } completion: { error in
-            print("chatStream completed \(error)")
-            self.pub?.send(completion: .finished)
+            print("chat stream completed \(error), error_count=\(error_count), success_count=\(success_count)")
+            guard let pub = self.pub else {return}
+            if error_count > 0 && success_count == 0 {
+                let result_id = UUID().uuidString
+                self.callback?(result_id, pub)
+                self.callback_called.insert(result_id)
+                pub.send("An error occurred during the dialogue") // FIXME
+            }
+            pub.send(completion: .finished)
         }
     }
     

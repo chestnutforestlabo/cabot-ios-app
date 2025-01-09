@@ -701,7 +701,7 @@ class ChatData {
     var lastCameraImage: String? {
         didSet {
             guard let image = lastCameraImage else {return}
-            NSLog("<Socket on: camera_image> \(image.count) bytes")
+            print("chat camera_image \(image.count) bytes")
         }
     }
 
@@ -737,11 +737,11 @@ class ChatData {
         guard let tourManager = self.tourManager else {return}
         if params.remove_all_destinations {
             tourManager.clearAllDestinations()
-            NSLog("clear destinations")
+            NSLog("chat clear destinations")
         }
         params.destination_manipulations.forEach{item in
             guard let dest = tourManager.destinations.first(where: {$0.value == item.destination_id}) else {
-                NSLog("destination_id \(item.destination_id) not found")
+                NSLog("chat destination_id \(item.destination_id) not found")
                 return
             }
             switch item.manipulation.manipulation_type {
@@ -752,10 +752,10 @@ class ChatData {
                 } else {
                     tourManager.addToLast(destination: dest)
                 }
-                NSLog("add destination \(dest.value)")
+                NSLog("chat add destination \(dest.value)")
                 break
             default:
-                NSLog("manipulation_type \(item.manipulation.manipulation_type) not supported")
+                NSLog("chat manipulation_type \(item.manipulation.manipulation_type) not supported")
                 break
             }
         }
@@ -765,9 +765,9 @@ class ChatData {
         if let tourManager = self.tourManager, let tours: [Tour] = try? ResourceManager.shared.load().tours {
             if let tour = tours.first(where: {$0.id == params.tour_id}) {
                 tourManager.set(tour: tour)
-                NSLog("set tour: \(tour.id)")
+                NSLog("chat set tour: \(tour.id)")
             } else {
-                NSLog("tour_id \(params.tour_id) not found")
+                NSLog("chat tour_id \(params.tour_id) not found")
             }
         }
     }
