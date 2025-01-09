@@ -285,13 +285,13 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
             }
             let complete:()->Void = {
                 if let last_text = weakself.last_text {
+                    NSLog("Recognized: \(last_text)")
                     let text = PassthroughSubject<String, Error>()
                     action(text, 0)
                     text.send(last_text)
                     text.send(completion: .finished)
                 }
             }
-
             if e != nil {
                 weakself.stoptimer()
                 guard let error:NSError = e as NSError? else {
@@ -307,11 +307,12 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
                         weakself.state?.wrappedValue.chatState = .Recognized
                     }
                     timeout()
-                } else if code == 209 || code == 216 || code == 1700 || code == 301 {
+                } else if code == 209 || code == 216 || code == 1700 || code == 301 || code == 1110 {
                     // noop
                     // 209 : trying to stop while starting
                     // 216 : terminated by manual
                     // 1700: background
+                    // 1110: No speech detected
                     complete()
                 } else if code == 4 {
                     weakself.endRecognize(); // network error
