@@ -1280,6 +1280,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
     }
 
+    private var loadTimer: Timer? = nil
+
     func loadFromServer(callback: (() -> Void)? = nil) {
         DispatchQueue.main.async {
             self.serverIsReady = .Loading
@@ -1288,6 +1290,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             backgroundQueue = DispatchQueue.init(label: "Network Queue")
         }
         backgroundQueue?.async {
+            self.loadTimer?.invalidate()
+            self.loadTimer = nil
             if let _ = try? ResourceManager.shared.load() {
                 DispatchQueue.main.async {
                     self.serverIsReady = .Ready
@@ -1296,6 +1300,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             } else {
                 DispatchQueue.main.async {
                     self.serverIsReady = .NotReady
+                    if self.loadTimer == nil {
+                        self.loadTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: false) { timer in
+                            NSLog("reload from server")
+                            self.loadFromServer(callback: callback)
+                        }
+                    }
                 }
             }
         }
