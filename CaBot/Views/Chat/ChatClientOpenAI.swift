@@ -100,7 +100,7 @@ class ChatClientOpenAI: ChatClient {
             switch partialResult {
             case .success(let result):
                 success_count += 1
-                if !self.callback_called.contains(result.id) {
+                if !self.callback_called.contains(result.id) && result.choices[0].delta.toolCalls == nil {
                     self.callback?(result.id, pub)
                     self.callback_called.insert(result.id)
                 }
