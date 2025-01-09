@@ -292,6 +292,7 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
                     text.send(completion: .finished)
                 }
             }
+
             if e != nil {
                 weakself.stoptimer()
                 guard let error:NSError = e as NSError? else {
