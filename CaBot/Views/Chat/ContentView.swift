@@ -57,7 +57,6 @@ public struct ContentView: View {
                         count_down = 5
                     }
                     if count_down > 0 {
-                        print("counter=\(count_down) recognizing=\(stt.recognizing) speaking=\(stt.speaking)")
                         model.requestCameraImage()
                         count_down -= 1
                     }
