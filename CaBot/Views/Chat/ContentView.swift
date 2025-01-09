@@ -49,16 +49,26 @@ public struct ContentView: View {
     }
     
     func startChat() {
-        func repeatCameraImage(_ interval: Double) {
+        var count_down = 0
+        func repeatCameraImage(_ interval: Double = 1.0) {
             if isVisible {
-                model.requestCameraImage()
+                if let stt: AppleSTT = model.stt {
+                    if stt.recognizing {
+                        count_down = 5
+                    }
+                    if count_down > 0 {
+                        print("counter=\(count_down) recognizing=\(stt.recognizing) speaking=\(stt.speaking)")
+                        model.requestCameraImage()
+                        count_down -= 1
+                    }
+                }
                 DispatchQueue.main.asyncAfter(deadline: .now() + interval) {
                     repeatCameraImage(interval)
                 }
             }
         }
         ChatData.shared.clear()
-        repeatCameraImage(2.5)
+        repeatCameraImage()
         model.stt = AppleSTT(state: $model.chatState, tts: PriorityQueueTTSWrapper.shared)
         model.chat = ChatClientOpenAI(config:model.config, callback: model.process)
         model.messages.removeAll()
