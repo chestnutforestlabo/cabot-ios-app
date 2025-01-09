@@ -689,6 +689,7 @@ class ChatData {
     private let locationLogPack = LogPack(title:"<Socket on: location>", threshold:7.0, maxPacking:10)
     var suitcase_id = "unknown"
     var lang = "en"
+    var tourManager: TourManager?
 
     var lastLocation: CurrentLocation? {
         didSet {
@@ -707,5 +708,67 @@ class ChatData {
     func clear() {
         lastLocation = nil
         lastCameraImage = nil
+    }
+
+    struct AroundDescription: Decodable {
+        var is_image_required: Bool
+    }
+
+    struct TourSetting: Decodable {
+        var tour_id: String
+        var add_idx: Int
+    }
+
+    struct DestinationSetting: Decodable {
+        struct DestinationManipulation: Decodable {
+            struct Manipulation: Decodable {
+                var manipulation_add_idx: Int
+                var manipulation_type: String
+            }
+            var manipulation: Manipulation
+            var index: Int
+            var destination_id: String
+        }
+        var destination_manipulations: [DestinationManipulation]
+        var remove_all_destinations: Bool
+    }
+
+    func onDestinationSetting(_ params: DestinationSetting) {
+        guard let tourManager = self.tourManager else {return}
+        if params.remove_all_destinations {
+            tourManager.clearAllDestinations()
+            NSLog("clear destinations")
+        }
+        params.destination_manipulations.forEach{item in
+            guard let dest = tourManager.destinations.first(where: {$0.value == item.destination_id}) else {
+                NSLog("destination_id \(item.destination_id) not found")
+                return
+            }
+            switch item.manipulation.manipulation_type {
+            case "add":
+                if item.manipulation.manipulation_add_idx == 0 {
+                    tourManager.stopCurrent()
+                    tourManager.addToFirst(destination: dest)
+                } else {
+                    tourManager.addToLast(destination: dest)
+                }
+                NSLog("add destination \(dest.value)")
+                break
+            default:
+                NSLog("manipulation_type \(item.manipulation.manipulation_type) not supported")
+                break
+            }
+        }
+    }
+
+    func onTourSetting(_ params: TourSetting) {
+        if let tourManager = self.tourManager, let tours: [Tour] = try? ResourceManager.shared.load().tours {
+            if let tour = tours.first(where: {$0.id == params.tour_id}) {
+                tourManager.set(tour: tour)
+                NSLog("set tour: \(tour.id)")
+            } else {
+                NSLog("tour_id \(params.tour_id) not found")
+            }
+        }
     }
 }

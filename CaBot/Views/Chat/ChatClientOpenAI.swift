@@ -117,7 +117,7 @@ class ChatClientOpenAI: ChatClient {
                         if let fn = tool_call.function, let name = fn.name, let arguments = fn.arguments?.data(using: .utf8) {
                             switch name {
                             case "around_description":
-                                if let params = try? JSONDecoder().decode(AroundDescription.self, from: arguments) {
+                                if let params = try? JSONDecoder().decode(ChatData.AroundDescription.self, from: arguments) {
                                     NSLog("function \(name): \(params)")
                                     if params.is_image_required {
                                         DispatchQueue.main.async {
@@ -127,15 +127,15 @@ class ChatClientOpenAI: ChatClient {
                                 }
                                 break
                             case "destination_setting":
-                                if let params = try? JSONDecoder().decode(DestinationSetting.self, from: arguments) {
+                                if let params = try? JSONDecoder().decode(ChatData.DestinationSetting.self, from: arguments) {
                                     NSLog("function \(name): \(params)")
-                                    print("destination_manipulations: \(params.destination_manipulations)")
-                                    print("remove_all_destinations: \(params.remove_all_destinations)")
+                                    ChatData.shared.onDestinationSetting(params)
                                 }
                                 break
                             case "tour_setting":
-                                if let params = try? JSONDecoder().decode(TourSetting.self, from: arguments) {
+                                if let params = try? JSONDecoder().decode(ChatData.TourSetting.self, from: arguments) {
                                     NSLog("function \(name): \(params)")
+                                    ChatData.shared.onTourSetting(params)
                                 }
                                 break
                             default:
@@ -154,29 +154,6 @@ class ChatClientOpenAI: ChatClient {
         }
     }
     
-    struct AroundDescription: Decodable {
-        var is_image_required: Bool
-    }
-
-    struct TourSetting: Decodable {
-        var tour_id: String
-        var add_idx: Int
-    }
-
-    struct DestinationSetting: Decodable {
-        struct DestinationManipulation: Decodable {
-            struct Manipulation: Decodable {
-                var manipulation_add_idx: Int
-                var manipulation_type: String
-            }
-            var manipulation: Manipulation
-            var index: Int
-            var destination_id: String
-        }
-        var destination_manipulations: [DestinationManipulation]
-        var remove_all_destinations: Bool
-    }
-
     func prepareSinkForHistory() {
         cleanupForHistory()
         guard let pub else { return }

@@ -776,6 +776,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
         // Chat
         self.chatModel.delegate = self
+        ChatData.shared.tourManager = self.tourManager
         ChatData.shared.suitcase_id = "\(teamID)@\(primaryAddr)" // TBD
         ChatData.shared.lang = selectedLanguage
     }
