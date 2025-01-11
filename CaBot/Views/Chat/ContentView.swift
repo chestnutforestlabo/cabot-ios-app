@@ -27,6 +27,7 @@ public struct ContentView: View {
     @StateObject var model: ChatViewModel
     @State var isShowSettings = false
     @State var isVisible = false
+    @State var timer: Timer?
     public var body: some View {
         ChatView(messages: model.messages)
         HStack {
@@ -39,35 +40,33 @@ public struct ContentView: View {
         }
         .frame(height: 200)
         .onAppear() {
-            isVisible = true
-            startChat()
+            startChat(true)
         }
         .onDisappear() {
-            isVisible = false
-            model.stt?.tts?.stop()
+            startChat(false)
         }
     }
     
-    func startChat() {
+    func startChat(_ start: Bool) {
+        isVisible = start
+        if !start {
+            model.stt?.tts?.stop()
+            timer?.invalidate()
+            return
+        }
         var count_down = 0
-        func repeatCameraImage(_ interval: Double = 1.0) {
-            if isVisible {
-                if let stt: AppleSTT = model.stt {
-                    if stt.recognizing {
-                        count_down = 5
-                    }
-                    if count_down > 0 {
-                        model.requestCameraImage()
-                        count_down -= 1
-                    }
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+            if isVisible, let stt: AppleSTT = model.stt {
+                if stt.recognizing {
+                    count_down = 5
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + interval) {
-                    repeatCameraImage(interval)
+                if count_down > 0 {
+                    model.requestCameraImage()
+                    count_down -= 1
                 }
             }
         }
         ChatData.shared.clear()
-        repeatCameraImage()
         model.stt = AppleSTT(state: $model.chatState, tts: PriorityQueueTTSWrapper.shared)
         model.chat = ChatClientOpenAI(config:model.config, callback: model.process)
         model.messages.removeAll()
