@@ -96,7 +96,7 @@
 "Repeat the message"="Repeat the message";
 "Begin Subtour %@"="Begin Subtour %@";
 "End Subtour"="End Subtour";
-"Skip Label %@"="Skip %@";
+"Skip Label %@"="Skip %@";
 
 "Destinations"="Destinations";
 "Navigating to %@"="Navigating to %@";  // accessibility label
@@ -316,3 +316,6 @@
 "Retry" = "Retry";
 "Return Mainmenu" = "Return MainMenu";
 "Resource Download" = "Resource Download";
+
+// Chat
+"SPEAK_NOW" = "Speak Now!";

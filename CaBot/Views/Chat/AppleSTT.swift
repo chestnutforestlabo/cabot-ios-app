@@ -101,7 +101,7 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
                 self.startPWCaptureSession()//alternative
                 self.startRecognize(action, failure: failure, timeout: timeout)
 
-                self.state?.wrappedValue.chatText = "SPEAK_NOW"
+                self.state?.wrappedValue.chatText = CustomLocalizedString("SPEAK_NOW", lang: I18N.shared.langCode)
                 self.state?.wrappedValue.chatState = .Listening
             }
 
@@ -144,7 +144,7 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
             DispatchQueue.main.asyncAfter(deadline: .now()+self.waitDelay) {
                 self.startPWCaptureSession()
                 self.startRecognize(actions, failure:self.last_failure, timeout:self.last_timeout)
-                self.state?.wrappedValue.chatText = "SPEAK_NOW"
+                self.state?.wrappedValue.chatText = CustomLocalizedString("SPEAK_NOW", lang: I18N.shared.langCode)
                 self.state?.wrappedValue.chatState = .Listening
             }
         }

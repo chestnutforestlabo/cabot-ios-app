@@ -316,3 +316,6 @@
 "Retry" = "Retry";
 "Return Mainmenu" = "Return MainMenu";
 "Resource Download" = "Resource Download";
+
+// Chat
+"SPEAK_NOW" = "Speak Now!";

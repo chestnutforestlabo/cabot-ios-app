@@ -316,3 +316,6 @@
 "Retry" = "リトライ";
 "Return Mainmenu" = "メインメニューに戻る";
 "Resource Download" = "リソースのダウンロード";
+
+// Chat
+"SPEAK_NOW" = "話しかけてください";
