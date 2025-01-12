@@ -52,7 +52,7 @@ class PriorityQueueTTSWrapper: NSObject, TTSProtocol, PriorityQueueTTSDelegate {
 
     func speak(_ text: PassthroughSubject<String, any Error>?, callback: @escaping () -> Void) {
         guard let text = text else { return callback() }
-        let entry = TokenizerEntry(separators: [".", "!", "?", "\n"], timeout_sec: 30)
+        let entry = TokenizerEntry(separators: [".", "!", "?", "\n"], timeout_sec: 90)
         map[entry] = callback
         text.sink(receiveCompletion: { _ in
             entry.close()
