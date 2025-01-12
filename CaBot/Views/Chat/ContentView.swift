@@ -50,7 +50,7 @@ public struct ContentView: View {
     func startChat(_ start: Bool) {
         isVisible = start
         if !start {
-            model.stt?.tts?.stop()
+            model.stt?.endRecognize()
             timer?.invalidate()
             return
         }
