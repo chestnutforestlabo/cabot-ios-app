@@ -56,11 +56,14 @@ class ChatClientOpenAI: ChatClient {
             "conversation_id": UUID().uuidString,
             "terminal_id": UIDevice.current.identifierForVendor?.uuidString ?? "unknown",
             "suitcase_id": ChatData.shared.suitcase_id,
-            "lang": ChatData.shared.lang,
+            "lang": I18N.shared.langCode,
             "tour_recommendation_filter": "all" // TBD
         ]
     }
     func send(message: String) {
+        if message.isEmpty {
+            self.metadata["conversation_id"] = UUID().uuidString
+        }
         // prepare messages
         var messages: [ChatQuery.ChatCompletionMessageParam] = []
         if message.hasPrefix("data:image") {

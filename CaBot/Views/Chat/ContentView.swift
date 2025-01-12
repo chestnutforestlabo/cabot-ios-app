@@ -67,8 +67,10 @@ public struct ContentView: View {
             }
         }
         ChatData.shared.clear()
-        model.stt = AppleSTT(state: $model.chatState, tts: PriorityQueueTTSWrapper.shared)
-        model.chat = ChatClientOpenAI(config:model.config, callback: model.process)
+        if model.stt == nil {
+            model.stt = AppleSTT(state: $model.chatState, tts: PriorityQueueTTSWrapper.shared)
+            model.chat = ChatClientOpenAI(config:model.config, callback: model.process)
+        }
         model.messages.removeAll()
         model.send(message: "")
     }
