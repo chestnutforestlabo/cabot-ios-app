@@ -54,7 +54,7 @@ class PriorityQueueTTSWrapper: NSObject, TTSProtocol, PriorityQueueTTSDelegate {
         guard let text = text else { return callback() }
         let entry = TokenizerEntry(separators: [".", "!", "?", "\n"], timeout_sec: 180) { _, token, reason in
             Debug(log:"<TTS> complete reason:\(reason) token:\(token?.text ?? "")")
-            if reason == .Canceled {
+            if reason == .Canceled && token != nil {
                 callback()
             }
         }
