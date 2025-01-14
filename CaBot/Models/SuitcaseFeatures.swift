@@ -101,19 +101,23 @@ final class SuitcaseFeatures: ObservableObject {
     }
 
     func update(handlesideOptions param: String?) {
+        NSLog("feature - update handlesideOptions param=\(String(describing: param))")
         possibleHandleSides = HandleSide.possibleOptions(options: param)
     }
 
     func update(touchmodeOptions param: String?) {
+        NSLog("feature - update touchmodeOptions param=\(String(describing: param))")
         possibleTouchModes = TouchMode.possibleOptions(options: param)
     }
 
     func silentUpdate(side: HandleSide) {
+        NSLog("feature - silentUpdate side=\(side)")
         self.slientForChange = true
         self.selectedHandleSide = side
     }
 
     func silentUpdate(mode: TouchMode) {
+        NSLog("feature - silentUpdate mode=\(mode)")
         self.slientForChange = true
         self.selectedTouchMode = mode
     }

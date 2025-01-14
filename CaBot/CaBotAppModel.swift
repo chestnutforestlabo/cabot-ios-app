@@ -742,11 +742,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.suitcaseFeatures.updater({side, mode in
             if let side = side {
                 print("willSet selectedHandleSide \(side)")
+                _ = self.fallbackService.share(user_info: SharedInfo(type: .PossibleHandleSide, value: self.suitcaseFeatures.possibleHandleSides.map({ s in s.rawValue }).joined(separator: ",")))
                 _ = self.fallbackService.share(user_info: SharedInfo(type: .ChangeHandleSide, value: side.rawValue))
                 _ = self.fallbackService.manage(command: .handleside, param: side.rawValue)
             }
             if let mode = mode {
                 print("willSet selectedTouchMode \(mode)")
+                _ = self.fallbackService.share(user_info: SharedInfo(type: .PossibleTouchMode, value: self.suitcaseFeatures.possibleTouchModes.map({ m in m.rawValue }).joined(separator: ",")))
                 _ = self.fallbackService.share(user_info: SharedInfo(type: .ChangeTouchMode, value: mode.rawValue))
                 _ = self.fallbackService.manage(command: .touchmode, param: mode.rawValue)
             }
@@ -1580,6 +1582,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     }
                 }
             }
+            if userInfo.type == .PossibleHandleSide {
+                self.suitcaseFeatures.update(handlesideOptions: userInfo.value)
+            }
+            if userInfo.type == .PossibleTouchMode {
+                self.suitcaseFeatures.update(touchmodeOptions: userInfo.value)
+            }
             return
         }
 
@@ -1630,6 +1638,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.share(user_info: SharedInfo(type: .ChangeLanguage, value: self.resourceLang))
         self.share(user_info: SharedInfo(type: .ChangeUserVoiceType, value: "\(self.userVoice?.id ?? "")", flag1: false))
         self.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(self.userSpeechRate)", flag1: false))
+        self.share(user_info: SharedInfo(type: .PossibleHandleSide, value: self.suitcaseFeatures.possibleHandleSides.map({ s in s.rawValue }).joined(separator: ",")))
+        self.share(user_info: SharedInfo(type: .PossibleTouchMode, value: self.suitcaseFeatures.possibleTouchModes.map({ m in m.rawValue }).joined(separator: ",")))
         self.share(user_info: SharedInfo(type: .ChangeHandleSide, value: self.suitcaseFeatures.selectedHandleSide.rawValue))
         self.share(user_info: SharedInfo(type: .ChangeTouchMode, value: self.suitcaseFeatures.selectedTouchMode.rawValue))
     }
