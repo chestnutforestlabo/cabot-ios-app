@@ -96,6 +96,10 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
             self.tts?.vibrate()
             self.tts?.playVoiceRecoStart()
 
+            if ChatData.shared.viewModel?.navigationAction() == true {
+                return
+            }
+
             DispatchQueue.main.asyncAfter(deadline: .now()+self.waitDelay) {
                 self.initPWCaptureSession()
                 self.startPWCaptureSession()//alternative

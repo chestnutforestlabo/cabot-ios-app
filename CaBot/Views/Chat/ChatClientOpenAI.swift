@@ -129,13 +129,17 @@ class ChatClientOpenAI: ChatClient {
                             case "destination_setting":
                                 if let params = try? JSONDecoder().decode(ChatData.DestinationSetting.self, from: arguments) {
                                     NSLog("chat function \(name): \(params)")
-                                    ChatData.shared.onDestinationSetting(params)
+                                    DispatchQueue.main.async() {
+                                        ChatData.shared.onDestinationSetting(params)
+                                    }
                                 }
                                 break
                             case "tour_setting":
                                 if let params = try? JSONDecoder().decode(ChatData.TourSetting.self, from: arguments) {
                                     NSLog("chat function \(name): \(params)")
-                                    ChatData.shared.onTourSetting(params)
+                                    DispatchQueue.main.async() {
+                                        ChatData.shared.onTourSetting(params)
+                                    }
                                 }
                                 break
                             default:
@@ -156,7 +160,7 @@ class ChatClientOpenAI: ChatClient {
                 let result_id = UUID().uuidString
                 self.callback?(result_id, pub)
                 self.callback_called.insert(result_id)
-                pub.send("An error occurred during the dialogue") // FIXME
+                pub.send(CustomLocalizedString("An unexpected error has occurred", lang: I18N.shared.langCode))
             }
             pub.send(completion: .finished)
         }

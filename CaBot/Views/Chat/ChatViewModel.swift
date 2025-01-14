@@ -36,7 +36,9 @@ class ChatViewModel: ObservableObject  {
     var config: ChatConfiguration = ChatConfiguration()
     private var map: [String: ChatMessage] = [:]
     private var map2: [String: PassthroughSubject<String, Error>] = [:]
-    var delegate:CaBotServiceDelegate?
+    var appModel: CaBotAppModel?
+    var errorMessage: String?
+    var startNavigate = false
 
     func toggleChat() {
         if self.stt?.recognizing == true {
@@ -92,11 +94,26 @@ class ChatViewModel: ObservableObject  {
         )
     }
 
-    func requestCameraImage() {
-        delegate?.requestCameraImage()
-    }
-
     func addUserImage(base64_text: String) {
         self.messages.append(ChatMessage(user: .User, text: base64_text))
+    }
+
+    func navigationAction() -> Bool {
+        if let errorMessage = self.errorMessage {
+            self.errorMessage = nil
+            self.chatState.chatState = .Inactive
+            DispatchQueue.main.async {
+                self.messages.append(ChatMessage(user: .User, text: errorMessage))
+                self.send(message: errorMessage)
+            }
+            return true
+        }
+        if self.startNavigate {
+            self.startNavigate = false
+            self.chatState.chatState = .Inactive
+            self.appModel?.needToStartAnnounce(wait: true)
+            return true
+        }
+        return false
     }
 }

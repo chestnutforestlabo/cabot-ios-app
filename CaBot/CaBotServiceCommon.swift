@@ -98,7 +98,6 @@ protocol CaBotServiceDelegate {
     func cabot(service:any CaBotTransportProtocol, logDetail:LogEntry)
     func cabot(service:any CaBotTransportProtocol, userInfo:SharedInfo)
     func getModeType() -> ModeType
-    func requestCameraImage()
 }
 
 enum NavigationNotification:String {
@@ -708,6 +707,8 @@ class ChatData {
     func clear() {
         lastLocation = nil
         lastCameraImage = nil
+        self.viewModel?.errorMessage = nil
+        self.viewModel?.startNavigate = false
     }
 
     struct AroundDescription: Decodable {
@@ -739,6 +740,7 @@ class ChatData {
             tourManager.clearAllDestinations()
             NSLog("chat clear destinations")
         }
+        var success = false
         params.destination_manipulations.forEach{item in
             guard let dest = tourManager.destinations.first(where: {$0.value == item.destination_id}) else {
                 NSLog("chat destination_id \(item.destination_id) not found")
@@ -753,11 +755,17 @@ class ChatData {
                     tourManager.addToLast(destination: dest)
                 }
                 NSLog("chat add destination \(dest.value)")
+                success = true
                 break
             default:
                 NSLog("chat manipulation_type \(item.manipulation.manipulation_type) not supported")
                 break
             }
+        }
+        if success {
+            self.viewModel?.startNavigate = true
+        } else {
+            self.viewModel?.errorMessage = CustomLocalizedString("Could not set destination", lang: I18N.shared.langCode)
         }
     }
 
@@ -766,9 +774,11 @@ class ChatData {
             if let tour = tours.first(where: {$0.id == params.tour_id}) {
                 tourManager.set(tour: tour)
                 NSLog("chat set tour: \(tour.id)")
-            } else {
-                NSLog("chat tour_id \(params.tour_id) not found")
+                self.viewModel?.startNavigate = true
+                return
             }
         }
+        NSLog("chat tour_id \(params.tour_id) not found")
+        self.viewModel?.errorMessage = CustomLocalizedString("Could not set tour", lang: I18N.shared.langCode)
     }
 }

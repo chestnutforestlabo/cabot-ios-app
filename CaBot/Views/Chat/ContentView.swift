@@ -24,6 +24,7 @@ import SwiftUI
 import ChatView
 
 public struct ContentView: View {
+    @EnvironmentObject var appModel: CaBotAppModel
     @StateObject var model: ChatViewModel
     @State var isShowSettings = false
     @State var isVisible = false
@@ -61,7 +62,7 @@ public struct ContentView: View {
                     count_down = 5
                 }
                 if count_down > 0 {
-                    model.requestCameraImage()
+                    appModel.requestCameraImage()
                     count_down -= 1
                 }
             }

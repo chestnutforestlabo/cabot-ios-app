@@ -321,3 +321,6 @@
 "SPEAK_NOW" = "話しかけてください";
 "Chat Settings" = "対話設定";
 "Chat server connection" = "対話サーバー接続";
+"An unexpected error has occurred" = "予期せぬエラーが起きました";
+"Could not set destination" = "目的地を設定できませんでした";
+"Could not set tour" = "ツアーを設定できませんでした";
