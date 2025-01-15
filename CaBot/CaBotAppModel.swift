@@ -438,6 +438,23 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
     }
 
+    @Published var showingChatView: Bool = false {
+        willSet {
+            if silentForChange == false {
+                share(user_info: SharedInfo(type: .ChatStatus, value: newValue ? "open" : "close"))
+            }
+            silentForChange = false
+        }
+    }
+    @Published var toggleChatView: Bool = false {
+        willSet {
+            if silentForChange == false {
+                share(user_info: SharedInfo(type: .ChatRequest, value: newValue ? "open" : "close"))
+            }
+            silentForChange = false
+        }
+    }
+
     enum ServerStatus {
         case Init
         case NotReady
@@ -1626,6 +1643,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     }
                 }
             }
+            if userInfo.type == .ChatStatus {
+                silentForChange = true
+                toggleChatView = userInfo.value == "open"
+            }
             return
         }
 
@@ -1668,6 +1689,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if userInfo.type == .ClearDestinations {
             self.clearAll()
         }
+        if userInfo.type == .ChatRequest {
+            silentForChange = true
+            showingChatView = userInfo.value == "open"
+        }
     }
 
     func shareAllUserConfig() {
@@ -1678,6 +1703,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(self.userSpeechRate)", flag1: false))
         self.share(user_info: SharedInfo(type: .ChangeHandleSide, value: self.suitcaseFeatures.selectedHandleSide.rawValue))
         self.share(user_info: SharedInfo(type: .ChangeTouchMode, value: self.suitcaseFeatures.selectedTouchMode.rawValue))
+        self.share(user_info: SharedInfo(type: .ChatStatus, value: self.showingChatView ? "open" : "close"))
     }
 
     func getModeType() -> ModeType {

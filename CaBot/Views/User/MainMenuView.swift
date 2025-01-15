@@ -281,6 +281,7 @@ struct MainMenus: View {
         }) {
             NavigationLink(
                 destination: ContentView(model: modelData.chatModel),
+                isActive: $modelData.showingChatView,
                 label: {
                     Text("START_CONVERSATION")
                 })
