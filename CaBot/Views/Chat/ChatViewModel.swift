@@ -37,12 +37,14 @@ class ChatViewModel: ObservableObject  {
     private var map: [String: ChatMessage] = [:]
     private var map2: [String: PassthroughSubject<String, Error>] = [:]
     var appModel: CaBotAppModel?
-    var errorMessage: String?
-    var startNavigate = false
 
     func toggleChat() {
         if self.stt?.recognizing == true {
             self.stt?.endRecognize()
+        }
+        else if ChatData.shared.viewModel?.navigationAction() == true {
+            self.stt?.tts?.stop()
+            self.stt?.speaking = false
         }
         else {
             self.stt?.tts?.stop()
@@ -99,8 +101,8 @@ class ChatViewModel: ObservableObject  {
     }
 
     func navigationAction() -> Bool {
-        if let errorMessage = self.errorMessage {
-            self.errorMessage = nil
+        if let errorMessage = ChatData.shared.errorMessage {
+            ChatData.shared.errorMessage = nil
             self.chatState.chatState = .Inactive
             DispatchQueue.main.async {
                 self.messages.append(ChatMessage(user: .User, text: errorMessage))
@@ -108,12 +110,50 @@ class ChatViewModel: ObservableObject  {
             }
             return true
         }
-        if self.startNavigate {
-            self.startNavigate = false
+        if ChatData.shared.startNavigate {
+            ChatData.shared.startNavigate = false
             self.chatState.chatState = .Inactive
             self.appModel?.needToStartAnnounce(wait: true)
             return true
         }
         return false
+    }
+}
+
+class ChatData {
+    static let shared = ChatData()
+    private let locationLogPack = LogPack(title:"<Socket on: location>", threshold:7.0, maxPacking:10)
+    var suitcase_id = "unknown"
+    var viewModel: ChatViewModel?
+    var tourManager: TourManager?
+    var errorMessage: String?
+    var startNavigate = false
+
+    struct CurrentLocation: Decodable {
+        var lat: Double
+        var lng: Double
+        var floor: Int
+        var yaw: Double
+    }
+
+    var lastLocation: CurrentLocation? {
+        didSet {
+            guard let location = lastLocation else {return}
+            locationLogPack.log(text:"\(location)")
+        }
+    }
+
+    var lastCameraImage: String? {
+        didSet {
+            guard let image = lastCameraImage else {return}
+            print("chat camera_image \(image.count) bytes")
+        }
+    }
+
+    func clear() {
+        lastLocation = nil
+        lastCameraImage = nil
+        errorMessage = nil
+        startNavigate = false
     }
 }

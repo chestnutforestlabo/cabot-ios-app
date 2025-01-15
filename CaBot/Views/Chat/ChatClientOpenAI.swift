@@ -115,7 +115,7 @@ class ChatClientOpenAI: ChatClient {
                         if let fn = tool_call.function, let name = fn.name, let arguments = fn.arguments?.data(using: .utf8) {
                             switch name {
                             case "around_description":
-                                if let params = try? JSONDecoder().decode(ChatData.AroundDescription.self, from: arguments) {
+                                if let params = try? JSONDecoder().decode(AroundDescription.self, from: arguments) {
                                     NSLog("chat function \(name): \(params)")
                                     if params.is_image_required {
                                         DispatchQueue.main.async {
@@ -127,18 +127,18 @@ class ChatClientOpenAI: ChatClient {
                                 }
                                 break
                             case "destination_setting":
-                                if let params = try? JSONDecoder().decode(ChatData.DestinationSetting.self, from: arguments) {
+                                if let params = try? JSONDecoder().decode(DestinationSetting.self, from: arguments) {
                                     NSLog("chat function \(name): \(params)")
                                     DispatchQueue.main.async() {
-                                        ChatData.shared.onDestinationSetting(params)
+                                        self.onDestinationSetting(params)
                                     }
                                 }
                                 break
                             case "tour_setting":
-                                if let params = try? JSONDecoder().decode(ChatData.TourSetting.self, from: arguments) {
+                                if let params = try? JSONDecoder().decode(TourSetting.self, from: arguments) {
                                     NSLog("chat function \(name): \(params)")
                                     DispatchQueue.main.async() {
-                                        ChatData.shared.onTourSetting(params)
+                                        self.onTourSetting(params)
                                     }
                                 }
                                 break
@@ -190,6 +190,77 @@ class ChatClientOpenAI: ChatClient {
     func cleanupForHistory(){
         queryResultCancellable = nil
         queryResultCache = ""
+    }
+
+    struct AroundDescription: Decodable {
+        var is_image_required: Bool
+    }
+
+    struct TourSetting: Decodable {
+        var tour_id: String
+        var add_idx: Int
+    }
+
+    struct DestinationSetting: Decodable {
+        struct DestinationManipulation: Decodable {
+            struct Manipulation: Decodable {
+                var manipulation_add_idx: Int
+                var manipulation_type: String
+            }
+            var manipulation: Manipulation
+            var index: Int
+            var destination_id: String
+        }
+        var destination_manipulations: [DestinationManipulation]
+        var remove_all_destinations: Bool
+    }
+
+    func onDestinationSetting(_ params: DestinationSetting) {
+        guard let tourManager = ChatData.shared.tourManager else {return}
+        if params.remove_all_destinations {
+            tourManager.clearAllDestinations()
+            NSLog("chat clear destinations")
+        }
+        var success = false
+        params.destination_manipulations.forEach{item in
+            guard let dest = tourManager.destinations.first(where: {$0.value == item.destination_id}) else {
+                NSLog("chat destination_id \(item.destination_id) not found")
+                return
+            }
+            switch item.manipulation.manipulation_type {
+            case "add":
+                if item.manipulation.manipulation_add_idx == 0 {
+                    tourManager.stopCurrent()
+                    tourManager.addToFirst(destination: dest)
+                } else {
+                    tourManager.addToLast(destination: dest)
+                }
+                NSLog("chat add destination \(dest.value)")
+                success = true
+                break
+            default:
+                NSLog("chat manipulation_type \(item.manipulation.manipulation_type) not supported")
+                break
+            }
+        }
+        if success {
+            ChatData.shared.startNavigate = true
+        } else {
+            ChatData.shared.errorMessage = CustomLocalizedString("Could not set destination", lang: I18N.shared.langCode)
+        }
+    }
+
+    func onTourSetting(_ params: TourSetting) {
+        if let tourManager = ChatData.shared.tourManager, let tours: [Tour] = try? ResourceManager.shared.load().tours {
+            if let tour = tours.first(where: {$0.id == params.tour_id}) {
+                tourManager.set(tour: tour)
+                NSLog("chat set tour: \(tour.id)")
+                ChatData.shared.startNavigate = true
+                return
+            }
+        }
+        NSLog("chat tour_id \(params.tour_id) not found")
+        ChatData.shared.errorMessage = CustomLocalizedString("Could not set tour", lang: I18N.shared.langCode)
     }
 }
 

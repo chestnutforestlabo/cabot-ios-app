@@ -295,7 +295,7 @@ class CaBotServiceTCP: NSObject {
             guard let text = dt[0] as? String else { return }
             guard let data = String(text).data(using:.utf8) else { return }
             do {
-                ChatData.shared.lastLocation = try JSONDecoder().decode(CurrentLocation.self, from: data)
+                ChatData.shared.lastLocation = try JSONDecoder().decode(ChatData.CurrentLocation.self, from: data)
             } catch {
                 print(text)
                 NSLog(error.localizedDescription)
