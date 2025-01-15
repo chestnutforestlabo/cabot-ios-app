@@ -42,7 +42,7 @@ class ChatViewModel: ObservableObject  {
         if self.stt?.recognizing == true {
             self.stt?.endRecognize()
         }
-        else if ChatData.shared.viewModel?.navigationAction() == true {
+        else if self.navigationAction() == true {
             self.stt?.tts?.stop()
             self.stt?.speaking = false
         }
