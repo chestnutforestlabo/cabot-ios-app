@@ -31,6 +31,7 @@ import Combine
 import os.log
 import HLPDialog
 import Speech
+import ChatView
 
 enum GrantState {
     case Init
@@ -441,7 +442,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var showingChatView: Bool = false {
         willSet {
             if silentForChange == false {
-                share(user_info: SharedInfo(type: .ChatStatus, value: newValue ? "open" : "close"))
+                shareChatStatus(all: true)
             }
             silentForChange = false
         }
@@ -646,6 +647,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var batteryStatus: BatteryStatus = BatteryStatus()
     @Published var touchStatus: TouchStatus = TouchStatus()
     @Published var userInfo: UserInfoBuffer
+    @Published var attend_messages: [ChatMessage] = []
 
     private var addressCandidate: AddressCandidate
     private var bleService: CaBotServiceBLE
@@ -1644,8 +1646,26 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 }
             }
             if userInfo.type == .ChatStatus {
-                silentForChange = true
-                toggleChatView = userInfo.value == "open"
+                let dict = jsonToDict(userInfo.value)
+                if let status = dict["status"] as? String, let messages = dict["messages"] as? [[String:String]] {
+                    silentForChange = true
+                    toggleChatView = status == "open"
+                    if toggleChatView {
+                        for message in messages {
+                            if let id = message["id"], let user = message["user"], let text = message["text"] {
+                                if let replace = attend_messages.first(where: { $0.id.uuidString == id }) {
+                                    let appendText = text.suffix(text.count - replace.combined_text.count)
+                                    replace.append(text: "\(appendText)")
+                                } else {
+                                    let newMessage = ChatMessage(id: UUID(uuidString: id)!, user: user == "User" ? .User : .Agent, text: text)
+                                    attend_messages.append(newMessage)
+                                }
+                            }
+                        }
+                    } else {
+                        attend_messages.removeAll()
+                    }
+                }
             }
             return
         }
@@ -1703,7 +1723,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(self.userSpeechRate)", flag1: false))
         self.share(user_info: SharedInfo(type: .ChangeHandleSide, value: self.suitcaseFeatures.selectedHandleSide.rawValue))
         self.share(user_info: SharedInfo(type: .ChangeTouchMode, value: self.suitcaseFeatures.selectedTouchMode.rawValue))
-        self.share(user_info: SharedInfo(type: .ChatStatus, value: self.showingChatView ? "open" : "close"))
+        self.shareChatStatus(all: true)
     }
 
     func getModeType() -> ModeType {
@@ -1712,6 +1732,38 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func requestCameraImage() {
         _ = self.fallbackService.camera_image_request()
+    }
+
+    func shareChatStatus(all: Bool = false) {
+        var status = "close"
+        var messages: [ChatMessage] = []
+        if self.showingChatView {
+            status = "open"
+            if all {
+                messages = self.chatModel.messages
+            } else if let last = self.chatModel.messages.last {
+                messages = self.chatModel.messages.suffix(last.user == .Agent ? 1 : 2)
+            }
+        }
+        let json = dictToJson([
+            "status": status,
+            "messages": messages.map{[
+                "id": "\($0.id)",
+                "user": "\($0.user)",
+                "text": $0.combined_text
+            ]}
+        ])
+        share(user_info: SharedInfo(type: .ChatStatus, value: json))
+    }
+
+    func dictToJson(_ dict: [String: Any]) -> String {
+        guard let data = try? JSONSerialization.data(withJSONObject: dict), let str = String(data: data, encoding: .utf8) else {return ""}
+        return str
+    }
+
+    func jsonToDict(_ text: String) -> [String: Any] {
+        guard let dict = try? JSONSerialization.jsonObject(with: text.data(using: .utf8)!) as? [String: Any] else {return [:]}
+        return dict
     }
 }
 
@@ -1994,6 +2046,7 @@ class UserInfoBuffer {
     var destinations: [any Destination] = []
     var speakingText: [SpeakingText] = []
     var speakingIndex = -1
+    var chatMessages: [ChatMessage] = []
     weak var modelData: CaBotAppModel?
 
     init(modelData: CaBotAppModel? = nil) {
@@ -2006,6 +2059,7 @@ class UserInfoBuffer {
         nextDestination = nil
         destinations = []
         speakingText = []
+        chatMessages = []
     }
 
     func update(userInfo: SharedInfo) {

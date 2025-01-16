@@ -22,6 +22,7 @@
 
 import SwiftUI
 import CoreData
+import ChatView
 
 struct MainMenuView: View {
     @Environment(\.locale) var locale
@@ -390,6 +391,14 @@ struct MainMenus: View {
                 Text("START_CONVERSATION")
             }
             .disabled(!modelData.isUserAppConnected)
+            if !modelData.attend_messages.isEmpty {
+                NavigationLink(
+                    destination: ChatHistoryView(),
+                    label: {
+                        Text("See history")
+                    })
+                .disabled(!modelData.isUserAppConnected)
+            }
             NavigationLink(
                 destination: DestinationsView()
                     .environmentObject(modelData).heartbeat("DestinationsView"),
@@ -642,6 +651,7 @@ struct ContentView_Previews: PreviewProvider {
         //preview_tour4
         //preview
         //preview_ja
+        preview_chat_history
     }
 
     static var preview_connected: some View {
@@ -865,5 +875,33 @@ struct ContentView_Previews: PreviewProvider {
             .environment(\.locale, .init(identifier: "ja"))
             .environmentObject(modelData)
             .previewDisplayName("preview ja")
+    }
+
+    static var preview_chat_history: some View {
+        let modelData = CaBotAppModel()
+        func test(_ count: Int = 5) {
+            DispatchQueue.main.asyncAfter(deadline: .now()+1) {
+                modelData.attend_messages.append(ChatMessage(user: .Agent, text: "Hello1\nHello2\nHello3"))
+                DispatchQueue.main.asyncAfter(deadline: .now()+1) {
+                    modelData.attend_messages.append(ChatMessage(user: .User, text: "Hello1\nHello2\nHello3"))
+                    if count>0 {
+                        test(count-1)
+                    }
+                }
+            }
+        }
+        test()
+
+        return ChatHistoryView()
+            .environmentObject(modelData)
+            .previewDisplayName("chat history")
+    }
+}
+
+struct ChatHistoryView: View {
+    @EnvironmentObject var modelData: CaBotAppModel
+
+    var body: some View {
+        ChatView(messages: modelData.attend_messages)
     }
 }

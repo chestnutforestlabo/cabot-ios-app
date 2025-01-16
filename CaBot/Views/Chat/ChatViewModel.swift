@@ -28,7 +28,9 @@ import SwiftUI
 
 class ChatViewModel: ObservableObject  {
     public var cancellables = Set<AnyCancellable>()
-    @Published public var messages: [ChatMessage] = []
+    @Published public var messages: [ChatMessage] = [] {
+        didSet {appModel?.shareChatStatus()}
+    }
     @Published var chatState = ChatStateButtonModel()
 
     var stt: AppleSTT?
@@ -62,6 +64,7 @@ class ChatViewModel: ObservableObject  {
             self.messages.append(message)
         }
         text.sink(receiveCompletion: {_ in
+            self.appModel?.shareChatStatus()
         }, receiveValue: { chunk in
             DispatchQueue.main.async {
                 message.append(text: chunk)
