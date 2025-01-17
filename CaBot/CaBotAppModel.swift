@@ -1646,20 +1646,17 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 }
             }
             if userInfo.type == .ChatStatus {
-                let dict = jsonToDict(userInfo.value)
-                if let status = dict["status"] as? String, let messages = dict["messages"] as? [[String:String]] {
+                if let data = userInfo.value.data(using: .utf8), let param = try? JSONDecoder().decode(ChatStatusParam.self, from: data) {
                     silentForChange = true
-                    toggleChatView = status == "open"
+                    toggleChatView = param.visible
                     if toggleChatView {
-                        for message in messages {
-                            if let id = message["id"], let user = message["user"], let text = message["text"] {
-                                if let replace = attend_messages.first(where: { $0.id.uuidString == id }) {
-                                    let appendText = text.suffix(text.count - replace.combined_text.count)
-                                    replace.append(text: "\(appendText)")
-                                } else {
-                                    let newMessage = ChatMessage(id: UUID(uuidString: id)!, user: user == "User" ? .User : .Agent, text: text)
-                                    attend_messages.append(newMessage)
-                                }
+                        for message in param.messages {
+                            if let replace = attend_messages.first(where: { $0.id == message.id }) {
+                                let appendText = message.text.suffix(message.text.count - replace.combined_text.count)
+                                replace.append(text: "\(appendText)")
+                            } else {
+                                let newMessage = ChatMessage(id: message.id, user: message.user == "User" ? .User : .Agent, text: message.text)
+                                attend_messages.append(newMessage)
                             }
                         }
                     } else {
@@ -1734,36 +1731,42 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         _ = self.fallbackService.camera_image_request()
     }
 
+    struct ChatStatusParam: Codable {
+        let visible: Bool
+        let messages: [ChatStatusMessage]
+
+        init(visible: Bool, messages: [ChatMessage]) {
+            self.visible = visible
+            self.messages = messages.map() {ChatStatusMessage($0)}
+        }
+
+        struct ChatStatusMessage: Codable {
+            let id: UUID
+            let user: String
+            let text: String
+            
+            init(_ message: ChatMessage) {
+                self.id = message.id
+                self.user = "\(message.user)"
+                self.text = message.combined_text
+            }
+        }
+    }
+
     func shareChatStatus(all: Bool = false) {
-        var status = "close"
         var messages: [ChatMessage] = []
         if self.showingChatView {
-            status = "open"
             if all {
                 messages = self.chatModel.messages
             } else if let last = self.chatModel.messages.last {
                 messages = self.chatModel.messages.suffix(last.user == .Agent ? 1 : 2)
             }
         }
-        let json = dictToJson([
-            "status": status,
-            "messages": messages.map{[
-                "id": "\($0.id)",
-                "user": "\($0.user)",
-                "text": $0.combined_text
-            ]}
-        ])
-        share(user_info: SharedInfo(type: .ChatStatus, value: json))
-    }
-
-    func dictToJson(_ dict: [String: Any]) -> String {
-        guard let data = try? JSONSerialization.data(withJSONObject: dict), let str = String(data: data, encoding: .utf8) else {return ""}
-        return str
-    }
-
-    func jsonToDict(_ text: String) -> [String: Any] {
-        guard let dict = try? JSONSerialization.jsonObject(with: text.data(using: .utf8)!) as? [String: Any] else {return [:]}
-        return dict
+        if let data = try? JSONEncoder().encode(ChatStatusParam(visible: self.showingChatView, messages: messages)) {
+            if let value = String(data: data, encoding: .utf8) {
+                share(user_info: SharedInfo(type: .ChatStatus, value: value))
+            }
+        }
     }
 }
 
