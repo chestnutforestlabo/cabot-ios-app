@@ -1646,11 +1646,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 }
             }
             if userInfo.type == .ChatStatus {
-                if let data = userInfo.value.data(using: .utf8), let param = try? JSONDecoder().decode(ChatStatusParam.self, from: data) {
+                if let data = userInfo.value.data(using: .utf8), let status = try? JSONDecoder().decode(ChatStatusParam.self, from: data) {
                     silentForChange = true
-                    toggleChatView = param.visible
+                    toggleChatView = status.visible
                     if toggleChatView {
-                        for message in param.messages {
+                        for message in status.messages {
                             if let replace = attend_messages.first(where: { $0.id == message.id }) {
                                 let appendText = message.text.suffix(message.text.count - replace.combined_text.count)
                                 replace.append(text: "\(appendText)")
