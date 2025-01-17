@@ -1437,6 +1437,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     }
                 }
                 _ = self.fallbackService.manage(command: .handleside, param: self.suitcaseFeatures.selectedHandleSide.rawValue)
+                self.share(user_info: SharedInfo(type: .PossibleHandleSide, value: self.suitcaseFeatures.possibleHandleSides.map({ s in s.rawValue }).joined(separator: ",")))
+                self.share(user_info: SharedInfo(type: .ChangeHandleSide, value: self.suitcaseFeatures.selectedHandleSide.rawValue))
             }
             break
         case .gettouchmode:
@@ -1448,6 +1450,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     }
                 }
                 _ = self.fallbackService.manage(command: .touchmode, param: self.suitcaseFeatures.selectedTouchMode.rawValue)
+                self.share(user_info: SharedInfo(type: .PossibleTouchMode, value: self.suitcaseFeatures.possibleTouchModes.map({ m in m.rawValue }).joined(separator: ",")))
+                self.share(user_info: SharedInfo(type: .ChangeTouchMode, value: self.suitcaseFeatures.selectedTouchMode.rawValue))
             }
             break
         }
