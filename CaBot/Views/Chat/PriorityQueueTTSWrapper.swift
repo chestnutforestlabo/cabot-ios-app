@@ -29,12 +29,26 @@ import AVFoundation
 class PriorityQueueTTSWrapper: NSObject, TTSProtocol, PriorityQueueTTSDelegate {
 
     func progress(queue: PriorityQueueTTS, entry: QueueEntry) {
-
+        if let callback = map[entry] {
+            if let token = entry.token, let text = token.text {
+                let uuid = entry.uuid, count=token.bufferedRange.progressCount, range = token.bufferedRange.range, voiceover = UIAccessibility.isVoiceOverRunning
+                Debug(log:"<TTS> progress token:\(token.text ?? "") pos:\(token.bufferedRange.range.location) count:\(token.bufferedRange.progressCount) len:\(token.bufferedRange.range.length)")
+                if count == 0 || self._lastSpokenEntryUUID != uuid {
+                    self.delegate?.share(user_info: SharedInfo(type: .Speak, value: text, flag1: true, flag2: voiceover, location: range.location))
+                    self._lastSpokenEntryUUID = uuid
+                }
+                self.delegate?.share(user_info: SharedInfo(type: .SpeakProgress, value: text, location: range.location, length: range.length))
+            }
+        } else {
+            self.ttsDelegate?.progress(queue: queue, entry: entry)
+        }
     }
 
     func completed(queue: PriorityQueueTTS, entry: QueueEntry) {
         if let callback = map[entry] {
             callback()
+        } else {
+            self.ttsDelegate?.completed(queue: queue, entry: entry)
         }
     }
 
@@ -43,9 +57,13 @@ class PriorityQueueTTSWrapper: NSObject, TTSProtocol, PriorityQueueTTSDelegate {
     let tts = PriorityQueueTTS.shared
     var map: [QueueEntry: ()->Void] = [:]
     var cancellables = Set<AnyCancellable>()
+    var delegate:CaBotTTSDelegate?
+    private var ttsDelegate: PriorityQueueTTSDelegate?
+    private var _lastSpokenEntryUUID: UUID? = nil
 
     private override init() {
         super.init()
+        self.ttsDelegate = tts.delegate
         tts.delegate = self
         tts.start()
     }
@@ -54,6 +72,11 @@ class PriorityQueueTTSWrapper: NSObject, TTSProtocol, PriorityQueueTTSDelegate {
         guard let text = text else { return callback() }
         let entry = TokenizerEntry(separators: [".", "!", "?", "\n", "。"], timeout_sec: 180) { _, token, reason in
             Debug(log:"<TTS> complete reason:\(reason) token:\(token?.text ?? "")")
+            if reason != .Canceled, let token = token, let text = token.text {
+                let voiceover = UIAccessibility.isVoiceOverRunning
+                self.delegate?.share(user_info: SharedInfo(type: .SpeakProgress, value: text, flag1: true, flag2: voiceover, length: text.count))
+                self._lastSpokenEntryUUID = nil
+            }
             if reason == .Canceled && token != nil {
                 callback()
             }
