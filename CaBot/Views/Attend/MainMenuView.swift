@@ -395,7 +395,10 @@ struct MainMenus: View {
                 NavigationLink(
                     destination: ChatHistoryView(),
                     label: {
-                        Text("See history")
+                        HStack {
+                            Spacer()
+                            Text("See history")
+                        }
                     })
                 .disabled(!modelData.isUserAppConnected)
             }

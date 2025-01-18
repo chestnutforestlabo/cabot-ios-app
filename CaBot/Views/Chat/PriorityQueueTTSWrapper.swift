@@ -75,7 +75,6 @@ class PriorityQueueTTSWrapper: NSObject, TTSProtocol, PriorityQueueTTSDelegate {
             if reason != .Canceled, let token = token, let text = token.text {
                 let voiceover = UIAccessibility.isVoiceOverRunning
                 self.delegate?.share(user_info: SharedInfo(type: .SpeakProgress, value: text, flag1: true, flag2: voiceover, length: text.count))
-                self._lastSpokenEntryUUID = nil
             }
             if reason == .Canceled && token != nil {
                 callback()
