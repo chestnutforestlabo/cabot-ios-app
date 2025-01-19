@@ -29,7 +29,7 @@ import AVFoundation
 class PriorityQueueTTSWrapper: NSObject, TTSProtocol, PriorityQueueTTSDelegate {
 
     func progress(queue: PriorityQueueTTS, entry: QueueEntry) {
-        if let callback = map[entry] {
+        if map[entry] != nil {
             if let token = entry.token, let text = token.text {
                 let uuid = entry.uuid, count=token.bufferedRange.progressCount, range = token.bufferedRange.range, voiceover = UIAccessibility.isVoiceOverRunning
                 Debug(log:"<TTS> progress token:\(token.text ?? "") pos:\(token.bufferedRange.range.location) count:\(token.bufferedRange.progressCount) len:\(token.bufferedRange.range.length)")

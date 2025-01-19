@@ -1446,7 +1446,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/CMU-cabot/ChatView";
 			requirement = {
-				branch = "auto-scroll";
+				branch = main;
 				kind = branch;
 			};
 		};
@@ -1454,7 +1454,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/cmu-cabot/OpenAI";
 			requirement = {
-				branch = "custom-metadata-anycodable";
+				branch = main;
 				kind = branch;
 			};
 		};
