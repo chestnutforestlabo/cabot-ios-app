@@ -332,7 +332,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             }
             ResourceManager.shared.invalidate()
             self.loadFromServer()
-            silentForChange = false
         }
         didSet {
             NSLog("selectedLanguage = \(selectedLanguage)")
@@ -341,6 +340,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             I18N.shared.set(lang: selectedLanguage)
             self.tts.lang = selectedLanguage
             self.updateVoice()
+            silentForChange = false
         }
     }
     var languages: [String] = ["en", "ja"]
@@ -390,7 +390,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     share(user_info: SharedInfo(type: .ChangeUserVoiceType, value: id, flag1: modeType == .Advanced))
                 }
             }
-            silentForChange = false
         }
         didSet {
             if let id = userVoice?.AVvoice.identifier {
@@ -399,6 +398,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 UserDefaults.standard.synchronize()
                 self.updateTTS()
             }
+            silentForChange = false
         }
     }
 
@@ -409,12 +409,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 // do not send flag1=true here, handled in setting view
                 share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(newValue)", flag1: false))
             }
-            silentForChange = false
         }
         didSet {
             UserDefaults.standard.setValue(userSpeechRate, forKey: speechRateKey)
             UserDefaults.standard.synchronize()
             self.updateTTS()
+            silentForChange = false
         }
     }
 
