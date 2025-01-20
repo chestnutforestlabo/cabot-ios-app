@@ -332,7 +332,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             }
             ResourceManager.shared.invalidate()
             self.loadFromServer()
-            silentForChange = false
         }
         didSet {
             NSLog("selectedLanguage = \(selectedLanguage)")
@@ -341,6 +340,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             I18N.shared.set(lang: selectedLanguage)
             self.tts.lang = selectedLanguage
             self.updateVoice()
+            silentForChange = false
         }
     }
     var languages: [String] = ["en", "ja"]
@@ -390,7 +390,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     share(user_info: SharedInfo(type: .ChangeUserVoiceType, value: id, flag1: modeType == .Advanced))
                 }
             }
-            silentForChange = false
         }
         didSet {
             if let id = userVoice?.AVvoice.identifier {
@@ -399,6 +398,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 UserDefaults.standard.synchronize()
                 self.updateTTS()
             }
+            silentForChange = false
         }
     }
 
@@ -409,12 +409,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 // do not send flag1=true here, handled in setting view
                 share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(newValue)", flag1: false))
             }
-            silentForChange = false
         }
         didSet {
             UserDefaults.standard.setValue(userSpeechRate, forKey: speechRateKey)
             UserDefaults.standard.synchronize()
             self.updateTTS()
+            silentForChange = false
         }
     }
 
@@ -742,11 +742,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.suitcaseFeatures.updater({side, mode in
             if let side = side {
                 print("willSet selectedHandleSide \(side)")
+                _ = self.fallbackService.share(user_info: SharedInfo(type: .PossibleHandleSide, value: self.suitcaseFeatures.possibleHandleSides.map({ s in s.rawValue }).joined(separator: ",")))
                 _ = self.fallbackService.share(user_info: SharedInfo(type: .ChangeHandleSide, value: side.rawValue))
                 _ = self.fallbackService.manage(command: .handleside, param: side.rawValue)
             }
             if let mode = mode {
                 print("willSet selectedTouchMode \(mode)")
+                _ = self.fallbackService.share(user_info: SharedInfo(type: .PossibleTouchMode, value: self.suitcaseFeatures.possibleTouchModes.map({ m in m.rawValue }).joined(separator: ",")))
                 _ = self.fallbackService.share(user_info: SharedInfo(type: .ChangeTouchMode, value: mode.rawValue))
                 _ = self.fallbackService.manage(command: .touchmode, param: mode.rawValue)
             }
@@ -1435,6 +1437,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     }
                 }
                 _ = self.fallbackService.manage(command: .handleside, param: self.suitcaseFeatures.selectedHandleSide.rawValue)
+                self.share(user_info: SharedInfo(type: .PossibleHandleSide, value: self.suitcaseFeatures.possibleHandleSides.map({ s in s.rawValue }).joined(separator: ",")))
+                self.share(user_info: SharedInfo(type: .ChangeHandleSide, value: self.suitcaseFeatures.selectedHandleSide.rawValue))
             }
             break
         case .gettouchmode:
@@ -1446,6 +1450,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     }
                 }
                 _ = self.fallbackService.manage(command: .touchmode, param: self.suitcaseFeatures.selectedTouchMode.rawValue)
+                self.share(user_info: SharedInfo(type: .PossibleTouchMode, value: self.suitcaseFeatures.possibleTouchModes.map({ m in m.rawValue }).joined(separator: ",")))
+                self.share(user_info: SharedInfo(type: .ChangeTouchMode, value: self.suitcaseFeatures.selectedTouchMode.rawValue))
             }
             break
         }
@@ -1580,6 +1586,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     }
                 }
             }
+            if userInfo.type == .PossibleHandleSide {
+                self.suitcaseFeatures.update(handlesideOptions: userInfo.value)
+            }
+            if userInfo.type == .PossibleTouchMode {
+                self.suitcaseFeatures.update(touchmodeOptions: userInfo.value)
+            }
             return
         }
 
@@ -1630,6 +1642,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.share(user_info: SharedInfo(type: .ChangeLanguage, value: self.resourceLang))
         self.share(user_info: SharedInfo(type: .ChangeUserVoiceType, value: "\(self.userVoice?.id ?? "")", flag1: false))
         self.share(user_info: SharedInfo(type: .ChangeUserVoiceRate, value: "\(self.userSpeechRate)", flag1: false))
+        self.share(user_info: SharedInfo(type: .PossibleHandleSide, value: self.suitcaseFeatures.possibleHandleSides.map({ s in s.rawValue }).joined(separator: ",")))
+        self.share(user_info: SharedInfo(type: .PossibleTouchMode, value: self.suitcaseFeatures.possibleTouchModes.map({ m in m.rawValue }).joined(separator: ",")))
         self.share(user_info: SharedInfo(type: .ChangeHandleSide, value: self.suitcaseFeatures.selectedHandleSide.rawValue))
         self.share(user_info: SharedInfo(type: .ChangeTouchMode, value: self.suitcaseFeatures.selectedTouchMode.rawValue))
     }
