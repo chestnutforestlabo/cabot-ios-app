@@ -46,7 +46,7 @@ class ChatClientOpenAI: ChatClient {
         let url = URL(string: config.host)!
         NSLog("OpenAI Client with \(url)")
         let configuration = OpenAI.Configuration(
-            token: "temp-key",
+            token: config.apiKey,
             organizationIdentifier: nil,
             endpoint: url
         )

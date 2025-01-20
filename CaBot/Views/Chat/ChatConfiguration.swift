@@ -26,31 +26,29 @@ import Foundation
 class ChatConfiguration : ObservableObject {
     @Published public var host : String {
         didSet {
-            setToUserDefaults()
+            Settings.host.set( host )
         }
     }
     @Published public var apiKey : String {
         didSet {
-            setToUserDefaults()
+            Settings.apiKey.set( apiKey )
         }
     }
     @Published public var model : String {
         didSet {
-            setToUserDefaults()
+            Settings.model.set( model )
         }
     }
     @Published public var historySize : Int {
         didSet {
-            setToUserDefaults()
         }
     }
 
-    init(host: String = "", apiKey: String = "", model: String = "", historySize : Int = 20) {
-        self.host = host
-        self.apiKey = apiKey
-        self.model = model
+    init(historySize : Int = 20) {
+        self.host = Settings.host.get(default:"http://localhost:8080/v1")
+        self.model = Settings.model.get(default:"ollama/llama3.2")
+        self.apiKey = Settings.apiKey.get(default:"")
         self.historySize = historySize
-        loadFromUserDefaults()
     }
 }
 
@@ -67,21 +65,6 @@ extension ChatConfiguration {
         func get() -> Int { UserDefaults.standard.integer(forKey:self.key) }
         func set( _ value:String ) { UserDefaults.standard.set(value, forKey:self.key) }
         func set( _ value:Int ) { UserDefaults.standard.set(value, forKey:self.key) }
-    }
-    
-    @discardableResult
-    func loadFromUserDefaults() -> Self {
-        self.host = Settings.host.get(default:"http://localhost:8080/v1")
-        self.model = Settings.host.get(default:"ollama/llama3.2")
-        self.apiKey = Settings.apiKey.get(default:"")
-        return self
-    }
-    
-    @discardableResult
-    func setToUserDefaults() -> Self {
-        Settings.host.set( host )
-        Settings.apiKey.set( apiKey )
-        return self
     }
     
     var isValid : Bool {
