@@ -65,7 +65,6 @@ class PriorityQueueTTSWrapper: NSObject, TTSProtocol, PriorityQueueTTSDelegate {
         super.init()
         self.ttsDelegate = tts.delegate
         tts.delegate = self
-        tts.start()
     }
 
     func speak(_ text: PassthroughSubject<String, any Error>?, callback: @escaping () -> Void) {
