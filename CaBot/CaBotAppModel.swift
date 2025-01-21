@@ -330,7 +330,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             if (self.bluetoothState == .poweredOn || self.bluetoothState == .poweredOff) &&
                 self.notificationState != .Init &&
                 self.locationState != .Init &&
-                self.recordPermission != .undetermined &&
+                self.recordPermission == .granted &&
                 self.speechRecoState != .notDetermined
             {
                 if self.authRequestedByUser {
