@@ -165,7 +165,7 @@ class ChatClientOpenAI: ChatClient {
         } completion: { error in
             print("chat stream completed \(error), error_count=\(error_count), success_count=\(success_count)")
             guard let pub = self.pub else {return}
-            if error_count > 0 && success_count == 0 {
+            if success_count == 0 {
                 let result_id = UUID().uuidString
                 self.callback?(result_id, pub)
                 self.callback_called.insert(result_id)
