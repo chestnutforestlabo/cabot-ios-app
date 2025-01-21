@@ -31,7 +31,7 @@ extension Model {
 
 class ChatClientOpenAI: ChatClient {
     var callback: ChatClientCallback?
-    var client: OpenAI
+    var client: OpenAI?
     let welcome_text = "Hello"
     var pub: PassthroughSubject<String, Error>?
     var callback_called = Set<String>()
@@ -43,14 +43,6 @@ class ChatClientOpenAI: ChatClient {
 
     init(config:ChatConfiguration, callback: @escaping ChatClientCallback) {
         self.callback = callback
-        let url = URL(string: config.host)!
-        NSLog("OpenAI Client with \(url)")
-        let configuration = OpenAI.Configuration(
-            token: config.apiKey,
-            organizationIdentifier: nil,
-            endpoint: url
-        )
-        self.client = OpenAI(configuration: configuration)
         self.history = LimitedArray<ChatItem>( limit: config.historySize )
         self.metadata = [
             "conversation_id": UUID().uuidString,
@@ -59,11 +51,28 @@ class ChatClientOpenAI: ChatClient {
             "lang": I18N.shared.langCode,
             "tour_recommendation_filter": "all" // TBD
         ]
+        self.initClient(config: config)
+    }
+    func restart(config:ChatConfiguration) {
+        self.history = LimitedArray<ChatItem>( limit: config.historySize )
+        self.metadata["conversation_id"] = UUID().uuidString
+        self.initClient(config: config)
+    }
+    func initClient(config:ChatConfiguration) {
+        if let url = URL(string: config.host) {
+            NSLog("OpenAI Client with \(url)")
+            let configuration = OpenAI.Configuration(
+                token: config.apiKey,
+                organizationIdentifier: nil,
+                endpoint: url
+            )
+            self.client = OpenAI(configuration: configuration)
+        } else {
+            NSLog("Invalid URL \(config.host)")
+            self.client = nil
+        }
     }
     func send(message: String) {
-        if message.isEmpty {
-            self.metadata["conversation_id"] = UUID().uuidString
-        }
         // prepare messages
         var messages: [ChatQuery.ChatCompletionMessageParam] = []
         if message.hasPrefix("data:image") {
@@ -97,7 +106,7 @@ class ChatClientOpenAI: ChatClient {
         self.pub = PassthroughSubject<String, Error>()
         self.prepareSinkForHistory()
         var error_count = 0, success_count = 0
-        client.chatsStream(query: query) { partialResult in
+        client?.chatsStream(query: query) { partialResult in
             print("chat stream partialResult \(partialResult)")
             guard let pub = self.pub else { return }
             switch partialResult {

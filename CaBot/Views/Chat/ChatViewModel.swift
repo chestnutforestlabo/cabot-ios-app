@@ -34,7 +34,7 @@ class ChatViewModel: ObservableObject  {
     @Published var chatState = ChatStateButtonModel()
 
     var stt: AppleSTT?
-    var chat: ChatClient?
+    var chat: ChatClientOpenAI?
     var config: ChatConfiguration = ChatConfiguration()
     private var map: [String: ChatMessage] = [:]
     private var map2: [String: PassthroughSubject<String, Error>] = [:]

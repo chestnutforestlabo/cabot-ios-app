@@ -71,6 +71,8 @@ public struct ContentView: View {
         if model.stt == nil {
             model.stt = AppleSTT(state: $model.chatState, tts: PriorityQueueTTSWrapper.shared)
             model.chat = ChatClientOpenAI(config:model.config, callback: model.process)
+        } else {
+            model.chat?.restart(config:model.config)
         }
         model.messages.removeAll()
         model.send(message: "")
