@@ -39,7 +39,7 @@ struct ChatSettingsView: View {
                 VStack(alignment:.leading) {
                     Text("Api Key:")
                         .font(.caption).foregroundColor(.secondary)
-                    TextField("", text: $model.chatModel.config.apiKey)
+                    SecureField("", text: $model.chatModel.config.apiKey)
                         .autocapitalization(.none)
                         .keyboardType(.asciiCapable)
                 }
