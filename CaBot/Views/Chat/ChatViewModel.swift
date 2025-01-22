@@ -149,7 +149,7 @@ class ChatData {
     var lastCameraImage: String? {
         didSet {
             guard let image = lastCameraImage else {return}
-            print("chat camera_image \(image.count) bytes")
+            NSLog("chat camera_image \(image.count) bytes")
         }
     }
 

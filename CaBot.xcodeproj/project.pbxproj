@@ -1446,7 +1446,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/CMU-cabot/ChatView";
 			requirement = {
-				branch = main;
+				branch = "itohtaka/scroll-onApear";
 				kind = branch;
 			};
 		};

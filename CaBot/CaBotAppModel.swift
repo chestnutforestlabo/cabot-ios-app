@@ -1662,7 +1662,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 if let data = userInfo.value.data(using: .utf8), let status = try? JSONDecoder().decode(ChatStatusParam.self, from: data) {
                     silentForChange = true
                     toggleChatView = status.visible
-                    if toggleChatView {
+                    if !status.messages.isEmpty {
                         for message in status.messages {
                             if let replace = attend_messages.first(where: { $0.id == message.id }) {
                                 let appendText = message.text.suffix(message.text.count - replace.combined_text.count)
@@ -1770,12 +1770,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func shareChatStatus(all: Bool = false) {
         var messages: [ChatMessage] = []
-        if self.showingChatView {
-            if all {
-                messages = self.chatModel.messages
-            } else if let last = self.chatModel.messages.last {
-                messages = self.chatModel.messages.suffix(last.user == .Agent ? 1 : 2)
-            }
+        if all && self.showingChatView {
+            messages = self.chatModel.messages
+        } else if let last = self.chatModel.messages.last {
+            messages = self.chatModel.messages.suffix(last.user == .Agent ? 1 : 2)
         }
         if let data = try? JSONEncoder().encode(ChatStatusParam(visible: self.showingChatView, messages: messages)) {
             if let value = String(data: data, encoding: .utf8) {
