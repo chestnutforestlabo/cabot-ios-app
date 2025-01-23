@@ -412,7 +412,8 @@ extension CaBotServiceTCP: CaBotServiceProtocol {
                         "chunkIndex": i,
                         "totalChunks": totalChunks,
                         "data": chunk,
-                        "appLogName": fileName
+                        "appLogName": fileName,
+                        "cabotLogName": log_info.log_name
                     ]
                     
                     do {

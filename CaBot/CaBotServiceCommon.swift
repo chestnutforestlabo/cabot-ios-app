@@ -421,7 +421,7 @@ enum CaBotLogRequestType:String, Decodable {
 
 struct LogEntry: Decodable, Hashable {
     var name: String
-    var nanoseconds: String?
+    var nanoseconds: Int?
     var title: String?
     var detail: String?
     var is_report_submitted: Bool? = false
@@ -448,13 +448,13 @@ struct LogEntry: Decodable, Hashable {
     }
     
     var endDate: Date? {
-        if let str_nanoseconds = nanoseconds, let date = parsedDate {
-            if let int_nanoseconds = Int(str_nanoseconds) {
-                var seconds = Double(int_nanoseconds) / 1_000_000_000
+        if let nanoseconds = nanoseconds, let date = parsedDate {
+            if nanoseconds > 0 {
+                var seconds = Double(nanoseconds) / 1_000_000_000
                 seconds = max(seconds, 60)
-                return Date(timeInterval: seconds, since: date)
+                return min(Date(timeInterval: seconds, since: date), Date())
             } else {
-                return Date() // now
+                return nil // now
             }
         }
         
