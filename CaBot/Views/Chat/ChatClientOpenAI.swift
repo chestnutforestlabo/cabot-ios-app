@@ -93,6 +93,14 @@ class ChatClientOpenAI: ChatClient {
         } else {
             self.metadata.removeValue(forKey: "current_location")
         }
+        if let tourManager = ChatData.shared.tourManager {
+            if let dest = tourManager.currentDestination {
+                self.metadata["current_destination"] = dest.value
+            } else {
+                self.metadata["current_destination"] = NSNull()
+            }
+            self.metadata["destinations"] = tourManager.destinations.map{$0.value}
+        }
         // query
         let query = ChatQuery(messages: messages, model: "dummy", metadata: AnyCodable(self.metadata))
 
