@@ -126,7 +126,8 @@ class ChatViewModel: ObservableObject  {
 class ChatData {
     static let shared = ChatData()
     private let locationLogPack = LogPack(title:"<Socket on: location>", threshold:7.0, maxPacking:10)
-    var suitcase_id = "unknown"
+    private let cameraOrientationLogPack = LogPack(title:"<Socket on: camera_orientation>", threshold:7.0, maxPacking:10)
+    private let cabotNameLogPack = LogPack(title:"<Socket on: cabot_name>", threshold:7.0, maxPacking:10)
     var viewModel: ChatViewModel?
     var tourManager: TourManager?
     var errorMessage: String?
@@ -163,7 +164,13 @@ class ChatData {
     var lastCameraOrientation: CameraOrientation? {
         didSet {
             guard let orientation = lastCameraOrientation else {return}
-            locationLogPack.log(text:"\(orientation)")
+            cameraOrientationLogPack.log(text:"\(orientation)")
+        }
+    }
+
+    var suitcase_id = "unknown" {
+        didSet {
+            cabotNameLogPack.log(text:"\(suitcase_id)")
         }
     }
 

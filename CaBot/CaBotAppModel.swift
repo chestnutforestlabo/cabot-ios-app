@@ -799,7 +799,6 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.chatModel.appModel = self
         ChatData.shared.tourManager = self.tourManager
         ChatData.shared.viewModel = self.chatModel
-        ChatData.shared.suitcase_id = "\(teamID)@\(primaryAddr)" // TBD
         PriorityQueueTTSWrapper.shared.delegate = self
     }
 

@@ -47,8 +47,6 @@ class ChatClientOpenAI: ChatClient {
         self.metadata = [
             "conversation_id": UUID().uuidString,
             "terminal_id": UIDevice.current.identifierForVendor?.uuidString ?? "unknown",
-            "suitcase_id": ChatData.shared.suitcase_id,
-            "lang": I18N.shared.langCode,
             "tour_recommendation_filter": "all" // TBD
         ]
         self.initClient(config: config)
@@ -84,6 +82,8 @@ class ChatClientOpenAI: ChatClient {
         }
         // prepare metadata
         self.metadata["request_id"] = UUID().uuidString
+        self.metadata["lang"] = I18N.shared.langCode
+        self.metadata["suitcase_id"] = ChatData.shared.suitcase_id
         if let loc = ChatData.shared.lastLocation {
             self.metadata["current_location"] = [
                 "lat": loc.lat,

@@ -136,6 +136,7 @@ class CaBotServiceTCP: NSObject {
                 weakself.connected = true
                 delegate.caBot(service: weakself, centralConnected: weakself.connected)
                 weakself.startHeartBeat()
+                socket.emit("req_name", true)
             }
             socket.emit("req_version", true)
         }
@@ -300,6 +301,10 @@ class CaBotServiceTCP: NSObject {
                 print(text)
                 NSLog(error.localizedDescription)
             }
+        }
+        socket.on("cabot_name"){[weak self] dt, ack in
+            guard let text = dt[0] as? String else { return }
+            ChatData.shared.suitcase_id = text
         }
         socket.on("camera_image"){[weak self] dt, ack in
             guard let text = dt[0] as? String else { return }
