@@ -139,6 +139,13 @@ class ChatData {
         var yaw: Double
     }
 
+    struct CameraOrientation: Decodable {
+        var roll: Double
+        var pitch: Double
+        var yaw: Double
+        var camera_rotate: Bool
+    }
+
     var lastLocation: CurrentLocation? {
         didSet {
             guard let location = lastLocation else {return}
@@ -153,9 +160,17 @@ class ChatData {
         }
     }
 
+    var lastCameraOrientation: CameraOrientation? {
+        didSet {
+            guard let orientation = lastCameraOrientation else {return}
+            locationLogPack.log(text:"\(orientation)")
+        }
+    }
+
     func clear() {
         lastLocation = nil
         lastCameraImage = nil
+        lastCameraOrientation = nil
         errorMessage = nil
         startNavigate = false
     }

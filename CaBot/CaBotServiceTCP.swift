@@ -305,6 +305,16 @@ class CaBotServiceTCP: NSObject {
             guard let text = dt[0] as? String else { return }
             ChatData.shared.lastCameraImage = text
         }
+        socket.on("camera_orientation"){[weak self] dt, ack in
+            guard let text = dt[0] as? String else { return }
+            guard let data = String(text).data(using:.utf8) else { return }
+            do {
+                ChatData.shared.lastCameraOrientation = try JSONDecoder().decode(ChatData.CameraOrientation.self, from: data)
+            } catch {
+                print(text)
+                NSLog(error.localizedDescription)
+            }
+        }
         socket.connect(timeoutAfter: 2.0) { [weak self] in
             guard let weakself = self else { return }
             weakself.stop()

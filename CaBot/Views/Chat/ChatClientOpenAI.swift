@@ -137,7 +137,10 @@ class ChatClientOpenAI: ChatClient {
                                     if params.is_image_required {
                                         DispatchQueue.main.async {
                                             guard let imageUrl = ChatData.shared.lastCameraImage, let viewModel = ChatData.shared.viewModel else {return}
-                                            let targetUrl = self.rotate(imageUrl) // TODO check camera type
+                                            var targetUrl = imageUrl
+                                            if let orientation = ChatData.shared.lastCameraOrientation, orientation.camera_rotate {
+                                                targetUrl = self.rotate(imageUrl)
+                                            }
                                             self.send(message: targetUrl)
                                             viewModel.addUserImage(base64_text: targetUrl)
                                         }
