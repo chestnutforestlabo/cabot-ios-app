@@ -137,8 +137,9 @@ class ChatClientOpenAI: ChatClient {
                                     if params.is_image_required {
                                         DispatchQueue.main.async {
                                             guard let imageUrl = ChatData.shared.lastCameraImage, let viewModel = ChatData.shared.viewModel else {return}
-                                            self.send(message: imageUrl)
-                                            viewModel.addUserImage(base64_text: imageUrl)
+                                            let targetUrl = self.rotate(imageUrl) // TODO check camera type
+                                            self.send(message: targetUrl)
+                                            viewModel.addUserImage(base64_text: targetUrl)
                                         }
                                     }
                                 }
@@ -278,6 +279,16 @@ class ChatClientOpenAI: ChatClient {
         }
         NSLog("chat tour_id \(params.tour_id) not found")
         ChatData.shared.errorMessage = CustomLocalizedString("Could not set tour", lang: I18N.shared.langCode)
+    }
+
+    func rotate(_ imageUrl: String) -> String {
+        let array = imageUrl.components(separatedBy: "base64,")
+        if array.count == 0 {return imageUrl}
+        guard let data = Data(base64Encoded: array[1]) else { return imageUrl }
+        guard let image = UIImage(data: data) else { return imageUrl }
+        let newImage = UIImage(cgImage: image.cgImage!, scale: 1.0, orientation: .down)
+        guard let imageData = newImage.jpegData(compressionQuality: 0.75) else { return imageUrl }
+        return "data:image/jpeg;base64,\(imageData.base64EncodedString())"
     }
 }
 
