@@ -82,6 +82,13 @@
 "Enable Notification"="通知を許可する";
 "Notification Enabled"="通知が許可されました";
 "Notification Denied"="通知が許可されませんでした";
+"Enable Microphone"="マイクを許可する";
+"Microphone Enabled"="マイクが許可されました";
+"Microphone Denied"="マイクが許可されませんでした";
+"Enable Speech Reco"="音声認識を許可する";
+"Speech Reco Enabled"="音声認識が許可されました";
+"Speech Reco Not Available"="音声認識を利用できません";
+"Speech Reco Denied"="音声認識が許可されませんでした";
 
 
 // MainMenuView

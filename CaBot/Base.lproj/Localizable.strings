@@ -82,6 +82,13 @@
 "Enable Notification"="Enable Notification";
 "Notification Enabled"="Notification Enabled";
 "Notification Denied"="Notification Denied";
+"Enable Microphone"="Enable Microphone";
+"Microphone Enabled"="Microphone Enabled";
+"Microphone Denied"="Microphone Denied";
+"Enable Speech Reco"="Enable Speech Reco";
+"Speech Reco Enabled"="Speech Reco Enabled";
+"Speech Reco Not Available"="Speech Reco Not Available";
+"Speech Reco Denied"="Speech Reco Not Available";
 
 
 // MainMenuView
