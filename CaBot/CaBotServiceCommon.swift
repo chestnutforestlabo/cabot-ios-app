@@ -76,7 +76,7 @@ protocol CaBotServiceProtocol {
     func summon(destination: String) -> Bool
     func manage(command: CaBotManageCommand, param: String?) -> Bool
     func log_request(request: LogRequest) -> Bool
-    func send_log(log_info: LogRequest, app_log: [String:String]?) -> Bool
+    func send_log(log_info: LogRequest, app_log: [String], urls: [URL]) -> Bool
     func isConnected() -> Bool
     func share(user_info: SharedInfo) -> Bool
 }
