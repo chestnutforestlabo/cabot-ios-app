@@ -76,7 +76,7 @@ public struct ContentView: View {
                 model.messages.removeAll()
             }
         }
-        ChatData.shared.loadDestinations()
+        ChatData.shared.printTourData()
         model.send(message: "")
     }
 }

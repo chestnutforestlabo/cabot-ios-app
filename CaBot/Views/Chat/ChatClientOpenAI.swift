@@ -95,11 +95,11 @@ class ChatClientOpenAI: ChatClient {
         }
         if let tourManager = ChatData.shared.tourManager {
             if let dest = tourManager.currentDestination {
-                self.metadata["current_destination"] = dest.id()
+                self.metadata["current_destination"] = dest._id
             } else {
                 self.metadata["current_destination"] = NSNull()
             }
-            self.metadata["destinations"] = tourManager.destinations.map{$0.id()}
+            self.metadata["destinations"] = tourManager.destinations.map{$0._id}
         }
         // query
         let query = ChatQuery(messages: messages, model: "dummy", metadata: AnyCodable(self.metadata))
@@ -246,14 +246,14 @@ class ChatClientOpenAI: ChatClient {
     }
 
     func onDestinationSetting(_ params: DestinationSetting) {
-        guard let tourManager = ChatData.shared.tourManager else {return}
+        guard let tourManager = ChatData.shared.tourManager, let destinations = try? ResourceManager.shared.load().directory.allDestinations() else {return}
         if params.remove_all_destinations {
             tourManager.clearAllDestinations()
             NSLog("chat clear destinations")
         }
         var success = false
         params.destination_manipulations.forEach{item in
-            guard let dest = ChatData.shared.allDestinations.first(where: {$0.id() == item.destination_id}) else {
+            guard let dest = destinations.first(where: {$0._id == item.destination_id}) else {
                 NSLog("chat destination_id \(item.destination_id) not found")
                 return
             }
@@ -281,16 +281,15 @@ class ChatClientOpenAI: ChatClient {
     }
 
     func onTourSetting(_ params: TourSetting) {
-        if let tourManager = ChatData.shared.tourManager, let tours: [Tour] = try? ResourceManager.shared.load().tours {
-            if let tour = tours.first(where: {$0.id == params.tour_id}) {
-                tourManager.set(tour: tour)
-                NSLog("chat set tour: \(tour.id)")
-                ChatData.shared.startNavigate = true
-                return
-            }
+        guard let tourManager = ChatData.shared.tourManager, let tours = try? ResourceManager.shared.load().tours else {return}
+        guard let tour = tours.first(where: {$0.id == params.tour_id}) else {
+            NSLog("chat tour_id \(params.tour_id) not found")
+            ChatData.shared.errorMessage = CustomLocalizedString("Could not set tour", lang: I18N.shared.langCode)
+            return
         }
-        NSLog("chat tour_id \(params.tour_id) not found")
-        ChatData.shared.errorMessage = CustomLocalizedString("Could not set tour", lang: I18N.shared.langCode)
+        tourManager.set(tour: tour)
+        NSLog("chat set tour: \(tour.id)")
+        ChatData.shared.startNavigate = true
     }
 
     func rotate(_ imageUrl: String) -> String {
@@ -305,8 +304,10 @@ class ChatClientOpenAI: ChatClient {
 }
 
 extension Destination {
-    func id() -> String {
-        return String(self.value.split(separator: "@")[0])
+    var _id: String {
+        get {
+            return String(self.value.split(separator: "@")[0])
+        }
     }
 }
 

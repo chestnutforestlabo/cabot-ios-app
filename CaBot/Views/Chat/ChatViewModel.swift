@@ -132,7 +132,6 @@ class ChatData {
     var tourManager: TourManager?
     var errorMessage: String?
     var startNavigate = false
-    var allDestinations: [any Destination] = []
 
     struct CurrentLocation: Decodable {
         var lat: Double
@@ -183,12 +182,17 @@ class ChatData {
         startNavigate = false
     }
 
-    func loadDestinations() {
-        if let sections = try? ResourceManager.shared.load().directory {
-            allDestinations =  sections.allDestinations()
-            NSLog("\(allDestinations.count) chat destinations")
-            allDestinations.forEach() { dest in
-                print("chat destination \(dest.title.text) \(dest.id())")
+    func printTourData() {
+        if let result = try? ResourceManager.shared.load() {
+            let tours = result.tours
+            let destinations =  result.directory.allDestinations()
+            NSLog("\(tours.count) chat tours")
+            tours.forEach() { tour in
+                NSLog("chat tour \(tour.title.text) \(tour.id)")
+            }
+            NSLog("\(destinations.count) chat destinations")
+            destinations.forEach() { dest in
+                NSLog("chat destination \(dest.title.text) \(dest._id)")
             }
         }
     }
