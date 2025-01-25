@@ -95,11 +95,11 @@ class ChatClientOpenAI: ChatClient {
         }
         if let tourManager = ChatData.shared.tourManager {
             if let dest = tourManager.currentDestination {
-                self.metadata["current_destination"] = dest.value
+                self.metadata["current_destination"] = dest.id()
             } else {
                 self.metadata["current_destination"] = NSNull()
             }
-            self.metadata["destinations"] = tourManager.destinations.map{$0.value}
+            self.metadata["destinations"] = tourManager.destinations.map{$0.id()}
         }
         // query
         let query = ChatQuery(messages: messages, model: "dummy", metadata: AnyCodable(self.metadata))
@@ -253,7 +253,7 @@ class ChatClientOpenAI: ChatClient {
         }
         var success = false
         params.destination_manipulations.forEach{item in
-            guard let dest = tourManager.destinations.first(where: {$0.value == item.destination_id}) else {
+            guard let dest = ChatData.shared.allDestinations.first(where: {$0.id() == item.destination_id}) else {
                 NSLog("chat destination_id \(item.destination_id) not found")
                 return
             }
@@ -301,6 +301,12 @@ class ChatClientOpenAI: ChatClient {
         let newImage = UIImage(cgImage: image.cgImage!, scale: 1.0, orientation: .down)
         guard let imageData = newImage.jpegData(compressionQuality: 0.75) else { return imageUrl }
         return "data:image/jpeg;base64,\(imageData.base64EncodedString())"
+    }
+}
+
+extension Destination {
+    func id() -> String {
+        return String(self.value.split(separator: "@")[0])
     }
 }
 

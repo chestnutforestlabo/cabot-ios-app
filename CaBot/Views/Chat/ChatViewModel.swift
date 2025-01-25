@@ -132,6 +132,7 @@ class ChatData {
     var tourManager: TourManager?
     var errorMessage: String?
     var startNavigate = false
+    var allDestinations: [any Destination] = []
 
     struct CurrentLocation: Decodable {
         var lat: Double
@@ -180,5 +181,15 @@ class ChatData {
         lastCameraOrientation = nil
         errorMessage = nil
         startNavigate = false
+    }
+
+    func loadDestinations() {
+        if let sections = try? ResourceManager.shared.load().directory {
+            allDestinations =  sections.allDestinations()
+            NSLog("\(allDestinations.count) chat destinations")
+            allDestinations.forEach() { dest in
+                print("chat destination \(dest.title.text) \(dest.id())")
+            }
+        }
     }
 }
