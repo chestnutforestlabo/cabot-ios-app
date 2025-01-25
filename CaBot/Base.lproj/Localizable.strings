@@ -332,3 +332,4 @@
 "Received an unexpected response" = "Received an unexpected response";
 "Could not set destination" = "Could not set destination";
 "Could not set tour" = "Could not set tour";
+"Could not send camera image" = "Could not send camera image";

@@ -332,3 +332,4 @@
 "Received an unexpected response" = "想定外の応答を受け取りました";
 "Could not set destination" = "目的地を設定できませんでした";
 "Could not set tour" = "ツアーを設定できませんでした";
+"Could not send camera image" = "カメラ画像を送信できませんでした";

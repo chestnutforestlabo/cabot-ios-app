@@ -54,7 +54,7 @@ class ChatViewModel: ObservableObject  {
         }
     }
     func send(message: String) {
-        print("send message: \(message)")
+        NSLog("chat send message: \(message)")
         self.chat?.send(message: message)
     }
 

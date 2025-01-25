@@ -136,7 +136,15 @@ class ChatClientOpenAI: ChatClient {
                                     NSLog("chat function \(name): \(params)")
                                     if params.is_image_required {
                                         DispatchQueue.main.async {
-                                            guard let imageUrl = ChatData.shared.lastCameraImage, let viewModel = ChatData.shared.viewModel else {return}
+                                            guard let viewModel = ChatData.shared.viewModel else {return}
+                                            guard let imageUrl = ChatData.shared.lastCameraImage else {
+                                                DispatchQueue.main.async {
+                                                    let errorMessage = CustomLocalizedString("Could not send camera image", lang: I18N.shared.langCode)
+                                                    viewModel.messages.append(ChatMessage(user: .User, text: errorMessage))
+                                                    viewModel.send(message: errorMessage)
+                                                }
+                                                return
+                                            }
                                             var targetUrl = imageUrl
                                             if let orientation = ChatData.shared.lastCameraOrientation, orientation.camera_rotate {
                                                 targetUrl = self.rotate(imageUrl)
