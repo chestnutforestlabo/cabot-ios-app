@@ -279,12 +279,14 @@ struct MainMenus: View {
                     .lineLimit(1)
             }
         }) {
-            NavigationLink(
-                destination: ContentView(model: modelData.chatModel),
-                isActive: $modelData.showingChatView,
-                label: {
-                    Text("START_CONVERSATION")
-                })
+            if !modelData.chatModel.config.host.isEmpty {
+                NavigationLink(
+                    destination: ContentView(model: modelData.chatModel),
+                    isActive: $modelData.showingChatView,
+                    label: {
+                        Text("START_CONVERSATION")
+                    })
+            }
             NavigationLink(
                 destination: DestinationsView()
                     .environmentObject(modelData).heartbeat("DestinationsView"),

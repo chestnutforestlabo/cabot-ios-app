@@ -329,5 +329,6 @@
 "Chat Settings" = "Chat Settings";
 "Chat server connection" = "Chat server connection";
 "An unexpected error has occurred" = "An unexpected error has occurred";
+"Received an unexpected response" = "Received an unexpected response";
 "Could not set destination" = "Could not set destination";
 "Could not set tour" = "Could not set tour";

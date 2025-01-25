@@ -171,17 +171,18 @@ class ChatClientOpenAI: ChatClient {
                 }
             case .failure(let error):
                 error_count += 1
-                print("chat stream failure \(error)")
+                NSLog("chat stream failure \(error)")
                 break
             }
         } completion: { error in
-            print("chat stream completed \(error), error_count=\(error_count), success_count=\(success_count)")
+            NSLog("chat stream completed \(error), error_count=\(error_count), success_count=\(success_count)")
             guard let pub = self.pub else {return}
             if success_count == 0 {
                 let result_id = UUID().uuidString
                 self.callback?(result_id, pub)
                 self.callback_called.insert(result_id)
-                pub.send(CustomLocalizedString("An unexpected error has occurred", lang: I18N.shared.langCode))
+                let msg = error_count > 0 ? "Received an unexpected response" : "An unexpected error has occurred"
+                pub.send(CustomLocalizedString(msg, lang: I18N.shared.langCode))
             }
             pub.send(completion: .finished)
         }
