@@ -76,8 +76,23 @@ public struct ContentView: View {
                 model.messages.removeAll()
             }
         }
-        ChatData.shared.printTourData()
+        debugPrintTourData()
         model.send(message: "")
+    }
+
+    func debugPrintTourData() {
+        if let result = try? ResourceManager.shared.load() {
+            let tours = result.tours
+            let destinations =  result.directory.allDestinations()
+            NSLog("\(tours.count) chat tours")
+            tours.forEach() { tour in
+                NSLog("chat tour \(tour.title.text) \(tour.id)")
+            }
+            NSLog("\(destinations.count) chat destinations")
+            destinations.forEach() { dest in
+                NSLog("chat destination \(dest.title.text) \(dest._id)")
+            }
+        }
     }
 }
 
