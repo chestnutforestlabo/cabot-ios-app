@@ -142,7 +142,9 @@ class ChatClientOpenAI: ChatClient {
                                                 DispatchQueue.main.async {
                                                     let errorMessage = CustomLocalizedString("Could not send camera image", lang: I18N.shared.langCode)
                                                     viewModel.messages.append(ChatMessage(user: .User, text: errorMessage))
-                                                    viewModel.send(message: errorMessage)
+                                                    DispatchQueue.main.async {
+                                                        viewModel.send(message: errorMessage)
+                                                    }
                                                 }
                                                 return
                                             }
@@ -150,8 +152,10 @@ class ChatClientOpenAI: ChatClient {
                                             if let orientation = ChatData.shared.lastCameraOrientation, orientation.camera_rotate {
                                                 targetUrl = self.rotate(imageUrl)
                                             }
-                                            self.send(message: targetUrl)
                                             viewModel.addUserImage(base64_text: targetUrl)
+                                            DispatchQueue.main.async {
+                                                self.send(message: targetUrl)
+                                            }
                                         }
                                     }
                                 }
