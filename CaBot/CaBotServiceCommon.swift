@@ -24,6 +24,7 @@
 import Foundation
 import SwiftUI
 import CoreBluetooth
+import PriorityQueueTTS
 
 enum ConnectionType:String, CaseIterable{
     case BLE = "ble"
@@ -363,7 +364,7 @@ enum NavigationEventType:String, Decodable {
     case getlanguage
     case gethandleside
     case gettouchmode
-    case activatemicrophone
+    case toggleconversation
     case togglespeakstate
     case unknown
 }
@@ -541,10 +542,14 @@ class CaBotServiceActions {
                 delegate.cabot(service: service, openRequest: url)
             case .sound:
                 delegate.cabot(service: service, soundRequest: request.param)
-            case .activatemicrophone:
+            case .toggleconversation:
                 NSLog("Receive activate microphone request")
+                if let appModel = ChatData.shared.viewModel?.appModel {
+                    appModel.showingChatView = !appModel.showingChatView
+                }
             case .togglespeakstate:
                 NSLog("Receive toggle speake state request")
+                PriorityQueueTTS.shared.toggleSpeakState()
             case .unknown:
                 break
             }
