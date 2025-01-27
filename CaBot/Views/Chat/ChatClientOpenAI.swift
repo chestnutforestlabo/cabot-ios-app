@@ -71,6 +71,7 @@ class ChatClientOpenAI: ChatClient {
         }
     }
     func send(message: String) {
+        guard let appModel = ChatData.shared.viewModel?.appModel else {return}
         // prepare messages
         var messages: [ChatQuery.ChatCompletionMessageParam] = []
         if message.hasPrefix("data:image") {
@@ -116,7 +117,7 @@ class ChatClientOpenAI: ChatClient {
         var error_count = 0, success_count = 0
         client?.chatsStream(query: query) { partialResult in
             print("chat stream partialResult \(partialResult)")
-            guard let pub = self.pub else { return }
+            guard let pub = self.pub, appModel.showingChatView else { return }
             switch partialResult {
             case .success(let result):
                 success_count += 1
@@ -184,7 +185,7 @@ class ChatClientOpenAI: ChatClient {
             }
         } completion: { error in
             NSLog("chat stream completed \(error), error_count=\(error_count), success_count=\(success_count)")
-            guard let pub = self.pub else {return}
+            guard let pub = self.pub, appModel.showingChatView else {return}
             if success_count == 0 {
                 let result_id = UUID().uuidString
                 self.callback?(result_id, pub)
