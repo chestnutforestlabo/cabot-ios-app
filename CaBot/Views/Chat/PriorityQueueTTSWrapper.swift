@@ -90,11 +90,11 @@ class PriorityQueueTTSWrapper: NSObject, TTSProtocol, PriorityQueueTTSDelegate {
     }
 
     func stop() {
-        tts.cancel()
+        tts.cancel(at: .immediate)
     }
 
     func stop(_ immediate: Bool) {
-        tts.cancel()
+        tts.cancel(at: immediate ? .immediate : .word)
     }
 
     func vibrate() {
