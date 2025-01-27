@@ -363,6 +363,8 @@ enum NavigationEventType:String, Decodable {
     case getlanguage
     case gethandleside
     case gettouchmode
+    case activatemicrophone
+    case togglespeakstate
     case unknown
 }
 
@@ -539,6 +541,10 @@ class CaBotServiceActions {
                 delegate.cabot(service: service, openRequest: url)
             case .sound:
                 delegate.cabot(service: service, soundRequest: request.param)
+            case .activatemicrophone:
+                NSLog("Receive activate microphone request")
+            case .togglespeakstate:
+                NSLog("Receive toggle speake state request")
             case .unknown:
                 break
             }
