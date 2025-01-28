@@ -55,10 +55,10 @@ public struct ContentView: View {
             return
         }
         var count_down = 0
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+        timer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { timer in
             if start, let stt: AppleSTT = model.stt {
                 if stt.recognizing {
-                    count_down = 5
+                    count_down = 2
                 }
                 if count_down > 0 {
                     appModel.requestCameraImage()
