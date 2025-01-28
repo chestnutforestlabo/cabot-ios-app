@@ -107,7 +107,7 @@ class ChatClientOpenAI: ChatClient {
 
         if let data = try? JSONEncoder().encode(query) {
             if let str = String(data: data, encoding: .utf8) {
-                NSLog("chat send query: \(str)")
+                NSLog("chat send query: \(str.prefix(1000))")
             }
         }
 
