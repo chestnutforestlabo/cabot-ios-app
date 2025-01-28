@@ -163,7 +163,7 @@ class ChatClientOpenAI: ChatClient {
                             case "destination_setting":
                                 if let params = try? JSONDecoder().decode(DestinationSetting.self, from: arguments) {
                                     NSLog("chat function \(name): \(params)")
-                                    DispatchQueue.main.async() {
+                                    DispatchQueue.main.async {
                                         self.onDestinationSetting(params)
                                     }
                                 }
@@ -171,7 +171,7 @@ class ChatClientOpenAI: ChatClient {
                             case "tour_setting":
                                 if let params = try? JSONDecoder().decode(TourSetting.self, from: arguments) {
                                     NSLog("chat function \(name): \(params)")
-                                    DispatchQueue.main.async() {
+                                    DispatchQueue.main.async {
                                         self.onTourSetting(params)
                                     }
                                 }

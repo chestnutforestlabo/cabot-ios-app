@@ -440,9 +440,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     @Published var showingChatView: Bool = false {
-        willSet {
+        didSet {
             if silentForChange == false {
-                shareChatStatus(all: true)
+                shareChatStatus()
             }
             silentForChange = false
         }
@@ -1769,7 +1769,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func shareChatStatus(all: Bool = false) {
         var messages: [ChatMessage] = []
-        if all && self.showingChatView {
+        if all {
             messages = self.chatModel.messages
         } else if let last = self.chatModel.messages.last {
             messages = self.chatModel.messages.suffix(last.user == .Agent ? 1 : 2)
