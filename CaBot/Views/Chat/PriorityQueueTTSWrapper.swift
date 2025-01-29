@@ -102,6 +102,6 @@ class PriorityQueueTTSWrapper: NSObject, TTSProtocol, PriorityQueueTTSDelegate {
     }
 
     func playVoiceRecoStart() {
-        AudioServicesPlaySystemSound(1200)
+        AudioServicesPlaySystemSound(1404)
     }
 }
