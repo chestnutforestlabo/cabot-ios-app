@@ -124,6 +124,8 @@ class ChatViewModel: ObservableObject  {
             ChatData.shared.startNavigate = false
             self.chatState.chatState = .Inactive
             self.appModel?.needToStartAnnounce(wait: true)
+            self.playTimeoutSound()
+            self.appModel?.showingChatView = false
             return true
         }
         return false

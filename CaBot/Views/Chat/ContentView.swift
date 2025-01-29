@@ -78,7 +78,11 @@ public struct ContentView: View {
         }
         ContentView.inactive_at = nil
         debugPrintTourData()
-        model.send(message: "")
+        if model.messages.isEmpty {
+            model.send(message: "")
+        } else {
+            model.stt?.restartRecognize()
+        }
     }
 
     func debugPrintTourData() {
