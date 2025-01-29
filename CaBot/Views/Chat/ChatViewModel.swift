@@ -95,8 +95,13 @@ class ChatViewModel: ObservableObject  {
             },
             timeout: {
                 print("timeout")
+                self.playTimeoutSound()
             }
         )
+    }
+
+    func playTimeoutSound() {
+        AudioServicesPlaySystemSound(1110) // 1110: jbl_begin.caf
     }
 
     func addUserImage(base64_text: String) {
