@@ -39,6 +39,18 @@ class ChatViewModel: ObservableObject  {
     private var map: [String: ChatMessage] = [:]
     private var map2: [String: PassthroughSubject<String, Error>] = [:]
     var appModel: CaBotAppModel?
+    let inactive_delay_key = "chat_debug_inactive_delay"
+    var inactive_delay = 20.0 {
+        didSet {
+            UserDefaults.standard.setValue(inactive_delay, forKey: inactive_delay_key)
+            UserDefaults.standard.synchronize()
+        }
+    }
+    init() {
+        if let inactive_delay = UserDefaults.standard.value(forKey: inactive_delay_key) as? Double {
+            self.inactive_delay = inactive_delay
+        }
+    }
 
     func toggleChat() {
         if self.stt?.recognizing == true {

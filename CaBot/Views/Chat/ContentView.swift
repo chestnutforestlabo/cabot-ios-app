@@ -71,7 +71,7 @@ public struct ContentView: View {
         if model.stt == nil {
             model.stt = AppleSTT(state: $model.chatState, tts: PriorityQueueTTSWrapper.shared)
             model.chat = ChatClientOpenAI(config:model.config, callback: model.process)
-        } else if let inactive_at = ContentView.inactive_at, -inactive_at.timeIntervalSinceNow > 10.0 {
+        } else if let inactive_at = ContentView.inactive_at, -inactive_at.timeIntervalSinceNow > model.inactive_delay {
             ChatData.shared.clear()
             model.chat?.restart(config:model.config)
             model.messages.removeAll()
