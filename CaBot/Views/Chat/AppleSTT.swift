@@ -144,6 +144,7 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
         if let actions = self.last_action {
             self.tts?.vibrate()
             self.tts?.playVoiceRecoStart()
+            ContentView.inactive_at = nil
 
             DispatchQueue.main.asyncAfter(deadline: .now()+self.waitDelay) {
                 self.initPWCaptureSession()

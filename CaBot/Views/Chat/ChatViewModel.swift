@@ -96,6 +96,8 @@ class ChatViewModel: ObservableObject  {
             timeout: {
                 print("timeout")
                 self.playTimeoutSound()
+                ContentView.inactive_at = Date()
+                self.appModel?.showingChatView = false
             }
         )
     }

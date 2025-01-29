@@ -27,7 +27,7 @@ public struct ContentView: View {
     @EnvironmentObject var appModel: CaBotAppModel
     @StateObject var model: ChatViewModel
     @State var timer: Timer?
-    static var expire_at = Date()
+    static var inactive_at: Date?
     public var body: some View {
         ChatView(messages: model.messages)
         HStack {
@@ -51,7 +51,9 @@ public struct ContentView: View {
         if !start {
             model.stt?.endRecognize()
             timer?.invalidate()
-            ContentView.expire_at = Date(timeIntervalSinceNow: 10.0)
+            if ContentView.inactive_at == nil {
+                ContentView.inactive_at = Date()
+            }
             return
         }
         var count_down = 0
@@ -69,13 +71,12 @@ public struct ContentView: View {
         if model.stt == nil {
             model.stt = AppleSTT(state: $model.chatState, tts: PriorityQueueTTSWrapper.shared)
             model.chat = ChatClientOpenAI(config:model.config, callback: model.process)
-        } else {
-            if Date() > ContentView.expire_at {
-                ChatData.shared.clear()
-                model.chat?.restart(config:model.config)
-                model.messages.removeAll()
-            }
+        } else if let inactive_at = ContentView.inactive_at, -inactive_at.timeIntervalSinceNow > 10.0 {
+            ChatData.shared.clear()
+            model.chat?.restart(config:model.config)
+            model.messages.removeAll()
         }
+        ContentView.inactive_at = nil
         debugPrintTourData()
         model.send(message: "")
     }
