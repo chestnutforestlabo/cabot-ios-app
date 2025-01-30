@@ -102,6 +102,6 @@ class PriorityQueueTTSWrapper: NSObject, TTSProtocol, PriorityQueueTTSDelegate {
     }
 
     func playVoiceRecoStart() {
-        AudioServicesPlaySystemSound(1404) // 1404: SiriStart_Haptic.caf
+        ChatData.shared.viewModel?.playVoiceRecoStart()
     }
 }

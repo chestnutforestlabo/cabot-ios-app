@@ -114,8 +114,14 @@ class ChatViewModel: ObservableObject  {
         )
     }
 
+    func playVoiceRecoStart() {
+//        appModel?.playAudio(file: "/System/Library/Audio/UISounds/nano/3rdParty_Start_Haptic.caf")
+        appModel?.playAudio(file: "/System/Library/Audio/UISounds/nano/SiriStart_Haptic.caf")
+    }
+
     func playTimeoutSound() {
-        AudioServicesPlaySystemSound(1110) // 1110: jbl_begin.caf
+//        appModel?.playAudio(file: "/System/Library/Audio/UISounds/nano/3rdParty_Stop_Haptic.caf")
+        appModel?.playAudio(file: "/System/Library/Audio/UISounds/nano/SiriStopSuccess_Haptic.caf")
     }
 
     func addUserImage(base64_text: String) {
