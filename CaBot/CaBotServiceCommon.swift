@@ -546,6 +546,9 @@ class CaBotServiceActions {
                 NSLog("Receive activate microphone request")
                 if let appModel = ChatData.shared.viewModel?.appModel {
                     appModel.showingChatView = !appModel.showingChatView
+                    if !appModel.showingChatView {
+                        ChatData.shared.viewModel?.playTimeoutSound()
+                    }
                 }
             case .togglespeakstate:
                 NSLog("Receive toggle speake state request")
