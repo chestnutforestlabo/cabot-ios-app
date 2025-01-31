@@ -412,13 +412,66 @@ extension CaBotServiceTCP: CaBotServiceProtocol {
         }
     }
 
-    func log_request(request: Dictionary<String, String>) -> Bool {
+    func log_request(request: LogRequest) -> Bool {
         NSLog("log_request \(request)")
-        if let jsonString = try? JSONEncoder().encode(request) {
-            self.emit("log_request", jsonString)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        if let jsonData = try? encoder.encode(request) {
+            self.emit("log_request", jsonData)
             return true
         }
         return false
+    }
+    
+    func send_log(log_info: LogRequest, app_log: [String], urls: [URL]) -> Bool {
+        NSLog("send log_info \(log_info)")
+        NSLog("app_log_list \(app_log)")
+        let zipped = zip(app_log ,urls)
+        for (fileName, url) in zipped {
+            let chunkSize = 512 * 1024
+            guard let fileHandle = try? FileHandle(forReadingFrom: url) else {
+                return false
+            }
+
+            var chunkIndex = 0
+            while true {
+                let data = fileHandle.readData(ofLength: chunkSize)
+                if data.count == 0 {
+                    break
+                }
+                
+                let base64String = data.base64EncodedString()
+                let dict: [String: Any] = [
+                    "type": "data-chunk",
+                    "chunkIndex": chunkIndex,
+                    "data": base64String,
+                    "appLogName": fileName,
+                    "cabotLogName": log_info.log_name
+                ]
+                
+                do {
+                    let jsonData = try JSONSerialization.data(withJSONObject: dict, options: [])
+
+                    self.emit("log_request_chunk", jsonData)
+                } catch {
+                    print("fail to serialize JSON: \(error)")
+                }
+                chunkIndex += 1
+            }
+
+            let dict2: [String: Any] = ["type": log_info.type, "cabotLogName": log_info.log_name, "appLogName": fileName, "totalChunks": chunkIndex]
+
+            do {
+                let jsonData2 = try JSONSerialization.data(withJSONObject: dict2, options: [])
+
+                self.emit("log_request", jsonData2)
+            } catch {
+                print("fail to serialize JSON: \(error)")
+            }
+
+            NSLog("chunk end \(fileName)")
+        }
+        return true
     }
 
     public func isConnected() -> Bool {
