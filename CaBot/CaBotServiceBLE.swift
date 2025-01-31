@@ -201,6 +201,10 @@ class CaBotServiceBLE: NSObject {
 }
 
 extension CaBotServiceBLE: CaBotServiceProtocol {
+    func send_log(log_info: LogRequest, app_log: [String], urls: [URL]) -> Bool {
+        return false
+    }
+    
     // MARK: CaBotServiceProtocol
 
     public func activityLog(category: String = "", text: String = "", memo: String = "") -> Bool{
@@ -243,9 +247,11 @@ extension CaBotServiceBLE: CaBotServiceProtocol {
         }
     }
     
-    public func log_request(request: Dictionary<String, String>) -> Bool {
+    public func log_request(request: LogRequest) -> Bool {
         NSLog("log_request \(request)")
-        if let jsonData = try? JSONEncoder().encode(request) {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        if let jsonData = try? encoder.encode(request) {
             return self.logRequestChar.notify(data: jsonData)
         }
         return false

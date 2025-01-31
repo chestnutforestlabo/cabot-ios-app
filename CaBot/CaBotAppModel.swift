@@ -132,9 +132,15 @@ class FallbackService: CaBotServiceProtocol {
         return service.manage(command: command, param: param)
     }
 
-    func log_request(request: Dictionary<String, String>) -> Bool {
+    func log_request(request: LogRequest) -> Bool {
         guard let service = getService() else { return false }
         return service.log_request(request: request)
+    }
+    
+    func send_log(log_info: LogRequest, app_log: [String], urls: [URL]) -> Bool {
+        guard let service = getService() else { return false }
+        NSLog("fallback send_log \(log_info)")
+        return service.send_log(log_info: log_info, app_log: app_log, urls: urls)
     }
 
     func share(user_info: SharedInfo) -> Bool {
@@ -911,9 +917,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     // MARK: LogReportModelDelegate
 
     func refreshLogList() {
-        let request = [
-            "type": CaBotLogRequestType.list.rawValue
-        ]
+        var request = LogRequest(type: CaBotLogRequestType.list.rawValue)
         _ = self.fallbackService.log_request(request: request)
     }
 
@@ -922,21 +926,30 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func requestDetail(log_name: String) {
-        let request = [
-            "type": CaBotLogRequestType.detail.rawValue,
-            "log_name": log_name
-        ]
+        var request = LogRequest(
+            type: CaBotLogRequestType.detail.rawValue,
+            log_name: log_name
+        )
         _ = self.fallbackService.log_request(request: request)
     }
 
     func submitLogReport(log_name: String, title: String, detail: String) {
-        let request = [
-            "type": CaBotLogRequestType.report.rawValue,
-            "log_name": log_name,
-            "title": title,
-            "detail": detail
-        ]
+        var request = LogRequest(
+            type: CaBotLogRequestType.report.rawValue,
+            log_name: log_name,
+            title: title,
+            detail: detail
+        )
         _ = self.fallbackService.log_request(request: request)
+    }
+    
+    func submitAppLog(app_log: [String], urls: [URL], log_name: String) {
+        NSLog("submitAppLog")
+        var log_info = LogRequest(
+            type: CaBotLogRequestType.appLog.rawValue,
+            log_name: log_name
+        )
+        _ = self.fallbackService.send_log(log_info: log_info, app_log: app_log, urls: urls)
     }
 
     // MARK: LocationManagerDelegate
@@ -1542,6 +1555,68 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     func cabot(service: any CaBotTransportProtocol, logDetail: LogEntry) {
         NSLog("set log detail \(logDetail)")
         self.logList.set(detail: logDetail)
+    }
+    
+    func cabot(service: any CaBotTransportProtocol,  logInfo: LogEntry) {
+        NSLog("send app log \(logInfo)")
+        let prefix = Bundle.main.infoDictionary!["CFBundleName"] as! String
+        
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+
+        do {
+            let fileURLs = try FileManager.default.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil)
+            
+            let fileNames = fileURLs.map { $0.lastPathComponent }
+            
+            let logName = logInfo.name
+            let pattern = "cabot_(\\d{4}-\\d{2}-\\d{2})"
+            guard let range = logName.range(of: pattern, options: .regularExpression),
+                  let logDate = logInfo.parsedDate,
+                  let endDate = logInfo.endDate else {
+                return
+            }
+            
+            let logDateString = String(logName[range]).replacingOccurrences(of: "cabot_", with: "")
+            
+            let regexPattern = "\(prefix)-\(logDateString)-\\d{2}-\\d{2}-\\d{2}\\.log$"
+            let regex = try NSRegularExpression(pattern: regexPattern)
+            
+            let matchingFileNames = fileNames.filter { fileName in
+                let range = NSRange(location: 0, length: fileName.utf16.count)
+                return regex.firstMatch(in: fileName, options: [], range: range) != nil
+            }
+            
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "'\(prefix)-'yyyy'-'MM'-'dd'-'HH'-'mm'-'ss'.log'"
+            
+            let firstLog = matchingFileNames
+                .compactMap { fileName -> (String, Date)? in
+                    if let date = dateFormatter.date(from: fileName), date <= logDate {
+                        return (fileName, date)
+                    }
+                    return nil
+                }
+                .max(by: { $0.1 < $1.1 })?
+                .0
+            
+            let logs = matchingFileNames.filter { fileName in
+                if let date = dateFormatter.date(from: fileName) {
+                    return date >= logDate && date <= endDate
+                }
+                return false
+            }
+            
+            var appLogs = logs
+            if let firstLog = firstLog {
+                appLogs.insert(firstLog, at: 0)
+            }
+            
+            let appLogURLs = appLogs.map { documentsURL.appendingPathComponent($0) }
+
+            self.submitAppLog(app_log: appLogs, urls: appLogURLs, log_name: logName)
+        } catch {
+            print("error: \(error)")
+        }
     }
 
     func cabot(service: any CaBotTransportProtocol, userInfo: SharedInfo) {
