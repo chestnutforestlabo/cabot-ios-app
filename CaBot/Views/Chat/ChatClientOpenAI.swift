@@ -139,18 +139,16 @@ class ChatClientOpenAI: ChatClient {
                                     NSLog("chat function \(name): \(params)")
                                     if params.is_image_required {
                                         image_requested = true
+                                        guard let viewModel = ChatData.shared.viewModel else {return}
                                         self.backgroundQueue.async {
-                                            guard let viewModel = ChatData.shared.viewModel else {return}
                                             if let imageUrl = ChatData.shared.lastCameraImage {
                                                 var targetUrl = imageUrl
                                                 if let orientation = ChatData.shared.lastCameraOrientation, orientation.camera_rotate {
                                                     targetUrl = self.rotate(imageUrl)
                                                 }
-                                                DispatchQueue.main.async {
-                                                    viewModel.messages.append(ChatMessage(user: .User, text: targetUrl))
-                                                    self.backgroundQueue.asyncAfter(deadline: .now() + 0.1) { // FIX heartbeat delay
-                                                        self.send(message: targetUrl)
-                                                    }
+                                                viewModel.messages.append(ChatMessage(user: .User, text: targetUrl))
+                                                self.backgroundQueue.asyncAfter(deadline: .now() + 0.1) { // FIX heartbeat delay
+                                                    self.send(message: targetUrl)
                                                 }
                                             } else {
                                                 ChatData.shared.errorMessage = CustomLocalizedString("Could not send camera image", lang: I18N.shared.langCode)
