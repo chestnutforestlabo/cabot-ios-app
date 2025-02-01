@@ -124,10 +124,6 @@ class ChatViewModel: ObservableObject  {
         appModel?.playAudio(file: "/System/Library/Audio/UISounds/nano/SiriStopSuccess_Haptic.caf")
     }
 
-    func addUserImage(base64_text: String) {
-        self.messages.append(ChatMessage(user: .User, text: base64_text))
-    }
-
     func navigationAction() -> Bool {
         if let errorMessage = ChatData.shared.errorMessage {
             ChatData.shared.errorMessage = nil

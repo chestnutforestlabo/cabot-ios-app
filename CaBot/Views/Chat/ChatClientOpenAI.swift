@@ -40,6 +40,7 @@ class ChatClientOpenAI: ChatClient {
     var queryResultCancellable : AnyCancellable? = nil
     var queryResultCache :String = ""
     var metadata: [String: Any]
+    private var backgroundQueue = DispatchQueue.init(label: "Background Queue")
 
     init(config:ChatConfiguration, callback: @escaping ChatClientCallback) {
         self.callback = callback
@@ -115,17 +116,18 @@ class ChatClientOpenAI: ChatClient {
         self.pub = PassthroughSubject<String, Error>()
         self.prepareSinkForHistory()
         var error_count = 0, success_count = 0
+        var image_requested = false
         client?.chatsStream(query: query) { partialResult in
             print("chat stream partialResult \(partialResult)")
             guard let pub = self.pub, appModel.showingChatView else { return }
             switch partialResult {
             case .success(let result):
                 success_count += 1
-                if !self.callback_called.contains(result.id) && result.choices[0].delta.toolCalls == nil {
+                if !image_requested && !self.callback_called.contains(result.id) && result.choices[0].delta.toolCalls == nil {
                     self.callback?(result.id, pub)
                     self.callback_called.insert(result.id)
                 }
-                if let content = result.choices[0].delta.content {
+                if !image_requested, let content = result.choices[0].delta.content {
                     pub.send(content)
                 }
                 if let toolCalls = result.choices[0].delta.toolCalls {
@@ -136,25 +138,22 @@ class ChatClientOpenAI: ChatClient {
                                 if let params = try? JSONDecoder().decode(AroundDescription.self, from: arguments) {
                                     NSLog("chat function \(name): \(params)")
                                     if params.is_image_required {
-                                        DispatchQueue.main.async {
+                                        image_requested = true
+                                        self.backgroundQueue.async {
                                             guard let viewModel = ChatData.shared.viewModel else {return}
-                                            guard let imageUrl = ChatData.shared.lastCameraImage else {
+                                            if let imageUrl = ChatData.shared.lastCameraImage {
+                                                var targetUrl = imageUrl
+                                                if let orientation = ChatData.shared.lastCameraOrientation, orientation.camera_rotate {
+                                                    targetUrl = self.rotate(imageUrl)
+                                                }
                                                 DispatchQueue.main.async {
-                                                    let errorMessage = CustomLocalizedString("Could not send camera image", lang: I18N.shared.langCode)
-                                                    viewModel.messages.append(ChatMessage(user: .User, text: errorMessage))
-                                                    DispatchQueue.main.async {
-                                                        viewModel.send(message: errorMessage)
+                                                    viewModel.messages.append(ChatMessage(user: .User, text: targetUrl))
+                                                    self.backgroundQueue.asyncAfter(deadline: .now() + 0.1) { // FIX heartbeat delay
+                                                        self.send(message: targetUrl)
                                                     }
                                                 }
-                                                return
-                                            }
-                                            var targetUrl = imageUrl
-                                            if let orientation = ChatData.shared.lastCameraOrientation, orientation.camera_rotate {
-                                                targetUrl = self.rotate(imageUrl)
-                                            }
-                                            viewModel.addUserImage(base64_text: targetUrl)
-                                            DispatchQueue.main.async {
-                                                self.send(message: targetUrl)
+                                            } else {
+                                                ChatData.shared.errorMessage = CustomLocalizedString("Could not send camera image", lang: I18N.shared.langCode)
                                             }
                                         }
                                     }
