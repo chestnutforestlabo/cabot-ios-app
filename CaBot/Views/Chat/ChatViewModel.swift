@@ -95,6 +95,7 @@ class ChatViewModel: ObservableObject  {
             action: { text, code in
                 var buffer = ""
                 text?.sink(receiveCompletion: { _ in
+                    self.playVoiceRecoSuccess()
                     DispatchQueue.main.async {
                         self.messages.append(ChatMessage(user: .User, text: buffer))
                         self.send(message: buffer)
@@ -119,9 +120,14 @@ class ChatViewModel: ObservableObject  {
         appModel?.playAudio(file: "/System/Library/Audio/UISounds/nano/SiriStart_Haptic.caf")
     }
 
+    func playVoiceRecoSuccess() {
+        //        appModel?.playAudio(file: "/System/Library/Audio/UISounds/nano/3rdParty_Stop_Haptic.caf")
+        appModel?.playAudio(file: "/System/Library/Audio/UISounds/nano/SiriStopSuccess_Haptic.caf")
+    }
+
     func playTimeoutSound() {
 //        appModel?.playAudio(file: "/System/Library/Audio/UISounds/nano/3rdParty_Stop_Haptic.caf")
-        appModel?.playAudio(file: "/System/Library/Audio/UISounds/nano/SiriStopSuccess_Haptic.caf")
+        appModel?.playAudio(file: "/System/Library/Audio/UISounds/nano/SiriStopFailure_Haptic.caf")
     }
 
     func navigationAction() -> Bool {

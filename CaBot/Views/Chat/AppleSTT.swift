@@ -46,7 +46,7 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
         self.audioDataQueue = DispatchQueue(label: "hulop.conversation", attributes: [])
         super.init()
 
-        speechRecognizer.delegate = self
+        resetLang()
         SFSpeechRecognizer.requestAuthorization { authStatus in
             print(authStatus);
         }
@@ -63,6 +63,10 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
         //self.initPWCaptureSession()
     }
 
+    public func resetLang() {
+        self.speechRecognizer = SFSpeechRecognizer(locale: Locale.init(identifier: I18N.shared.langCode))
+        speechRecognizer?.delegate = self
+    }
     public func listen(
         selfvoice: PassthroughSubject<String, any Error>?,
         speakendaction: ((PassthroughSubject<String, any Error>?)->Void)?,
@@ -157,7 +161,7 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
     }
 
     // MARK: - private func
-    private let speechRecognizer = SFSpeechRecognizer()!
+    private var speechRecognizer: SFSpeechRecognizer?
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
 
@@ -285,7 +289,7 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
         recognitionRequest!.shouldReportPartialResults = true
         last_text = nil
         NSLog("Start recognizing")
-        recognitionTask = speechRecognizer.recognitionTask(with: recognitionRequest!, resultHandler: { [weak self] (result, e) in
+        recognitionTask = speechRecognizer?.recognitionTask(with: recognitionRequest!, resultHandler: { [weak self] (result, e) in
             guard let weakself = self else {
                 return
             }

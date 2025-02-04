@@ -41,6 +41,7 @@ class ChatClientOpenAI: ChatClient {
     var queryResultCache :String = ""
     var metadata: [String: Any]
     private var backgroundQueue = DispatchQueue.init(label: "Background Queue")
+    private let chatLanguages = ["ja": "JA", "en": "EN", "zh-Hans": "CN"]
 
     init(config:ChatConfiguration, callback: @escaping ChatClientCallback) {
         self.callback = callback
@@ -84,7 +85,7 @@ class ChatClientOpenAI: ChatClient {
         }
         // prepare metadata
         self.metadata["request_id"] = UUID().uuidString
-        self.metadata["lang"] = I18N.shared.langCode
+        self.metadata["lang"] = chatLanguages[I18N.shared.langCode, default: "OTHER"]
         self.metadata["suitcase_id"] = ChatData.shared.suitcase_id
         if let loc = ChatData.shared.lastLocation {
             self.metadata["current_location"] = [
