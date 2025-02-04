@@ -117,18 +117,18 @@ class ChatClientOpenAI: ChatClient {
         self.pub = PassthroughSubject<String, Error>()
         self.prepareSinkForHistory()
         var error_count = 0, success_count = 0
-        var image_requested = false
+        var camera_message: String?
         client?.chatsStream(query: query) { partialResult in
             print("chat stream partialResult \(partialResult)")
             guard let pub = self.pub, appModel.showingChatView else { return }
             switch partialResult {
             case .success(let result):
                 success_count += 1
-                if !image_requested && !self.callback_called.contains(result.id) && result.choices[0].delta.toolCalls == nil {
+                if camera_message == nil && !self.callback_called.contains(result.id) && result.choices[0].delta.toolCalls == nil {
                     self.callback?(result.id, pub)
                     self.callback_called.insert(result.id)
                 }
-                if !image_requested, let content = result.choices[0].delta.content {
+                if camera_message == nil, let content = result.choices[0].delta.content {
                     pub.send(content)
                 }
                 if let toolCalls = result.choices[0].delta.toolCalls {
@@ -139,23 +139,13 @@ class ChatClientOpenAI: ChatClient {
                                 if let params = try? JSONDecoder().decode(AroundDescription.self, from: arguments) {
                                     NSLog("chat function \(name): \(params)")
                                     if params.is_image_required {
-                                        image_requested = true
-                                        self.backgroundQueue.async {
-                                            guard let viewModel = ChatData.shared.viewModel else {return}
-                                            if let imageUrl = ChatData.shared.lastCameraImage {
-                                                var targetUrl = imageUrl
-                                                if let orientation = ChatData.shared.lastCameraOrientation, orientation.camera_rotate {
-                                                    targetUrl = self.rotate(imageUrl)
-                                                }
-                                                DispatchQueue.main.async {
-                                                    viewModel.messages.append(ChatMessage(user: .User, text: targetUrl))
-                                                    self.backgroundQueue.asyncAfter(deadline: .now() + 0.1) { // FIX heartbeat delay
-                                                        self.send(message: targetUrl)
-                                                    }
-                                                }
-                                            } else {
-                                                ChatData.shared.errorMessage = CustomLocalizedString("Could not send camera image", lang: I18N.shared.langCode)
+                                        if let imageUrl = ChatData.shared.lastCameraImage {
+                                            camera_message = imageUrl
+                                            if let orientation = ChatData.shared.lastCameraOrientation, orientation.camera_rotate {
+                                                camera_message = self.rotate(imageUrl)
                                             }
+                                        } else {
+                                            camera_message = CustomLocalizedString("Could not send camera image", lang: I18N.shared.langCode)
                                         }
                                     }
                                 }
@@ -198,6 +188,14 @@ class ChatClientOpenAI: ChatClient {
                 pub.send(CustomLocalizedString(msg, lang: I18N.shared.langCode))
             }
             pub.send(completion: .finished)
+            if let message = camera_message, let viewModel = ChatData.shared.viewModel {
+                DispatchQueue.main.async {
+                    viewModel.messages.append(ChatMessage(user: .User, text: message))
+                    self.backgroundQueue.asyncAfter(deadline: .now() + 0.1) { // FIX heartbeat delay
+                        self.send(message: message)
+                    }
+                }
+            }
         }
     }
     
