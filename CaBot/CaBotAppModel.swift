@@ -1837,7 +1837,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             init(_ message: ChatMessage) {
                 self.id = message.id
                 self.user = "\(message.user)"
-                self.text = message.combined_text
+//                self.text = message.combined_text
+                self.text = message.combined_text.hasPrefix("data:image") ? "IMAGE" : message.combined_text // FIX heartbeat delay
             }
         }
     }
