@@ -120,6 +120,10 @@ class TourManager: TourProtocol {
     }
 
     func remove(destination: (any Destination)) {
+        if _currentDestination?._id == destination._id {
+            clearCurrent()
+            return
+        }
         _destinations = _destinations.filter {$0._id != destination._id}
         delegate?.tourUpdated(manager: self)
         save()
