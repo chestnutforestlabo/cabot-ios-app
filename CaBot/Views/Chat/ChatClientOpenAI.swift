@@ -254,10 +254,11 @@ class ChatClientOpenAI: ChatClient {
             tourManager.clearAllDestinations()
             NSLog("chat clear destinations")
         }
-        var success = false
         params.destination_manipulations.forEach{item in
             guard let dest = destinations.first(where: {$0._id == item.destination_id}) else {
                 NSLog("chat destination_id \(item.destination_id) not found")
+                ChatData.shared.errorMessage = CustomLocalizedString("Could not set destination", lang: I18N.shared.langCode)
+                ChatData.shared.startNavigate = false
                 return
             }
             switch item.manipulation.manipulation_type {
@@ -265,21 +266,21 @@ class ChatClientOpenAI: ChatClient {
                 if item.manipulation.manipulation_add_idx == 0 {
                     tourManager.stopCurrent()
                     tourManager.addToFirst(destination: dest)
+                    ChatData.shared.startNavigate = true
                 } else {
                     tourManager.addToLast(destination: dest)
+                    ChatData.shared.startNavigate = tourManager.destinationCount == 1
                 }
                 NSLog("chat add destination \(dest.value)")
-                success = true
+                break
+            case "remove":
+                tourManager.remove(destination: dest)
+                NSLog("chat remove destination \(dest.value)")
                 break
             default:
                 NSLog("chat manipulation_type \(item.manipulation.manipulation_type) not supported")
                 break
             }
-        }
-        if success {
-            ChatData.shared.startNavigate = true
-        } else {
-            ChatData.shared.errorMessage = CustomLocalizedString("Could not set destination", lang: I18N.shared.langCode)
         }
     }
 
