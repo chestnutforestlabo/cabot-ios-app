@@ -86,6 +86,9 @@ class PriorityQueueTTSWrapper: NSObject, TTSProtocol, PriorityQueueTTSDelegate {
             try? entry.append(text: chunk)
         }
         .store(in: &cancellables)
+        if tts.isPaused {
+            tts.stop(true)
+        }
         tts.append(entry: entry)
     }
 
