@@ -570,7 +570,7 @@ class CaBotServiceActions {
                 }
             case .togglespeakstate:
                 NSLog("Receive toggle speake state request")
-                PriorityQueueTTS.shared.toggleSpeakState()
+                PriorityQueueTTS.shared.toggleSpeakState(at: .word)
             case .unknown:
                 break
             }
