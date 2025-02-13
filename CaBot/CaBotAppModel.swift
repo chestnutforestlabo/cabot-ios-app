@@ -1133,7 +1133,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func stopSpeak() {
-        self.tts.stop(false)
+        self.tts.stop(self.tts.isPaused)
     }
 
     func playSample(mode: VoiceMode, priority: CaBotTTS.SpeechPriority? = nil, timeout sec : TimeInterval? = nil ){

@@ -64,6 +64,12 @@ class CaBotTTS : TTSProtocol {
             self._tts.isSpeaking
         }
     }
+
+    var isPaused: Bool {
+        get {
+            self._tts.isPaused
+        }
+    }
     var delegate:CaBotTTSDelegate?
 
     init(voice: AVSpeechSynthesisVoice?, lang: String? = nil ) {
