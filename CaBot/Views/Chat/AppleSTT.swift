@@ -27,6 +27,7 @@ import UIKit
 import AVFoundation
 import Speech
 import SwiftUI
+import PriorityQueueTTS
 
 @objcMembers
 open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBufferDelegate, SFSpeechRecognizerDelegate {
@@ -101,18 +102,9 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
                 return
             }
 
-            self.tts?.vibrate()
-            self.tts?.playVoiceRecoStart()
-
-            DispatchQueue.main.asyncAfter(deadline: .now()+self.waitDelay) {
-                self.initPWCaptureSession()
-                self.startPWCaptureSession()//alternative
-                self.startRecognize(action, failure: failure, timeout: timeout)
-
-                self.state?.wrappedValue.chatText = CustomLocalizedString("SPEAK_NOW", lang: I18N.shared.langCode)
-                self.state?.wrappedValue.chatState = .Listening
-            }
-
+            self.last_timeout = timeout
+            self.last_failure = failure
+            self.restartSTT()
         }
         self.speaking = true
     }
@@ -145,6 +137,17 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
     public func restartRecognize() {
         self.paused = false;
         self.restarting = true;
+        self.restartSTT()
+    }
+
+    private func restartSTT() {
+        if  PriorityQueueTTS.shared.isSpeaking {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.restartSTT()
+            }
+            return
+        }
+        self.tts?.stop()
         if let actions = self.last_action {
             self.tts?.vibrate()
             self.tts?.playVoiceRecoStart()
