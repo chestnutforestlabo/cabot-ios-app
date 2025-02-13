@@ -46,6 +46,7 @@ class ChatViewModel: ObservableObject  {
             UserDefaults.standard.synchronize()
         }
     }
+    let welcome_delay = 5 * 60.0
     init() {
         if let inactive_delay = UserDefaults.standard.value(forKey: inactive_delay_key) as? Double {
             self.inactive_delay = inactive_delay

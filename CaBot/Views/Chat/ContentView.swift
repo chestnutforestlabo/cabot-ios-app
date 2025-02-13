@@ -68,20 +68,25 @@ public struct ContentView: View {
                 }
             }
         }
+        var welcome_message = false
         if model.stt == nil {
             model.stt = AppleSTT(state: $model.chatState, tts: PriorityQueueTTSWrapper.shared)
             model.chat = ChatClientOpenAI(config:model.config, callback: model.process)
+            welcome_message = true
         } else {
             model.stt?.resetLang()
             if let inactive_at = ContentView.inactive_at, -inactive_at.timeIntervalSinceNow > model.inactive_delay {
                 ChatData.shared.clear()
                 model.chat?.restart(config:model.config)
-                model.messages.removeAll()
+                if -inactive_at.timeIntervalSinceNow > model.welcome_delay {
+                    model.messages.removeAll()
+                    welcome_message = true
+                }
             }
         }
         ContentView.inactive_at = nil
         debugPrintTourData()
-        if model.messages.isEmpty {
+        if welcome_message {
             model.send(message: "")
         } else {
             model.stt?.restartRecognize()
