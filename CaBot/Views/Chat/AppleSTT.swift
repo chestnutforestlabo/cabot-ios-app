@@ -107,6 +107,9 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
             self.restartSTT()
         }
         self.speaking = true
+        DispatchQueue.main.async {
+            self.monitorSpeechBeforeRecognition(timeout: timeout)
+        }
     }
 
     public func disconnect() {
@@ -122,7 +125,9 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
     }
 
     public func endRecognize() {
-        tts?.stop()
+        if self.speaking {
+            tts?.stop()
+        }
         DispatchQueue.main.async {
             self.state?.wrappedValue.chatText = " "
             self.state?.wrappedValue.chatState = .Inactive
@@ -159,7 +164,40 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
                 self.startRecognize(actions, failure:self.last_failure, timeout:self.last_timeout)
                 self.state?.wrappedValue.chatText = CustomLocalizedString("SPEAK_NOW", lang: I18N.shared.langCode)
                 self.state?.wrappedValue.chatState = .Listening
+                self.monitorSpeechWhileRecognition(timeout: self.last_timeout)
             }
+        }
+    }
+
+    private func monitorSpeechBeforeRecognition(timeout: @escaping ()->Void) {
+        var lastSpeakAt = Date()
+        Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { timer in
+            if self.speaking {
+                if PriorityQueueTTS.shared.isSpeaking || PriorityQueueTTS.shared.isPaused || PriorityQueueTTSWrapper.shared.isQueuing {
+                    lastSpeakAt = Date()
+                }
+                if -lastSpeakAt.timeIntervalSinceNow < 2.0 {
+                    return
+                }
+                timeout()
+                print("monitorSpeechBeforeRecognition: Timeout")
+            }
+            timer.invalidate()
+        }
+    }
+
+    private func monitorSpeechWhileRecognition(timeout: @escaping ()->Void) {
+        Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { timer in
+            if self.recognizing {
+                if !PriorityQueueTTS.shared.isSpeaking {
+                    return
+                }
+                self.stoptimer()
+                self.endRecognize()
+                timeout()
+                print("monitorSpeechWhileRecognition: Timeout")
+            }
+            timer.invalidate()
         }
     }
 

@@ -25,6 +25,7 @@ import Foundation
 import UIKit
 import ChatView
 import SwiftUI
+import PriorityQueueTTS
 
 class ChatViewModel: ObservableObject  {
     public var cancellables = Set<AnyCancellable>()
@@ -109,7 +110,11 @@ class ChatViewModel: ObservableObject  {
             },
             timeout: {
                 print("timeout")
-                self.playTimeoutSound()
+                if PriorityQueueTTS.shared.isSpeaking {
+//                    self.playVoiceRecoSuccess()
+                } else {
+                    self.playTimeoutSound()
+                }
                 ContentView.inactive_at = Date()
                 self.appModel?.showingChatView = false
             }

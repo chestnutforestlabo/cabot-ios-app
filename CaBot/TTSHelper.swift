@@ -94,7 +94,7 @@ class CaBotTTS : TTSProtocol {
         // let isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
         // let selfspeak = forceSelfvoice || !isForeground || !isVoiceOverRunning
         
-        if force || self._tts.isPaused {
+        if force || self._tts.isPaused || self._tts.priority == .Chat {
             self._tts.stop( true )
             Debug(log:"<TTS> force stop tts by \(text?._summary(15) ?? "")")
         }
@@ -247,6 +247,7 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
     
     public enum SpeechPriority {
         case Low
+        case Chat
         case Normal
         case High
         case Required
@@ -255,8 +256,10 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
             switch queuePriority {
             case .Low:
                 self = .Low
+            case .Chat:
+                self = .Low
             case .Normal:
-                self = .Normal
+                self = .Chat
             case .High:
                 self = .High
             case .Required:
@@ -268,6 +271,8 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
             switch self {
             case .Low:
                 return .Low
+            case .Chat:
+                return .Chat
             case .Normal:
                 return .Normal
             case .High:

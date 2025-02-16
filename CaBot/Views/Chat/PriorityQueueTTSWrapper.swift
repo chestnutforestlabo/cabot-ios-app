@@ -60,6 +60,7 @@ class PriorityQueueTTSWrapper: NSObject, TTSProtocol, PriorityQueueTTSDelegate {
     var delegate:CaBotTTSDelegate?
     private var ttsDelegate: PriorityQueueTTSDelegate?
     private var _lastSpokenEntryUUID: UUID? = nil
+    var isQueuing = false
 
     private override init() {
         super.init()
@@ -69,7 +70,7 @@ class PriorityQueueTTSWrapper: NSObject, TTSProtocol, PriorityQueueTTSDelegate {
 
     func speak(_ text: PassthroughSubject<String, any Error>?, callback: @escaping () -> Void) {
         guard let text = text else { return callback() }
-        let entry = TokenizerEntry(separators: [".", "!", "?", "\n", "。", "！", "？"], timeout_sec: 180) { _, token, reason in
+        let entry = TokenizerEntry(separators: [".", "!", "?", "\n", "。", "！", "？"], priority: .Chat	, timeout_sec: 180) { _, token, reason in
             Debug(log:"<TTS> complete reason:\(reason) token:\(token?.text ?? "")")
             if reason != .Canceled, let token = token, let text = token.text {
                 let voiceover = UIAccessibility.isVoiceOverRunning
@@ -80,7 +81,9 @@ class PriorityQueueTTSWrapper: NSObject, TTSProtocol, PriorityQueueTTSDelegate {
             }
         }
         map[entry] = callback
+        self.isQueuing = true
         text.sink(receiveCompletion: { _ in
+            self.isQueuing = false
             entry.close()
         }) { chunk in
             try? entry.append(text: chunk)
