@@ -81,6 +81,8 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
         }
         // NSLog("Listen \"\(selfvoice ?? "")\" \(action)")
         self.last_action = action
+        self.last_timeout = timeout
+        self.last_failure = failure
 
         self.stoptimer()
         DispatchQueue.main.async {
@@ -102,8 +104,6 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
                 return
             }
 
-            self.last_timeout = timeout
-            self.last_failure = failure
             self.restartSTT()
         }
         self.speaking = true
@@ -172,7 +172,7 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
     private func monitorSpeechBeforeRecognition(timeout: @escaping ()->Void) {
         var lastSpeakAt = Date()
         Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { timer in
-            if self.speaking {
+            if self.speaking && !self.recognizing {
                 if PriorityQueueTTS.shared.isSpeaking || PriorityQueueTTS.shared.isPaused || PriorityQueueTTSWrapper.shared.isQueuing {
                     lastSpeakAt = Date()
                 }
