@@ -33,7 +33,7 @@ class PriorityQueueTTSWrapper: NSObject, TTSProtocol, PriorityQueueTTSDelegate {
     func needForceSpeak(_ priority: CaBotTTS.SpeechPriority) -> Bool {
         if interruptSystemMessage {
             interruptSystemMessage = false
-            return true
+            return self.tts.priority == .Chat
         }
         return false
     }
