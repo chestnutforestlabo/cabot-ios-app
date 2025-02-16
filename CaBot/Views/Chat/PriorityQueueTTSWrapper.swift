@@ -28,6 +28,16 @@ import AVFoundation
 
 class PriorityQueueTTSWrapper: NSObject, TTSProtocol, PriorityQueueTTSDelegate {
 
+    private var interruptSystemMessage = false
+
+    func needForceSpeak(_ priority: CaBotTTS.SpeechPriority) -> Bool {
+        if interruptSystemMessage {
+            interruptSystemMessage = false
+            return true
+        }
+        return false
+    }
+
     func progress(queue: PriorityQueueTTS, entry: QueueEntry) {
         if map[entry] != nil {
             if let token = entry.token, let text = token.text {
@@ -46,6 +56,7 @@ class PriorityQueueTTSWrapper: NSObject, TTSProtocol, PriorityQueueTTSDelegate {
 
     func completed(queue: PriorityQueueTTS, entry: QueueEntry) {
         if let callback = map[entry] {
+            interruptSystemMessage = false
             callback()
         } else {
             self.ttsDelegate?.completed(queue: queue, entry: entry)
@@ -80,6 +91,7 @@ class PriorityQueueTTSWrapper: NSObject, TTSProtocol, PriorityQueueTTSDelegate {
                 callback()
             }
         }
+        interruptSystemMessage = true
         map[entry] = callback
         self.isQueuing = true
         text.sink(receiveCompletion: { _ in

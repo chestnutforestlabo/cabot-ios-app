@@ -94,7 +94,7 @@ class CaBotTTS : TTSProtocol {
         // let isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
         // let selfspeak = forceSelfvoice || !isForeground || !isVoiceOverRunning
         
-        if force || self._tts.isPaused || self._tts.priority == .Chat {
+        if force || self._tts.isPaused || PriorityQueueTTSWrapper.shared.needForceSpeak(priority) {
             self._tts.stop( true )
             Debug(log:"<TTS> force stop tts by \(text?._summary(15) ?? "")")
         }
