@@ -72,6 +72,7 @@ public struct ContentView: View {
         if model.stt == nil {
             model.stt = AppleSTT(state: $model.chatState, tts: PriorityQueueTTSWrapper.shared)
             model.chat = ChatClientOpenAI(config:model.config, callback: model.process)
+            model.resetSttActions()
             welcome_message = true
         } else {
             model.stt?.resetLang()

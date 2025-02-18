@@ -73,7 +73,7 @@ class ChatClientOpenAI: ChatClient {
         }
     }
     func send(message: String) {
-        guard let appModel = ChatData.shared.viewModel?.appModel else {return}
+        guard let appModel = ChatData.shared.viewModel?.appModel, appModel.showingChatView else {return}
         // prepare messages
         var messages: [ChatQuery.ChatCompletionMessageParam] = []
         if message.hasPrefix("data:image") {

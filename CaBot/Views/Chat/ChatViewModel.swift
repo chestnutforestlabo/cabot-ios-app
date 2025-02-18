@@ -72,6 +72,38 @@ class ChatViewModel: ObservableObject  {
         self.chat?.send(message: message)
     }
 
+    private func sttAction(text: PassthroughSubject<String, any Error>?, code: UInt64)->Void {
+        var buffer = ""
+        text?.sink(receiveCompletion: { _ in
+            if self.appModel?.showingChatView != true {return}
+            self.playVoiceRecoSuccess()
+            DispatchQueue.main.async {
+                self.messages.append(ChatMessage(user: .User, text: buffer))
+                self.send(message: buffer)
+            }
+        }, receiveValue: { chunk in buffer += chunk})
+        .store(in: &self.cancellables)
+    }
+
+    private func sttFailure(error: NSError)->Void {
+        print(error)
+    }
+
+    private func sttTimeout()->Void {
+        print("timeout")
+        if PriorityQueueTTS.shared.isSpeaking {
+//                    self.playVoiceRecoSuccess()
+        } else {
+            self.playTimeoutSound()
+        }
+        ContentView.inactive_at = Date()
+        self.appModel?.showingChatView = false
+    }
+
+    func resetSttActions() {
+        stt?.resetActions(action: sttAction, failure: sttFailure, timeout: sttTimeout)
+    }
+
     func process(_ identifier: String, _ text: PassthroughSubject<String, Error>) {
         let message = ChatMessage(user: .Agent, text: "")
         DispatchQueue.main.async {
@@ -94,30 +126,9 @@ class ChatViewModel: ObservableObject  {
                     print("speakend \(text)")
                 }
             },
-            action: { text, code in
-                var buffer = ""
-                text?.sink(receiveCompletion: { _ in
-                    self.playVoiceRecoSuccess()
-                    DispatchQueue.main.async {
-                        self.messages.append(ChatMessage(user: .User, text: buffer))
-                        self.send(message: buffer)
-                    }
-                }, receiveValue: { chunk in buffer += chunk})
-                .store(in: &self.cancellables)
-            },
-            failure: { error in
-                print(error)
-            },
-            timeout: {
-                print("timeout")
-                if PriorityQueueTTS.shared.isSpeaking {
-//                    self.playVoiceRecoSuccess()
-                } else {
-                    self.playTimeoutSound()
-                }
-                ContentView.inactive_at = Date()
-                self.appModel?.showingChatView = false
-            }
+            action: sttAction,
+            failure: sttFailure,
+            timeout: sttTimeout
         )
     }
 

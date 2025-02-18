@@ -145,12 +145,25 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
         self.restartSTT()
     }
 
+    public func resetActions(
+        action: @escaping (PassthroughSubject<String, any Error>?, UInt64)->Void,
+        failure: @escaping (NSError)->Void,
+        timeout: @escaping ()->Void
+    ) {
+        self.last_action = action
+        self.last_timeout = timeout
+        self.last_failure = failure
+    }
+
     private func restartSTT() {
         if  PriorityQueueTTS.shared.isSpeaking {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.restartSTT()
             }
             return
+        }
+        if self.recognizing {
+            self.endRecognize()
         }
         self.tts?.stop()
         if let actions = self.last_action {
@@ -189,7 +202,7 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
     private func monitorSpeechWhileRecognition(timeout: @escaping ()->Void) {
         Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { timer in
             if self.recognizing {
-                if !PriorityQueueTTS.shared.isSpeaking {
+                if !PriorityQueueTTS.shared.isSpeaking || PriorityQueueTTS.shared.priority == .Chat {
                     return
                 }
                 self.stoptimer()
@@ -345,7 +358,6 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
             }
 
             if e != nil {
-                weakself.stoptimer()
                 guard let error:NSError = e as NSError? else {
                     weakself.endRecognize()
                     timeout()
@@ -353,6 +365,9 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
                 }
 
                 let code = error.code
+                if code != 1110 {
+                    weakself.stoptimer()
+                }
                 if code == 203 { // Empty recognition
                     weakself.endRecognize();
                     DispatchQueue.main.async {
