@@ -420,12 +420,18 @@ class I18NText: Equatable, Hashable {
                 else if items.count == 2 {
                     if items[1] == "hira" { // special case for Japanese hiragana
                         pron["ja"] = try container.decode(String.self, forKey: key)
-                    } else {
+                    }
+                    else if items[0].hasPrefix("ent") && items[1] == "n" {
+                        main["en"] = try container.decode(String.self, forKey: key)
+                    }else {
                         main[String(items[1])] = try container.decode(String.self, forKey: key)
                     }
                 }
                 else if items.count == 3 && items[2] == "pron" {
                     pron[String(items[1])] = try container.decode(String.self, forKey: key)
+                }
+                else if items.count == 3 && items[0].hasPrefix("ent"){
+                    main[String(items[2])] = try container.decode(String.self, forKey: key)
                 }
             }
             return I18NText(text: main, pron: pron)
@@ -454,24 +460,6 @@ class I18NText: Equatable, Hashable {
             newPron[lang] = combinedPron
         }
         return I18NText(text: newTexts, pron: newPron)
-    }
-
-    static func constant(_ string: String) -> I18NText {
-        return I18NText(text: ["Base": string], pron: ["Base": string])
-    }
-
-    static func + (lhs: I18NText, rhs: String) -> I18NText {
-        return lhs + I18NText.constant(rhs)
-    }
-
-    static func + (lhs: String, rhs: I18NText) -> I18NText {
-        return I18NText.constant(lhs) + rhs
-    }
-
-    func removingNodeKeys() -> I18NText {
-        let filteredText = self._text.filter { !$0.key.contains("node") }
-        let filteredPron = self._pron.filter { !$0.key.contains("node") }
-        return I18NText(text: filteredText, pron: filteredPron)
     }
 }
 
@@ -879,9 +867,9 @@ class Feature : Decodable,  Hashable {
             })  {
                 let entrance = try container.decode(String.self, forKey: key)
                 self.entrances.append(entrance)
-//                let prefix = key.stringValue.replacingOccurrences(of: "_node", with: "")
-//                let entranceName = I18NText.decode(decoder: decoder, baseKey: prefix + "_n").removingNodeKeys()
-//                entranceMapping[entrance] = entranceName
+                let prefix = key.stringValue.replacingOccurrences(of: "_node", with: "")
+                let entranceName = I18NText.decode(decoder: decoder, baseKey: prefix + "_n")
+                entranceMapping[entrance] = entranceName
             }
             name = I18NText.decode(decoder: decoder, baseKey: "name")
         }
@@ -890,7 +878,7 @@ class Feature : Decodable,  Hashable {
     func getFacilityName(for nodeID: String, locale: Locale = .current) -> I18NText {
         let baseName = properties.name
         if properties.entrances.count > 1, let entranceText = properties.entranceMapping[nodeID] {
-            return baseName + ": test" + entranceText
+            return baseName + entranceText
         } else {
             return baseName
         }
@@ -1002,8 +990,7 @@ class Directory {
 
                 if let nodeID = nodeID {
                     if let feature = Features.getFeature(by: NodeRef(node_id: nodeID, variation: nil)) {
-                        title = feature.properties.name
-//                        title = feature.getFacilityName(for: nodeID)
+                        title = feature.getFacilityName(for: nodeID)
                     } else {
                         title = I18NText.decode(decoder: decoder, baseKey: "title")
                     }
