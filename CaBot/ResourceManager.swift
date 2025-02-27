@@ -446,16 +446,28 @@ class I18NText: Equatable, Hashable {
 
         let languages = Set(lhs._text.keys).union(rhs._text.keys)
         for lang in languages {
-            let lhsText = lhs._text[lang] ?? ""
-            let rhsText = rhs._text[lang] ?? ""
+            var lhsText = lhs._text[lang] ?? ""
+            if lhsText.isEmpty, let baseLhs = lhs._text["Base"], !baseLhs.isEmpty {
+                lhsText = baseLhs
+            }
+            var rhsText = rhs._text[lang] ?? ""
+            if rhsText.isEmpty, let baseRhs = rhs._text["Base"], !baseRhs.isEmpty {
+                rhsText = baseRhs
+            }
             let combinedText = (lhsText + " " + rhsText).trimmingCharacters(in: .whitespaces)
             newTexts[lang] = combinedText
         }
 
         let pronLanguages = Set(lhs._pron.keys).union(rhs._pron.keys)
         for lang in pronLanguages {
-            let lhsPron = lhs._pron[lang] ?? ""
-            let rhsPron = rhs._pron[lang] ?? ""
+            var lhsPron = lhs._pron[lang] ?? ""
+            if lhsPron.isEmpty, let baseLhsPron = lhs._pron["Base"], !baseLhsPron.isEmpty {
+                lhsPron = baseLhsPron
+            }
+            var rhsPron = rhs._pron[lang] ?? ""
+            if rhsPron.isEmpty, let baseRhsPron = rhs._pron["Base"], !baseRhsPron.isEmpty {
+                rhsPron = baseRhsPron
+            }
             let combinedPron = (lhsPron + " " + rhsPron).trimmingCharacters(in: .whitespaces)
             newPron[lang] = combinedPron
         }
