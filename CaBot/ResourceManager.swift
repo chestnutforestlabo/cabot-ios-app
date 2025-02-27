@@ -422,7 +422,7 @@ class I18NText: Equatable, Hashable {
                         pron["ja"] = try container.decode(String.self, forKey: key)
                     }
                     else if items[0].hasPrefix("ent") && items[1] == "n" {
-                        main["en"] = try container.decode(String.self, forKey: key)
+                        main["Base"] = try container.decode(String.self, forKey: key)
                     }else {
                         main[String(items[1])] = try container.decode(String.self, forKey: key)
                     }
