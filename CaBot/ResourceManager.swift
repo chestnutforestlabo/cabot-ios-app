@@ -420,18 +420,58 @@ class I18NText: Equatable, Hashable {
                 else if items.count == 2 {
                     if items[1] == "hira" { // special case for Japanese hiragana
                         pron["ja"] = try container.decode(String.self, forKey: key)
-                    } else {
+                    }
+                    else if items[0].hasPrefix("ent") && items[1] == "n" {
+                        main["Base"] = try container.decode(String.self, forKey: key)
+                    }else {
                         main[String(items[1])] = try container.decode(String.self, forKey: key)
                     }
                 }
                 else if items.count == 3 && items[2] == "pron" {
                     pron[String(items[1])] = try container.decode(String.self, forKey: key)
                 }
+                else if items.count == 3 && items[0].hasPrefix("ent"){
+                    main[String(items[2])] = try container.decode(String.self, forKey: key)
+                }
             }
             return I18NText(text: main, pron: pron)
         } catch {
             return I18NText(text: [:], pron: [:])
         }
+    }
+
+    static func + (lhs: I18NText, rhs: I18NText) -> I18NText {
+        var newTexts: [String: String] = [:]
+        var newPron: [String: String] = [:]
+
+        let languages = Set(lhs._text.keys).union(rhs._text.keys)
+        for lang in languages {
+            var lhsText = lhs._text[lang] ?? ""
+            if lhsText.isEmpty, let baseLhs = lhs._text["Base"], !baseLhs.isEmpty {
+                lhsText = baseLhs
+            }
+            var rhsText = rhs._text[lang] ?? ""
+            if rhsText.isEmpty, let baseRhs = rhs._text["Base"], !baseRhs.isEmpty {
+                rhsText = baseRhs
+            }
+            let combinedText = (lhsText + " " + rhsText).trimmingCharacters(in: .whitespaces)
+            newTexts[lang] = combinedText
+        }
+
+        let pronLanguages = Set(lhs._pron.keys).union(rhs._pron.keys)
+        for lang in pronLanguages {
+            var lhsPron = lhs._pron[lang] ?? ""
+            if lhsPron.isEmpty, let baseLhsPron = lhs._pron["Base"], !baseLhsPron.isEmpty {
+                lhsPron = baseLhsPron
+            }
+            var rhsPron = rhs._pron[lang] ?? ""
+            if rhsPron.isEmpty, let baseRhsPron = rhs._pron["Base"], !baseRhsPron.isEmpty {
+                rhsPron = baseRhsPron
+            }
+            let combinedPron = (lhsPron + " " + rhsPron).trimmingCharacters(in: .whitespaces)
+            newPron[lang] = combinedPron
+        }
+        return I18NText(text: newTexts, pron: newPron)
     }
 }
 
@@ -818,6 +858,7 @@ class Feature : Decodable,  Hashable {
     }
     struct Properties: Decodable {
         var entrances: [String] = []
+        var entranceMapping: [String: I18NText] = [:]
         var name: I18NText
 
         private struct CodingKeys: CodingKey {
@@ -838,8 +879,20 @@ class Feature : Decodable,  Hashable {
             })  {
                 let entrance = try container.decode(String.self, forKey: key)
                 self.entrances.append(entrance)
+                let prefix = key.stringValue.replacingOccurrences(of: "_node", with: "")
+                let entranceName = I18NText.decode(decoder: decoder, baseKey: prefix + "_n")
+                entranceMapping[entrance] = entranceName
             }
             name = I18NText.decode(decoder: decoder, baseKey: "name")
+        }
+    }
+
+    func getFacilityName(for nodeID: String, locale: Locale = .current) -> I18NText {
+        let baseName = properties.name
+        if properties.entrances.count > 1, let entranceText = properties.entranceMapping[nodeID] {
+            return baseName + entranceText
+        } else {
+            return baseName
         }
     }
 }
@@ -949,7 +1002,7 @@ class Directory {
 
                 if let nodeID = nodeID {
                     if let feature = Features.getFeature(by: NodeRef(node_id: nodeID, variation: nil)) {
-                        title = feature.properties.name
+                        title = feature.getFacilityName(for: nodeID)
                     } else {
                         title = I18NText.decode(decoder: decoder, baseKey: "title")
                     }
