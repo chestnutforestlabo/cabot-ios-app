@@ -261,6 +261,7 @@ class ChatClientOpenAI: ChatClient {
                 ChatData.shared.startNavigate = false
                 return
             }
+            ChatData.shared.errorMessage = nil
             switch item.manipulation.manipulation_type {
             case "add":
                 if item.manipulation.manipulation_add_idx == 0 {
