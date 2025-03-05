@@ -528,9 +528,8 @@ class CaBotServiceActions {
             let line = request.text
             let force = request.force
             let priority = request.priority
-            let timeout: TimeInterval? = request.timeout > 0 ? TimeInterval(request.timeout) : nil
             _ = service.activityLog(category: "ble speech request speaking", text: String(line), memo: "force=\(force)")
-            tts.speak(String(line), force: force, priority: .parse(priority:priority), timeout: timeout) { code, length in
+            tts.speak(String(line), force: force, priority: .parse(priority:priority)) { code, length in
                 if code == .Completed {
                     _ = service.activityLog(category: "ble speech request completed", text: String(line), memo: "force=\(force),return_code=\(code),length=(length)")
                 } else if code == .Canceled {
