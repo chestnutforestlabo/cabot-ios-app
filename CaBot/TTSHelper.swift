@@ -251,6 +251,7 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
     public enum SpeechPriority {
         case Low
         case Chat
+        case Moderate
         case Normal
         case High
         case Required
@@ -260,9 +261,11 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
             case .Low:
                 self = .Low
             case .Chat:
-                self = .Low
-            case .Normal:
                 self = .Chat
+            case .Moderate:
+                self = .Moderate
+            case .Normal:
+                self = .Normal
             case .High:
                 self = .High
             case .Required:
@@ -276,6 +279,8 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
                 return .Low
             case .Chat:
                 return .Chat
+            case .Moderate:
+                return .Moderate
             case .Normal:
                 return .Normal
             case .High:
@@ -376,8 +381,10 @@ extension CaBotTTS.SpeechPriority {
 
         if let priority {
             switch priority {
-            case _ where priority <= 25:
+            case _ where priority <= 12:
                 return .Low
+            case 13 ... 25:
+                return .Moderate
             case 26 ... 50:
                 return .Normal
             case 51 ... 75:
