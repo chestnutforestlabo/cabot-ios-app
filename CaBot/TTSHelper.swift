@@ -101,10 +101,6 @@ class CaBotTTS : TTSProtocol {
             self._tts.stop( true )
             Debug(log:"<TTS> force stop tts by \(text?._summary(15) ?? "")")
         }
-        else if let speakingPriority = self._tts.priority, priority.queuePriority < speakingPriority, priority == .Low || priority == .Moderate  {
-            Debug(log:"<TTS> skip speak \(priority.queuePriority)<\(speakingPriority): \(text ?? "")")
-            return
-        }
 
         var voiceover = false
         if UIAccessibility.isVoiceOverRunning {
