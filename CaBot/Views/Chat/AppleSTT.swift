@@ -248,6 +248,18 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
     private var pwCapturingStarted: Bool = false
     private var pwCapturingIgnore: Bool = false
     private func initPWCaptureSession(){//alternative
+        if pwCapturingStarted, let captureSession = self.pwCaptureSession, !captureSession.isRunning {
+            NSLog("AVCaptureSession is not running. Restarting...")
+            // Reset AVAudioSession
+            let audioSession:AVAudioSession = AVAudioSession.sharedInstance()
+            do {
+                try audioSession.setCategory(.playAndRecord, mode: .default, options: [.allowBluetooth, .defaultToSpeaker])
+                try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+            } catch {
+                NSLog("Audio session error")
+            }
+            pwCapturingStarted = false // Rerun AVCaptureSession.startRunning
+        }
         if nil == self.pwCaptureSession{
             self.pwCaptureSession = AVCaptureSession()
             if let captureSession = self.pwCaptureSession{
