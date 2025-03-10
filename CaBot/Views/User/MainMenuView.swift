@@ -362,6 +362,7 @@ struct StatusMenus: View {
                         }
                     }
                 ).isDetailLink(false)
+                Text("CABOT_NAME: \(ChatData.shared.suitcase_id)")
             }
         }
     }

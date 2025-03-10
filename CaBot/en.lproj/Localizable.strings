@@ -136,6 +136,7 @@
 "System"="System";
 "Settings"="Settings";
 "Version: %@ (%@) - %@"="Version: %@ (%@) - %@";
+"CABOT_NAME: %@"="Suitcase Name : %@";
 
 
 // DeviceStatusView

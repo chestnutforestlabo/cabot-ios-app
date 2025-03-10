@@ -136,6 +136,7 @@
 "System"="システム";
 "Settings"="設定";
 "Version: %@ (%@) - %@"="バージョン: %@ (%@) - %@";
+"CABOT_NAME: %@"="スーツケース名 : %@";
 
 
 // DeviceStatusView
