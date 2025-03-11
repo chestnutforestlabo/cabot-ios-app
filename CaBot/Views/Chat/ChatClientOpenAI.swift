@@ -153,6 +153,7 @@ class ChatClientOpenAI: ChatClient {
                             case "destination_setting":
                                 if let params = try? JSONDecoder().decode(DestinationSetting.self, from: arguments) {
                                     NSLog("chat function \(name): \(params)")
+                                    self.checkDestination(params)
                                     DispatchQueue.main.async {
                                         self.onDestinationSetting(params)
                                     }
@@ -161,6 +162,7 @@ class ChatClientOpenAI: ChatClient {
                             case "tour_setting":
                                 if let params = try? JSONDecoder().decode(TourSetting.self, from: arguments) {
                                     NSLog("chat function \(name): \(params)")
+                                    self.checkTour(params)
                                     DispatchQueue.main.async {
                                         self.onTourSetting(params)
                                     }
@@ -186,6 +188,9 @@ class ChatClientOpenAI: ChatClient {
                 self.callback_called.insert(result_id)
                 let msg = error_count > 0 ? "Received an unexpected response" : "An unexpected error has occurred"
                 pub.send(CustomLocalizedString(msg, lang: I18N.shared.langCode))
+            }
+            if let msg = ChatData.shared.errorMessage {
+                pub.send("\n\n\n\(msg)\n\(CustomLocalizedString("Checking now", lang: I18N.shared.langCode))")
             }
             pub.send(completion: .finished)
             if let message = camera_message, let viewModel = ChatData.shared.viewModel {
@@ -255,12 +260,7 @@ class ChatClientOpenAI: ChatClient {
             NSLog("chat clear destinations")
         }
         params.destination_manipulations.forEach{item in
-            guard let dest = destinations.first(where: {$0._id == item.destination_id}) else {
-                NSLog("chat destination_id \(item.destination_id) not found")
-                ChatData.shared.errorMessage = CustomLocalizedString("Could not set destination", lang: I18N.shared.langCode)
-                ChatData.shared.startNavigate = false
-                return
-            }
+            guard let dest = destinations.first(where: {$0._id == item.destination_id}) else {return}
             ChatData.shared.errorMessage = nil
             switch item.manipulation.manipulation_type {
             case "add":
@@ -287,14 +287,29 @@ class ChatClientOpenAI: ChatClient {
 
     func onTourSetting(_ params: TourSetting) {
         guard let tourManager = ChatData.shared.tourManager, let tours = try? ResourceManager.shared.load().tours else {return}
-        guard let tour = tours.first(where: {$0.id == params.tour_id}) else {
-            NSLog("chat tour_id \(params.tour_id) not found")
-            ChatData.shared.errorMessage = CustomLocalizedString("Could not set tour", lang: I18N.shared.langCode)
-            return
-        }
+        guard let tour = tours.first(where: {$0.id == params.tour_id}) else {return}
         tourManager.set(tour: tour)
         NSLog("chat set tour: \(tour.id)")
         ChatData.shared.startNavigate = true
+    }
+
+    func checkDestination(_ params: DestinationSetting) {
+        guard let destinations = try? ResourceManager.shared.load().directory.allDestinations() else {return}
+        for item in params.destination_manipulations {
+            if destinations.first(where: {$0._id == item.destination_id}) == nil {
+                NSLog("chat destination_id \(item.destination_id) not found")
+                ChatData.shared.errorMessage = CustomLocalizedString("Could not set destination", lang: I18N.shared.langCode)
+                ChatData.shared.startNavigate = false
+            }
+        }
+    }
+
+    func checkTour(_ params: TourSetting) {
+        guard let tours = try? ResourceManager.shared.load().tours else {return}
+        if tours.first(where: {$0.id == params.tour_id}) == nil {
+            NSLog("chat tour_id \(params.tour_id) not found")
+            ChatData.shared.errorMessage = CustomLocalizedString("Could not set tour", lang: I18N.shared.langCode)
+        }
     }
 
     func rotate(_ imageUrl: String) -> String {

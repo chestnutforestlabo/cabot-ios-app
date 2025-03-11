@@ -243,6 +243,9 @@
 		7EDF3C4129D4776D00AD1115 /* I18NExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = I18NExtension.swift; sourceTree = "<group>"; };
 		7EF5F1E8228DB07100788987 /* NavUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NavUtil.m; sourceTree = "<group>"; };
 		7EF5F1E9228DB07100788987 /* NavUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NavUtil.h; sourceTree = "<group>"; };
+		A056A36D2D8059DE0001FD38 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/User-InfoPlist.strings"; sourceTree = "<group>"; };
+		A056A36E2D8059DE0001FD38 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Attend-InfoPlist.strings"; sourceTree = "<group>"; };
+		A056A36F2D8059DE0001FD38 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		D7CC052B2BFB352700C0B10A /* CaBot-User.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CaBot-User.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D7CC05322BFB3BF900C0B10A /* DestinationDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DestinationDetailView.swift; sourceTree = "<group>"; };
 		D7CC05342BFB419900C0B10A /* DestinationsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DestinationsView.swift; sourceTree = "<group>"; };
@@ -664,6 +667,7 @@
 				Base,
 				ja,
 				"en-US",
+				"zh-Hans",
 			);
 			mainGroup = 7E29F000228B548100CA7DD6;
 			packageReferences = (
@@ -941,6 +945,7 @@
 			children = (
 				097845C12531E65B004DE1F6 /* ja */,
 				097845C32531E685004DE1F6 /* en */,
+				A056A36E2D8059DE0001FD38 /* zh-Hans */,
 			);
 			name = "Attend-InfoPlist.strings";
 			sourceTree = "<group>";
@@ -951,6 +956,7 @@
 				7E557EFF2581C79B00B1B9CA /* Base */,
 				7E557F042581C80E00B1B9CA /* ja */,
 				3013614A26A2262B0050CF9E /* en */,
+				A056A36F2D8059DE0001FD38 /* zh-Hans */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -960,6 +966,7 @@
 			children = (
 				D7CC05372BFB688400C0B10A /* en */,
 				D7CC05392BFB68BB00C0B10A /* ja */,
+				A056A36D2D8059DE0001FD38 /* zh-Hans */,
 			);
 			name = "User-InfoPlist.strings";
 			sourceTree = "<group>";

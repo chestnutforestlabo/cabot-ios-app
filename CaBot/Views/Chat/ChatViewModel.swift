@@ -152,7 +152,7 @@ class ChatViewModel: ObservableObject  {
             ChatData.shared.errorMessage = nil
             self.chatState.chatState = .Inactive
             DispatchQueue.main.async {
-                self.messages.append(ChatMessage(user: .User, text: errorMessage))
+//                self.messages.append(ChatMessage(user: .User, text: errorMessage))
                 self.send(message: errorMessage)
             }
             return true

@@ -136,7 +136,7 @@
 "System"="系统";
 "Settings"="设置";
 "Version: %@ (%@) - %@"="版本: %@ (%@) - %@";
-"CABOT_NAME: %@"="スーツケース名 : %@";
+"CABOT_NAME: %@"="行李箱名称 : %@";
 
 
 // DeviceStatusView
@@ -334,3 +334,4 @@
 "Could not set destination" = "无法设置目的地";
 "Could not set tour" = "无法设置行程";
 "Could not send camera image" = "无法发送相机图像";
+"Checking now" = "立即检查";
