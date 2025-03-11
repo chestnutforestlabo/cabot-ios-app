@@ -370,7 +370,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             silentForChange = false
         }
     }
-    var languages: [String] = ["en", "ja"]
+    var languages: [String] = ["en", "ja", "zh-CN"]
 
     var selectedLocale: Locale {
         get {
