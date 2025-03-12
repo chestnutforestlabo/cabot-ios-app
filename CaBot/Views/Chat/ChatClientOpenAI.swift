@@ -41,7 +41,7 @@ class ChatClientOpenAI: ChatClient {
     var queryResultCache :String = ""
     var metadata: [String: Any]
     private var backgroundQueue = DispatchQueue.init(label: "Background Queue")
-    private let chatLanguages = ["ja": "JA", "en": "EN", "zh-Hans": "CN"]
+    private let chatLanguages = ["ja": "JA", "en": "EN", "zh": "CN"]
 
     init(config:ChatConfiguration, callback: @escaping ChatClientCallback) {
         self.callback = callback
