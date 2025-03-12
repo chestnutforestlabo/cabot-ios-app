@@ -87,19 +87,24 @@ class ResourceManager {
         do {
             // need to load in this order to build structure correctly
             // make suer the server is initialized with the user ID
+            print("Initializing server...")
             let _ = try initServer()
             // features are not depending on other data, so load it first
+            print("Loading features...")
             let _ = try Features.load()
             // tour data depends on features, it provides messages
+            print("Loading tour data...")
             let tourData = try TourData.load()
             // directory depends on features and messages
+            print("Loading directory...")
             let directory = try Directory.load()
             lastResult = Result(tours: tourData.tours, directory: directory)
+            print("Loading Processes completed.")
             if let lastResult {
                 return lastResult
             }
         } catch {
-            print("Error")
+            print("Error occurred: \(error)")
         }
         throw ResourceManagerError.contentLoadError
     }
@@ -195,7 +200,7 @@ class ResourceManager {
         case .config:
             baseURL = "http://\(currentAddress):9090/map/api/config"
         case .directory:
-            baseURL = "http://\(currentAddress):9090/query/directory?user=\(user)&lat=\(lat)&lng=\(lng)&dist=\(dist)&lang=\(I18N.shared.langCode)"
+            baseURL = "http://\(currentAddress):9090/query/directory?user=\(user)&lat=\(lat)&lng=\(lng)&dist=\(dist)&lang=\(I18N.shared.fullLangCode)"
         case .tourdata:
             baseURL = "http://\(currentAddress):9090/map/cabot/tourdata.json"
         case .features_start:
@@ -203,6 +208,7 @@ class ResourceManager {
         case .features:
             baseURL = "http://\(currentAddress):9090/map/routesearch?action=features&lat=\(lat)&lng=\(lng)&user=\(user)&dist=\(dist)"
         }
+        print("URL: \(baseURL)")
 
         guard let url = URL(string: baseURL) else {
             throw ResourceManagerError.contentLoadError
@@ -253,11 +259,20 @@ enum ResourceManagerError: Error {
 }
 
 class I18N {
-    private var lang: String
+    var lang: String
 
     var langCode: String {
         get {
             Locale(identifier: self.lang).languageCode ?? "en"
+        }
+    }
+
+    var fullLangCode: String {
+        get {
+            if self.lang == "zh-Hans" {
+                return "zh-CN"
+            }
+            return Locale(identifier: self.lang).identifier ?? "en-US"
         }
     }
 
