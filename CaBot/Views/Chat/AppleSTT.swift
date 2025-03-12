@@ -175,7 +175,7 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
                 self.initPWCaptureSession()
                 self.startPWCaptureSession()
                 self.startRecognize(actions, failure:self.last_failure, timeout:self.last_timeout)
-                self.state?.wrappedValue.chatText = CustomLocalizedString("SPEAK_NOW", lang: I18N.shared.langCode)
+                self.state?.wrappedValue.chatText = CustomLocalizedString("SPEAK_NOW", lang: I18N.shared.lang)
                 self.state?.wrappedValue.chatState = .Listening
                 self.monitorSpeechWhileRecognition(timeout: self.last_timeout)
             }

@@ -259,7 +259,7 @@ enum ResourceManagerError: Error {
 }
 
 class I18N {
-    private var lang: String
+    var lang: String
 
     var langCode: String {
         get {

@@ -145,7 +145,7 @@ class ChatClientOpenAI: ChatClient {
                                                 camera_message = self.rotate(imageUrl)
                                             }
                                         } else {
-                                            camera_message = CustomLocalizedString("Could not send camera image", lang: I18N.shared.langCode)
+                                            camera_message = CustomLocalizedString("Could not send camera image", lang: I18N.shared.lang)
                                         }
                                     }
                                 }
@@ -298,7 +298,7 @@ class ChatClientOpenAI: ChatClient {
         for item in params.destination_manipulations {
             if destinations.first(where: {$0._id == item.destination_id}) == nil {
                 NSLog("chat destination_id \(item.destination_id) not found")
-                ChatData.shared.errorMessage = CustomLocalizedString("Could not set destination", lang: I18N.shared.langCode)
+                ChatData.shared.errorMessage = CustomLocalizedString("Could not set destination", lang: I18N.shared.lang)
                 ChatData.shared.startNavigate = false
             }
         }
@@ -308,7 +308,7 @@ class ChatClientOpenAI: ChatClient {
         guard let tours = try? ResourceManager.shared.load().tours else {return}
         if tours.first(where: {$0.id == params.tour_id}) == nil {
             NSLog("chat tour_id \(params.tour_id) not found")
-            ChatData.shared.errorMessage = CustomLocalizedString("Could not set tour", lang: I18N.shared.langCode)
+            ChatData.shared.errorMessage = CustomLocalizedString("Could not set tour", lang: I18N.shared.lang)
         }
     }
 
