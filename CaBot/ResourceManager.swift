@@ -200,7 +200,7 @@ class ResourceManager {
         case .config:
             baseURL = "http://\(currentAddress):9090/map/api/config"
         case .directory:
-            baseURL = "http://\(currentAddress):9090/query/directory?user=\(user)&lat=\(lat)&lng=\(lng)&dist=\(dist)&lang=\(I18N.shared.langCode)"
+            baseURL = "http://\(currentAddress):9090/query/directory?user=\(user)&lat=\(lat)&lng=\(lng)&dist=\(dist)&lang=\(I18N.shared.fullLangCode)"
         case .tourdata:
             baseURL = "http://\(currentAddress):9090/map/cabot/tourdata.json"
         case .features_start:
@@ -264,6 +264,11 @@ class I18N {
     var langCode: String {
         get {
             Locale(identifier: self.lang).languageCode ?? "en"
+        }
+    }
+    var fullLangCode: String {
+        get {
+            Locale(identifier: self.lang).identifier ?? "en"
         }
     }
 
