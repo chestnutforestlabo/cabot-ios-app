@@ -320,7 +320,7 @@
 "RESTART_LOCALIZATION_MESSAGE"="将重试估计位置。请一定在机器人停止的状态下进行。";
 
 //Resource Download Alert View
-"Retry Alert" = "请检查与服务器的连接！";
+"Retry Alert" = "Check the connection with the server!";
 "Retry" = "重试";
 "Return Mainmenu" = "返回主菜单";
 "Resource Download" = "资源下载";
