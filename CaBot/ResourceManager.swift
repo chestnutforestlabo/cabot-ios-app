@@ -131,7 +131,7 @@ class ResourceManager {
         guard path.range(of: "^[A-Za-z]", options: .regularExpression) != nil else {
             return nil
         }
-        let replacedPath = path.replacingOccurrences(of: "%@", with: I18N.shared.langCode)
+        let replacedPath = path.replacingOccurrences(of: "%@", with: I18N.shared.fullLangCode)
         guard let addressCandidate else { return nil }
         guard let url = URL(string: "http://\(addressCandidate.getCurrent()):9090/map/\(replacedPath)") else {
             return nil
@@ -320,9 +320,9 @@ class KeyedI18NText: Equatable {
     var text: String {
         get {
             if let base = self.base {
-                return CustomLocalizedString(key, lang: I18N.shared.langCode, base.text)
+                return CustomLocalizedString(key, lang: I18N.shared.fullLangCode, base.text)
             } else {
-                return CustomLocalizedString(key, lang: I18N.shared.langCode)
+                return CustomLocalizedString(key, lang: I18N.shared.fullLangCode)
             }
         }
     }
@@ -330,9 +330,9 @@ class KeyedI18NText: Equatable {
     var pron: String {
         get {
             if let base = self.base {
-                return CustomLocalizedString("\(key)-pron", lang: I18N.shared.langCode, base.pron)
+                return CustomLocalizedString("\(key)-pron", lang: I18N.shared.fullLangCode, base.pron)
             } else {
-                return CustomLocalizedString("\(key)-pron", lang: I18N.shared.langCode)
+                return CustomLocalizedString("\(key)-pron", lang: I18N.shared.fullLangCode)
             }
         }
     }
@@ -367,19 +367,19 @@ class I18NText: Equatable, Hashable {
 
     var text: String {
         get {
-            if let text = self._text[I18N.shared.langCode] {
+            if let text = self._text[I18N.shared.fullLangCode] {
                 return text
             }
             if let text = self._text["Base"] {
                 return text
             }
-            return "" // CustomLocalizedString("❗️NO Text", lang: I18N.shared.lang)
+            return "" // CustomLocalizedString("❗️NO Text", lang: I18N.shared.fullLangCode)
         }
     }
 
     var pron: String {
         get {
-            if let text = self._pron[I18N.shared.langCode] {
+            if let text = self._pron[I18N.shared.fullLangCode] {
                 return text
             }
             return self.text
@@ -402,7 +402,7 @@ class I18NText: Equatable, Hashable {
         get {
             let warn = BufferedInfo()
             if self.text.count == 0 {
-                warn.add(info: "No text found for launguage \(I18N.shared.langCode)")
+                warn.add(info: "No text found for launguage \(I18N.shared.fullLangCode)")
             }
             return warn.summary()
         }
@@ -428,7 +428,12 @@ class I18NText: Equatable, Hashable {
                 key.stringValue.hasPrefix(baseKey)
             }) {
                 let separators = CharacterSet(charactersIn: "-_:")
-                let items = key.stringValue.components(separatedBy: separators)
+                var items = key.stringValue.components(separatedBy: separators)
+                if items.count >= 3, items[1] == "zh", items[2] == "CN" {
+                    items[1] = "\(items[1])-\(items[2])"
+                    items.remove(at: 2)
+                }
+
                 if items.count == 1 { // title
                     main["Base"] = try container.decode(String.self, forKey: key)
                 }
