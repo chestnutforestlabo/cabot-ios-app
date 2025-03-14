@@ -187,10 +187,10 @@ class ChatClientOpenAI: ChatClient {
                 self.callback?(result_id, pub)
                 self.callback_called.insert(result_id)
                 let msg = error_count > 0 ? "Received an unexpected response" : "An unexpected error has occurred"
-                pub.send(CustomLocalizedString(msg, lang: I18N.shared.langCode))
+                pub.send(CustomLocalizedString(msg, lang: I18N.shared.lang))
             }
             if let msg = ChatData.shared.errorMessage {
-                pub.send("\n\n\n\(msg)\n\(CustomLocalizedString("Checking now", lang: I18N.shared.langCode))")
+                pub.send("\n\n\n\(msg)\n\(CustomLocalizedString("Checking now", lang: I18N.shared.lang))")
             }
             pub.send(completion: .finished)
             if let message = camera_message, let viewModel = ChatData.shared.viewModel {
