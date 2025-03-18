@@ -20,6 +20,9 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
+// Do not translate
+"DEFAULT_VOICE"="com.apple.voice.compact.zh-CN.Tingting";
+
 // General
 "Yes"="是";
 "No"="否";

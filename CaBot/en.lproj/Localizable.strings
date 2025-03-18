@@ -20,6 +20,9 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
+// Do not translate
+"DEFAULT_VOICE"="com.apple.voice.compact.en-AU.Karen";
+
 // General
 "Yes"="Yes";
 "No"="No";

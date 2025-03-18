@@ -505,18 +505,23 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 #endif
 
+    func getDefaultVoice() -> Voice {
+        let voice = TTSHelper.getVoice(by: CustomLocalizedString("DEFAULT_VOICE", lang: selectedLanguage))
+        return voice ?? TTSHelper.getVoices(by: selectedLocale)[0]
+    }
+
     func initTTS()
     {
         let key = "\(selectedVoiceKey)_\(selectedLanguage)"
         if let id = UserDefaults.standard.value(forKey: key) as? String {
             self.userVoice = TTSHelper.getVoice(by: id)
         } else {
-            self.userVoice = TTSHelper.getVoices(by: selectedLocale)[0]
+            self.userVoice = getDefaultVoice()
         }
         if let id = UserDefaults.standard.value(forKey: key) as? String {
             self.attendVoice = TTSHelper.getVoice(by: id)
         } else {
-            self.attendVoice = TTSHelper.getVoices(by: selectedLocale)[0]
+            self.attendVoice = getDefaultVoice()
         }
 
         self.updateTTS()
@@ -528,13 +533,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             if let id = UserDefaults.standard.value(forKey: key) as? String {
                 self.userVoice = TTSHelper.getVoice(by: id)
             } else {
-                self.userVoice = TTSHelper.getVoices(by: selectedLocale)[0]
+                self.userVoice = getDefaultVoice()
             }
         } else if(voiceSetting == .Attend) {
             if let id = UserDefaults.standard.value(forKey: key) as? String {
                 self.attendVoice = TTSHelper.getVoice(by: id)
             } else {
-                self.attendVoice = TTSHelper.getVoices(by: selectedLocale)[0]
+                self.attendVoice = getDefaultVoice()
             }
         }
     }

@@ -20,6 +20,9 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
+// Do not translate
+"DEFAULT_VOICE"="com.apple.ttsbundle.siri_O-ren_ja-JP_compact";
+
 // General
 "Yes"="はい";
 "No"="いいえ";
