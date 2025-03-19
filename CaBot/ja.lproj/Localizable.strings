@@ -230,6 +230,8 @@
 "DEBUG"="デバッグ";
 "SELECT_RESOURCE"="リソースの選択";
 "LANGUAGE"="言語";
+"USER_LANGUAGE"="ユーザー言語";
+"ATTEND_LANGUAGE"="アテンド言語";
 "MENU_DEBUG"="メニューデバッグ";
 "NO_SUITCASE_DEBUG"="スーツケース無しデバッグ";
 

@@ -230,6 +230,8 @@
 "DEBUG"="调试";
 "SELECT_RESOURCE"="选择资源";
 "LANGUAGE"="语言";
+"USER_LANGUAGE"="用户语言";
+"ATTEND_LANGUAGE"="指引人员语言";
 "MENU_DEBUG"="菜单调试";
 "NO_SUITCASE_DEBUG"="无行李箱调试模式";
 

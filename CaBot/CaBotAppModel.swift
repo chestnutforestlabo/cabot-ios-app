@@ -280,6 +280,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     private let selectedResourceKey = "SelectedResourceKey"
     private let selectedResourceLangKey = "selectedResourceLangKey"
+    private let selectedAttendLangKey = "selectedAttendLangKey"
     private let selectedVoiceKey = "SelectedVoiceKey"
     private let isTTSEnabledKey = "isTTSEnabledKey"
     private let speechRateKey = "speechRateKey"
@@ -357,22 +358,43 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             if silentForChange == false {
                 share(user_info: SharedInfo(type: .ChangeLanguage, value: newValue))
             }
+            #if USER
             ResourceManager.shared.invalidate()
             self.loadFromServer()
+            #endif
         }
         didSet {
             NSLog("selectedLanguage = \(selectedLanguage)")
             UserDefaults.standard.setValue(selectedLanguage, forKey: selectedResourceLangKey)
             _ = self.fallbackService.manage(command: .lang, param: selectedLanguage)
+            #if USER
             I18N.shared.set(lang: selectedLanguage)
+            #endif
             self.tts.lang = selectedLanguage
             self.updateVoice()
             silentForChange = false
         }
     }
+    @Published var attendLanguage: String = "en" {
+        willSet {
+            ResourceManager.shared.invalidate()
+            self.loadFromServer()
+        }
+        didSet {
+            NSLog("attendLanguage = \(attendLanguage)")
+            UserDefaults.standard.setValue(attendLanguage, forKey: selectedAttendLangKey)
+            I18N.shared.set(lang: attendLanguage)
+        }
+    }
     var languages: [String] = ["en", "ja", "zh-Hans"]
 
     var selectedLocale: Locale {
+        get {
+            Locale(identifier: self.resourceLang)
+        }
+    }
+
+    var voiceLocale: Locale {
         get {
             Locale(identifier: self.selectedLanguage)
         }
@@ -380,7 +402,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     var resourceLang: String {
         get {
+            #if USER
             return selectedLanguage
+            #else
+            return attendLanguage
+            #endif
         }
     }
 
@@ -507,7 +533,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func getDefaultVoice() -> Voice {
         let voice = TTSHelper.getVoice(by: CustomLocalizedString("DEFAULT_VOICE", lang: selectedLanguage))
-        return voice ?? TTSHelper.getVoices(by: selectedLocale)[0]
+        return voice ?? TTSHelper.getVoices(by: voiceLocale)[0]
     }
 
     func initTTS()
@@ -726,6 +752,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if let selectedLanguage = UserDefaults.standard.value(forKey: selectedResourceLangKey) as? String {
             self.silentForChange = true
             self.selectedLanguage = selectedLanguage
+        }
+        if let attendLanguage = UserDefaults.standard.value(forKey: selectedAttendLangKey) as? String {
+            self.attendLanguage = attendLanguage
         }
         if let groupID = UserDefaults.standard.value(forKey: teamIDKey) as? String {
             self.teamID = groupID

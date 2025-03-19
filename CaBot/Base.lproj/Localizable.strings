@@ -227,6 +227,8 @@
 "DEBUG"="DEBUG";
 "SELECT_RESOURCE"="Select Resource";
 "LANGUAGE"="Language";
+"USER_LANGUAGE"="User Language";
+"ATTEND_LANGUAGE"="Attend Language";
 "MENU_DEBUG"="Menu Debug";
 "NO_SUITCASE_DEBUG"="No Suitcase Debug";
 

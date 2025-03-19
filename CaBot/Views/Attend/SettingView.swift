@@ -34,7 +34,12 @@ struct SettingView: View {
     var body: some View {
         return Form {
             Section(header: Text("Settings")){
-                Picker("LANGUAGE", selection: $modelData.selectedLanguage) {
+                Picker("ATTEND_LANGUAGE", selection: $modelData.attendLanguage) {
+                    ForEach(modelData.languages, id: \.self) { language in
+                        Text(language).tag(language)
+                    }
+                }
+                Picker("USER_LANGUAGE", selection: $modelData.selectedLanguage) {
                     ForEach(modelData.languages, id: \.self) { language in
                         Text(language).tag(language)
                     }
@@ -82,7 +87,7 @@ struct SettingView: View {
                     }
                 }
                 Picker(LocalizedStringKey("Voice"), selection: $modelData.attendVoice) {
-                    ForEach(TTSHelper.getVoices(by: locale), id: \.self) { voice in
+                    ForEach(TTSHelper.getVoices(by: modelData.voiceLocale), id: \.self) { voice in
                         Text(voice.AVvoice.name).tag(voice as Voice?)
                     }
                 }.onChange(of: modelData.attendVoice, perform: { value in
@@ -120,7 +125,7 @@ struct SettingView: View {
                     }
                 }
                 Picker(LocalizedStringKey("Voice"), selection: $modelData.userVoice) {
-                    ForEach(TTSHelper.getVoices(by: locale), id: \.self) { voice in
+                    ForEach(TTSHelper.getVoices(by: modelData.voiceLocale), id: \.self) { voice in
                         Text(voice.AVvoice.name).tag(voice as Voice?)
                     }
                 }
