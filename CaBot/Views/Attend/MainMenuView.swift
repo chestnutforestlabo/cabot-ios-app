@@ -500,6 +500,7 @@ struct StatusMenus: View {
                             .foregroundColor(modelData.suitcaseFeatures.selectedHandleSide.color)
                     }
                 }
+                .disabled(!modelData.isUserAppConnected)
             }
             if modelData.suitcaseConnected {
                 if (modelData.suitcaseConnectedBLE && modelData.versionMatchedBLE == false) ||
