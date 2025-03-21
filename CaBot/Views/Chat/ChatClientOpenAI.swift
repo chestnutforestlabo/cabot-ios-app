@@ -130,6 +130,7 @@ class ChatClientOpenAI: ChatClient {
                 }
                 if camera_message == nil, let content = result.choices[0].delta.content {
                     pub.send(content)
+                    NSLog("chat stream content \(content)")
                 }
                 if let toolCalls = result.choices[0].delta.toolCalls {
                     toolCalls.forEach {tool_call in
