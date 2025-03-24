@@ -10,13 +10,20 @@ import SwiftUI
 
 struct SpokenTextView: View {
     @EnvironmentObject var modelData: CaBotAppModel
+    @State var translationShown: Bool = false
+    @State var translationText: String = ""
 
     var body: some View {
         Form {
             ForEach(modelData.userInfo.speakingText, id: \.self) { text in
                 SpokenTokenView(speakingText: text)
+                    .onTapGesture {
+                        translationText = text.text
+                        translationShown = true
+                    }
             }
         }
+        .translationPresentation(isPresented: $translationShown, text: translationText)
     }
     
     static func showText(text: SpeakingText) -> some View {

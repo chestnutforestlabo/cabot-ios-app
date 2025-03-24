@@ -23,6 +23,7 @@
 import SwiftUI
 import CoreData
 import ChatView
+import Translation
 
 struct MainMenuView: View {
     @Environment(\.locale) var locale
@@ -118,6 +119,8 @@ struct UserInfoDestinations: View {
 
 struct UserInfoView: View {
     @EnvironmentObject var modelData: CaBotAppModel
+    @State var translationShown: Bool = false
+    @State var translationText: String = ""
 
     var body: some View {
         Section(header: Text("User App Info")) {
@@ -134,6 +137,7 @@ struct UserInfoView: View {
             } icon: {
                 Image(systemName: "list.bullet.rectangle.portrait")
             }
+            .translationPresentation(isPresented: $translationShown, text: translationText)
             Label {
                 if let dest = modelData.userInfo.currentDestination {
                     Text(dest.title.text)
@@ -191,6 +195,10 @@ struct UserInfoView: View {
             } else if modelData.userInfo.speakingText.count > 1 {
                 ForEach(modelData.userInfo.speakingText[..<2], id: \.self) { text in
                     SpokenTextView.showText(text: text)
+                        .onTapGesture {
+                            translationText = text.text
+                            translationShown = true
+                        }
                 }
                 if modelData.userInfo.speakingText.count > 2 {
                     NavigationLink(destination: SpokenTextView().environmentObject(modelData).heartbeat("SpokenTextView"), label: {
@@ -203,6 +211,10 @@ struct UserInfoView: View {
             } else {
                 ForEach(modelData.userInfo.speakingText, id: \.self) { text in
                     SpokenTextView.showText(text: text)
+                        .onTapGesture {
+                            translationText = text.text
+                            translationShown = true
+                        }
                 }
             }
         }
@@ -907,6 +919,6 @@ struct ChatHistoryView: View {
     @EnvironmentObject var modelData: CaBotAppModel
 
     var body: some View {
-        ChatView(messages: modelData.attend_messages)
+        ChatView(messages: modelData.attend_messages, translate: true)
     }
 }
