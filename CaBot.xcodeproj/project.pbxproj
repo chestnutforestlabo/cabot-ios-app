@@ -1453,7 +1453,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/CMU-cabot/ChatView";
 			requirement = {
-				branch = "itohtaka/scroll-onApear";
+				branch = main;
 				kind = branch;
 			};
 		};
@@ -1461,7 +1461,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/cmu-cabot/OpenAI";
 			requirement = {
-				branch = "itohtaka/x-api-key";
+				branch = main;
 				kind = branch;
 			};
 		};
