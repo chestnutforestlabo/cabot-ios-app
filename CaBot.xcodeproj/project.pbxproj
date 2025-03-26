@@ -1477,7 +1477,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/CMU-cabot/PriorityQueueTTS.git";
 			requirement = {
-				branch = fix/utterance_attribute;
+				branch = main;
 				kind = branch;
 			};
 		};
