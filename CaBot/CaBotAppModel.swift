@@ -531,6 +531,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 #endif
 
+
+    func getVoice(by id:String) -> Voice {
+        return TTSHelper.getVoice(by: id) ?? getDefaultVoice()
+    }
+
     func getDefaultVoice() -> Voice {
         let voice = TTSHelper.getVoice(by: CustomLocalizedString("DEFAULT_VOICE", lang: selectedLanguage))
         return voice ?? TTSHelper.getVoices(by: voiceLocale)[0]
@@ -540,12 +545,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     {
         let key = "\(selectedVoiceKey)_\(selectedLanguage)"
         if let id = UserDefaults.standard.value(forKey: key) as? String {
-            self.userVoice = TTSHelper.getVoice(by: id)
+            self.userVoice = getVoice(by: id)
         } else {
             self.userVoice = getDefaultVoice()
         }
         if let id = UserDefaults.standard.value(forKey: key) as? String {
-            self.attendVoice = TTSHelper.getVoice(by: id)
+            self.attendVoice = getVoice(by: id)
         } else {
             self.attendVoice = getDefaultVoice()
         }
@@ -557,13 +562,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         let key = "\(selectedVoiceKey)_\(selectedLanguage)"
         if(voiceSetting == .User){
             if let id = UserDefaults.standard.value(forKey: key) as? String {
-                self.userVoice = TTSHelper.getVoice(by: id)
+                self.userVoice = getVoice(by: id)
             } else {
                 self.userVoice = getDefaultVoice()
             }
         } else if(voiceSetting == .Attend) {
             if let id = UserDefaults.standard.value(forKey: key) as? String {
-                self.attendVoice = TTSHelper.getVoice(by: id)
+                self.attendVoice = getVoice(by: id)
             } else {
                 self.attendVoice = getDefaultVoice()
             }
@@ -1730,7 +1735,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             }
         }
         if userInfo.type == .ChangeUserVoiceType {
-            self.silentUpdate(voice: TTSHelper.getVoice(by: userInfo.value))
+            self.silentUpdate(voice: getVoice(by: userInfo.value))
             if modeType == .Normal && userInfo.flag1 {
                 self.playSample(mode: .User)
             }
