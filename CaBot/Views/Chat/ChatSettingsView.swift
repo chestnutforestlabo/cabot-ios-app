@@ -44,16 +44,6 @@ struct ChatSettingsView: View {
                         .keyboardType(.asciiCapable)
                 }
             }
-            Section("For development use only") {
-                VStack(alignment:.leading) {
-                    Text("Time to reset chat session when inactive")
-                        .font(.caption).foregroundColor(.secondary)
-                    HStack {
-                        Slider(value: $model.chatModel.inactive_delay, in: 10...300, step: 5)
-                        Text(LocalizedStringKey("\(model.chatModel.inactive_delay, specifier: "%.1f") sec"))
-                    }
-                }
-            }
         }.navigationTitle(Text("Settings"))
     }
 }
