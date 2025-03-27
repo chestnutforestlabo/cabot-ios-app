@@ -136,6 +136,7 @@ class CaBotServiceTCP: NSObject {
                 weakself.connected = true
                 delegate.caBot(service: weakself, centralConnected: weakself.connected)
                 weakself.startHeartBeat()
+                socket.emit("req_name", true)
             }
             socket.emit("req_version", true)
         }
@@ -288,6 +289,34 @@ class CaBotServiceTCP: NSObject {
             } catch {
                 print(text)
                 NSLog("<Socket on: share> json parse error")
+                NSLog(error.localizedDescription)
+            }
+        }
+        socket.on("location"){[weak self] dt, ack in
+            guard let text = dt[0] as? String else { return }
+            guard let data = String(text).data(using:.utf8) else { return }
+            do {
+                ChatData.shared.lastLocation = try JSONDecoder().decode(ChatData.CurrentLocation.self, from: data)
+            } catch {
+                print(text)
+                NSLog(error.localizedDescription)
+            }
+        }
+        socket.on("cabot_name"){[weak self] dt, ack in
+            guard let text = dt[0] as? String else { return }
+            ChatData.shared.suitcase_id = text
+        }
+        socket.on("camera_image"){[weak self] dt, ack in
+            guard let text = dt[0] as? String else { return }
+            ChatData.shared.lastCameraImage = text
+        }
+        socket.on("camera_orientation"){[weak self] dt, ack in
+            guard let text = dt[0] as? String else { return }
+            guard let data = String(text).data(using:.utf8) else { return }
+            do {
+                ChatData.shared.lastCameraOrientation = try JSONDecoder().decode(ChatData.CameraOrientation.self, from: data)
+            } catch {
+                print(text)
                 NSLog(error.localizedDescription)
             }
         }
@@ -463,5 +492,11 @@ extension CaBotServiceTCP: CaBotServiceProtocol {
         } catch {
         }
         return false
+    }
+
+    func camera_image_request() -> Bool {
+        NSLog("camera_image_request")
+        self.emit("camera_image_request", true)
+        return true
     }
 }

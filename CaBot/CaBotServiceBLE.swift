@@ -265,6 +265,11 @@ extension CaBotServiceBLE: CaBotServiceProtocol {
         NSLog("BLE share is not implemented")
         return false
     }
+
+    func camera_image_request() -> Bool {
+        NSLog("BLE camera_image_request is not implemented")
+        return false
+    }
 }
 
 

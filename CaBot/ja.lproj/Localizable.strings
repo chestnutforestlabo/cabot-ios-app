@@ -20,6 +20,9 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
+// Do not translate
+"DEFAULT_VOICE"="com.apple.ttsbundle.siri_O-ren_ja-JP_compact";
+
 // General
 "Yes"="はい";
 "No"="いいえ";
@@ -69,7 +72,7 @@
 
 
 //OnboardGrantAccess
-"ONBOARD_MESSAGE"="位置情報、Bluetooth、通知の利用を許可してください";
+"ONBOARD_MESSAGE"="位置情報、Bluetooth、通知、マイク、音声認識の利用を許可してください";
 "Enable Location Update"="位置情報を許可する";
 "Location Update Enabled"="位置情報が許可されました";
 "Location Update Denied"="位置情報が許可されませんでした";
@@ -82,6 +85,13 @@
 "Enable Notification"="通知を許可する";
 "Notification Enabled"="通知が許可されました";
 "Notification Denied"="通知が許可されませんでした";
+"Enable Microphone"="マイクを許可する";
+"Microphone Enabled"="マイクが許可されました";
+"Microphone Denied"="マイクが許可されませんでした";
+"Enable Speech Reco"="音声認識を許可する";
+"Speech Reco Enabled"="音声認識が許可されました";
+"Speech Reco Not Available"="音声認識を利用できません";
+"Speech Reco Denied"="音声認識が許可されませんでした";
 
 
 // MainMenuView
@@ -129,6 +139,7 @@
 "System"="システム";
 "Settings"="設定";
 "Version: %@ (%@) - %@"="バージョン: %@ (%@) - %@";
+"CABOT_NAME: %@"="スーツケース名 : %@";
 
 
 // DeviceStatusView
@@ -219,6 +230,8 @@
 "DEBUG"="デバッグ";
 "SELECT_RESOURCE"="リソースの選択";
 "LANGUAGE"="言語";
+"USER_LANGUAGE"="ユーザー言語";
+"ATTEND_LANGUAGE"="アテンド言語";
 "MENU_DEBUG"="メニューデバッグ";
 "NO_SUITCASE_DEBUG"="スーツケース無しデバッグ";
 
@@ -316,3 +329,14 @@
 "Retry" = "リトライ";
 "Return Mainmenu" = "メインメニューに戻る";
 "Resource Download" = "リソースのダウンロード";
+
+// Chat
+"SPEAK_NOW" = "話しかけてください";
+"Chat Settings" = "対話設定";
+"Chat server connection" = "対話サーバー接続";
+"An unexpected error has occurred" = "予期せぬエラーが起きました";
+"Received an unexpected response" = "想定外の応答を受け取りました";
+"Could not set destination" = "目的地を設定できませんでした";
+"Could not set tour" = "ツアーを設定できませんでした";
+"Could not send camera image" = "カメラ画像を送信できませんでした";
+"Checking now" = "確認中です";

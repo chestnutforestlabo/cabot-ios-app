@@ -30,6 +30,8 @@ import UserNotifications
 import Combine
 import os.log
 import HLPDialog
+import Speech
+import ChatView
 
 enum GrantState {
     case Init
@@ -146,6 +148,11 @@ class FallbackService: CaBotServiceProtocol {
     func share(user_info: SharedInfo) -> Bool {
         guard let service = getService() else { return false }
         return service.share(user_info: user_info)
+    }
+
+    func camera_image_request() -> Bool {
+        guard let service = getService() else { return false }
+        return service.camera_image_request()
     }
 }
 
@@ -273,6 +280,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     private let selectedResourceKey = "SelectedResourceKey"
     private let selectedResourceLangKey = "selectedResourceLangKey"
+    private let selectedAttendLangKey = "selectedAttendLangKey"
     private let selectedVoiceKey = "SelectedVoiceKey"
     private let isTTSEnabledKey = "isTTSEnabledKey"
     private let speechRateKey = "speechRateKey"
@@ -314,17 +322,31 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.checkOnboardCondition()
         }
     }
+    @Published var recordPermission: AVAudioApplication.recordPermission = AVAudioApplication.shared.recordPermission {
+        didSet {
+            self.checkOnboardCondition()
+        }
+    }
+    @Published var speechRecoState: SFSpeechRecognizerAuthorizationStatus = SFSpeechRecognizer.authorizationStatus() {
+        didSet {
+            self.checkOnboardCondition()
+        }
+    }
     func checkOnboardCondition() {
-        if (self.bluetoothState == .poweredOn || self.bluetoothState == .poweredOff) &&
-            self.notificationState != .Init &&
-            self.locationState != .Init
-        {
-            if authRequestedByUser {
-                withAnimation() {
+        DispatchQueue.main.async {
+            if (self.bluetoothState == .poweredOn || self.bluetoothState == .poweredOff) &&
+                self.notificationState != .Init &&
+                self.locationState != .Init &&
+                self.recordPermission == .granted &&
+                self.speechRecoState != .notDetermined
+            {
+                if self.authRequestedByUser {
+                    withAnimation() {
+                        self.displayedScene = .App
+                    }
+                } else {
                     self.displayedScene = .App
                 }
-            } else {
-                self.displayedScene = .App
             }
         }
     }
@@ -336,22 +358,43 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             if silentForChange == false {
                 share(user_info: SharedInfo(type: .ChangeLanguage, value: newValue))
             }
+            #if USER
             ResourceManager.shared.invalidate()
             self.loadFromServer()
+            #endif
         }
         didSet {
             NSLog("selectedLanguage = \(selectedLanguage)")
             UserDefaults.standard.setValue(selectedLanguage, forKey: selectedResourceLangKey)
             _ = self.fallbackService.manage(command: .lang, param: selectedLanguage)
+            #if USER
             I18N.shared.set(lang: selectedLanguage)
+            #endif
             self.tts.lang = selectedLanguage
             self.updateVoice()
             silentForChange = false
         }
     }
-    var languages: [String] = ["en", "ja"]
+    @Published var attendLanguage: String = "en" {
+        willSet {
+            ResourceManager.shared.invalidate()
+            self.loadFromServer()
+        }
+        didSet {
+            NSLog("attendLanguage = \(attendLanguage)")
+            UserDefaults.standard.setValue(attendLanguage, forKey: selectedAttendLangKey)
+            I18N.shared.set(lang: attendLanguage)
+        }
+    }
+    var languages: [String] = ["en", "ja", "zh-Hans"]
 
     var selectedLocale: Locale {
+        get {
+            Locale(identifier: self.resourceLang)
+        }
+    }
+
+    var voiceLocale: Locale {
         get {
             Locale(identifier: self.selectedLanguage)
         }
@@ -359,7 +402,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     var resourceLang: String {
         get {
+            #if USER
             return selectedLanguage
+            #else
+            return attendLanguage
+            #endif
         }
     }
 
@@ -424,6 +471,23 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
     }
 
+    @Published var showingChatView: Bool = false {
+        didSet {
+            if silentForChange == false {
+                shareChatStatus()
+            }
+            silentForChange = false
+        }
+    }
+    @Published var toggleChatView: Bool = false {
+        willSet {
+            if silentForChange == false {
+                share(user_info: SharedInfo(type: .ChatRequest, value: newValue ? "open" : "close"))
+            }
+            silentForChange = false
+        }
+    }
+
     enum ServerStatus {
         case Init
         case NotReady
@@ -467,18 +531,28 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 #endif
 
+
+    func getVoice(by id:String) -> Voice {
+        return TTSHelper.getVoice(by: id) ?? getDefaultVoice()
+    }
+
+    func getDefaultVoice() -> Voice {
+        let voice = TTSHelper.getVoice(by: CustomLocalizedString("DEFAULT_VOICE", lang: selectedLanguage))
+        return voice ?? TTSHelper.getVoices(by: voiceLocale)[0]
+    }
+
     func initTTS()
     {
         let key = "\(selectedVoiceKey)_\(selectedLanguage)"
         if let id = UserDefaults.standard.value(forKey: key) as? String {
-            self.userVoice = TTSHelper.getVoice(by: id)
+            self.userVoice = getVoice(by: id)
         } else {
-            self.userVoice = TTSHelper.getVoices(by: selectedLocale)[0]
+            self.userVoice = getDefaultVoice()
         }
         if let id = UserDefaults.standard.value(forKey: key) as? String {
-            self.attendVoice = TTSHelper.getVoice(by: id)
+            self.attendVoice = getVoice(by: id)
         } else {
-            self.attendVoice = TTSHelper.getVoices(by: selectedLocale)[0]
+            self.attendVoice = getDefaultVoice()
         }
 
         self.updateTTS()
@@ -488,15 +562,15 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         let key = "\(selectedVoiceKey)_\(selectedLanguage)"
         if(voiceSetting == .User){
             if let id = UserDefaults.standard.value(forKey: key) as? String {
-                self.userVoice = TTSHelper.getVoice(by: id)
+                self.userVoice = getVoice(by: id)
             } else {
-                self.userVoice = TTSHelper.getVoices(by: selectedLocale)[0]
+                self.userVoice = getDefaultVoice()
             }
         } else if(voiceSetting == .Attend) {
             if let id = UserDefaults.standard.value(forKey: key) as? String {
-                self.attendVoice = TTSHelper.getVoice(by: id)
+                self.attendVoice = getVoice(by: id)
             } else {
-                self.attendVoice = TTSHelper.getVoices(by: selectedLocale)[0]
+                self.attendVoice = getDefaultVoice()
             }
         }
     }
@@ -615,6 +689,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     @Published var batteryStatus: BatteryStatus = BatteryStatus()
     @Published var touchStatus: TouchStatus = TouchStatus()
     @Published var userInfo: UserInfoBuffer
+    @Published var attend_messages: [ChatMessage] = []
 
     private var addressCandidate: AddressCandidate
     private var bleService: CaBotServiceBLE
@@ -637,6 +712,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     let locationUpdateTimeLimit: CFAbsoluteTime = 60*15
     var locationUpdateStartTime: CFAbsoluteTime = 0
     var audioAvailableEstimate: Bool = false
+
+    var chatModel: ChatViewModel = ChatViewModel()
 
     convenience override init() {
         self.init(preview: true)
@@ -680,6 +757,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if let selectedLanguage = UserDefaults.standard.value(forKey: selectedResourceLangKey) as? String {
             self.silentForChange = true
             self.selectedLanguage = selectedLanguage
+        }
+        if let attendLanguage = UserDefaults.standard.value(forKey: selectedAttendLangKey) as? String {
+            self.attendLanguage = attendLanguage
         }
         if let groupID = UserDefaults.standard.value(forKey: teamIDKey) as? String {
             self.teamID = groupID
@@ -759,6 +839,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 _ = self.fallbackService.manage(command: .touchmode, param: mode.rawValue)
             }
         })
+
+        // Chat
+        self.chatModel.appModel = self
+        ChatData.shared.tourManager = self.tourManager
+        ChatData.shared.viewModel = self.chatModel
+        PriorityQueueTTSWrapper.shared.delegate = self
     }
 
 
@@ -874,7 +960,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.showingDeviceStatusNotification = true
     }
 
-    // MARK: onboading
+    // MARK: onboarding
 
     func requestLocationAuthorization() {
         self.authRequestedByUser = true
@@ -894,6 +980,24 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             (granted, error) in
             DispatchQueue.main.async {
                 self.notificationState = granted ? .Granted : .Denied
+            }
+        }
+    }
+
+    func requestMicrophoneAuthorization() {
+        self.authRequestedByUser = true
+        AVAudioApplication.requestRecordPermission(completionHandler: {_ in
+            DispatchQueue.main.async {
+                self.recordPermission = AVAudioApplication.shared.recordPermission
+            }
+        })
+    }
+
+    func requestSpeechRecoAuthorization() {
+        self.authRequestedByUser = true
+        SFSpeechRecognizer.requestAuthorization { authStatus in
+            DispatchQueue.main.async {
+                self.speechRecoState = authStatus
             }
         }
     }
@@ -1068,7 +1172,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func stopSpeak() {
-        self.tts.stop(false)
+        self.tts.stop(self.tts.isPaused)
     }
 
     func playSample(mode: VoiceMode, priority: CaBotTTS.SpeechPriority? = nil, timeout sec : TimeInterval? = nil ){
@@ -1631,7 +1735,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             }
         }
         if userInfo.type == .ChangeUserVoiceType {
-            self.silentUpdate(voice: TTSHelper.getVoice(by: userInfo.value))
+            self.silentUpdate(voice: getVoice(by: userInfo.value))
             if modeType == .Normal && userInfo.flag1 {
                 self.playSample(mode: .User)
             }
@@ -1666,6 +1770,25 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             }
             if userInfo.type == .PossibleTouchMode {
                 self.suitcaseFeatures.update(touchmodeOptions: userInfo.value)
+            }
+            if userInfo.type == .ChatStatus {
+                if let data = userInfo.value.data(using: .utf8), let status = try? JSONDecoder().decode(ChatStatusParam.self, from: data) {
+                    silentForChange = true
+                    toggleChatView = status.visible
+                    if !status.messages.isEmpty {
+                        for message in status.messages {
+                            if let replace = attend_messages.first(where: { $0.id == message.id }) {
+                                let appendText = message.text.suffix(message.text.count - replace.combined_text.count)
+                                replace.append(text: "\(appendText)")
+                            } else {
+                                let newMessage = ChatMessage(id: message.id, user: message.user == "User" ? .User : .Agent, text: message.text)
+                                attend_messages.append(newMessage)
+                            }
+                        }
+                    } else {
+                        attend_messages.removeAll()
+                    }
+                }
             }
             return
         }
@@ -1709,6 +1832,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if userInfo.type == .ClearDestinations {
             self.clearAll()
         }
+        if userInfo.type == .ChatRequest {
+            silentForChange = true
+            showingChatView = userInfo.value == "open"
+        }
     }
 
     func shareAllUserConfig() {
@@ -1721,10 +1848,52 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.share(user_info: SharedInfo(type: .PossibleTouchMode, value: self.suitcaseFeatures.possibleTouchModes.map({ m in m.rawValue }).joined(separator: ",")))
         self.share(user_info: SharedInfo(type: .ChangeHandleSide, value: self.suitcaseFeatures.selectedHandleSide.rawValue))
         self.share(user_info: SharedInfo(type: .ChangeTouchMode, value: self.suitcaseFeatures.selectedTouchMode.rawValue))
+        self.shareChatStatus(all: true)
     }
 
     func getModeType() -> ModeType {
         return modeType
+    }
+
+    func requestCameraImage() {
+        _ = self.fallbackService.camera_image_request()
+    }
+
+    struct ChatStatusParam: Codable {
+        let visible: Bool
+        let messages: [ChatStatusMessage]
+
+        init(visible: Bool, messages: [ChatMessage]) {
+            self.visible = visible
+            self.messages = messages.map() {ChatStatusMessage($0)}
+        }
+
+        struct ChatStatusMessage: Codable {
+            let id: UUID
+            let user: String
+            let text: String
+            
+            init(_ message: ChatMessage) {
+                self.id = message.id
+                self.user = "\(message.user)"
+//                self.text = message.combined_text
+                self.text = message.combined_text.hasPrefix("data:image") ? "IMAGE" : message.combined_text // FIX heartbeat delay
+            }
+        }
+    }
+
+    func shareChatStatus(all: Bool = false) {
+        var messages: [ChatMessage] = []
+        if all {
+            messages = self.chatModel.messages
+        } else if let last = self.chatModel.messages.last {
+            messages = self.chatModel.messages.suffix(last.user == .Agent ? 1 : 2)
+        }
+        if let data = try? JSONEncoder().encode(ChatStatusParam(visible: self.showingChatView, messages: messages)) {
+            if let value = String(data: data, encoding: .utf8) {
+                share(user_info: SharedInfo(type: .ChatStatus, value: value))
+            }
+        }
     }
 }
 
@@ -2007,6 +2176,7 @@ class UserInfoBuffer {
     var destinations: [any Destination] = []
     var speakingText: [SpeakingText] = []
     var speakingIndex = -1
+    var chatMessages: [ChatMessage] = []
     weak var modelData: CaBotAppModel?
 
     init(modelData: CaBotAppModel? = nil) {
@@ -2019,6 +2189,7 @@ class UserInfoBuffer {
         nextDestination = nil
         destinations = []
         speakingText = []
+        chatMessages = []
     }
 
     func update(userInfo: SharedInfo) {

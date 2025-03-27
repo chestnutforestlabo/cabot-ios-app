@@ -24,6 +24,7 @@
 import Foundation
 import SwiftUI
 import CoreBluetooth
+import PriorityQueueTTS
 
 enum ConnectionType:String, CaseIterable{
     case BLE = "ble"
@@ -50,6 +51,8 @@ struct SharedInfo: Codable {
         case PossibleTouchMode
         case ChangeHandleSide
         case ChangeTouchMode
+        case ChatRequest
+        case ChatStatus
     }
     init(type: InfoType, value: String, flag1: Bool = false, flag2: Bool = false, location: Int = 0, length: Int = 0) {
         self.info_id = Int64(Date().timeIntervalSince1970*1000000000.0)
@@ -78,6 +81,7 @@ protocol CaBotServiceProtocol {
     func send_log(log_info: LogRequest, app_log: [String], urls: [URL]) -> Bool
     func isConnected() -> Bool
     func share(user_info: SharedInfo) -> Bool
+    func camera_image_request() -> Bool
 }
 
 protocol CaBotTransportProtocol: CaBotServiceProtocol {
@@ -362,6 +366,8 @@ enum NavigationEventType:String, Decodable {
     case getlanguage
     case gethandleside
     case gettouchmode
+    case toggleconversation
+    case togglespeakstate
     case unknown
 }
 
@@ -554,6 +560,17 @@ class CaBotServiceActions {
                 delegate.cabot(service: service, openRequest: url)
             case .sound:
                 delegate.cabot(service: service, soundRequest: request.param)
+            case .toggleconversation:
+                NSLog("Receive activate microphone request")
+                if let appModel = ChatData.shared.viewModel?.appModel {
+                    appModel.showingChatView = !appModel.showingChatView
+                    if !appModel.showingChatView {
+                        ChatData.shared.viewModel?.playTimeoutSound()
+                    }
+                }
+            case .togglespeakstate:
+                NSLog("Receive toggle speake state request")
+                PriorityQueueTTS.shared.toggleSpeakState()//(at: .word)
             case .unknown:
                 break
             }

@@ -64,6 +64,12 @@ class CaBotTTS : TTSProtocol {
             self._tts.isSpeaking
         }
     }
+
+    var isPaused: Bool {
+        get {
+            self._tts.isPaused
+        }
+    }
     var delegate:CaBotTTSDelegate?
 
     init(voice: AVSpeechSynthesisVoice?, lang: String? = nil ) {
@@ -88,7 +94,10 @@ class CaBotTTS : TTSProtocol {
         // let isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
         // let selfspeak = forceSelfvoice || !isForeground || !isVoiceOverRunning
         
-        if force {
+        if priority == .Low && ChatData.shared.viewModel?.appModel?.showingChatView == true {
+            return
+        }
+        if force || self._tts.isPaused || PriorityQueueTTSWrapper.shared.needForceSpeak(priority) {
             self._tts.stop( true )
             Debug(log:"<TTS> force stop tts by \(text?._summary(15) ?? "")")
         }
@@ -241,6 +250,8 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
     
     public enum SpeechPriority {
         case Low
+        case Chat
+        case Moderate
         case Normal
         case High
         case Required
@@ -249,6 +260,10 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
             switch queuePriority {
             case .Low:
                 self = .Low
+            case .Chat:
+                self = .Chat
+            case .Moderate:
+                self = .Moderate
             case .Normal:
                 self = .Normal
             case .High:
@@ -262,6 +277,10 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
             switch self {
             case .Low:
                 return .Low
+            case .Chat:
+                return .Chat
+            case .Moderate:
+                return .Moderate
             case .Normal:
                 return .Normal
             case .High:
@@ -362,8 +381,10 @@ extension CaBotTTS.SpeechPriority {
 
         if let priority {
             switch priority {
-            case _ where priority <= 25:
+            case _ where priority <= 12:
                 return .Low
+            case 13 ... 25:
+                return .Moderate
             case 26 ... 50:
                 return .Normal
             case 51 ... 75:

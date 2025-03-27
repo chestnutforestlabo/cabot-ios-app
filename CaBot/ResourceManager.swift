@@ -87,19 +87,24 @@ class ResourceManager {
         do {
             // need to load in this order to build structure correctly
             // make suer the server is initialized with the user ID
+            print("Initializing server...")
             let _ = try initServer()
             // features are not depending on other data, so load it first
+            print("Loading features...")
             let _ = try Features.load()
             // tour data depends on features, it provides messages
+            print("Loading tour data...")
             let tourData = try TourData.load()
             // directory depends on features and messages
+            print("Loading directory...")
             let directory = try Directory.load()
             lastResult = Result(tours: tourData.tours, directory: directory)
+            print("Loading Processes completed.")
             if let lastResult {
                 return lastResult
             }
         } catch {
-            print("Error")
+            print("Error occurred: \(error)")
         }
         throw ResourceManagerError.contentLoadError
     }
@@ -126,7 +131,7 @@ class ResourceManager {
         guard path.range(of: "^[A-Za-z]", options: .regularExpression) != nil else {
             return nil
         }
-        let replacedPath = path.replacingOccurrences(of: "%@", with: I18N.shared.langCode)
+        let replacedPath = path.replacingOccurrences(of: "%@", with: I18N.shared.fullLangCode)
         guard let addressCandidate else { return nil }
         guard let url = URL(string: "http://\(addressCandidate.getCurrent()):9090/map/\(replacedPath)") else {
             return nil
@@ -195,7 +200,7 @@ class ResourceManager {
         case .config:
             baseURL = "http://\(currentAddress):9090/map/api/config"
         case .directory:
-            baseURL = "http://\(currentAddress):9090/query/directory?user=\(user)&lat=\(lat)&lng=\(lng)&dist=\(dist)&lang=\(I18N.shared.langCode)"
+            baseURL = "http://\(currentAddress):9090/query/directory?user=\(user)&lat=\(lat)&lng=\(lng)&dist=\(dist)&lang=\(I18N.shared.fullLangCode)"
         case .tourdata:
             baseURL = "http://\(currentAddress):9090/map/cabot/tourdata.json"
         case .features_start:
@@ -203,6 +208,7 @@ class ResourceManager {
         case .features:
             baseURL = "http://\(currentAddress):9090/map/routesearch?action=features&lat=\(lat)&lng=\(lng)&user=\(user)&dist=\(dist)"
         }
+        print("URL: \(baseURL)")
 
         guard let url = URL(string: baseURL) else {
             throw ResourceManagerError.contentLoadError
@@ -253,11 +259,20 @@ enum ResourceManagerError: Error {
 }
 
 class I18N {
-    private var lang: String
+    private(set) var lang: String
 
     var langCode: String {
         get {
             Locale(identifier: self.lang).languageCode ?? "en"
+        }
+    }
+
+    var fullLangCode: String {
+        get {
+            if self.lang == "zh-Hans" {
+                return "zh-CN"
+            }
+            return Locale(identifier: self.lang).identifier ?? "en-US"
         }
     }
 
@@ -305,9 +320,9 @@ class KeyedI18NText: Equatable {
     var text: String {
         get {
             if let base = self.base {
-                return CustomLocalizedString(key, lang: I18N.shared.langCode, base.text)
+                return CustomLocalizedString(key, lang: I18N.shared.fullLangCode, base.text)
             } else {
-                return CustomLocalizedString(key, lang: I18N.shared.langCode)
+                return CustomLocalizedString(key, lang: I18N.shared.fullLangCode)
             }
         }
     }
@@ -315,9 +330,9 @@ class KeyedI18NText: Equatable {
     var pron: String {
         get {
             if let base = self.base {
-                return CustomLocalizedString("\(key)-pron", lang: I18N.shared.langCode, base.pron)
+                return CustomLocalizedString("\(key)-pron", lang: I18N.shared.fullLangCode, base.pron)
             } else {
-                return CustomLocalizedString("\(key)-pron", lang: I18N.shared.langCode)
+                return CustomLocalizedString("\(key)-pron", lang: I18N.shared.fullLangCode)
             }
         }
     }
@@ -352,19 +367,19 @@ class I18NText: Equatable, Hashable {
 
     var text: String {
         get {
-            if let text = self._text[I18N.shared.langCode] {
+            if let text = self._text[I18N.shared.fullLangCode] {
                 return text
             }
             if let text = self._text["Base"] {
                 return text
             }
-            return "" // CustomLocalizedString("❗️NO Text", lang: I18N.shared.lang)
+            return "" // CustomLocalizedString("❗️NO Text", lang: I18N.shared.fullLangCode)
         }
     }
 
     var pron: String {
         get {
-            if let text = self._pron[I18N.shared.langCode] {
+            if let text = self._pron[I18N.shared.fullLangCode] {
                 return text
             }
             return self.text
@@ -387,7 +402,7 @@ class I18NText: Equatable, Hashable {
         get {
             let warn = BufferedInfo()
             if self.text.count == 0 {
-                warn.add(info: "No text found for launguage \(I18N.shared.langCode)")
+                warn.add(info: "No text found for launguage \(I18N.shared.fullLangCode)")
             }
             return warn.summary()
         }
@@ -413,25 +428,70 @@ class I18NText: Equatable, Hashable {
                 key.stringValue.hasPrefix(baseKey)
             }) {
                 let separators = CharacterSet(charactersIn: "-_:")
-                let items = key.stringValue.components(separatedBy: separators)
+                var items = key.stringValue.components(separatedBy: separators)
+                if items.count >= 3, items[1] == "zh", items[2] == "CN" {
+                    items[1] = "\(items[1])-\(items[2])"
+                    items.remove(at: 2)
+                }
+
                 if items.count == 1 { // title
                     main["Base"] = try container.decode(String.self, forKey: key)
                 }
                 else if items.count == 2 {
                     if items[1] == "hira" { // special case for Japanese hiragana
                         pron["ja"] = try container.decode(String.self, forKey: key)
-                    } else {
+                    }
+                    else if items[0].hasPrefix("ent") && items[1] == "n" {
+                        main["Base"] = try container.decode(String.self, forKey: key)
+                    }else {
                         main[String(items[1])] = try container.decode(String.self, forKey: key)
                     }
                 }
                 else if items.count == 3 && items[2] == "pron" {
                     pron[String(items[1])] = try container.decode(String.self, forKey: key)
                 }
+                else if items.count == 3 && items[0].hasPrefix("ent"){
+                    main[String(items[2])] = try container.decode(String.self, forKey: key)
+                }
             }
             return I18NText(text: main, pron: pron)
         } catch {
             return I18NText(text: [:], pron: [:])
         }
+    }
+
+    static func + (lhs: I18NText, rhs: I18NText) -> I18NText {
+        var newTexts: [String: String] = [:]
+        var newPron: [String: String] = [:]
+
+        let languages = Set(lhs._text.keys).union(rhs._text.keys)
+        for lang in languages {
+            var lhsText = lhs._text[lang] ?? ""
+            if lhsText.isEmpty, let baseLhs = lhs._text["Base"], !baseLhs.isEmpty {
+                lhsText = baseLhs
+            }
+            var rhsText = rhs._text[lang] ?? ""
+            if rhsText.isEmpty, let baseRhs = rhs._text["Base"], !baseRhs.isEmpty {
+                rhsText = baseRhs
+            }
+            let combinedText = (lhsText + " " + rhsText).trimmingCharacters(in: .whitespaces)
+            newTexts[lang] = combinedText
+        }
+
+        let pronLanguages = Set(lhs._pron.keys).union(rhs._pron.keys)
+        for lang in pronLanguages {
+            var lhsPron = lhs._pron[lang] ?? ""
+            if lhsPron.isEmpty, let baseLhsPron = lhs._pron["Base"], !baseLhsPron.isEmpty {
+                lhsPron = baseLhsPron
+            }
+            var rhsPron = rhs._pron[lang] ?? ""
+            if rhsPron.isEmpty, let baseRhsPron = rhs._pron["Base"], !baseRhsPron.isEmpty {
+                rhsPron = baseRhsPron
+            }
+            let combinedPron = (lhsPron + " " + rhsPron).trimmingCharacters(in: .whitespaces)
+            newPron[lang] = combinedPron
+        }
+        return I18NText(text: newTexts, pron: newPron)
     }
 }
 
@@ -818,6 +878,7 @@ class Feature : Decodable,  Hashable {
     }
     struct Properties: Decodable {
         var entrances: [String] = []
+        var entranceMapping: [String: I18NText] = [:]
         var name: I18NText
 
         private struct CodingKeys: CodingKey {
@@ -838,8 +899,20 @@ class Feature : Decodable,  Hashable {
             })  {
                 let entrance = try container.decode(String.self, forKey: key)
                 self.entrances.append(entrance)
+                let prefix = key.stringValue.replacingOccurrences(of: "_node", with: "")
+                let entranceName = I18NText.decode(decoder: decoder, baseKey: prefix + "_n")
+                entranceMapping[entrance] = entranceName
             }
             name = I18NText.decode(decoder: decoder, baseKey: "name")
+        }
+    }
+
+    func getFacilityName(for nodeID: String, locale: Locale = .current) -> I18NText {
+        let baseName = properties.name
+        if properties.entrances.count > 1, let entranceText = properties.entranceMapping[nodeID] {
+            return baseName + entranceText
+        } else {
+            return baseName
         }
     }
 }
@@ -949,7 +1022,7 @@ class Directory {
 
                 if let nodeID = nodeID {
                     if let feature = Features.getFeature(by: NodeRef(node_id: nodeID, variation: nil)) {
-                        title = feature.properties.name
+                        title = feature.getFacilityName(for: nodeID)
                     } else {
                         title = I18NText.decode(decoder: decoder, baseKey: "title")
                     }

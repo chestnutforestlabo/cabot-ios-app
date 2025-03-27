@@ -69,7 +69,7 @@
 
 
 //OnboardGrantAccess
-"ONBOARD_MESSAGE"="Please allow the app to access Location, Bluetooth device and Notification.";
+"ONBOARD_MESSAGE"="Please allow the app to access Location, Bluetooth device, Notification, Microphone and Speech Reco.";
 "Enable Location Update"="Enable Location Update";
 "Location Update Enabled"="Location Update Enabled";
 "Location Update Denied"="Location Update Denied";
@@ -82,6 +82,13 @@
 "Enable Notification"="Enable Notification";
 "Notification Enabled"="Notification Enabled";
 "Notification Denied"="Notification Denied";
+"Enable Microphone"="Enable Microphone";
+"Microphone Enabled"="Microphone Enabled";
+"Microphone Denied"="Microphone Denied";
+"Enable Speech Reco"="Enable Speech Reco";
+"Speech Reco Enabled"="Speech Reco Enabled";
+"Speech Reco Not Available"="Speech Reco Not Available";
+"Speech Reco Denied"="Speech Reco Not Available";
 
 
 // MainMenuView
@@ -96,7 +103,7 @@
 "Repeat the message"="Repeat the message";
 "Begin Subtour %@"="Begin Subtour %@";
 "End Subtour"="End Subtour";
-"Skip Label %@"="Skip %@";
+"Skip Label %@"="Skip %@";
 
 "Destinations"="Destinations";
 "Navigating to %@"="Navigating to %@";  // accessibility label
@@ -129,6 +136,7 @@
 "System"="System";
 "Settings"="Settings";
 "Version: %@ (%@) - %@"="Version: %@ (%@) - %@";
+"CABOT_NAME: %@"="Suitcase Name : %@";
 
 
 // DeviceStatusView
@@ -219,6 +227,8 @@
 "DEBUG"="DEBUG";
 "SELECT_RESOURCE"="Select Resource";
 "LANGUAGE"="Language";
+"USER_LANGUAGE"="User Language";
+"ATTEND_LANGUAGE"="Attend Language";
 "MENU_DEBUG"="Menu Debug";
 "NO_SUITCASE_DEBUG"="No Suitcase Debug";
 
@@ -316,3 +326,14 @@
 "Retry" = "Retry";
 "Return Mainmenu" = "Return MainMenu";
 "Resource Download" = "Resource Download";
+
+// Chat
+"SPEAK_NOW" = "Speak Now!";
+"Chat Settings" = "Chat Settings";
+"Chat server connection" = "Chat server connection";
+"An unexpected error has occurred" = "An unexpected error has occurred";
+"Received an unexpected response" = "Received an unexpected response";
+"Could not set destination" = "Could not set destination";
+"Could not set tour" = "Could not set tour";
+"Could not send camera image" = "Could not send camera image";
+"Checking now" = "Checking now";

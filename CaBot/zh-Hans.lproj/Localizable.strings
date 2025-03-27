@@ -1,0 +1,342 @@
+/*******************************************************************************
+ * Copyright (c) 2021  Carnegie Mellon University
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *******************************************************************************/
+
+// Do not translate
+"DEFAULT_VOICE"="com.apple.voice.compact.zh-CN.Tingting";
+
+// General
+"Yes"="是";
+"No"="否";
+"Okay"="可以";
+"ERROR"="错误";
+"TOKEN_SEPARATORS"="。";
+
+
+// CaBotAppModel
+"SELECT_RESOURCE"="选择资源";
+"MAIN_MENU"="主菜单";
+"ATTEND_MENU"="指引人员菜单";
+
+/// func summon
+"Sending the command to the suitcase"="正在向行李箱传送命令。请松开把手。";
+
+/// func summon, func send
+"processing..."="正在处理中";
+"Suitcase may not be connected"="行李箱未连接";
+
+/// func skipDestination
+"Skip Message %@"="跳过%@";
+
+/// func needToStartAnnounce
+"You can proceed by pressing the right button of the suitcase handle"="按行李箱把手的右按钮即可前进";
+
+/// func tour
+"Going to %@"="移动至%@";
+
+/// func caBot service centralConnected
+"Suitcase has been connected"="已连接行李箱";
+"Suitcase has been disconnected"="已与行李箱断开连接";
+
+/// func caBot service notification
+"No destination is selected"="未设定目的地";
+"You have arrived at %@. "="已到达%@";
+"You can check detail of %@ on the phone. "="您可以在手机上阅读关于%@的详细内容";
+"You can proceed to %@ by pressing the right button of the suitcase handle. "="您可以按行李箱把手的右按钮前往%@";
+"Or by pressing the center button to proceed a subtour %@."="或者按中间按钮开始项目游览。%@";
+"Press the center button to proceed a subtour %@."="按中间按钮即可开始项目游览。%@";
+"PRESS_RIGHT_BUTTON"="按右按钮即可前往下一个目的地";
+
+
+// RootView
+"Let the suitcase wait"="让行李箱待侯";
+"Let the suitcase wait message %@"="直到%@的指示被送达时行李箱将会一直等候。是否要这样做？";
+
+
+//OnboardGrantAccess
+"ONBOARD_MESSAGE"="请允许系统访问位置信息，蓝牙和发送通知";
+"Enable Location Update"="允许访问位置信息";
+"Location Update Enabled"="位置信息已被允许";
+"Location Update Denied"="位置信息已被拒绝";
+"Enable Bluetooth"="允许蓝牙";
+"Bluetooth Denied"="蓝牙已被拒绝";
+"Bluetooth Enabled"="蓝牙已被允许";
+"Bluetooth is Off"="蓝牙为关闭状态";
+"Running on Simulator?"="正在模拟器中进行运行";
+"bluetoothState error"="蓝牙状态错误";
+"Enable Notification"="允许通知";
+"Notification Enabled"="通知已被允许";
+"Notification Denied"="通知已被拒绝";
+"Enable Microphone"="启用麦克风";
+"Microphone Enabled"="麦克风已启用";
+"Microphone Denied"="麦克风已被拒绝";
+"Enable Speech Reco"="启用语音识别";
+"Speech Reco Enabled"="语音识别已启用";
+"Speech Reco Not Available"="语音识别不可用";
+"Speech Reco Denied"="语音识别已被拒绝";
+
+
+// MainMenuView
+"No Suitcase Debug mode"="无行李箱的调试模式";
+
+"Actions"="动作";
+"PAUSE_NAVIGATION"="暂停导航";
+"START"="开始导航";
+
+"Open Content for %@"="打开 %@的说明页面";
+"Let the suitcase wait at %@"="让行李箱在%@待侯";
+"Repeat the message"="再次播放语音";
+"Begin Subtour %@"="项目游览开始。%@";
+"End Subtour"="项目游览结束";
+"Skip Label %@"="跳过%@";
+
+"Destinations"="目的地";
+"Navigating to %@"="正在前往%@";  // accessibility label
+"Complete Destination"="到达目的地";
+"Complete Destination Message"="可否设置已到达目的地";
+"See detail"="阅览详细内容";
+
+"Navigation"="导航";
+"START_CONVERSATION"="开始对话";
+"SELECT_DESTINATION"="选择目的地";
+"SELECT_TOUR"="选择行程";
+"Others"="其它";
+
+"Status"="状态";
+"BLE Connected"="已连接BLE";
+"BLE Not Connected"="未连接BLE";
+"TCP Connected"="已连接TCP";
+"TCP Not Connected"="未连接TCP";
+"Protocol mismatch %@"="通信信号标准不一致%@";
+"Handle"="手柄";
+"GRIP_HAND_LEFT"="左手握持";
+"GRIP_HAND_RIGHT"="右手握持";
+"Touch Mode"="触摸模式";
+"Capacitive"="电容感应";
+"Time of Flight"="飞行时间传感器（ToF）";
+"Dual"="双模式";
+"Battery"="电池";
+"Device"="设备";
+
+"System"="系统";
+"Settings"="设置";
+"Version: %@ (%@) - %@"="版本: %@ (%@) - %@";
+"CABOT_NAME: %@"="行李箱名称 : %@";
+
+
+// DeviceStatusView
+"Details"="详细内容";
+"Reboot"="重新启动";
+"Suitcase Connected"="已连接行李箱";
+"Suitcase Not Connected"="未连接行李箱";
+"Reboot Computer"="重新启动计算机";
+"The app will be disconnected."="解除与行李箱的连接";
+"Power off"="关闭电源";
+"Device Status"="设备状态";
+"DEVICE_ERROR_ALERT%@" = "设备 - %@";
+"CHECK_DEVICE_STATUS" = "请确认设备菜单";
+
+
+// BatteryStatusView
+"Battery Status"="电池状态";
+
+
+// SystemStatusView
+"Start System"="启动系统";
+"Stop System"="停止系统";
+"Are you sure to stop the suitcase system?"="是否停止行李箱系统的运作？";
+"System Status"="系统状态";
+"SYSTEM_OK" = "可以";
+"SYSTEM_ERROR" = "错误";
+"SYSTEM_ERROR_ALERT%@" = "系统状态";
+"CHECK_SYSTEM_STATUS" = "请确认系统菜单";
+"CHECK_MENU" = "确认";
+"DO_NOT_CHECK_MENU" = "返回";
+
+
+// DestinationsView
+"ADD_A_DESTINATION"="添加目的地";
+"ADD_A_DESTINATION_MESSAGE %d"="已设定%d个目的地。想在哪里添加目的地？";
+"CLEAR_ALL_THEN_ADD"="全部消除后添加";
+"ADD_TO_FIRST"="添加至首位";
+"ADD_TO_LAST"="添加至最后";
+"DOUBLETAP_TO_ADD_A_DESTINATION"="双击追加目的地";
+"DOUBLETAP_TO_VIEW_DETAILS"="双击显示详情";
+
+
+// DestinationDetailView
+"Show more detail"="显示详情";
+"Add to destinations"="添加目的地";
+
+
+// TourDetailView
+/// StaticTourDetailView
+"SET_TOUR"="设定行程";
+"ADD_TOUR"="添加这些目的地";
+"ADD_TOUR_MESSAGE %d"="已设置%d个目的地，是否覆盖这些目的地？";
+"OVERWRITE_TOUR"="覆盖";
+
+/// DynamicTourDetailView
+"CANCEL_NAVIGATION"="停止导航";
+"CANCEL_NAVIGATION_MESSAGE %d"="已设置%d个目的地，是否全部取消？";
+"CANCEL_ALL"="停止全部目的地";
+
+
+// SettingView
+"TTS"="语音朗读文字";
+"Attend Voice"="指引人员语音";
+"Speech Voice"="朗读语音";
+"Voice"="语音";
+"User Voice"="用户语音";
+"Speech Speed"="语音速度";
+"User Speech Speed"="用户语音速度";
+"Connection"="连接";
+
+"PRIORITY_CONNECTION"="优先链接";
+"ROBOT_NAME"="机器人名称";
+"ROBOT_NAME_LABEL"="机器人名称 (BLE)";
+"SOCKET_ADDRESS"="接口地址";
+"SOCKET_ADDRESS_LABEL"="接口地址";
+"ROS_SOCKET_ADDRESS_LABEL"="ROS网桥地址";
+"PRIMARY_IP_ADDRESS"="主要IP";
+"SECONDARY_IP_ADDRESS"="次要IP";
+"PLACEHOLDER_IP_ADDRESS"="xxx.xxx.xxx.xx";
+
+"MODE_TYPE"="模式设置";
+"Normal"="普通";
+"Advanced"="详细";
+"Debug"="调试";
+
+"DETAIL_SETTING"="详情设置";
+
+"DEBUG"="调试";
+"SELECT_RESOURCE"="选择资源";
+"LANGUAGE"="语言";
+"USER_LANGUAGE"="用户语言";
+"ATTEND_LANGUAGE"="指引人员语言";
+"MENU_DEBUG"="菜单调试";
+"NO_SUITCASE_DEBUG"="无行李箱调试模式";
+
+
+// DetailSettingView
+"Tour"="行程";
+"Enable subtour on handle"="在把手上启用项目游览";
+"Show content when arrive"="到达时显示详细页面";
+
+"Audio Effect"="效果音";
+"Start"="开始";
+"Arrived"="到达";
+"SpeedUp"="加速";
+"SpeedDown"="减速";
+
+"VoiceOver adjustment"="调整配音";
+"Delay after closing browser"="关闭浏览器后的等待时间";
+"%.1f seconds"="%.1f秒";
+"%.1f sec"="%.1f秒";
+
+
+// Report a Bag
+"REPORT_BUG" = "%.1f秒";
+"SELECT_LOG" = "选择运行记录";
+"REPORT_TITLE" = "标题";
+"REPORT_DETAILS" = "详细内容";
+"ENTER_REPORT_TITLE" = "输入标题";
+"ENTER_REPORT_DETAILS" = "输入详细内容";
+"SUBMIT_REPORT" = "提交报告";
+"UPDATE_REPORT" = "更新报告";
+"REPORT_IS_UPLOADED" = "报告已上传";
+"SUBMIT" = "提交";
+"CONFIRM_DISCARD_SUBMISSION" = "是否销毁报告？";
+"SUITCASE_DOES_NOT_ACCEPT_NEW_REPORT" = "行李箱未接收提交的报告";
+"PLEASE_CONNECT_TO_SUITCASE" = "请连接行李箱";
+"INVALID_DATE_STRING" = "日期文字无效";
+
+
+// TTSHelper
+"Hello Suitcase!"="你好行李箱";
+
+
+// ResourceManager
+"Robot Waiting Spot (%@)"="机器人待机地点(%@)";
+"Robot Waiting Spot (%@)-pron"="机器人待机地点(%@)";
+
+
+// CaBotServiceCommon
+/// DeviceStatusLevel
+"OK"="机器人待机地点(%@)";
+"Error"="错误";
+"Unknown"="不明";
+
+/// CaBotSystemLevel
+"Inactive"="停止";
+"Active"="启动";
+"Activating"="正在启动";
+"Deactivating"="正在停止";
+
+
+// Send tour/destination
+"SEND_TOUR_MESSAGE %@"="发送行程: %@\n 用户的行程将被覆盖";
+"SEND_TOUR"="发送行程";
+"SEND_DESTINATION_MESSAGE %@"="是否将%@添加为目的地";
+"SEND_DESTINATION"="发送目的地";
+"CLEAR_AND_ADD_DESTINATION"="清除并添加目的地";
+"ADD_DESTINATION"="添加目的地";
+
+"TTS Enabled (Advanced only)"="朗读语音（详细模式）";
+"Select Voice Settings"="选择语音设置";
+"Speech Priority"="语音的优先顺序";
+"Robot"="机器人";
+"App"="应用";
+
+"See history"="查看记录";
+
+"PLACEHOLDER_TOUR_TITLE"="行程名称";
+"PLACEHOLDER_DESTINATION_TITLE"="目的地名称";
+"PLACEHOLDER_SPEAKING_TEXT"="朗读文本";
+
+"User App Info"="用户应用信息";
+"CUSTOMIZED_TOUR"="自定义行程";
+"USER_APP_NOT_CONNECTED"="未连接用户应用";
+"ATTEND_APP_NOT_CONNECTED"="未连接指引人员应用";
+
+
+// ROS Web View
+"Reload"="重新加载";
+"Restart Localization"="重新估计位置";
+"Restarting Localization"="正在估计位置";
+"RESTART_LOCALIZATION_MESSAGE"="将重试估计位置。请一定在机器人停止的状态下进行。";
+
+//Resource Download Alert View
+"Retry Alert" = "Check the connection with the server!";
+"Retry" = "重试";
+"Return Mainmenu" = "返回主菜单";
+"Resource Download" = "资源下载";
+
+// Chat
+"SPEAK_NOW" = "请开始说话！";
+"Chat Settings" = "聊天设置";
+"Chat server connection" = "聊天服务器连接";
+"An unexpected error has occurred" = "发生了意外错误";
+"Received an unexpected response" = "收到意外的响应";
+"Could not set destination" = "无法设置目的地";
+"Could not set tour" = "无法设置行程";
+"Could not send camera image" = "无法发送相机图像";
+"Checking now" = "立即检查";

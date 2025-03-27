@@ -34,27 +34,37 @@ struct SettingView: View {
     var body: some View {
         return Form {
             Section(header: Text("Settings")){
-                Picker("LANGUAGE", selection: $modelData.selectedLanguage) {
+                Picker("ATTEND_LANGUAGE", selection: $modelData.attendLanguage) {
                     ForEach(modelData.languages, id: \.self) { language in
                         Text(language).tag(language)
                     }
                 }
+                Picker("USER_LANGUAGE", selection: $modelData.selectedLanguage) {
+                    ForEach(modelData.languages, id: \.self) { language in
+                        Text(language).tag(language)
+                    }
+                }
+                .disabled(!modelData.isUserAppConnected)
 
                 Picker(LocalizedStringKey("Handle"), selection: $modelData.suitcaseFeatures.selectedHandleSide) {
                     ForEach(modelData.suitcaseFeatures.possibleHandleSides, id: \.rawValue) { grip in
                         Text(LocalizedStringKey(grip.text)).tag(grip)
                     }
                 }
+                .disabled(!modelData.isUserAppConnected)
 
                 Picker(LocalizedStringKey("Touch Mode"), selection: $modelData.suitcaseFeatures.selectedTouchMode) {
                     ForEach(modelData.suitcaseFeatures.possibleTouchModes, id: \.rawValue) { touch in
                         Text(LocalizedStringKey(touch.text)).tag(touch)
                     }
                 }
+                .disabled(!modelData.isUserAppConnected)
 
-                NavigationLink(destination: DetailSettingView().environmentObject(modelData.detailSettingModel).heartbeat("DetailSettingView"), label: {
-                    Text("DETAIL_SETTING")
-                })
+                if modelData.isUserAppConnected {
+                    NavigationLink(destination: DetailSettingView().environmentObject(modelData.detailSettingModel).heartbeat("DetailSettingView"), label: {
+                        Text("DETAIL_SETTING")
+                    })
+                }
             }
 
             Section(header: Text("TTS")){
@@ -82,7 +92,7 @@ struct SettingView: View {
                     }
                 }
                 Picker(LocalizedStringKey("Voice"), selection: $modelData.attendVoice) {
-                    ForEach(TTSHelper.getVoices(by: locale), id: \.self) { voice in
+                    ForEach(TTSHelper.getVoices(by: modelData.voiceLocale), id: \.self) { voice in
                         Text(voice.AVvoice.name).tag(voice as Voice?)
                     }
                 }.onChange(of: modelData.attendVoice, perform: { value in
@@ -120,12 +130,13 @@ struct SettingView: View {
                     }
                 }
                 Picker(LocalizedStringKey("Voice"), selection: $modelData.userVoice) {
-                    ForEach(TTSHelper.getVoices(by: locale), id: \.self) { voice in
+                    ForEach(TTSHelper.getVoices(by: modelData.voiceLocale), id: \.self) { voice in
                         Text(voice.AVvoice.name).tag(voice as Voice?)
                     }
                 }
                 .pickerStyle(DefaultPickerStyle())
                 .listRowSeparator(.hidden)
+                .disabled(!modelData.isUserAppConnected)
                 HStack {
                     Text("Speech Speed")
                         .accessibility(hidden: true)
@@ -141,6 +152,7 @@ struct SettingView: View {
                     })
                     .accessibility(label: Text("Speech Speed"))
                     .accessibility(value: Text(String(format:"%.0f %%", arguments:[modelData.userSpeechRate*100.0])))
+                    .disabled(!modelData.isUserAppConnected)
                     Text(String(format:"%.0f %%", arguments:[modelData.userSpeechRate*100.0]))
                         .accessibility(hidden: true)
                 }
