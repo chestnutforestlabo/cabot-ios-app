@@ -516,7 +516,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
 #if ATTEND
-    @Published var voiceSetting: VoiceMode = .Attend {
+    @Published var voiceSetting: VoiceMode = .User {
         didSet {
             UserDefaults.standard.setValue(voiceSetting.rawValue, forKey: voiceSettingKey)
             UserDefaults.standard.synchronize()
@@ -790,7 +790,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.isTTSEnabledForAdvanced = isTTSEnabled
         }
         if let voiceSetting = UserDefaults.standard.value(forKey: voiceSettingKey) as? String {
-            self.voiceSetting = VoiceMode(rawValue: voiceSetting)!
+//            self.voiceSetting = VoiceMode(rawValue: voiceSetting)!
         }
 
         // services
