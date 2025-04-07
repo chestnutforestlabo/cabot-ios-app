@@ -94,6 +94,9 @@ class CaBotTTS : TTSProtocol {
         // let isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
         // let selfspeak = forceSelfvoice || !isForeground || !isVoiceOverRunning
         
+        if priority == .Low && self._tts.isSpeaking {
+            return
+        }
         if priority == .Low && ChatData.shared.viewModel?.appModel?.showingChatView == true {
             return
         }
