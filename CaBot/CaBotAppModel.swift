@@ -1101,9 +1101,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     func resetAudioSession() {
         let audioSession = AVAudioSession.sharedInstance()
         do {
-            try audioSession.setCategory(.playback,
-                                         mode: .spokenAudio,
-                                         options: [])
+//            try audioSession.setCategory(.playback, mode: .spokenAudio, options: [])
+            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.allowBluetooth, .defaultToSpeaker])
         } catch {
             NSLog("audioSession category weren't set because of an error. \(error)")
         }
@@ -1275,7 +1274,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     // MARK: TourManagerDelegate
     func tourUpdated(manager: TourManager) {
         tourUpdated = true
-        UIApplication.shared.isIdleTimerDisabled = manager.hasDestination
+//        UIApplication.shared.isIdleTimerDisabled = manager.hasDestination
         self.activityLog(category: "tour-text", text: manager.title.text, memo: manager.title.pron)
         let data = manager.getTourSaveData()
         self.share(user_info: SharedInfo(type: .Tour, value: data.toJsonString()))
