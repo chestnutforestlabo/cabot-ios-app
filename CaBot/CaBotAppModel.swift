@@ -1101,8 +1101,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     func resetAudioSession() {
         let audioSession = AVAudioSession.sharedInstance()
         do {
-//            try audioSession.setCategory(.playback, mode: .spokenAudio, options: [])
-            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.allowBluetooth, .defaultToSpeaker])
+            try audioSession.setCategory(.playback,
+                                         mode: .spokenAudio,
+                                         options: [])
         } catch {
             NSLog("audioSession category weren't set because of an error. \(error)")
         }
@@ -1111,6 +1112,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         } catch {
             NSLog("audioSession cannot be set active. \(error)")
         }
+        SilentAudioPlayer.shared.start()
     }
 
     func open(content: URL) {
@@ -2246,5 +2248,30 @@ class UserInfoBuffer {
         default:
             break
         }
+    }
+}
+
+class SilentAudioPlayer {
+    static let shared = SilentAudioPlayer()
+    var audioPlayer: AVAudioPlayer?
+
+    func start() {
+        if audioPlayer == nil, let url = Bundle.main.url(forResource: "Resource/silent", withExtension: "wav") {
+            do {
+                audioPlayer = try AVAudioPlayer(contentsOf: url)
+                audioPlayer?.numberOfLoops = -1
+                audioPlayer?.volume = 0
+                audioPlayer?.prepareToPlay()
+                audioPlayer?.play()
+                print("SilentAudioPlayer started")
+            } catch {
+                print("SilentAudioPlayer error: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    func stop() {
+        audioPlayer?.stop()
+        print("SilentAudioPlayer stopped")
     }
 }

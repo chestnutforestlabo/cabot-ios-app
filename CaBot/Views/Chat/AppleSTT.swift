@@ -55,7 +55,8 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
         // need to set AVAudioSession before
         let audioSession:AVAudioSession = AVAudioSession.sharedInstance()
         do {
-            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.allowBluetooth, .defaultToSpeaker])
+            SilentAudioPlayer.shared.stop()
+            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.allowBluetooth, .allowBluetoothA2DP, .defaultToSpeaker])
             try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
         } catch {
             NSLog("Audio session error")
@@ -253,7 +254,7 @@ open class AppleSTT: NSObject, STTProtocol, AVCaptureAudioDataOutputSampleBuffer
             // Reset AVAudioSession
             let audioSession:AVAudioSession = AVAudioSession.sharedInstance()
             do {
-                try audioSession.setCategory(.playAndRecord, mode: .default, options: [.allowBluetooth, .defaultToSpeaker])
+                try audioSession.setCategory(.playAndRecord, mode: .default, options: [.allowBluetooth, .allowBluetoothA2DP, .defaultToSpeaker])
                 try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
             } catch {
                 NSLog("Audio session error")
