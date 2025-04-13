@@ -42,6 +42,7 @@ struct RosWebView: View, LocalizationStatusDelegate {
 
     var address: String
     var port: String
+    var type: LocalWebView.ViewModeType
     var localization = LocalizationStatusHandler()
     @State private var localizationStatus = 0
     @State private var shouldRefresh = false
@@ -54,7 +55,7 @@ struct RosWebView: View, LocalizationStatusDelegate {
 
     var body: some View {
         localization.delegate = self
-        return LocalWebView(address: address, port: port, handler: localization, reload: $shouldRefresh)
+        return LocalWebView(address: address, port: port, type: type, handler: localization, reload: $shouldRefresh)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .bottomBar) {
@@ -102,18 +103,34 @@ struct RosWebView: View, LocalizationStatusDelegate {
 
 struct RosWebView_Previews: PreviewProvider {
     static var previews: some View {
-        RosWebView(address: "", port: "")
+        RosWebView(address: "", port: "", type: .rosMap)
     }
 }
 
 struct LocalWebView: UIViewRepresentable {
-    
+    enum ViewModeType {
+        case rosMap
+        case directionTest
+    }
+
     var address: String
     var port: String
+    var type: ViewModeType
     var handler: WKScriptMessageHandlerWithReply
     @Binding var reload: Bool
     
     fileprivate func loadRequest(in webView: WKWebView) {
+        switch type {
+        case .rosMap:
+            loadRosMap(webView: webView)
+            break
+        case .directionTest:
+            loadDirectionTest(webView: webView)
+            break
+        }
+    }
+
+    fileprivate func loadRosMap(webView: WKWebView) {
         if let htmlPath = Bundle.main.url(forResource: "Resource/localserver/cabot_map", withExtension: "html"),
            let baseUrl = Bundle.main.resourceURL?.appendingPathComponent("Resource/localserver") {
            var components = URLComponents(url: htmlPath, resolvingAgainstBaseURL: false)
@@ -125,7 +142,20 @@ struct LocalWebView: UIViewRepresentable {
             webView.isHidden = false
         }
     }
-    
+
+    fileprivate func loadDirectionTest(webView: WKWebView) {
+        if let htmlPath = Bundle.main.url(forResource: "Resource/localserver/cabot_direction_test", withExtension: "html"),
+           let baseUrl = Bundle.main.resourceURL?.appendingPathComponent("Resource/localserver") {
+           var components = URLComponents(url: htmlPath, resolvingAgainstBaseURL: false)
+            components?.query = "ip=" + address + "&port=" + port
+            if let queryURL = components?.url {
+                webView.loadFileURL(queryURL, allowingReadAccessTo: baseUrl)
+            }
+            webView.isOpaque = false
+            webView.isHidden = false
+        }
+    }
+
     func makeUIView(context: UIViewRepresentableContext<LocalWebView>) -> WKWebView {
         let configuration = WKWebViewConfiguration()
         let userContentController = WKUserContentController()
