@@ -516,7 +516,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
 #if ATTEND
-    @Published var voiceSetting: VoiceMode = .Attend {
+    @Published var voiceSetting: VoiceMode = .User {
         didSet {
             UserDefaults.standard.setValue(voiceSetting.rawValue, forKey: voiceSettingKey)
             UserDefaults.standard.synchronize()
@@ -790,7 +790,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.isTTSEnabledForAdvanced = isTTSEnabled
         }
         if let voiceSetting = UserDefaults.standard.value(forKey: voiceSettingKey) as? String {
-            self.voiceSetting = VoiceMode(rawValue: voiceSetting)!
+//            self.voiceSetting = VoiceMode(rawValue: voiceSetting)!
         }
 
         // services
@@ -1112,6 +1112,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         } catch {
             NSLog("audioSession cannot be set active. \(error)")
         }
+        SilentAudioPlayer.shared.start()
     }
 
     func open(content: URL) {
@@ -1275,7 +1276,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     // MARK: TourManagerDelegate
     func tourUpdated(manager: TourManager) {
         tourUpdated = true
-        UIApplication.shared.isIdleTimerDisabled = manager.hasDestination
+//        UIApplication.shared.isIdleTimerDisabled = manager.hasDestination
         self.activityLog(category: "tour-text", text: manager.title.text, memo: manager.title.pron)
         let data = manager.getTourSaveData()
         self.share(user_info: SharedInfo(type: .Tour, value: data.toJsonString()))
@@ -2247,5 +2248,30 @@ class UserInfoBuffer {
         default:
             break
         }
+    }
+}
+
+class SilentAudioPlayer {
+    static let shared = SilentAudioPlayer()
+    var audioPlayer: AVAudioPlayer?
+
+    func start() {
+        if audioPlayer == nil, let url = Bundle.main.url(forResource: "Resource/silent", withExtension: "wav") {
+            do {
+                audioPlayer = try AVAudioPlayer(contentsOf: url)
+                audioPlayer?.numberOfLoops = -1
+                audioPlayer?.volume = 0
+                audioPlayer?.prepareToPlay()
+                audioPlayer?.play()
+                print("SilentAudioPlayer started")
+            } catch {
+                print("SilentAudioPlayer error: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    func stop() {
+        audioPlayer?.stop()
+        print("SilentAudioPlayer stopped")
     }
 }

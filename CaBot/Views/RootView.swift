@@ -93,6 +93,9 @@ struct RootView: View {
             }
         }
         .environment(\.locale, modelData.selectedLocale)
+        .onAppear() {
+            UIApplication.shared.isIdleTimerDisabled = true
+        }
     }
 }
 
