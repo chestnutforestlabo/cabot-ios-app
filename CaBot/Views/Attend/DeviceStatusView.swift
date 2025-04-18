@@ -90,6 +90,24 @@ struct DeviceStatusView: View {
                     }
                     .disabled(!modelData.suitcaseConnected)
                 }
+
+                Section(header:Text("WiFi")) {
+                    Button(action: {
+                        modelData.systemManageCommand(command: .enablewifi)
+                    }){
+                        Text("Enable")
+                            .frame(width: nil, alignment: .topLeading)
+                    }
+                    .disabled(!modelData.suitcaseConnected)
+
+                    Button(action: {
+                        modelData.systemManageCommand(command: .disablewifi)
+                    }){
+                        Text("Disable")
+                            .frame(width: nil, alignment: .topLeading)
+                    }
+                    .disabled(!modelData.suitcaseConnected)
+                }
             }
             .navigationTitle("Device Status")
         }

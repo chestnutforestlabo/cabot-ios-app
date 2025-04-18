@@ -164,6 +164,24 @@ struct DetailSettingView: View {
                     }
                 }
             }
+
+            Section(header:Text("WiFi")) {
+                Button(action: {
+                    cabotAppModel.systemManageCommand(command: .enablewifi)
+                }){
+                    Text("Enable")
+                        .frame(width: nil, alignment: .topLeading)
+                }
+                .disabled(!cabotAppModel.suitcaseConnected)
+
+                Button(action: {
+                    cabotAppModel.systemManageCommand(command: .disablewifi)
+                }){
+                    Text("Disable")
+                        .frame(width: nil, alignment: .topLeading)
+                }
+                .disabled(!cabotAppModel.suitcaseConnected)
+            }
         }
     }
 }
