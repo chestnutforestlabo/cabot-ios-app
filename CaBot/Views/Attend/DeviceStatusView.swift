@@ -89,24 +89,11 @@ struct DeviceStatusView: View {
                         Text("The app will be disconnected.")
                     }
                     .disabled(!modelData.suitcaseConnected)
-                }
 
-                Section(header:Text("WiFi")) {
-                    Button(action: {
-                        modelData.systemManageCommand(command: .enablewifi)
-                    }){
-                        Text("Enable")
-                            .frame(width: nil, alignment: .topLeading)
+                    Toggle(isOn: $modelData.wifiEnabled) {
+                        Text("WiFi")
                     }
-                    .disabled(!modelData.suitcaseConnected)
-
-                    Button(action: {
-                        modelData.systemManageCommand(command: .disablewifi)
-                    }){
-                        Text("Disable")
-                            .frame(width: nil, alignment: .topLeading)
-                    }
-                    .disabled(!modelData.suitcaseConnected)
+                    .disabled(!modelData.suitcaseConnected || !modelData.wifiDetected)
                 }
             }
             .navigationTitle("Device Status")

@@ -110,6 +110,11 @@ struct DetailSettingView: View {
                     Text("Are you sure to stop the suitcase system?")
                 }
                 .disabled(!cabotAppModel.systemStatus.canStop || !cabotAppModel.suitcaseConnected)
+
+                Toggle(isOn: $cabotAppModel.wifiEnabled) {
+                    Text("WiFi")
+                }
+                .disabled(!cabotAppModel.suitcaseConnected || !cabotAppModel.wifiDetected)
             }
             
             Section(header: Text("Tour")) {
@@ -163,24 +168,6 @@ struct DetailSettingView: View {
                             .accessibility(hidden: true)
                     }
                 }
-            }
-
-            Section(header:Text("WiFi")) {
-                Button(action: {
-                    cabotAppModel.systemManageCommand(command: .enablewifi)
-                }){
-                    Text("Enable")
-                        .frame(width: nil, alignment: .topLeading)
-                }
-                .disabled(!cabotAppModel.suitcaseConnected)
-
-                Button(action: {
-                    cabotAppModel.systemManageCommand(command: .disablewifi)
-                }){
-                    Text("Disable")
-                        .frame(width: nil, alignment: .topLeading)
-                }
-                .disabled(!cabotAppModel.suitcaseConnected)
             }
         }
     }
