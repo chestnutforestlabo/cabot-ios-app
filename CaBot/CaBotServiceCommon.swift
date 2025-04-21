@@ -127,6 +127,8 @@ enum CaBotManageCommand:String {
     case handleside
     case touchmode
     case restart_localization
+    case speaker_audio_file
+    case speaker_volume
 }
 
 struct DeviceStatus: Decodable {

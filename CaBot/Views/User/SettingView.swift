@@ -88,6 +88,35 @@ struct SettingView: View {
                 }
             }
 
+            Section(header:Text("Suitcase Speaker")) {
+                Picker(LocalizedStringKey("AudioFile"), selection: $modelData.selectedSpeakerAudioFile) {
+                    ForEach(modelData.audioFileList, id: \.self) { audioFileName in
+                        Text(audioFileName).tag(audioFileName)
+                    }
+                }
+                .onChange(of: modelData.selectedSpeakerAudioFile) {
+                    modelData.updateSpeakerSettings()
+                }
+                .pickerStyle(DefaultPickerStyle())
+
+                HStack {
+                    Text("Volume")
+                        .accessibility(hidden: true)
+                    Slider(value: $modelData.speakerVolume,
+                           in: -20...20,
+                           step: 0.5,
+                           onEditingChanged: { editing in
+                        if editing == false {
+                            modelData.updateSpeakerSettings()
+                        }
+                    })
+                    .accessibility(label: Text("Speaker Volume"))
+                    .accessibility(value: Text(String(format: "%.0f decibels", modelData.speakerVolume)))
+                    Text(String(format:"%.0f dB", modelData.speakerVolume))
+                        .accessibility(hidden: true)
+                }
+            }
+
             Section(header: Text("Connection")) {
                 VStack {
                     HStack{

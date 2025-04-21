@@ -296,6 +296,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private let modeTypeKey = "modeTypeKey"
     private let notificationCenterID = "cabot_state_notification"
     private let voiceSettingKey = "voiceSettingKey"
+    private let selectedSpeakerAudioFileKey = "selectedSpeakerAudioFileKey"
+    private let speechVolumeKey = "speechVolumeKey"
 
     let detailSettingModel: DetailSettingModel
 
@@ -487,6 +489,20 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             silentForChange = false
         }
     }
+
+    @Published var selectedSpeakerAudioFile: String = "" {
+        didSet {
+            UserDefaults.standard.setValue(selectedSpeakerAudioFile, forKey: selectedSpeakerAudioFileKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
+    @Published var speakerVolume: Float = 0.0 {
+        didSet {
+            UserDefaults.standard.setValue(speakerVolume, forKey: speechVolumeKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
+    @Published var audioFileList: [String] = ["Beep_sound_low_urgency.wav", "Beep_sound_middles_urgency.wav"]
 
     enum ServerStatus {
         case Init
@@ -1235,6 +1251,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 break
             case .touchmode:
                 break
+            case .speaker_audio_file:
+                break
+            case .speaker_volume:
+                break
             }
             systemStatus.components.removeAll()
             objectWillChange.send()
@@ -1261,6 +1281,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         let data = fm.contents(atPath: path.path)!
         let status = try! JSONDecoder().decode(DeviceStatus.self, from: data)
         self.cabot(service: self.tcpService, deviceStatus: status)
+    }
+
+    func updateSpeakerSettings(){
+        _ = self.fallbackService.manage(command: .speaker_audio_file, param: self.selectedSpeakerAudioFile)
+        _ = self.fallbackService.manage(command: .speaker_volume, param: String(self.speakerVolume))
     }
 
     func share(tour: Tour) {
