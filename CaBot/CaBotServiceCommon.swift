@@ -130,6 +130,7 @@ enum CaBotManageCommand:String {
     case restart_localization
     case speaker_audio_file
     case speaker_volume
+    case speaker_alert
 }
 
 struct DeviceStatus: Decodable {

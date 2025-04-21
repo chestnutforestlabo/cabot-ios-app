@@ -1255,6 +1255,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 break
             case .speaker_volume:
                 break
+            case .speaker_alert:
+                break
             }
             systemStatus.components.removeAll()
             objectWillChange.send()
@@ -1284,8 +1286,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func updateSpeakerSettings(){
+        // set speaker settings
         _ = self.fallbackService.manage(command: .speaker_audio_file, param: self.selectedSpeakerAudioFile)
         _ = self.fallbackService.manage(command: .speaker_volume, param: String(self.speakerVolume))
+        // play sample audio
+        _ = self.fallbackService.manage(command: .speaker_alert)
     }
 
     func share(tour: Tour) {
