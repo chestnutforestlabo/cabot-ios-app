@@ -502,7 +502,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             UserDefaults.standard.synchronize()
         }
     }
-    @Published var audioFileList: [String] = ["Beep_sound_low_urgency.wav", "Beep_sound_middles_urgency.wav"]
+    @Published var audioFileList: [String] = ["Beep_sound_low_urgency.wav", "Beep_sound_middle_urgency.wav"]
 
     enum ServerStatus {
         case Init

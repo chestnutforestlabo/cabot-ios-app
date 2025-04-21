@@ -88,7 +88,7 @@ struct SettingView: View {
                 }
             }
 
-            Section(header:Text("Suitcase Speaker")) {
+            Section(header:Text("SuitcaseSpeaker")) {
                 Picker(LocalizedStringKey("AudioFile"), selection: $modelData.selectedSpeakerAudioFile) {
                     ForEach(modelData.audioFileList, id: \.self) { audioFileName in
                         Text(audioFileName).tag(audioFileName)
@@ -100,7 +100,7 @@ struct SettingView: View {
                 .pickerStyle(DefaultPickerStyle())
 
                 HStack {
-                    Text("Volume")
+                    Text("SpeakerVolume")
                         .accessibility(hidden: true)
                     Slider(value: $modelData.speakerVolume,
                            in: -20...20,
