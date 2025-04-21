@@ -63,7 +63,8 @@ struct DetailSettingView: View {
                 } message: {
                     Text("The app will be disconnected.")
                 }
-                .disabled(!cabotAppModel.suitcaseConnected)
+                .disabled(!cabotAppModel.systemStatus.canStart || !cabotAppModel.suitcaseConnected)
+
             
                 Button(action: {
                     isConfirmingPoweroff = true
@@ -82,7 +83,8 @@ struct DetailSettingView: View {
                 } message: {
                     Text("The app will be disconnected.")
                 }
-                .disabled(!cabotAppModel.suitcaseConnected)
+                .disabled(!cabotAppModel.systemStatus.canStart || !cabotAppModel.suitcaseConnected)
+
                 
                 Button(action: {
                     cabotAppModel.systemManageCommand(command: .start)

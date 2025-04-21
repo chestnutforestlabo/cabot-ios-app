@@ -69,7 +69,7 @@ struct DeviceStatusView: View {
                     } message: {
                         Text("The app will be disconnected.")
                     }
-                    .disabled(!modelData.suitcaseConnected)
+                    .disabled(!modelData.systemStatus.canStart || !modelData.suitcaseConnected)
 
                     Button(action: {
                         isConfirmingPoweroff = true
@@ -88,7 +88,7 @@ struct DeviceStatusView: View {
                     } message: {
                         Text("The app will be disconnected.")
                     }
-                    .disabled(!modelData.suitcaseConnected)
+                    .disabled(!modelData.systemStatus.canStart || !modelData.suitcaseConnected)
 
                     Toggle(isOn: $modelData.wifiEnabled) {
                         Text("WiFi")
