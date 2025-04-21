@@ -115,6 +115,7 @@ enum NavigationNotification:String {
     case getlanguage
     case gethandleside
     case gettouchmode
+    case getspeakeraudiofiles
 }
 
 enum CaBotManageCommand:String {
@@ -368,6 +369,7 @@ enum NavigationEventType:String, Decodable {
     case getlanguage
     case gethandleside
     case gettouchmode
+    case getspeakeraudiofiles
     case toggleconversation
     case togglespeakstate
     case unknown
@@ -549,7 +551,7 @@ class CaBotServiceActions {
 
         DispatchQueue.main.async {
             switch(request.type) {
-            case .next, .arrived, .subtour, .skip, .getlanguage, .gethandleside, .gettouchmode:
+            case .next, .arrived, .subtour, .skip, .getlanguage, .gethandleside, .gettouchmode, .getspeakeraudiofiles:
                 if let note = NavigationNotification(rawValue: request.type.rawValue) {
                     delegate.cabot(service: service, notification: note, param: request.param)
                 } else {

@@ -90,7 +90,7 @@ struct SettingView: View {
 
             Section(header:Text("SuitcaseSpeaker")) {
                 Picker(LocalizedStringKey("AudioFile"), selection: $modelData.selectedSpeakerAudioFile) {
-                    ForEach(modelData.audioFileList, id: \.self) { audioFileName in
+                    ForEach(modelData.possibleAudioFiles, id: \.self) { audioFileName in
                         Text(audioFileName).tag(audioFileName)
                     }
                 }

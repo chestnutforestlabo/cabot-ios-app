@@ -502,7 +502,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             UserDefaults.standard.synchronize()
         }
     }
-    @Published var audioFileList: [String] = ["Beep_sound_low_urgency.wav", "Beep_sound_middle_urgency.wav"]
+    @Published var possibleAudioFiles: [String] = []
 
     enum ServerStatus {
         case Init
@@ -1596,6 +1596,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 self.share(user_info: SharedInfo(type: .PossibleTouchMode, value: self.suitcaseFeatures.possibleTouchModes.map({ m in m.rawValue }).joined(separator: ",")))
                 self.share(user_info: SharedInfo(type: .ChangeTouchMode, value: self.suitcaseFeatures.selectedTouchMode.rawValue))
             }
+            break
+        case .getspeakeraudiofiles:
+            self.possibleAudioFiles = (param ?? "").components(separatedBy: ",")
             break
         }
     }
