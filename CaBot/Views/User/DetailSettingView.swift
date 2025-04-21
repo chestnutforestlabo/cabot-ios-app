@@ -63,7 +63,8 @@ struct DetailSettingView: View {
                 } message: {
                     Text("The app will be disconnected.")
                 }
-                .disabled(!cabotAppModel.suitcaseConnected)
+                .disabled(!cabotAppModel.systemStatus.canStart || !cabotAppModel.suitcaseConnected)
+
             
                 Button(action: {
                     isConfirmingPoweroff = true
@@ -82,7 +83,8 @@ struct DetailSettingView: View {
                 } message: {
                     Text("The app will be disconnected.")
                 }
-                .disabled(!cabotAppModel.suitcaseConnected)
+                .disabled(!cabotAppModel.systemStatus.canStart || !cabotAppModel.suitcaseConnected)
+
                 
                 Button(action: {
                     cabotAppModel.systemManageCommand(command: .start)
@@ -110,6 +112,11 @@ struct DetailSettingView: View {
                     Text("Are you sure to stop the suitcase system?")
                 }
                 .disabled(!cabotAppModel.systemStatus.canStop || !cabotAppModel.suitcaseConnected)
+
+                Toggle(isOn: $cabotAppModel.wifiEnabled) {
+                    Text("WiFi")
+                }
+                .disabled(!cabotAppModel.suitcaseConnected || !cabotAppModel.wifiDetected)
             }
             
             Section(header: Text("Tour")) {

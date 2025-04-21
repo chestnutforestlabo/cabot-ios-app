@@ -570,13 +570,19 @@ struct MapMenus: View {
 
     var body: some View {
         if modelData.suitcaseConnected{
-            Section(header:Text("Map")) {
-                HStack {
+            Section(header:Text("ROS")) {
+                List {
                     NavigationLink(
-                        destination: RosWebView(address: modelData.getCurrentAddress(), port: modelData.rosPort)
+                        destination: RosWebView(address: modelData.getCurrentAddress(), port: modelData.rosPort, type: .rosMap)
                             .environmentObject(modelData).heartbeat("RosWebView"),
                         label: {
                             Text("ROS Map")
+                        })
+                    NavigationLink(
+                        destination: RosWebView(address: modelData.getCurrentAddress(), port: modelData.rosPort, type: .directionTest)
+                            .environmentObject(modelData).heartbeat("RosWebView"),
+                        label: {
+                            Text("Direction Test")
                         })
                 }
             }

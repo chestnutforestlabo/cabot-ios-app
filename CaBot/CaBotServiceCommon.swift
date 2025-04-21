@@ -127,6 +127,8 @@ enum CaBotManageCommand:String {
     case handleside
     case touchmode
     case restart_localization
+    case enablewifi
+    case disablewifi
 }
 
 struct DeviceStatus: Decodable {
