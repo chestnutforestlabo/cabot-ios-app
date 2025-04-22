@@ -296,6 +296,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     private let modeTypeKey = "modeTypeKey"
     private let notificationCenterID = "cabot_state_notification"
     private let voiceSettingKey = "voiceSettingKey"
+    private let enableSpeakerKey = "enableSpeakerKey"
     private let selectedSpeakerAudioFileKey = "selectedSpeakerAudioFileKey"
     private let speechVolumeKey = "speechVolumeKey"
 
@@ -490,6 +491,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
     }
 
+    @Published var enableSpeaker: Bool = false {
+        didSet {
+            UserDefaults.standard.setValue(enableSpeaker, forKey: enableSpeakerKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
     @Published var selectedSpeakerAudioFile: String = "" {
         didSet {
             UserDefaults.standard.setValue(selectedSpeakerAudioFile, forKey: selectedSpeakerAudioFileKey)
@@ -1251,6 +1258,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 break
             case .touchmode:
                 break
+            case .speaker_enable:
+                break
             case .speaker_audio_file:
                 break
             case .speaker_volume:
@@ -1287,10 +1296,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 
     func updateSpeakerSettings(){
         // set speaker settings
-        _ = self.fallbackService.manage(command: .speaker_audio_file, param: self.selectedSpeakerAudioFile)
-        _ = self.fallbackService.manage(command: .speaker_volume, param: String(self.speakerVolume))
-        // play sample audio
-        _ = self.fallbackService.manage(command: .speaker_alert)
+        _ = self.fallbackService.manage(command: .speaker_enable, param: String(self.enableSpeaker))
+        if self.enableSpeaker {
+            _ = self.fallbackService.manage(command: .speaker_audio_file, param: self.selectedSpeakerAudioFile)
+            _ = self.fallbackService.manage(command: .speaker_volume, param: String(self.speakerVolume))
+            // play sample audio
+            _ = self.fallbackService.manage(command: .speaker_alert)
+        }
     }
 
     func share(tour: Tour) {

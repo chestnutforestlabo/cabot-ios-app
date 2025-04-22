@@ -340,5 +340,6 @@
 
 // Suitcase's speaker settings
 "SuitcaseSpeaker" = "Speaker in Suitcase";
+"EnableSpeaker" = "Enable Speaker";
 "AudioFile" = "Audio File";
 "SpeakerVolume" = "Volume";

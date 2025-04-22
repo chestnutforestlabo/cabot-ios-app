@@ -343,5 +343,6 @@
 
 // Suitcase's speaker settings
 "SuitcaseSpeaker" = "行李箱内置扬声器";
+"EnableSpeaker" = "使用扬声器";
 "AudioFile" = "音频文件";
 "SpeakerVolume" = "音量";

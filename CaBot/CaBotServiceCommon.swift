@@ -128,6 +128,7 @@ enum CaBotManageCommand:String {
     case handleside
     case touchmode
     case restart_localization
+    case speaker_enable
     case speaker_audio_file
     case speaker_volume
     case speaker_alert

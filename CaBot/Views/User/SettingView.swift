@@ -89,19 +89,31 @@ struct SettingView: View {
             }
 
             Section(header:Text("SuitcaseSpeaker")) {
+                Toggle("EnableSpeaker", isOn: $modelData.enableSpeaker)
+                .accessibility(label: Text("Enable or disable suitcase speaker"))
+                .onChange(of: modelData.enableSpeaker) {
+                    modelData.updateSpeakerSettings()
+                }
+
                 Picker(LocalizedStringKey("AudioFile"), selection: $modelData.selectedSpeakerAudioFile) {
                     ForEach(modelData.possibleAudioFiles, id: \.self) { audioFileName in
-                        Text(audioFileName).tag(audioFileName)
+                        Text(audioFileName)
+                            .tag(audioFileName)
+                            .foregroundColor(modelData.enableSpeaker ? .primary : .gray)
                     }
                 }
+                .foregroundColor(modelData.enableSpeaker ? .primary : .gray)
                 .onChange(of: modelData.selectedSpeakerAudioFile) {
                     modelData.updateSpeakerSettings()
                 }
                 .pickerStyle(DefaultPickerStyle())
+                .disabled(!modelData.enableSpeaker)
 
                 HStack {
                     Text("SpeakerVolume")
+                        .foregroundColor(modelData.enableSpeaker ? .primary : .gray)
                         .accessibility(hidden: true)
+
                     Slider(value: $modelData.speakerVolume,
                            in: -20...20,
                            step: 0.5,
@@ -112,7 +124,10 @@ struct SettingView: View {
                     })
                     .accessibility(label: Text("Speaker Volume"))
                     .accessibility(value: Text(String(format: "%.0f decibels", modelData.speakerVolume)))
-                    Text(String(format:"%.0f dB", modelData.speakerVolume))
+                    .disabled(!modelData.enableSpeaker)
+
+                    Text(String(format: "%.0f dB", modelData.speakerVolume))
+                        .foregroundColor(modelData.enableSpeaker ? .primary : .gray)
                         .accessibility(hidden: true)
                 }
             }

@@ -343,5 +343,6 @@
 
 // Suitcase's speaker settings
 "SuitcaseSpeaker" = "スーツケース搭載スピーカー";
+"EnableSpeaker" = "スピーカーの使用";
 "AudioFile" = "音声ファイル";
 "SpeakerVolume" = "音量";
