@@ -92,10 +92,17 @@ struct SettingView: View {
                 Toggle("EnableSpeaker", isOn: $modelData.enableSpeaker)
                 .accessibility(label: Text("Enable or disable suitcase speaker"))
                 .onChange(of: modelData.enableSpeaker) {
+                    modelData.silentForSpeakerSettingUpdate = false
                     modelData.updateSpeakerSettings()
                 }
 
-                Picker(LocalizedStringKey("AudioFile"), selection: $modelData.selectedSpeakerAudioFile) {
+                Picker(LocalizedStringKey("AudioFile"), selection: Binding(
+                    get: { modelData.selectedSpeakerAudioFile },
+                    set: { newValue in
+                        modelData.selectedSpeakerAudioFile = newValue
+                        modelData.silentForSpeakerSettingUpdate = false
+                    }
+                )) {
                     ForEach(modelData.possibleAudioFiles, id: \.self) { audioFileName in
                         Text(audioFileName)
                             .tag(audioFileName)
@@ -104,7 +111,9 @@ struct SettingView: View {
                 }
                 .foregroundColor(modelData.enableSpeaker ? .primary : .gray)
                 .onChange(of: modelData.selectedSpeakerAudioFile) {
-                    modelData.updateSpeakerSettings()
+                    if !modelData.silentForSpeakerSettingUpdate {
+                        modelData.updateSpeakerSettings()
+                    }
                 }
                 .pickerStyle(DefaultPickerStyle())
                 .disabled(!modelData.enableSpeaker)
@@ -119,6 +128,7 @@ struct SettingView: View {
                            step: 0.5,
                            onEditingChanged: { editing in
                         if editing == false {
+                            modelData.silentForSpeakerSettingUpdate = false
                             modelData.updateSpeakerSettings()
                         }
                     })

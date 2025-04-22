@@ -510,6 +510,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
     }
     @Published var possibleAudioFiles: [String] = []
+    var silentForSpeakerSettingUpdate: Bool = false
 
     enum ServerStatus {
         case Init
@@ -1300,8 +1301,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if self.enableSpeaker {
             _ = self.fallbackService.manage(command: .speaker_audio_file, param: self.selectedSpeakerAudioFile)
             _ = self.fallbackService.manage(command: .speaker_volume, param: String(self.speakerVolume))
-            // play sample audio
-            _ = self.fallbackService.manage(command: .speaker_alert)
+            if !self.silentForSpeakerSettingUpdate {
+                // play sample audio
+                _ = self.fallbackService.manage(command: .speaker_alert)
+            }
         }
     }
 
@@ -1616,13 +1619,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             break
         case .getspeakeraudiofiles:
             DispatchQueue.main.async {
+                self.silentForSpeakerSettingUpdate = true
                 self.possibleAudioFiles = (param ?? "").components(separatedBy: ",")
                 if !self.possibleAudioFiles.contains(self.selectedSpeakerAudioFile){
                     if let firstOption = self.possibleAudioFiles.first {
                         self.selectedSpeakerAudioFile = firstOption
                     }
                 }
-                _ = self.fallbackService.manage(command: .speaker_audio_file, param: self.selectedSpeakerAudioFile)
+                self.updateSpeakerSettings()
             }
             break
         }
