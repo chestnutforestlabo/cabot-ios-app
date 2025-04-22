@@ -1615,7 +1615,15 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             }
             break
         case .getspeakeraudiofiles:
-            self.possibleAudioFiles = (param ?? "").components(separatedBy: ",")
+            DispatchQueue.main.async {
+                self.possibleAudioFiles = (param ?? "").components(separatedBy: ",")
+                if !self.possibleAudioFiles.contains(self.selectedSpeakerAudioFile){
+                    if let firstOption = self.possibleAudioFiles.first {
+                        self.selectedSpeakerAudioFile = firstOption
+                    }
+                }
+                _ = self.fallbackService.manage(command: .speaker_audio_file, param: self.selectedSpeakerAudioFile)
+            }
             break
         }
     }
