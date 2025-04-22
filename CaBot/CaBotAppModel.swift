@@ -1297,6 +1297,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             case .speaker_volume:
                 break
             case .speaker_alert:
+                break
             case .enablewifi:
                 break
             case .disablewifi:
