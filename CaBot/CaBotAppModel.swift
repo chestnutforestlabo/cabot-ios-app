@@ -539,6 +539,18 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         userSpeechRate = rate
     }
 
+    var skipWifNotification: Bool = false // Ignore next WiFi change notification
+    @Published var wifiDetected: Bool = false
+    @Published var wifiEnabled: Bool = false {
+        willSet {
+            if silentForChange == false {
+                skipWifNotification = true
+                self.systemManageCommand(command: newValue ? .enablewifi : .disablewifi)
+            }
+            silentForChange = false
+        }
+    }
+
 #if ATTEND
     @Published var voiceSetting: VoiceMode = .User {
         didSet {
@@ -701,6 +713,25 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         didSet{
             isUserAppConnected = deviceStatus.devices.contains { device in
                 device.type == "User App" && device.level == .OK
+            }
+            if skipWifNotification {
+                skipWifNotification = false
+            }
+            else if deviceStatus.devices.contains(where: { device in
+                device.type == "WiFi" && device.message == "enabled"
+            }) {
+                silentForChange = true
+                wifiEnabled = true
+                wifiDetected = true
+            }
+            else if deviceStatus.devices.contains(where: { device in
+                device.type == "WiFi" && device.message == "disabled"
+            }) {
+                silentForChange = true
+                wifiEnabled = false
+                wifiDetected = true
+            } else {
+                wifiDetected = false
             }
         }
     }
@@ -1266,6 +1297,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             case .speaker_volume:
                 break
             case .speaker_alert:
+            case .enablewifi:
+                break
+            case .disablewifi:
                 break
             }
             systemStatus.components.removeAll()

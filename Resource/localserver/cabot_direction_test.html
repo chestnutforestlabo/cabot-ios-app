@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="copyright" content='
+Copyright (c) 2023  Carnegie Mellon University and Miraikan
+ 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
+'>
+    <link rel="stylesheet" href="css/cabot.css">
+</head>
+
+<script src="js/roslib.js"></script>
+
+<body>
+    <div id="msg"></div>
+    <div class="three">
+        <div class="button" onclick="send(-30)">Left 30</div><br>
+        <div class="button" onclick="send(-45)">Left 45</div><br>
+        <div class="button" onclick="send(-90)">Left 90</div><br>
+        <div class="button" onclick="send(-145)">Left 145</div>
+    </div>
+    <div class="three">
+        <div class="button" onclick="slow(0)">Straight</div>
+    </div>
+    <div class="three">
+        <div class="button" onclick="send(30)">Right 30</div><br>
+        <div class="button" onclick="send(45)">Right 45</div><br>
+        <div class="button" onclick="send(90)">Right 90</div><br>
+        <div class="button" onclick="send(145)">Right 145</div>
+    </div>
+</body>
+
+<script>
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const ip = urlParams.get('ip');
+        const url = `ws://${ip}:9091`;
+        msg.innerText = "connecting to "+url;
+        connection(url)
+    }
+    /**
+    * Setup all visualization elements when the page is loaded.
+    */
+
+    let msg =  document.getElementById('msg');
+
+    function connection(url) {
+        // Connect to ROS.
+        var ros = new ROSLIB.Ros({
+            // set this to false to use the new service interface to
+            // tf2_web_republisher. true is the default and means roslibjs
+            // will use the action interface
+            groovyCompatibility : false
+        });
+
+        // If there is an error on the backend, an 'error' emit will be emitted.
+        ros.on('error', function(error) {
+            console.log(error);
+            msg.innerText = error;
+        });
+
+        // Find out exactly when we made a connection.
+        ros.on('connection', function() {
+            console.log('Connection made!');
+            msg.innerText = 'Connection made!';
+            topicInit(ros);
+        });
+
+        ros.on('close', function() {
+            console.log('Connection closed.');
+            msg.innerText = 'Connection closed.';
+        });
+
+        // Create a connection to the rosbridge WebSocket server.
+        msg.innerText = 'waiting  ' + url;
+        ros.connect(url);
+    }
+
+    window.current = 0;
+
+    function slow(target) {
+        flag = false;
+        if (target - window.current < 0) {
+            window.current -= 1;
+            flag = true;
+        }
+        else if (target - window.current > 0) {
+            window.current += 1;
+            flag = true;
+        }
+        window.servoTargetTopic.publish({
+            data: window.current
+        });
+        if (flag) {
+            setTimeout(function() {
+                slow(target)
+            }, 50);
+        }
+    }
+
+    function send(degree) {
+        window.current = degree;
+        window.servoTargetTopic.publish({
+            data: degree
+        });
+    }
+
+    function topicInit(ros) {
+        var firstTime = true;
+
+        var servoTargetTopic = new ROSLIB.Topic({
+            ros : ros,
+            name : '/cabot/servo_target',
+            messageType : 'std_msgs/Int16'
+        });
+        window.servoTargetTopic = servoTargetTopic;
+        msg.innerText = "servoTargetTopic is ready."
+        send(0);
+    }
+</script>
+
+</html>

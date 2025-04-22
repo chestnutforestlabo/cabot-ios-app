@@ -132,6 +132,8 @@ enum CaBotManageCommand:String {
     case speaker_audio_file
     case speaker_volume
     case speaker_alert
+    case enablewifi
+    case disablewifi
 }
 
 struct DeviceStatus: Decodable {
