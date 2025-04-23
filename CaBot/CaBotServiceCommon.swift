@@ -53,6 +53,10 @@ struct SharedInfo: Codable {
         case ChangeTouchMode
         case ChatRequest
         case ChatStatus
+        case ChangeEnableSpeaker
+        case ChangeSelectedSpeakerAudioFile
+        case ChangeSpeakerVolume
+        case UpdateSpeakerSettings
     }
     init(type: InfoType, value: String, flag1: Bool = false, flag2: Bool = false, location: Int = 0, length: Int = 0) {
         self.info_id = Int64(Date().timeIntervalSince1970*1000000000.0)
@@ -548,7 +552,7 @@ class CaBotServiceActions {
     }
 
     func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, request: NavigationEventRequest) {
-        guard delegate.getModeType() == .Normal else { return } // only for Normal mode
+        guard delegate.getModeType() == .Normal || request.type == .getspeakeraudiofiles else { return } // only for Normal mode
         // noop for same request ID from different transport
         guard lastNavigationEventRequestID < request.request_id else { return }
         lastNavigationEventRequestID = request.request_id

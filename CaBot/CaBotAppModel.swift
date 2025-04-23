@@ -492,18 +492,39 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     @Published var enableSpeaker: Bool = false {
+        willSet {
+            if silentForChange == false {
+                share(user_info: SharedInfo(type: .ChangeEnableSpeaker, value: String(newValue)))
+            }
+            silentForChange = false
+            skipPlaySpeakerSample = false
+        }
         didSet {
             UserDefaults.standard.setValue(enableSpeaker, forKey: enableSpeakerKey)
             UserDefaults.standard.synchronize()
         }
     }
     @Published var selectedSpeakerAudioFile: String = "" {
+        willSet {
+            if silentForChange == false {
+                share(user_info: SharedInfo(type: .ChangeSelectedSpeakerAudioFile, value: newValue))
+            }
+            silentForChange = false
+            skipPlaySpeakerSample = false
+        }
         didSet {
             UserDefaults.standard.setValue(selectedSpeakerAudioFile, forKey: selectedSpeakerAudioFileKey)
             UserDefaults.standard.synchronize()
         }
     }
     @Published var speakerVolume: Float = 0.0 {
+        willSet {
+            if silentForChange == false {
+                share(user_info: SharedInfo(type: .ChangeSpeakerVolume, value: String(newValue)))
+            }
+            silentForChange = false
+            skipPlaySpeakerSample = false
+        }
         didSet {
             UserDefaults.standard.setValue(speakerVolume, forKey: speechVolumeKey)
             UserDefaults.standard.synchronize()
@@ -511,6 +532,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
     @Published var possibleAudioFiles: [String] = []
     var silentForSpeakerSettingUpdate: Bool = false
+    var skipPlaySpeakerSample: Bool = false
 
     enum ServerStatus {
         case Init
@@ -900,6 +922,19 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         ChatData.shared.tourManager = self.tourManager
         ChatData.shared.viewModel = self.chatModel
         PriorityQueueTTSWrapper.shared.delegate = self
+
+        // Speaker
+        #if USER
+        if let enableSpeaker = UserDefaults.standard.value(forKey: enableSpeakerKey) as? Bool {
+            self.enableSpeaker = enableSpeaker
+        }
+        if let selectedSpeakerAudioFile = UserDefaults.standard.value(forKey: selectedSpeakerAudioFileKey) as? String {
+            self.selectedSpeakerAudioFile = selectedSpeakerAudioFile
+        }
+        if let speakerVolume = UserDefaults.standard.value(forKey: speechVolumeKey) as? Float {
+            self.speakerVolume = speakerVolume
+        }
+        #endif
     }
 
 
@@ -1331,16 +1366,21 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func updateSpeakerSettings(){
+        if self.modeType != .Normal {
+            share(user_info: SharedInfo(type: .UpdateSpeakerSettings, value: String(self.silentForSpeakerSettingUpdate)))
+            return
+        }
         // set speaker settings
         _ = self.fallbackService.manage(command: .speaker_enable, param: String(self.enableSpeaker))
         if self.enableSpeaker {
             _ = self.fallbackService.manage(command: .speaker_audio_file, param: self.selectedSpeakerAudioFile)
             _ = self.fallbackService.manage(command: .speaker_volume, param: String(self.speakerVolume))
-            if !self.silentForSpeakerSettingUpdate {
+            if !self.silentForSpeakerSettingUpdate && !skipPlaySpeakerSample {
                 // play sample audio
                 _ = self.fallbackService.manage(command: .speaker_alert)
             }
         }
+        skipPlaySpeakerSample = true
     }
 
     func share(tour: Tour) {
@@ -1474,6 +1514,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 }
                 DispatchQueue.main.async {
                     _ = self.fallbackService.manage(command: .lang, param: self.resourceLang)
+                    self.possibleAudioFiles = []
                     _ = self.fallbackService.manage(command: .reqfeatures)
                 }
             }
@@ -1839,6 +1880,25 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if userInfo.type == .ChangeTouchMode {
             self.suitcaseFeatures.silentUpdate(mode: SuitcaseFeatures.TouchMode(rawValue: userInfo.value) ?? .cap)
         }
+        switch userInfo.type {
+        case .ChangeEnableSpeaker:
+            self.silentForChange = true
+            self.silentForSpeakerSettingUpdate = true
+            self.enableSpeaker = Bool(userInfo.value) ?? false
+        case .ChangeSelectedSpeakerAudioFile:
+            self.silentForChange = true
+            self.silentForSpeakerSettingUpdate = true
+            self.selectedSpeakerAudioFile = userInfo.value
+        case .ChangeSpeakerVolume:
+            self.silentForChange = true
+            self.silentForSpeakerSettingUpdate = true
+            self.speakerVolume = Float(userInfo.value) ?? 0.0
+        case .UpdateSpeakerSettings:
+            self.silentForSpeakerSettingUpdate = Bool(userInfo.value) ?? true
+            self.updateSpeakerSettings()
+        default:
+            break
+        }
 
         // Only Attend
         if modeType != .Normal {
@@ -1942,6 +2002,10 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         self.share(user_info: SharedInfo(type: .ChangeHandleSide, value: self.suitcaseFeatures.selectedHandleSide.rawValue))
         self.share(user_info: SharedInfo(type: .ChangeTouchMode, value: self.suitcaseFeatures.selectedTouchMode.rawValue))
         self.shareChatStatus(all: true)
+        self.share(user_info: SharedInfo(type: .ChangeEnableSpeaker, value: String(self.enableSpeaker)))
+        self.share(user_info: SharedInfo(type: .ChangeSelectedSpeakerAudioFile, value: self.selectedSpeakerAudioFile))
+        self.share(user_info: SharedInfo(type: .ChangeSpeakerVolume, value: String(self.speakerVolume)))
+
     }
 
     func getModeType() -> ModeType {
@@ -2103,6 +2167,17 @@ class SystemStatusData: NSObject, ObservableObject {
             switch(self.level) {
             case .Unknown, .Inactive, .Activating, .Deactivating, .Error:
                 return false
+            case .Active:
+                return true
+            }
+        }
+    }
+
+    var canNavigate:Bool {
+        get {
+            switch(self.level) {
+            case .Unknown, .Inactive, .Activating, .Deactivating, .Error:
+                return !self.components.isEmpty
             case .Active:
                 return true
             }
