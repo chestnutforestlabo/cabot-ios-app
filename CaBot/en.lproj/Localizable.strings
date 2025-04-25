@@ -161,6 +161,7 @@
 
 // SystemStatusView
 "Start System"="Start System";
+"Start the suitcase system"="Start the suitcase system";
 "Stop System"="Stop System";
 "Are you sure to stop the suitcase system?"="Are you sure to stop the suitcase system?";
 "System Status"="System Status";

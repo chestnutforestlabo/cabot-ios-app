@@ -161,6 +161,7 @@
 
 // SystemStatusView
 "Start System"="启动系统";
+"Start the suitcase system"="启动行李箱系统";
 "Stop System"="停止系统";
 "Are you sure to stop the suitcase system?"="是否停止行李箱系统的运作？";
 "System Status"="系统状态";

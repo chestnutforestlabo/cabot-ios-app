@@ -12,6 +12,7 @@ struct DetailSettingView: View {
     @EnvironmentObject var modelData: DetailSettingModel
     @EnvironmentObject var cabotAppModel: CaBotAppModel
     
+    @State private var isConfirmingStart = false
     @State private var isConfirmingStop = false
     @State private var isConfirmingReboot = false
     @State private var isConfirmingPoweroff = false
@@ -87,10 +88,21 @@ struct DetailSettingView: View {
 
                 
                 Button(action: {
-                    cabotAppModel.systemManageCommand(command: .start)
+                    isConfirmingStart = true
                 }){
                    Text("Start System")
                         .frame(width: nil, alignment: .topLeading)
+                }
+                .confirmationDialog(Text("Start System"), isPresented: $isConfirmingStart) {
+                    Button {
+                        cabotAppModel.systemManageCommand(command: .start)
+                    } label: {
+                        Text("Start System")
+                    }
+                    Button("Cancel", role: .cancel) {
+                    }
+                } message: {
+                    Text("Start the suitcase system")
                 }
                 .disabled(!cabotAppModel.systemStatus.canStart || !cabotAppModel.suitcaseConnected)
                 

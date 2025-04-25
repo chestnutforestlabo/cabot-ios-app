@@ -161,6 +161,7 @@
 
 // SystemStatusView
 "Start System"="システム起動";
+"Start the suitcase system"="スーツケースのシステム起動を実行します";
 "Stop System"="システム停止";
 "Are you sure to stop the suitcase system?"="スーツケースのシステム停止しますが、よろしいですか？";
 "System Status"="システム状態";
