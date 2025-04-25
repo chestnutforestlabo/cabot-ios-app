@@ -53,6 +53,10 @@ struct SharedInfo: Codable {
         case ChangeTouchMode
         case ChatRequest
         case ChatStatus
+        case ChangeEnableSpeaker
+        case ChangeSelectedSpeakerAudioFile
+        case ChangeSpeakerVolume
+        case UpdateSpeakerSettings
     }
     init(type: InfoType, value: String, flag1: Bool = false, flag2: Bool = false, location: Int = 0, length: Int = 0) {
         self.info_id = Int64(Date().timeIntervalSince1970*1000000000.0)
@@ -115,6 +119,7 @@ enum NavigationNotification:String {
     case getlanguage
     case gethandleside
     case gettouchmode
+    case getspeakeraudiofiles
 }
 
 enum CaBotManageCommand:String {
@@ -127,6 +132,10 @@ enum CaBotManageCommand:String {
     case handleside
     case touchmode
     case restart_localization
+    case speaker_enable
+    case speaker_audio_file
+    case speaker_volume
+    case speaker_alert
     case enablewifi
     case disablewifi
 }
@@ -368,6 +377,7 @@ enum NavigationEventType:String, Decodable {
     case getlanguage
     case gethandleside
     case gettouchmode
+    case getspeakeraudiofiles
     case toggleconversation
     case togglespeakstate
     case unknown
@@ -542,14 +552,14 @@ class CaBotServiceActions {
     }
 
     func handle(service: CaBotTransportProtocol, delegate: CaBotServiceDelegate, request: NavigationEventRequest) {
-        guard delegate.getModeType() == .Normal else { return } // only for Normal mode
+        guard delegate.getModeType() == .Normal || request.type == .getspeakeraudiofiles else { return } // only for Normal mode
         // noop for same request ID from different transport
         guard lastNavigationEventRequestID < request.request_id else { return }
         lastNavigationEventRequestID = request.request_id
 
         DispatchQueue.main.async {
             switch(request.type) {
-            case .next, .arrived, .subtour, .skip, .getlanguage, .gethandleside, .gettouchmode:
+            case .next, .arrived, .subtour, .skip, .getlanguage, .gethandleside, .gettouchmode, .getspeakeraudiofiles:
                 if let note = NavigationNotification(rawValue: request.type.rawValue) {
                     delegate.cabot(service: service, notification: note, param: request.param)
                 } else {

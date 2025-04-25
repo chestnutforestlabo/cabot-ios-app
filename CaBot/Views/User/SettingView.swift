@@ -88,6 +88,63 @@ struct SettingView: View {
                 }
             }
 
+            if !modelData.possibleAudioFiles.isEmpty {
+                Section(header:Text("SuitcaseSpeaker")) {
+                    Toggle("EnableSpeaker", isOn: $modelData.enableSpeaker)
+                        .accessibility(label: Text("Enable or disable suitcase speaker"))
+                        .onChange(of: modelData.enableSpeaker) {
+                            modelData.silentForSpeakerSettingUpdate = false
+                            modelData.updateSpeakerSettings()
+                        }
+                    
+                    Picker(LocalizedStringKey("AudioFile"), selection: Binding(
+                        get: { modelData.selectedSpeakerAudioFile },
+                        set: { newValue in
+                            modelData.selectedSpeakerAudioFile = newValue
+                            modelData.silentForSpeakerSettingUpdate = false
+                        }
+                    )) {
+                        ForEach(modelData.possibleAudioFiles, id: \.self) { audioFileName in
+                            Text(audioFileName)
+                                .tag(audioFileName)
+                                .foregroundColor(modelData.enableSpeaker ? .primary : .gray)
+                        }
+                    }
+                    .foregroundColor(modelData.enableSpeaker ? .primary : .gray)
+                    .onChange(of: modelData.selectedSpeakerAudioFile) {
+                        if !modelData.silentForSpeakerSettingUpdate {
+                            modelData.updateSpeakerSettings()
+                        }
+                    }
+                    .pickerStyle(DefaultPickerStyle())
+                    .disabled(!modelData.enableSpeaker)
+                    
+                    HStack {
+                        Text("SpeakerVolume")
+                            .foregroundColor(modelData.enableSpeaker ? .primary : .gray)
+                            .accessibility(hidden: true)
+                        
+                        Slider(value: $modelData.speakerVolume,
+                               in: -20...20,
+                               step: 0.5,
+                               onEditingChanged: { editing in
+                            if editing == false {
+                                modelData.silentForSpeakerSettingUpdate = false
+                                modelData.updateSpeakerSettings()
+                            }
+                        })
+                        .accessibility(label: Text("Speaker Volume"))
+                        .accessibility(value: Text(String(format: "%.0f decibels", modelData.speakerVolume)))
+                        .disabled(!modelData.enableSpeaker)
+                        
+                        Text(String(format: "%.0f dB", modelData.speakerVolume))
+                            .foregroundColor(modelData.enableSpeaker ? .primary : .gray)
+                            .accessibility(hidden: true)
+                    }
+                }
+                .disabled(!modelData.systemStatus.canNavigate || !modelData.suitcaseConnected)
+            }
+
             Section(header: Text("Connection")) {
                 VStack {
                     HStack{
