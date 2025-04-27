@@ -138,6 +138,7 @@ enum CaBotManageCommand:String {
     case speaker_alert
     case enablewifi
     case disablewifi
+    case release_emergencystop
 }
 
 struct DeviceStatus: Decodable {

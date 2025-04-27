@@ -1337,6 +1337,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 break
             case .disablewifi:
                 break
+            case .release_emergencystop:
+                break
             }
             systemStatus.components.removeAll()
             objectWillChange.send()

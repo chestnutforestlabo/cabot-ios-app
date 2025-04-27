@@ -16,6 +16,7 @@ struct DetailSettingView: View {
     @State private var isConfirmingStop = false
     @State private var isConfirmingReboot = false
     @State private var isConfirmingPoweroff = false
+    @State private var isConfirmingReleaseEmergencystop = false
 
     let startSounds:[String] = [
         "/System/Library/Audio/UISounds/nano/3rdParty_Success_Haptic.caf",
@@ -86,7 +87,25 @@ struct DetailSettingView: View {
                 }
                 .disabled(!cabotAppModel.systemStatus.canStart || !cabotAppModel.suitcaseConnected)
 
-                
+                Button(action: {
+                    isConfirmingReleaseEmergencystop = true
+                }) {
+                    Text("RELEASE_EMERGENCYSTOP")
+                        .frame(width: nil, alignment: .topLeading)
+                }
+                .confirmationDialog(Text("RELEASE_EMERGENCYSTOP"), isPresented: $isConfirmingReleaseEmergencystop) {
+                    Button {
+                        cabotAppModel.systemManageCommand(command: .release_emergencystop)
+                    } label: {
+                        Text("RELEASE_EMERGENCYSTOP")
+                    }
+                    Button("Cancel", role: .cancel) {
+                    }
+                } message: {
+                    Text("CONFIRM_EMERGENCYSTOP")
+                }
+                .disabled(!cabotAppModel.systemStatus.canStart || !cabotAppModel.suitcaseConnected)
+
                 Button(action: {
                     isConfirmingStart = true
                 }){

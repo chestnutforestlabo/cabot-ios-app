@@ -26,6 +26,7 @@ struct DeviceStatusView: View {
     @EnvironmentObject var modelData: CaBotAppModel
     @State private var isConfirmingReboot = false
     @State private var isConfirmingPoweroff = false
+    @State private var isConfirmingReleaseEmergencystop = false
     var body: some View {
         return VStack {
             Form {
@@ -87,6 +88,25 @@ struct DeviceStatusView: View {
                         }
                     } message: {
                         Text("The app will be disconnected.")
+                    }
+                    .disabled(!modelData.systemStatus.canStart || !modelData.suitcaseConnected)
+
+                    Button(action: {
+                        isConfirmingReleaseEmergencystop = true
+                    }) {
+                        Text("RELEASE_EMERGENCYSTOP")
+                            .frame(width: nil, alignment: .topLeading)
+                    }
+                    .confirmationDialog(Text("RELEASE_EMERGENCYSTOP"), isPresented: $isConfirmingReleaseEmergencystop) {
+                        Button {
+                            modelData.systemManageCommand(command: .release_emergencystop)
+                        } label: {
+                            Text("RELEASE_EMERGENCYSTOP")
+                        }
+                        Button("Cancel", role: .cancel) {
+                        }
+                    } message: {
+                        Text("CONFIRM_EMERGENCYSTOP")
                     }
                     .disabled(!modelData.systemStatus.canStart || !modelData.suitcaseConnected)
 

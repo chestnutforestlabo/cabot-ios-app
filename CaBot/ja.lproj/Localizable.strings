@@ -347,3 +347,7 @@
 "EnableSpeaker" = "スピーカーの使用";
 "AudioFile" = "音声ファイル";
 "SpeakerVolume" = "音量";
+
+// Emergency Stop
+"RELEASE_EMERGENCYSTOP" = "緊急停止を解除";
+"CONFIRM_EMERGENCYSTOP" = "緊急停止を解除します。ハンドルから手を必ず離してください。";

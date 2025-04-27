@@ -347,3 +347,7 @@
 "EnableSpeaker" = "Enable Speaker";
 "AudioFile" = "Audio File";
 "SpeakerVolume" = "Volume";
+
+// Emergency Stop
+"RELEASE_EMERGENCYSTOP" = "Release Emergency Stop";
+"CONFIRM_EMERGENCYSTOP" = "Release the emergency stop. Be sure to remove your hand from the handle.";
