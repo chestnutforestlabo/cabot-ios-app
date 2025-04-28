@@ -108,7 +108,7 @@ struct DeviceStatusView: View {
                     } message: {
                         Text("CONFIRM_EMERGENCYSTOP")
                     }
-                    .disabled(!modelData.systemStatus.canStart || !modelData.suitcaseConnected)
+                    .disabled(!modelData.suitcaseConnected)
 
                     Toggle(isOn: $modelData.wifiEnabled) {
                         Text("WiFi")

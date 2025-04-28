@@ -104,7 +104,7 @@ struct DetailSettingView: View {
                 } message: {
                     Text("CONFIRM_EMERGENCYSTOP")
                 }
-                .disabled(!cabotAppModel.systemStatus.canStart || !cabotAppModel.suitcaseConnected)
+                .disabled(!cabotAppModel.suitcaseConnected)
 
                 Button(action: {
                     isConfirmingStart = true
