@@ -2423,6 +2423,7 @@ class UserInfoBuffer {
 class SilentAudioPlayer {
     static let shared = SilentAudioPlayer()
     var audioPlayer: AVAudioPlayer?
+    var playing = false
 
     func start() {
         if audioPlayer == nil, let url = Bundle.main.url(forResource: "Resource/silent", withExtension: "wav") {
@@ -2432,6 +2433,7 @@ class SilentAudioPlayer {
                 audioPlayer?.volume = 0
                 audioPlayer?.prepareToPlay()
                 audioPlayer?.play()
+                playing = true
                 print("SilentAudioPlayer started")
             } catch {
                 print("SilentAudioPlayer error: \(error.localizedDescription)")
@@ -2441,6 +2443,14 @@ class SilentAudioPlayer {
 
     func stop() {
         audioPlayer?.stop()
+        playing = false
         print("SilentAudioPlayer stopped")
+    }
+
+    func healthcheck() {
+        if playing && !(audioPlayer?.isPlaying ?? true) {
+            audioPlayer?.play()
+            print("restart audioPlayer")
+        }
     }
 }
