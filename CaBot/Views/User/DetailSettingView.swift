@@ -150,6 +150,20 @@ struct DetailSettingView: View {
                 .disabled(!cabotAppModel.suitcaseConnected || !cabotAppModel.wifiDetected)
             }
             
+            if cabotAppModel.suitcaseConnected {
+                Section(header:Text("ROS")) {
+                    List {
+                        NavigationLink(
+                            destination: RosWebView(address: cabotAppModel.getCurrentAddress(), port: cabotAppModel.rosPort, type: .rosMap)
+                                .environmentObject(cabotAppModel).heartbeat("RosWebView"),
+                            label: {
+                                Text("ROS Map")
+                            }
+                        )
+                    }
+                }
+            }
+
             Section(header: Text("Tour")) {
                 Toggle("Enable subtour on handle", isOn: $modelData.enableSubtourOnHandle)
                 Toggle("Show content when arrive", isOn: $modelData.showContentWhenArrive)
