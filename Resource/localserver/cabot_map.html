@@ -69,7 +69,7 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
         ros.on('error', function(error) {
             console.log(error);
             msg.innerText = error;
-            webkit.messageHandlers.callbackHandler.postMessage('connection error');
+            window.webkit && webkit.messageHandlers.callbackHandler.postMessage('connection error');
         });
 
         // Find out exactly when we made a connection.
@@ -78,13 +78,13 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
             msg.innerText = 'Connection made!';
             document.querySelector('#map').innerHTML = ``;
             topicInit(ros);
-            webkit.messageHandlers.callbackHandler.postMessage('connection success');
+            window.webkit && webkit.messageHandlers.callbackHandler.postMessage('connection success');
         });
 
         ros.on('close', function() {
             console.log('Connection closed.');
             msg.innerText = 'Connection closed.';
-            webkit.messageHandlers.callbackHandler.postMessage('connection closed');
+            window.webkit && webkit.messageHandlers.callbackHandler.postMessage('connection closed');
         });
 
         // Create a connection to the rosbridge WebSocket server.
@@ -112,7 +112,7 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
                 ros : ros,
                 tfClient : tfClient,
                 rootObject : viewer.scene,
-                cntinuous: false,
+                continuous: false,
                 compression : 'png'
             });
         }, 0);
@@ -125,7 +125,7 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
         });
         localizeStatusTopic.subscribe(function(message) {
             console.log(message);
-            window.webkit.messageHandlers.LocalizeStatus.postMessage(message.status);
+            window.webkit && webkit.messageHandlers.LocalizeStatus.postMessage(message.status);
         });
 
         // Setup a client to listen to TFs.
@@ -155,12 +155,16 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
         checkLoopCount = 0;
         checkLoopID = setInterval(function() {
             checkLoopCount++;
-            webkit.messageHandlers.callbackHandler.postMessage(`expected_frames="${expected_frames}" checkLoopCount=${checkLoopCount}`);
+            window.webkit && webkit.messageHandlers.callbackHandler.postMessage(`expected_frames="${expected_frames}" checkLoopCount=${checkLoopCount}`);
             if (expected_frames.length == 0) {
                 clearInterval(checkLoopID)
             }
             if (checkLoopCount > 300 + retry * 100) {
                 location.search = params.join("&");
+            }
+            if (checkLoopCount % 20 == 0) {
+                setTimeout(() => tfClient.updateGoal(), 0);
+                console.log('Refresh TF Goal')
             }
         }, 100);
 
