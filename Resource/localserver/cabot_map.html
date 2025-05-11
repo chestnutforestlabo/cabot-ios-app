@@ -152,23 +152,21 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
         });
         params.push(`retry=${retry + 1}`);
 
-        checkLoopCount = 0;
+        let checkLoopCount = 0;
         let mapRefreshCount = 0;
         checkLoopID = setInterval(function() {
             checkLoopCount++;
             window.webkit && webkit.messageHandlers.callbackHandler.postMessage(`expected_frames="${expected_frames}" checkLoopCount=${checkLoopCount}`);
             if (expected_frames.length == 0) {
-                clearInterval(checkLoopID)
-            }
-            if (checkLoopCount > 300 + retry * 100) {
+                clearInterval(checkLoopID);
+            } else if (checkLoopCount > 300 + retry * 100) {
                 location.search = params.join("&");
-            }
-            if (tfClient.frameInfos.map) {
-                if (mapRefreshCount % 10 == 0) {
-                    setTimeout(() => tfClient.updateGoal(), 0);
-                    console.log('Refresh TF Goal', Object.keys(tfClient.frameInfos), 'checkLoopCount', checkLoopCount)
-                }
+            } else if (tfClient.frameInfos.map) {
                 mapRefreshCount++;
+                if (mapRefreshCount % 10 == 5) {
+                    setTimeout(() => tfClient.updateGoal(), 0);
+                    console.log('Refresh TF Goal', Object.keys(tfClient.frameInfos), 'checkLoopCount', checkLoopCount);
+                }
             }
         }, 100);
 
