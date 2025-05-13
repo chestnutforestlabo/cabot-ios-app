@@ -125,8 +125,8 @@ struct SettingView: View {
                             .accessibility(hidden: true)
                         
                         Slider(value: $modelData.speakerVolume,
-                               in: -20...20,
-                               step: 0.5,
+                               in: 0...100,
+                               step: 1,
                                onEditingChanged: { editing in
                             if editing == false {
                                 modelData.silentForSpeakerSettingUpdate = false
@@ -134,10 +134,10 @@ struct SettingView: View {
                             }
                         })
                         .accessibility(label: Text("Speaker Volume"))
-                        .accessibility(value: Text(String(format: "%.0f decibels", modelData.speakerVolume)))
+                        .accessibility(value: Text(String(format: "%.0f percents", modelData.speakerVolume)))
                         .disabled(!modelData.enableSpeaker)
                         
-                        Text(String(format: "%.0f dB", modelData.speakerVolume))
+                        Text(String(format: "%.0f%%", modelData.speakerVolume))
                             .foregroundColor(modelData.enableSpeaker ? .primary : .gray)
                             .accessibility(hidden: true)
                     }
