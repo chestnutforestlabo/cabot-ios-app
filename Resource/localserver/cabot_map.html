@@ -40,6 +40,7 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
     </tr>
   </table>
   <div id="map"></div>
+  <div id="loading"></div>
 </body>
 
 <script>
@@ -69,7 +70,7 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
         ros.on('error', function(error) {
             console.log(error);
             msg.innerText = error;
-            webkit.messageHandlers.callbackHandler.postMessage('connection error');
+            window.webkit && webkit.messageHandlers.callbackHandler.postMessage('connection error');
         });
 
         // Find out exactly when we made a connection.
@@ -78,13 +79,13 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
             msg.innerText = 'Connection made!';
             document.querySelector('#map').innerHTML = ``;
             topicInit(ros);
-            webkit.messageHandlers.callbackHandler.postMessage('connection success');
+            window.webkit && webkit.messageHandlers.callbackHandler.postMessage('connection success');
         });
 
         ros.on('close', function() {
             console.log('Connection closed.');
             msg.innerText = 'Connection closed.';
-            webkit.messageHandlers.callbackHandler.postMessage('connection closed');
+            window.webkit && webkit.messageHandlers.callbackHandler.postMessage('connection closed');
         });
 
         // Create a connection to the rosbridge WebSocket server.
@@ -112,7 +113,7 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
                 ros : ros,
                 tfClient : tfClient,
                 rootObject : viewer.scene,
-                cntinuous: false,
+                continuous: false,
                 compression : 'png'
             });
         }, 0);
@@ -125,7 +126,7 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
         });
         localizeStatusTopic.subscribe(function(message) {
             console.log(message);
-            window.webkit.messageHandlers.LocalizeStatus.postMessage(message.status);
+            window.webkit && webkit.messageHandlers.LocalizeStatus.postMessage(message.status);
         });
 
         // Setup a client to listen to TFs.
@@ -135,21 +136,40 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
             for (index in tfs.transforms) {
                 tf = tfs.transforms[index]
                 expected_frames = expected_frames.filter(function(item) {
-                    return item !== tf.child_frame_id
+                    return item !== tf.child_frame_id.replace("lidar_base_link", "velodyne");
                 });
                 //console.log(tfs.transforms[index])
             }
             originalTFProcessFunc.call(tfClient, tfs)
         };
-        checkLoopCount = 0;
+
+        let retry = 0;
+        const params = location.search.split(/[?&]/).slice(1).filter(item => {
+            const kv = item.split('=');
+            if (kv[0] != 'retry') {
+                return true;
+            }
+            retry = Number(kv[1]);
+        });
+        params.push(`retry=${retry + 1}`);
+
+        let checkLoopCount = 0;
+        let mapRefreshCount = 0;
+        document.getElementById('loading').style.display = 'unset';
         checkLoopID = setInterval(function() {
             checkLoopCount++;
-            webkit.messageHandlers.callbackHandler.postMessage(`expected_frames="${expected_frames}" checkLoopCount=${checkLoopCount}`);
+            window.webkit && webkit.messageHandlers.callbackHandler.postMessage(`expected_frames="${expected_frames}" checkLoopCount=${checkLoopCount}`);
             if (expected_frames.length == 0) {
-                clearInterval(checkLoopID)
-            }
-            if (checkLoopCount > 50) {
-                location.reload()
+                clearInterval(checkLoopID);
+                document.getElementById('loading').style.display = 'none';
+            } else if (checkLoopCount > 300 + retry * 100) {
+                location.search = params.join("&");
+            } else if (tfClient.frameInfos.map) {
+                mapRefreshCount++;
+                if (mapRefreshCount % 10 == 5) {
+                    setTimeout(() => tfClient.updateGoal(), 0);
+                    console.log('Refresh TF Goal', Object.keys(tfClient.frameInfos), 'checkLoopCount', checkLoopCount);
+                }
             }
         }, 100);
 
@@ -210,7 +230,12 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
                 var tf = new ROSLIB.Transform(map_global_map);
                 var poseTransformed = new ROSLIB.Pose(msg);
                 poseTransformed.applyTransform(tf);
-                viewer.cameraControls.center.set(poseTransformed.position.x, poseTransformed.position.y, poseTransformed.position.z);
+                const dir = new THREE.Vector3();
+                viewer.camera.getWorldDirection(dir);
+                const dot = Math.abs(dir.dot(new THREE.Vector3(0, 1, 0)));
+                if (dot > 0.01) {
+                    viewer.cameraControls.center.set(poseTransformed.position.x, poseTransformed.position.y, poseTransformed.position.z);
+                }
                 if (firstTime) {
                     // set camera above the robot position
                     // y - 5 stabilize camera orientation

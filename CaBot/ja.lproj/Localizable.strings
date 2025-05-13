@@ -161,6 +161,7 @@
 
 // SystemStatusView
 "Start System"="システム起動";
+"Start the suitcase system"="スーツケースのシステム起動を実行します";
 "Stop System"="システム停止";
 "Are you sure to stop the suitcase system?"="スーツケースのシステム停止しますが、よろしいですか？";
 "System Status"="システム状態";
@@ -346,3 +347,7 @@
 "EnableSpeaker" = "スピーカーの使用";
 "AudioFile" = "音声ファイル";
 "SpeakerVolume" = "音量";
+
+// Emergency Stop
+"RELEASE_EMERGENCYSTOP" = "緊急停止を解除";
+"CONFIRM_EMERGENCYSTOP" = "緊急停止を解除します。ハンドルから手を必ず離してください。";

@@ -24,6 +24,7 @@ import SwiftUI
 
 struct SystemStatusView: View {
     @EnvironmentObject var modelData: CaBotAppModel
+    @State private var isConfirmingStart = false
     @State private var isConfirmingStop = false
 
     var body: some View {
@@ -59,10 +60,21 @@ struct SystemStatusView: View {
                             .opacity(0.3)
                     }
                     Button(action: {
-                        modelData.systemManageCommand(command: .start)
+                        isConfirmingStart = true
                     }) {
                         Text("Start System")
                             .frame(width: nil, alignment: .topLeading)
+                    }
+                    .confirmationDialog(Text("Start System"), isPresented: $isConfirmingStart) {
+                        Button {
+                            modelData.systemManageCommand(command: .start)
+                        } label: {
+                            Text("Start System")
+                        }
+                        Button("Cancel", role: .cancel) {
+                        }
+                    } message: {
+                        Text("Start the suitcase system")
                     }
                     .disabled(!modelData.systemStatus.canStart || !modelData.suitcaseConnected)
 

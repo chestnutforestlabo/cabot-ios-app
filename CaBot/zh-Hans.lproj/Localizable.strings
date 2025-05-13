@@ -161,6 +161,7 @@
 
 // SystemStatusView
 "Start System"="启动系统";
+"Start the suitcase system"="启动行李箱系统";
 "Stop System"="停止系统";
 "Are you sure to stop the suitcase system?"="是否停止行李箱系统的运作？";
 "System Status"="系统状态";
@@ -346,3 +347,7 @@
 "EnableSpeaker" = "使用扬声器";
 "AudioFile" = "音频文件";
 "SpeakerVolume" = "音量";
+
+// Emergency Stop
+"RELEASE_EMERGENCYSTOP" = "释放紧急停止";
+"CONFIRM_EMERGENCYSTOP" = "松开紧急停止装置。 始终将手从手柄上移开。";

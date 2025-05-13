@@ -38,6 +38,7 @@ struct SuitcaseStatusView: View {
     @EnvironmentObject var modelData: CaBotAppModel
     var body: some View {
         HStack {
+            #if ATTEND
             Image(modelData.suitcaseFeatures.selectedHandleSide.imageName, bundle: Bundle.main)
                 .resizable()
                 .scaledToFit()
@@ -47,6 +48,7 @@ struct SuitcaseStatusView: View {
                 .foregroundColor(modelData.suitcaseConnected ? modelData.suitcaseFeatures.selectedHandleSide.color : Color.gray)
                 .clipShape(Circle())
                 .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+            #endif
             if modelData.suitcaseConnected {
                 Image(systemName: "suitcase.rolling")
                     .font(.title2)
@@ -56,6 +58,7 @@ struct SuitcaseStatusView: View {
                     .clipShape(Circle())
                     .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
                     .padding(.trailing, 8)
+                    .overlay(Text("\(modelData.batteryStatus.message.replacingOccurrences(of: "Unknown", with: ""))").foregroundColor(modelData.batteryStatus.level == .OK ? .black : .red).font(.footnote).fontWeight(.bold).background(.white.opacity(0.8)).offset(y: 0).padding(.leading, -8), alignment: .center)
             } else {
                 Image("suitcase.rolling.slash", bundle: Bundle.main)
                     .font(.title2)
@@ -89,9 +92,7 @@ struct CaBotApp: App {
         WindowGroup {
             RootView()
                 .environmentObject(modelData)
-#if ATTEND
                 .overlay(SuitcaseStatusView().environmentObject(modelData), alignment: .topTrailing)
-#endif
         }.onChange(of: scenePhase) { newScenePhase in
             NSLog( "<ScenePhase to \(newScenePhase)>" )
 

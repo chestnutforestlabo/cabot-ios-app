@@ -12,9 +12,11 @@ struct DetailSettingView: View {
     @EnvironmentObject var modelData: DetailSettingModel
     @EnvironmentObject var cabotAppModel: CaBotAppModel
     
+    @State private var isConfirmingStart = false
     @State private var isConfirmingStop = false
     @State private var isConfirmingReboot = false
     @State private var isConfirmingPoweroff = false
+    @State private var isConfirmingReleaseEmergencystop = false
 
     let startSounds:[String] = [
         "/System/Library/Audio/UISounds/nano/3rdParty_Success_Haptic.caf",
@@ -85,12 +87,41 @@ struct DetailSettingView: View {
                 }
                 .disabled(!cabotAppModel.systemStatus.canStart || !cabotAppModel.suitcaseConnected)
 
-                
                 Button(action: {
-                    cabotAppModel.systemManageCommand(command: .start)
+                    isConfirmingReleaseEmergencystop = true
+                }) {
+                    Text("RELEASE_EMERGENCYSTOP")
+                        .frame(width: nil, alignment: .topLeading)
+                }
+                .confirmationDialog(Text("RELEASE_EMERGENCYSTOP"), isPresented: $isConfirmingReleaseEmergencystop) {
+                    Button {
+                        cabotAppModel.systemManageCommand(command: .release_emergencystop)
+                    } label: {
+                        Text("RELEASE_EMERGENCYSTOP")
+                    }
+                    Button("Cancel", role: .cancel) {
+                    }
+                } message: {
+                    Text("CONFIRM_EMERGENCYSTOP")
+                }
+                .disabled(!cabotAppModel.suitcaseConnected)
+
+                Button(action: {
+                    isConfirmingStart = true
                 }){
                    Text("Start System")
                         .frame(width: nil, alignment: .topLeading)
+                }
+                .confirmationDialog(Text("Start System"), isPresented: $isConfirmingStart) {
+                    Button {
+                        cabotAppModel.systemManageCommand(command: .start)
+                    } label: {
+                        Text("Start System")
+                    }
+                    Button("Cancel", role: .cancel) {
+                    }
+                } message: {
+                    Text("Start the suitcase system")
                 }
                 .disabled(!cabotAppModel.systemStatus.canStart || !cabotAppModel.suitcaseConnected)
                 
@@ -119,6 +150,20 @@ struct DetailSettingView: View {
                 .disabled(!cabotAppModel.suitcaseConnected || !cabotAppModel.wifiDetected)
             }
             
+            if cabotAppModel.suitcaseConnected {
+                Section(header:Text("ROS")) {
+                    List {
+                        NavigationLink(
+                            destination: RosWebView(address: cabotAppModel.getCurrentAddress(), port: cabotAppModel.rosPort, type: .rosMap)
+                                .environmentObject(cabotAppModel).heartbeat("RosWebView"),
+                            label: {
+                                Text("ROS Map")
+                            }
+                        )
+                    }
+                }
+            }
+
             Section(header: Text("Tour")) {
                 Toggle("Enable subtour on handle", isOn: $modelData.enableSubtourOnHandle)
                 Toggle("Show content when arrive", isOn: $modelData.showContentWhenArrive)

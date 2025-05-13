@@ -323,6 +323,7 @@ extension CaBotTTS : PriorityQueueTTSDelegate {
 
     func _speak( _ text:String, priority:SpeechPriority, timeout sec : TimeInterval? = nil, tag:SpeakTag? = nil, completionHandler:@escaping (UUID, String?, Reason, Int)->Void, progressHandler: ((UUID, String?,Int,NSRange)->Void)? = nil ) {
 
+        SilentAudioPlayer.shared.healthcheck()
         
         let entry = TokenizerEntry( separators:separators, priority:priority.queuePriority, timeout_sec: (sec ?? 90.0), tag: (tag?.tag ?? Tag.Default) ) { [weak self] entry, token, reason in
             

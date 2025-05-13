@@ -162,6 +162,7 @@ struct LocalWebView: UIViewRepresentable {
         userContentController.addScriptMessageHandler(handler, contentWorld: .page, name: "LocalizeStatus")
         configuration.userContentController = userContentController
         let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 320, height: 320), configuration: configuration)
+//        webView.isInspectable = true
         UIApplication.shared.isIdleTimerDisabled = true
         webView.navigationDelegate = context.coordinator
         webView.configuration.userContentController.add(context.coordinator, name: "callbackHandler")

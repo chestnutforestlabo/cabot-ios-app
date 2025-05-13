@@ -68,3 +68,19 @@ div.three {
     // border: 1px solid black;
     text-align: center;
 }
+
+#loading {
+    display: none;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	height: 100%;
+	width: 100%;
+	background-color: #FFF;
+	background-image: url("loading.gif");
+	background-repeat: no-repeat;
+	background-position: center;
+	filter: alpha(opacity = 85);
+	-moz-opacity: 0.85;
+	opacity: 0.85;
+}
