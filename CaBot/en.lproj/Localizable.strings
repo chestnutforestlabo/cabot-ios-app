@@ -323,6 +323,7 @@
 "Reload"="Reload";
 "Restart Localization"="Restart Localization";
 "Restarting Localization"="Restarting Localization";
+"Localization State Unknown"="Localization State Unknown";
 "RESTART_LOCALIZATION_MESSAGE"="The localization will be restarted. This should be used when the robot is stopped.";
 
 //Resource Download Alert View

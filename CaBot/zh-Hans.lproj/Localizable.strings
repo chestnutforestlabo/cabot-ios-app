@@ -255,7 +255,7 @@
 
 
 // Report a Bag
-"REPORT_BUG" = "%.1f秒";
+"REPORT_BUG" = "错误报告";
 "SELECT_LOG" = "选择运行记录";
 "REPORT_TITLE" = "标题";
 "REPORT_DETAILS" = "详细内容";
@@ -323,6 +323,7 @@
 "Reload"="重新加载";
 "Restart Localization"="重新估计位置";
 "Restarting Localization"="正在估计位置";
+"Localization State Unknown"="定位状态未知";
 "RESTART_LOCALIZATION_MESSAGE"="将重试估计位置。请一定在机器人停止的状态下进行。";
 
 //Resource Download Alert View
