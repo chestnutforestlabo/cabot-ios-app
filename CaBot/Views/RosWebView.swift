@@ -65,6 +65,9 @@ struct RosWebView: View, LocalizationStatusDelegate {
                     if (localizationStatus == 2) {
                         Image(systemName: "mappin.and.ellipse")
                         Text("Restart Localization")
+                    } else if (localizationStatus != 1) {
+                        Image(systemName: "mappin.and.ellipse")
+                        Text("Localization State Unknown")
                     } else {
                         Image(systemName: "mappin.and.ellipse")
                         Text("Restarting Localization")
