@@ -33,5 +33,6 @@ void NavNSLogv(NSString* fmt, va_list args);
 + (BOOL)isLogging;
 + (BOOL)isSensorLogging;
 + (void)logType:(NSString*)type withParam:(NSDictionary*)param;
++ (void)checkLogDate;
 
 @end

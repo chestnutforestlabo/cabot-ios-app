@@ -49,6 +49,7 @@ void NavNSLogv(NSString* fmt, va_list args) {
 
 static int stderrSave = 0;
 static NSString *logFilePath = nil;
+static NSDate *logFileDate;
 static BOOL isSensorLogging = true;
 
 + (NSString*)startLog:(BOOL)_isSensorLogging {
@@ -64,7 +65,8 @@ static BOOL isSensorLogging = true;
         [formatter setDateFormat:[NSString stringWithFormat:@"'%@-'yyyy-MM-dd-HH-mm-ss'.log'", appName]];
         [formatter setTimeZone:[NSTimeZone systemTimeZone]];
     }
-    NSString *fileName = [formatter stringFromDate:[NSDate date]];
+    logFileDate = [NSDate date];
+    NSString *fileName = [formatter stringFromDate:logFileDate];
     NSString *dir = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     logFilePath = [dir stringByAppendingPathComponent:fileName];
     NSLog(@"Start log to %@", logFilePath);
@@ -109,5 +111,18 @@ static BOOL isSensorLogging = true;
     NSLog(@"%@,%ld,%@", type, timestamp, paramStr);
 }
 
++(void)checkLogDate {
+    NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
+    fmt.dateFormat = @"yyyy/MM/dd";
+    fmt.timeZone = [NSTimeZone systemTimeZone];
+    NSString *fileDate = [fmt stringFromDate:logFileDate];
+    NSString *currentDate = [fmt stringFromDate:[NSDate date]];
+    if (![fileDate isEqualToString:currentDate]) {
+        NSLog(@"Current log file closed");
+        [self stopLog];
+        [self startLog:TRUE];
+        NSLog(@"New log file opened");
+    }
+}
 
 @end

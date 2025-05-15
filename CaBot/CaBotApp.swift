@@ -94,6 +94,7 @@ struct CaBotApp: App {
                 .environmentObject(modelData)
                 .overlay(SuitcaseStatusView().environmentObject(modelData), alignment: .topTrailing)
         }.onChange(of: scenePhase) { newScenePhase in
+            Logging.checkLogDate()
             NSLog( "<ScenePhase to \(newScenePhase)>" )
 
             modelData.onChange(of: newScenePhase)
