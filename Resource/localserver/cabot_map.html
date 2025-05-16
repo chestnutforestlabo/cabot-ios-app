@@ -204,6 +204,12 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
             material : { size : 1, color : 0xff00ff }
         });
 
+        var footprint = new ROS3D.Polygon({
+            ros : ros,
+            topic : '/global_costmap/published_footprint',
+            tfClient : tfClient,
+            rootObject : viewer.scene
+        });
 
         originalPathProcessFunc = ROS3D.Path.prototype.processMessage;
         ROS3D.Path.prototype.processMessage = (message) => {
