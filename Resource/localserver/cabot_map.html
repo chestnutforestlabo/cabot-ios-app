@@ -139,16 +139,6 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
             originalTFProcessFunc.call(tfClient, tfs)
         };
 
-        let retry = 0;
-        const params = location.search.split(/[?&]/).slice(1).filter(item => {
-            const kv = item.split('=');
-            if (kv[0] != 'retry') {
-                return true;
-            }
-            retry = Number(kv[1]);
-        });
-        params.push(`retry=${retry + 1}`);
-
         let checkLoopCount = 0;
         let mapRefreshCount = 0;
         document.getElementById('loading').style.display = 'unset';
@@ -158,8 +148,6 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
             if (processed_frames.size >= 3) {
                 clearInterval(checkLoopID);
                 document.getElementById('loading').style.display = 'none';
-            } else if (checkLoopCount > 300 + retry * 100) {
-                location.search = params.join("&");
             } else if (tfClient.frameInfos.map) {
                 mapRefreshCount++;
                 if (mapRefreshCount % 10 == 5) {
