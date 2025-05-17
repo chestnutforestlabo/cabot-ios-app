@@ -130,15 +130,11 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
         });
 
         // Setup a client to listen to TFs.
-        expected_frames = ["velodyne", "map", "map_global"]
+        const processed_frames = new Set();
         originalTFProcessFunc = ROSLIB.TFClient.prototype.processTFArray
         ROSLIB.TFClient.prototype.processTFArray = (tfs) => {
-            for (index in tfs.transforms) {
-                tf = tfs.transforms[index]
-                expected_frames = expected_frames.filter(function(item) {
-                    return item !== tf.child_frame_id.replace("lidar_base_link", "velodyne");
-                });
-                //console.log(tfs.transforms[index])
+            for (const tf of tfs.transforms) {
+                processed_frames.add(tf.child_frame_id);
             }
             originalTFProcessFunc.call(tfClient, tfs)
         };
@@ -158,8 +154,8 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
         document.getElementById('loading').style.display = 'unset';
         checkLoopID = setInterval(function() {
             checkLoopCount++;
-            window.webkit && webkit.messageHandlers.callbackHandler.postMessage(`expected_frames="${expected_frames}" checkLoopCount=${checkLoopCount}`);
-            if (expected_frames.length == 0) {
+            window.webkit && webkit.messageHandlers.callbackHandler.postMessage(`processed_frames=[${Array.from(processed_frames)}] checkLoopCount=${checkLoopCount}`);
+            if (processed_frames.size >= 3) {
                 clearInterval(checkLoopID);
                 document.getElementById('loading').style.display = 'none';
             } else if (checkLoopCount > 300 + retry * 100) {
@@ -183,32 +179,25 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
         });
 
         // Setup the marker client.
-        var laserScan = new ROS3D.LaserScan({
+        /*var laserScan = new ROS3D.LaserScan({
             ros : ros,
             topic : '/scan',
             tfClient : tfClient,
             compression : 'png',
             rootObject : viewer.scene,
-            material : { size : 1, color : 0xff00ff }
-        });
+            material : { size : 1, color : 0x00ffff }
+        });*/
 
         var points2 = new ROS3D.PointCloud2({
             ros : ros,
-            //topic : '/velodyne_points',
+            //topic : '/velodyne_points',
             topic : '/scan_matched_points2',
             tfClient : tfClient,
             compression : 'png',
             rootObject : viewer.scene,
             max_pts: 40000,
-            throttle_rate: 1,
+            throttle_rate: 1000,
             material : { size : 1, color : 0xff00ff }
-        });
-
-        var footprint = new ROS3D.Polygon({
-            ros : ros,
-            topic : '/global_costmap/published_footprint',
-            tfClient : tfClient,
-            rootObject : viewer.scene
         });
 
         originalPathProcessFunc = ROS3D.Path.prototype.processMessage;
