@@ -190,13 +190,13 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
 
         var points2 = new ROS3D.PointCloud2({
             ros : ros,
-            topic : '/velodyne_points',
-            //topic : '/scan_matched_points2',
+            //topic : '/velodyne_points',
+            topic : '/scan_matched_points2',
             tfClient : tfClient,
             compression : 'png',
             rootObject : viewer.scene,
             max_pts: 40000,
-            throttle_rate: 500,
+            throttle_rate: 1000,
             material : { size : 1, color : 0xff00ff }
         });
 
