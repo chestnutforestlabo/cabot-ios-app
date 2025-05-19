@@ -80,6 +80,7 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
             document.querySelector('#map').innerHTML = ``;
             topicInit(ros);
             window.webkit && webkit.messageHandlers.callbackHandler.postMessage('connection success');
+            window.webkit && webkit.messageHandlers.StartIdleTimer.postMessage('');
         });
 
         ros.on('close', function() {
@@ -127,6 +128,7 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
         localizeStatusTopic.subscribe(function(message) {
             console.log(message);
             window.webkit && webkit.messageHandlers.LocalizeStatus.postMessage(message.status);
+            window.webkit && webkit.messageHandlers.StartIdleTimer.postMessage('');
         });
 
         // Setup a client to listen to TFs.
@@ -145,6 +147,7 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
         checkLoopID = setInterval(function() {
             checkLoopCount++;
             window.webkit && webkit.messageHandlers.callbackHandler.postMessage(`processed_frames=[${Array.from(processed_frames)}] checkLoopCount=${checkLoopCount}`);
+            window.webkit && webkit.messageHandlers.StartIdleTimer.postMessage('');
             if (processed_frames.size >= 3) {
                 clearInterval(checkLoopID);
                 document.getElementById('loading').style.display = 'none';

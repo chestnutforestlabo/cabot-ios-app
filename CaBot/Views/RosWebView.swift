@@ -25,6 +25,7 @@ import WebKit
 
 protocol LocalizationStatusDelegate {
     func updated(status: Int)
+    func startIdleTimer()
 }
 
 struct RosWebView: View, LocalizationStatusDelegate {
@@ -33,9 +34,13 @@ struct RosWebView: View, LocalizationStatusDelegate {
         func userContentController(_ userContentController: WKUserContentController,
                                    didReceive message: WKScriptMessage,
                                    replyHandler: @escaping (Any?, String?) -> Void) {
-            if let status = message.body as? Int {
-                NSLog("<RosLib LocalizeStatus topic: \(status)>")
-                delegate?.updated(status: status)
+            if message.name == "LocalizeStatus" {
+                if let status = message.body as? Int {
+                    NSLog("<RosLib LocalizeStatus topic: \(status)>")
+                    delegate?.updated(status: status)
+                }
+            } else if message.name == "StartIdleTimer" {
+                delegate?.startIdleTimer()
             }
         }
     }
@@ -44,9 +49,13 @@ struct RosWebView: View, LocalizationStatusDelegate {
     var port: String
     var type: LocalWebView.ViewModeType
     var localization = LocalizationStatusHandler()
+    let idleTimeout:TimeInterval = 60
     @State private var localizationStatus = 0
     @State private var shouldRefresh = false
     @State private var isConfirming = false
+    @State private var idleTimer: Timer?
+    @State private var showingExitAlert = false
+    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var modelData: CaBotAppModel
 
     func updated(status: Int) {
@@ -97,10 +106,29 @@ struct RosWebView: View, LocalizationStatusDelegate {
                 .accessibilityLabel("Reload")
             }
         }
+        .alert("Please close ROS Map", isPresented: $showingExitAlert) {
+            Button("Yes") {
+                dismiss()
+            }
+            Button("No") {
+                startIdleTimer()
+            }
+        } message: {
+            Text("Leaving ROS Map open increases network load")
+        }
     }
 
     func reload() {
         self.shouldRefresh = true
+    }
+
+    func startIdleTimer() {
+        if self.type == .rosMap {
+            self.idleTimer?.invalidate()
+            self.idleTimer = Timer.scheduledTimer(withTimeInterval: idleTimeout, repeats: false) {timer in
+                self.showingExitAlert = true
+            }
+        }
     }
 }
 
@@ -163,6 +191,7 @@ struct LocalWebView: UIViewRepresentable {
         let configuration = WKWebViewConfiguration()
         let userContentController = WKUserContentController()
         userContentController.addScriptMessageHandler(handler, contentWorld: .page, name: "LocalizeStatus")
+        userContentController.addScriptMessageHandler(handler, contentWorld: .page, name: "StartIdleTimer")
         configuration.userContentController = userContentController
         let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 320, height: 320), configuration: configuration)
 //        webView.isInspectable = true
