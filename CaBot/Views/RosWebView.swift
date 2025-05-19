@@ -126,7 +126,9 @@ struct RosWebView: View, LocalizationStatusDelegate {
         if self.type == .rosMap {
             self.idleTimer?.invalidate()
             self.idleTimer = Timer.scheduledTimer(withTimeInterval: idleTimeout, repeats: false) {timer in
-                self.showingExitAlert = true
+                if self.localizationStatus == 2 {
+                    self.showingExitAlert = true
+                }
             }
         }
     }
