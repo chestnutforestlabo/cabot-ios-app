@@ -133,7 +133,8 @@ ROS3D.People = function(options) {
   this.rootObject = options.rootObject || new THREE.Object3D();
   this.radius = options.radius || 0.2;
 
-  this.peoples = [];
+  this.sceneNode = null;
+  this.people = [];
 
   this.rosTopic = undefined;
   this.subscribe();
@@ -163,12 +164,14 @@ ROS3D.People.prototype.subscribe = function(){
 
 ROS3D.People.prototype.processMessage = function(message){
 
-  for (let i = 0; i < this.peoples.length; i++) {
-      this.rootObject.remove(this.peoples[i]);
+  for (let i = 0; i < this.people.length; i++) {
+      this.sceneNode.remove(this.people[i]);
+      this.people[i].geometry.dispose();
+      this.people[i].material.dispose();
   }
 
   if (message.people.length > 0) {
-      this.peoples = [];
+      this.people = [];
 
       message.people.forEach(person => {
           var sphereGeometry = new THREE.SphereGeometry( this.radius );
@@ -176,14 +179,18 @@ ROS3D.People.prototype.processMessage = function(message){
           var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
           sphere.position.set(person.position.x, person.position.y, person.position.z);
 
-          var node = new ROS3D.SceneNode({
-              frameID : message.header.frame_id,
-              tfClient : this.tfClient,
-              object : sphere
-          });
-
-          this.peoples.push(node);
-          this.rootObject.add(node);
+          if (this.sceneNode == null) {
+            this.sceneNode = new ROS3D.SceneNode({
+              frameID: message.header.frame_id,
+              tfClient: this.tfClient,
+              object: sphere
+            });
+            this.rootObject.add(this.sceneNode);
+            this.people.push(sphere);
+          } else {
+            this.sceneNode.add(sphere);
+            this.people.push(sphere);
+          }
       });
 
   }
