@@ -44,6 +44,7 @@ ROS3D.PoseLog = function(options) {
   this.tfClient = options.tfClient;
   this.color = options.color || 0xcc00ff;
   this.rootObject = options.rootObject || new THREE.Object3D();
+  this.throttle_rate = options.throttle_rate || 0;
 
   this.sceneNode = null;
   this.currentPose = null;
@@ -67,6 +68,7 @@ ROS3D.PoseLog.prototype.subscribe = function(){
   this.rosTopic = new ROSLIB.Topic({
       ros : this.ros,
       name : this.topicName,
+      throttle_rate: this.throttle_rate,
       queue_length : 1,
       messageType : 'cabot_msgs/msg/PoseLog'
   });
@@ -132,6 +134,7 @@ ROS3D.People = function(options) {
   this.color = options.color || 0x0000ff;
   this.rootObject = options.rootObject || new THREE.Object3D();
   this.radius = options.radius || 0.2;
+  this.throttle_rate = options.throttle_rate || 0;
 
   this.sceneNode = null;
   this.people = [];
@@ -156,6 +159,7 @@ ROS3D.People.prototype.subscribe = function(){
   this.rosTopic = new ROSLIB.Topic({
       ros : this.ros,
       name : this.topicName,
+      throttle_rate: this.throttle_rate,
       queue_length : 1,
       messageType : 'people_msgs/msg/People'
   });
