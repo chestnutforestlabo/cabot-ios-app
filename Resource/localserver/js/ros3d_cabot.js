@@ -45,7 +45,8 @@ ROS3D.PoseLog = function(options) {
   this.color = options.color || 0xcc00ff;
   this.rootObject = options.rootObject || new THREE.Object3D();
 
-  this.poses = [];
+  this.sceneNode = null;
+  this.currentPose = null;
 
   this.rosTopic = undefined;
   this.subscribe();
@@ -73,12 +74,6 @@ ROS3D.PoseLog.prototype.subscribe = function(){
 };
 
 ROS3D.PoseLog.prototype.processMessage = function(message){
-  if (this.poses.length > 1) {
-    this.poses[0].unsubscribeTf();
-    this.rootObject.remove(this.poses[0]);
-    this.poses.shift();
-  }
-
   this.options.origin = new THREE.Vector3( message.pose.position.x, message.pose.position.y,
                                            message.pose.position.z);
 
@@ -89,14 +84,20 @@ ROS3D.PoseLog.prototype.processMessage = function(message){
   this.options.material = new THREE.MeshBasicMaterial({color: this.color});
   var arrow = new ROS3D.Arrow(this.options);
 
-  var node = new ROS3D.SceneNode({
-      frameID : message.header.frame_id,
-      tfClient : this.tfClient,
-      object : arrow
-  });
-
-  this.poses.push(node);
-  this.rootObject.add(node);
+  if (this.sceneNode == null) {
+    this.sceneNode = new ROS3D.SceneNode({
+      frameID: message.header.frame_id,
+      tfClient: this.tfClient,
+      object: arrow
+    });
+    this.rootObject.add(this.sceneNode);
+    this.currentPose = arrow;
+  } else {
+    this.sceneNode.remove(this.currentPose);
+    this.currentPose.dispose();
+    this.sceneNode.add(arrow);
+    this.currentPose = arrow;
+  }
 
   if (this.onMessage) {
      this.onMessage(message.pose);
