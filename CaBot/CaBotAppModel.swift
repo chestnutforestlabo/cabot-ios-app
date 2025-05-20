@@ -1263,7 +1263,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func stopSpeak() {
-        self.tts.stop(self.tts.isPaused)
+        self.tts.stop(true)
     }
 
     func playSample(mode: VoiceMode, priority: CaBotTTS.SpeechPriority? = nil, timeout sec : TimeInterval? = nil ){
@@ -1777,7 +1777,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                 if self.shouldNoAnnounceToPushRightButton == false && self.willSpeakArriveMessage == false{
                     if tourManager.hasDestination {
                         let announce = CustomLocalizedString("PRESS_RIGHT_BUTTON", lang: self.resourceLang)
-                        self.speak(announce, priority:.Required){ _, _ in }
+                        self.speak(announce, priority:.Low){ _, _ in }
                         self.announceToPushRightButtonTime = CFAbsoluteTimeGetCurrent()
                         self.shouldNoAnnounceToPushRightButton = true
                     }
