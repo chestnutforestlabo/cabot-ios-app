@@ -107,6 +107,7 @@
 "Begin Subtour %@"="Begin Subtour %@";
 "End Subtour"="End Subtour";
 "Skip Label %@"="Skip %@";
+"Do you really want to skip the destination?"="Do you really want to skip the destination?";
 
 "Destinations"="Destinations";
 "Navigating to %@"="Navigating to %@";  // accessibility label
@@ -325,6 +326,8 @@
 "Restarting Localization"="Restarting Localization";
 "Localization State Unknown"="Localization State Unknown";
 "RESTART_LOCALIZATION_MESSAGE"="The localization will be restarted. This should be used when the robot is stopped.";
+"Please close ROS Map"="Please close ROS Map";
+"Leaving ROS Map open increases network load"="Leaving ROS Map open increases network load";
 
 //Resource Download Alert View
 "Retry Alert" = "Check the connection with the server!";

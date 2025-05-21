@@ -107,6 +107,7 @@
 "Begin Subtour %@"="项目游览开始。%@";
 "End Subtour"="项目游览结束";
 "Skip Label %@"="跳过%@";
+"Do you really want to skip the destination?"="你真的想跳过目的地吗？";
 
 "Destinations"="目的地";
 "Navigating to %@"="正在前往%@";  // accessibility label
@@ -325,6 +326,8 @@
 "Restarting Localization"="正在估计位置";
 "Localization State Unknown"="定位状态未知";
 "RESTART_LOCALIZATION_MESSAGE"="将重试估计位置。请一定在机器人停止的状态下进行。";
+"Please close ROS Map"="请关闭 ROS Map";
+"Leaving ROS Map open increases network load"="打开ROS Map会增加网络负荷";
 
 //Resource Download Alert View
 "Retry Alert" = "Check the connection with the server!";

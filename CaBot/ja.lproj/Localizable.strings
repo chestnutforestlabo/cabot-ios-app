@@ -107,6 +107,7 @@
 "Begin Subtour %@"="サブツアーを開始。%@";
 "End Subtour"="サブツアーを終了";
 "Skip Label %@"="%@をスキップ";
+"Do you really want to skip the destination?"="本当にこの目的地をスキップしたいですか？";
 
 "Destinations"="目的地";
 "Navigating to %@"="%@に移動ちゅう";  // accessibility label
@@ -325,6 +326,8 @@
 "Restarting Localization"="位置推定中";
 "Localization State Unknown"="位置推定状態不明";
 "RESTART_LOCALIZATION_MESSAGE"="位置推定が再試行されます。必ずロボットが停止した状態で行ってください。";
+"Please close ROS Map"="ROS Mapを閉じてください";
+"Leaving ROS Map open increases network load"="ROS Mapを開いたままにするとネットワーク負荷が増加します";
 
 //Resource Download Alert View
 "Retry Alert" = "サーバーとの接続をご確認ください！";

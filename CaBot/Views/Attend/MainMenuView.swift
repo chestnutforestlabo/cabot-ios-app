@@ -121,6 +121,7 @@ struct UserInfoView: View {
     @EnvironmentObject var modelData: CaBotAppModel
     @State var translationShown: Bool = false
     @State var translationText: String = ""
+    @State private var isConfirmingSkip = false
 
     var body: some View {
         Section(header: Text("User App Info")) {
@@ -165,7 +166,7 @@ struct UserInfoView: View {
             }
             if modelData.userInfo.nextDestination != nil {
                 Button(action: {
-                    modelData.share(user_info: SharedInfo(type: .Skip, value: ""))
+                    isConfirmingSkip = true
                 }) {
                     Label{
                         if let dest = modelData.userInfo.currentDestination {
@@ -176,6 +177,21 @@ struct UserInfoView: View {
                     } icon: {
                         Image(systemName: "arrow.right.to.line")
                     }
+                }
+                .confirmationDialog(Text("Skip Destination"), isPresented: $isConfirmingSkip) {
+                    Button {
+                        modelData.share(user_info: SharedInfo(type: .Skip, value: ""))
+                    } label: {
+                        if let dest = modelData.userInfo.currentDestination {
+                            Text("Skip Label \(dest.title.text)")
+                        } else if let dest = modelData.userInfo.nextDestination {
+                            Text("Skip Label \(dest.title.text)")
+                        }
+                    }
+                    Button("Cancel", role: .cancel) {
+                    }
+                } message: {
+                    Text("Do you really want to skip the destination?")
                 }
             }
             if (modelData.userInfo.destinations.count > 1) {
