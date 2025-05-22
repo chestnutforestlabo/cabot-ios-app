@@ -167,7 +167,11 @@ struct LocalWebView: UIViewRepresentable {
         if let htmlPath = Bundle.main.url(forResource: "Resource/localserver/cabot_map", withExtension: "html"),
            let baseUrl = Bundle.main.resourceURL?.appendingPathComponent("Resource/localserver") {
            var components = URLComponents(url: htmlPath, resolvingAgainstBaseURL: false)
-            components?.query = "ip=" + address + "&port=" + port
+            #if USER
+            components?.query = "ip=" + address + "&port=" + port + "&map_compression=cbor"
+            #else
+            components?.query = "ip=" + address + "&port=" + port + "&map_compression=png"
+            #endif
             if let queryURL = components?.url {
                 webView.loadFileURL(queryURL, allowingReadAccessTo: baseUrl)
             }
