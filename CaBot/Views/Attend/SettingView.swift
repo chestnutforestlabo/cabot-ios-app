@@ -216,6 +216,7 @@ struct SettingView: View {
             }
 
             Section(header: Text("Connection")) {
+                #if false
                 VStack {
                     HStack{
                         Text("PRIORITY_CONNECTION")
@@ -231,6 +232,7 @@ struct SettingView: View {
                     Text("ROBOT_NAME_LABEL")
                     TextField("ROBOT_NAME", text: $modelData.teamID)
                 }
+                #endif
                 HStack {
                     Text("PRIMARY_IP_ADDRESS")
                     TextField("PLACEHOLDER_IP_ADDRESS", text:

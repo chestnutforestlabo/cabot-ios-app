@@ -426,12 +426,12 @@ struct MainMenus: View {
 
     var body: some View {
         Section(header: Text("Navigation")) {
-            if false {
+            #if false
                 Toggle(isOn: $modelData.toggleChatView) {
                     Text("START_CONVERSATION")
                 }
                 .disabled(!modelData.isUserAppConnected)
-            }
+            #endif
             NavigationLink(
                 destination: DestinationsView()
                     .environmentObject(modelData).heartbeat("DestinationsView"),
