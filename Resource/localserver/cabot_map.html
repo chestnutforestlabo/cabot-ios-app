@@ -44,8 +44,8 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
 </body>
 
 <script>
+    const urlParams = new URLSearchParams(window.location.search);
     window.onload = function() {
-        const urlParams = new URLSearchParams(window.location.search);
         const ip = urlParams.get('ip');
         const url = `ws://${ip}:9091`;
         msg.innerText = "connecting to "+url;
@@ -56,6 +56,8 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
     */
 
     const msg =  document.getElementById('msg');
+    const map_compression = urlParams.get('map_compression') || 'png';
+    const scan_compression = urlParams.get('scan_compression') || 'png';
 
     function connection(url) {
         // Connect to ROS.
@@ -118,7 +120,7 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
                 tfClient : tfClient,
                 rootObject : viewer.scene,
                 continuous: false,
-                compression : 'png'
+                compression : map_compression
             });
         }, 0);
 
@@ -177,7 +179,7 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
             ros : ros,
             topic : '/scan',
             tfClient : tfClient,
-            compression : 'png',
+            compression : scan_compression,
             rootObject : viewer.scene,
             material : { size : 1, color : 0x00ffff }
         });*/
@@ -187,7 +189,7 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
             //topic : '/velodyne_points',
             topic : '/scan_matched_points2',
             tfClient : tfClient,
-            compression : 'png',
+            compression : scan_compression,
             rootObject : viewer.scene,
             max_pts: 40000,
             throttle_rate: 1000,
