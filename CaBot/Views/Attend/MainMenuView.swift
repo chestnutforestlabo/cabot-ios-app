@@ -233,6 +233,17 @@ struct UserInfoView: View {
                         }
                 }
             }
+            if !modelData.attend_messages.isEmpty && modelData.isUserAppConnected {
+                NavigationLink(
+                    destination: ChatHistoryView(),
+                    label: {
+                        HStack {
+                            Label(LocalizedStringKey("See chat history"),
+                                  systemImage: "bubble.left.and.text.bubble.right")
+                        }
+                    }
+                )
+            }
         }
     }
 }
@@ -415,19 +426,10 @@ struct MainMenus: View {
 
     var body: some View {
         Section(header: Text("Navigation")) {
-            Toggle(isOn: $modelData.toggleChatView) {
-                Text("START_CONVERSATION")
-            }
-            .disabled(!modelData.isUserAppConnected)
-            if !modelData.attend_messages.isEmpty {
-                NavigationLink(
-                    destination: ChatHistoryView(),
-                    label: {
-                        HStack {
-                            Spacer()
-                            Text("See history")
-                        }
-                    })
+            if false {
+                Toggle(isOn: $modelData.toggleChatView) {
+                    Text("START_CONVERSATION")
+                }
                 .disabled(!modelData.isUserAppConnected)
             }
             NavigationLink(
