@@ -302,7 +302,8 @@
 "CLEAR_AND_ADD_DESTINATION"="クリアして目的地を追加";
 "ADD_DESTINATION"="目的地を追加";
 
-"TTS Enabled (Advanced only)"="音声読み上げ有り (詳細モード用)";
+"TTS Enabled (Advanced only)"="音声読み上げ有り";
+"Speak in a different voice"="別の音声で読み上げる";
 "Select Voice Settings"="音声設定選択";
 "Speech Priority"="音声の優先順位";
 "Robot"="ロボット";

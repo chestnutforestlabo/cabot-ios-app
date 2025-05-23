@@ -68,68 +68,7 @@ struct SettingView: View {
             }
 
             Section(header: Text("TTS")){
-                Toggle(isOn: $modelData.isTTSEnabledForAdvanced) {
-                    Text("TTS Enabled (Advanced only)")
-                }
-
-                Text("Select Voice Settings")
-                    .listRowSeparator(.hidden, edges: .bottom)
-
-                Picker("", selection: $modelData.voiceSetting){
-                    Text(LocalizedStringKey("Attend Voice")).tag(VoiceMode.Attend)
-                    Text(LocalizedStringKey("User Voice")).tag(VoiceMode.User)
-                }
-                .pickerStyle(SegmentedPickerStyle())
-                .listRowSeparator(.hidden, edges: .top)
-
-                HStack{
-                    Text("Attend Voice")
-                    if(modelData.voiceSetting == .Attend){
-                        Spacer()
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                            .font(.system(size:22))
-                    }
-                }
-                Picker(LocalizedStringKey("Voice"), selection: $modelData.attendVoice) {
-                    ForEach(TTSHelper.getVoices(by: modelData.voiceLocale), id: \.self) { voice in
-                        Text(voice.AVvoice.name).tag(voice as Voice?)
-                    }
-                }.onChange(of: modelData.attendVoice, perform: { value in
-                    if let _ = modelData.attendVoice {
-                        modelData.playSample(mode: VoiceMode.Attend)
-                    }
-                })
-                .pickerStyle(DefaultPickerStyle())
-                .listRowSeparator(.hidden)
-
-                HStack {
-                    Text("Speech Speed")
-                        .accessibility(hidden: true)
-                    Slider(value: $modelData.attendSpeechRate,
-                           in: 0...1,
-                           step: 0.05,
-                           onEditingChanged: { editing in
-                        if editing == false {
-                            modelData.playSample(mode: VoiceMode.Attend)
-                        }
-                    })
-                    .accessibility(label: Text("Speech Speed"))
-                    .accessibility(value: Text(String(format:"%.0f %%", arguments:[modelData.attendSpeechRate*100.0])))
-                    Text(String(format:"%.0f %%", arguments:[modelData.attendSpeechRate*100.0]))
-                        .accessibility(hidden: true)
-                }
-
-                HStack{
-                    Text("User Voice")
-                    if(modelData.voiceSetting == .User){
-                        Spacer()
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                            .font(.system(size:22))
-                    }
-                }
-                Picker(LocalizedStringKey("Voice"), selection: $modelData.userVoice) {
+                Picker(LocalizedStringKey("User Voice"), selection: $modelData.userVoice) {
                     ForEach(TTSHelper.getVoices(by: modelData.voiceLocale), id: \.self) { voice in
                         Text(voice.AVvoice.name).tag(voice as Voice?)
                     }
@@ -155,6 +94,44 @@ struct SettingView: View {
                     .disabled(!modelData.isUserAppConnected)
                     Text(String(format:"%.0f %%", arguments:[modelData.userSpeechRate*100.0]))
                         .accessibility(hidden: true)
+                }
+                Toggle(isOn: $modelData.isTTSEnabledForAdvanced) {
+                    Text("TTS Enabled (Advanced only)")
+                }
+                if modelData.isTTSEnabledForAdvanced {
+                    Toggle(isOn: $modelData.useAttendVoce) {
+                        Text("Speak in a different voice")
+                    }
+                    if(modelData.voiceSetting == .Attend){
+                        Picker(LocalizedStringKey("Attend Voice"), selection: $modelData.attendVoice) {
+                            ForEach(TTSHelper.getVoices(by: modelData.voiceLocale), id: \.self) { voice in
+                                Text(voice.AVvoice.name).tag(voice as Voice?)
+                            }
+                        }.onChange(of: modelData.attendVoice, perform: { value in
+                            if let _ = modelData.attendVoice {
+                                modelData.playSample(mode: VoiceMode.Attend)
+                            }
+                        })
+                        .pickerStyle(DefaultPickerStyle())
+                        .listRowSeparator(.hidden)
+                        
+                        HStack {
+                            Text("Speech Speed")
+                                .accessibility(hidden: true)
+                            Slider(value: $modelData.attendSpeechRate,
+                                   in: 0...1,
+                                   step: 0.05,
+                                   onEditingChanged: { editing in
+                                if editing == false {
+                                    modelData.playSample(mode: VoiceMode.Attend)
+                                }
+                            })
+                            .accessibility(label: Text("Speech Speed"))
+                            .accessibility(value: Text(String(format:"%.0f %%", arguments:[modelData.attendSpeechRate*100.0])))
+                            Text(String(format:"%.0f %%", arguments:[modelData.attendSpeechRate*100.0]))
+                                .accessibility(hidden: true)
+                        }
+                    }
                 }
             }
 

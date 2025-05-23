@@ -299,7 +299,8 @@
 "CLEAR_AND_ADD_DESTINATION"="Clear and Add Destination";
 "ADD_DESTINATION"="Add Destination";
 
-"TTS Enabled (Advanced only)"="TTS Enabled (Advanced only)";
+"TTS Enabled (Advanced only)"="TTS Enabled";
+"Speak in a different voice"="Speak in a different voice";
 "Select Voice Settings"="Select Voice Settings";
 "Speech Priority"="Speech Priority";
 "Robot"="Robot";

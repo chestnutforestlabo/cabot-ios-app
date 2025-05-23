@@ -574,6 +574,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
 #if ATTEND
+    @Published var useAttendVoce: Bool = false {
+        didSet {
+            voiceSetting = useAttendVoce ? .Attend : .User
+        }
+    }
     @Published var voiceSetting: VoiceMode = .User {
         didSet {
             UserDefaults.standard.setValue(voiceSetting.rawValue, forKey: voiceSettingKey)

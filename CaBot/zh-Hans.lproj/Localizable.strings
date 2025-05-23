@@ -302,7 +302,8 @@
 "CLEAR_AND_ADD_DESTINATION"="清除并添加目的地";
 "ADD_DESTINATION"="添加目的地";
 
-"TTS Enabled (Advanced only)"="朗读语音（详细模式）";
+"TTS Enabled (Advanced only)"="朗读语音";
+"Speak in a different voice"="用不同的声音说话";
 "Select Voice Settings"="选择语音设置";
 "Speech Priority"="语音的优先顺序";
 "Robot"="机器人";
