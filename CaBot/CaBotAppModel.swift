@@ -420,12 +420,14 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
     }
 
+    var suspendAttendSample = Date()
     @Published var attendVoice: Voice? = nil {
         didSet {
             if let id = attendVoice?.AVvoice.identifier {
-                let key = "\(selectedVoiceKey)_\(selectedLanguage)"
+                let key = "\(selectedVoiceKey)_\(selectedLanguage)_attend"
                 UserDefaults.standard.setValue(id, forKey: key)
                 UserDefaults.standard.synchronize()
+                self.updateTTS()
             }
         }
     }
@@ -576,6 +578,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 #if ATTEND
     @Published var useAttendVoce: Bool = false {
         didSet {
+            suspendAttendSample = Date()
             voiceSetting = useAttendVoce ? .Attend : .User
         }
     }
@@ -584,6 +587,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             UserDefaults.standard.setValue(voiceSetting.rawValue, forKey: voiceSettingKey)
             UserDefaults.standard.synchronize()
             self.updateTTS()
+            playSample(mode: voiceSetting)
         }
     }
 #elseif USER
@@ -604,38 +608,20 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         return voice ?? TTSHelper.getVoices(by: voiceLocale)[0]
     }
 
-    func initTTS()
-    {
-        let key = "\(selectedVoiceKey)_\(selectedLanguage)"
-        if let id = UserDefaults.standard.value(forKey: key) as? String {
+    func updateVoice() {
+        if let id = UserDefaults.standard.value(forKey: "\(selectedVoiceKey)_\(selectedLanguage)") as? String {
             self.userVoice = getVoice(by: id)
         } else {
             self.userVoice = getDefaultVoice()
         }
-        if let id = UserDefaults.standard.value(forKey: key) as? String {
+        #if ATTEND
+        self.suspendAttendSample = Date()
+        if let id = UserDefaults.standard.value(forKey: "\(selectedVoiceKey)_\(selectedLanguage)_attend") as? String {
             self.attendVoice = getVoice(by: id)
         } else {
             self.attendVoice = getDefaultVoice()
         }
-
-        self.updateTTS()
-    }
-
-    func updateVoice() {
-        let key = "\(selectedVoiceKey)_\(selectedLanguage)"
-        if(voiceSetting == .User){
-            if let id = UserDefaults.standard.value(forKey: key) as? String {
-                self.userVoice = getVoice(by: id)
-            } else {
-                self.userVoice = getDefaultVoice()
-            }
-        } else if(voiceSetting == .Attend) {
-            if let id = UserDefaults.standard.value(forKey: key) as? String {
-                self.attendVoice = getVoice(by: id)
-            } else {
-                self.attendVoice = getDefaultVoice()
-            }
-        }
+        #endif
     }
 
     func updateTTS() {
@@ -646,6 +632,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.tts.rate = self.attendSpeechRate
             self.tts.voice = self.attendVoice?.AVvoice
         }
+        NSLog("self.tts.voice=\(self.tts.voice?.identifier)")
     }
 
     @Published var suitcaseConnectedBLE: Bool = false {
@@ -1276,19 +1263,8 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.tts.speak(CustomLocalizedString("Hello Suitcase!", lang: self.resourceLang), force:false, priority:priority ?? .Required, timeout:sec, tag: .Sample(erase:true)) {code, _ in
             }
         } else {
-            // override TTS settings by the mode
-            if(mode == .User){
-                self.tts.rate = self.userSpeechRate
-                self.tts.voice = self.userVoice?.AVvoice
-            } else if(mode == .Attend) {
-                self.tts.rate = self.attendSpeechRate
-                self.tts.voice = self.attendVoice?.AVvoice
-            }
-            self.tts.speakForAdvanced(CustomLocalizedString("Hello Suitcase!", lang: self.resourceLang), force:false, tag: .Sample(erase:true)) {code, _ in
-                if code != .Paused {
-                    // revert the change after speech
-                    self.updateTTS()
-                }
+            updateTTS()
+            self.tts.speakForAdvanced(CustomLocalizedString("Hello Suitcase!", lang: self.selectedLanguage), force:false, tag: .Sample(erase:true)) {code, _ in
             }
         }
 

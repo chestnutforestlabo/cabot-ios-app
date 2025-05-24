@@ -108,7 +108,7 @@ struct SettingView: View {
                                 Text(voice.AVvoice.name).tag(voice as Voice?)
                             }
                         }.onChange(of: modelData.attendVoice, perform: { value in
-                            if let _ = modelData.attendVoice {
+                            if let _ = modelData.attendVoice, modelData.suspendAttendSample.timeIntervalSinceNow < -0.5 {
                                 modelData.playSample(mode: VoiceMode.Attend)
                             }
                         })
