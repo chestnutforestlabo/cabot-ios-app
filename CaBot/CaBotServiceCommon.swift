@@ -57,6 +57,7 @@ struct SharedInfo: Codable {
         case ChangeSelectedSpeakerAudioFile
         case ChangeSpeakerVolume
         case UpdateSpeakerSettings
+        case SpeakState
     }
     init(type: InfoType, value: String, flag1: Bool = false, flag2: Bool = false, location: Int = 0, length: Int = 0) {
         self.info_id = Int64(Date().timeIntervalSince1970*1000000000.0)
@@ -583,7 +584,10 @@ class CaBotServiceActions {
                 }
             case .togglespeakstate:
                 NSLog("Receive toggle speake state request")
-                PriorityQueueTTS.shared.toggleSpeakState()//(at: .word)
+                if let speakState = PriorityQueueTTS.shared.toggleSpeakState() {
+                    NSLog("SpeakState: \(speakState)")
+                    delegate.cabot(service: service, userInfo: SharedInfo(type: .SpeakState, value: String(speakState)))
+                }
             case .unknown:
                 break
             }

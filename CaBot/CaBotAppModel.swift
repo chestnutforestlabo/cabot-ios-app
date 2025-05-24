@@ -32,6 +32,7 @@ import os.log
 import HLPDialog
 import Speech
 import ChatView
+import PriorityQueueTTS
 
 enum GrantState {
     case Init
@@ -632,7 +633,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.tts.rate = self.attendSpeechRate
             self.tts.voice = self.attendVoice?.AVvoice
         }
-        NSLog("self.tts.voice=\(self.tts.voice?.identifier)")
+        NSLog("tts.voice=\(self.tts.voice?.identifier ?? "")")
     }
 
     @Published var suitcaseConnectedBLE: Bool = false {
@@ -1926,6 +1927,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
                     }
                 }
             }
+            if userInfo.type == .SpeakState {
+                if userInfo.value == "true" {
+                    PriorityQueueTTS.shared.pauseSpeaking()
+                } else if userInfo.value == "false" {
+                    PriorityQueueTTS.shared.continueSpeaking()
+                }
+            }
             return
         }
 
@@ -1971,6 +1979,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if userInfo.type == .ChatRequest {
             silentForChange = true
             showingChatView = userInfo.value == "open"
+        }
+        if userInfo.type == .SpeakState {
+            self.share(user_info: userInfo)
         }
     }
 
