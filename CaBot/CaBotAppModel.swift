@@ -418,6 +418,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         didSet {
             UserDefaults.standard.setValue(isTTSEnabledForAdvanced, forKey: isTTSEnabledKey)
             UserDefaults.standard.synchronize()
+            if isTTSEnabledForAdvanced, suspendAttendSample.timeIntervalSinceNow < -0.5 {
+               playSample(mode: voiceSetting)
+            }
         }
     }
 
