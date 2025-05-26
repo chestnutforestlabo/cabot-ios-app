@@ -636,6 +636,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.tts.rate = self.attendSpeechRate
             self.tts.voice = self.attendVoice?.AVvoice
         }
+        #if ATTEND
+        self.tts.rate = min(self.tts.rate + 0.005, 1.0)
+        #endif
         NSLog("tts.voice=\(self.tts.voice?.identifier ?? "")")
     }
 
