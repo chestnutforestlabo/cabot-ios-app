@@ -339,6 +339,7 @@ class CaBotServiceTCP: NSObject {
 
                 let now = Date().timeIntervalSince1970
                 if now - weakself.last_data_received_time > 5.0 {
+                    NSLog("No heartbeat response since last_data_received_time: \(weakself.last_data_received_time)")
                     weakself.stop()
                 }
             }
