@@ -131,7 +131,7 @@ class CaBotServiceTCP: NSObject {
             guard let weakself = self else { return }
             guard let socket = weakself.socket else { return }
             guard let delegate = weakself.delegate else { return }
-            NSLog("<Socket: connected>")
+            NSLog("<Socket: connected>: \(data)")
             DispatchQueue.main.async {
                 weakself.connected = true
                 delegate.caBot(service: weakself, centralConnected: weakself.connected)
@@ -142,14 +142,14 @@ class CaBotServiceTCP: NSObject {
         }
         socket.on(clientEvent: .error){[weak self] data, ack in
             guard let weakself = self else { return }
-            NSLog("<Socket: error>")
+            NSLog("<Socket: error>: \(data)")
             DispatchQueue.main.async {
                 weakself.stop()
             }
         }
         socket.on(clientEvent: .disconnect){[weak self] data, ack in
             guard let weakself = self else { return }
-            NSLog("<Socket on: disconnect>")
+            NSLog("<Socket on: disconnect>: \(data)")
             DispatchQueue.main.async {
                 weakself.stop()
             }

@@ -87,7 +87,10 @@ class CaBotTTS : TTSProtocol {
 
 
     func speak(_ text: String?, forceSelfvoice: Bool, force: Bool, priority: SpeechPriority = .Normal, timeout sec : TimeInterval? = nil, tag:SpeakTag? = nil, callback: @escaping (Reason, Int) -> Void, progress: ((NSRange) -> Void)? = nil) {
-        guard self.delegate?.getModeType() == .Normal else { return }
+        guard self.delegate?.getModeType() == .Normal else {
+            NSLog("<TTS> skip speak:\(text ?? "")")
+            return
+        }
         
         // - pendding - fix voiceover
         // let isForeground = UIApplication.shared.applicationState == .active

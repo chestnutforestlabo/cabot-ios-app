@@ -639,7 +639,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         #if ATTEND
         self.tts.rate = min(self.tts.rate + 0.005, 1.0)
         #endif
-        NSLog("tts.voice=\(self.tts.voice?.identifier ?? "")")
+        NSLog("tts.voice=\(self.tts.voice?.identifier ?? ""), tts.rate=\(self.tts.rate)")
     }
 
     @Published var suitcaseConnectedBLE: Bool = false {
@@ -1490,7 +1490,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if self.suitcaseConnected != saveSuitcaseConnected {
             let text = centralConnected ? CustomLocalizedString("Suitcase has been connected", lang: self.resourceLang) :
             CustomLocalizedString("Suitcase has been disconnected", lang: self.resourceLang)
-            self.tts.speak(text, force: true, priority:.Normal) { _, _ in }
+            #if USER
+//            self.tts.speak(text, force: true, priority:.Normal) { _, _ in }
+            NSLog("<TTS> skip speak:\(text)")
+            #else
+            self.tts.speakForAdvanced(text, force: true) { _, _ in }
+            #endif
 
             if self.suitcaseConnected {
                 loadFromServer() {
