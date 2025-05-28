@@ -418,13 +418,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         didSet {
             UserDefaults.standard.setValue(isTTSEnabledForAdvanced, forKey: isTTSEnabledKey)
             UserDefaults.standard.synchronize()
-            if isTTSEnabledForAdvanced, suspendAttendSample.timeIntervalSinceNow < -0.5 {
+            if isTTSEnabledForAdvanced, suspendSamplePlayback.timeIntervalSinceNow < -0.5 {
                playSample(mode: voiceSetting)
             }
         }
     }
 
-    var suspendAttendSample = Date()
+    var suspendSamplePlayback = Date()
     @Published var attendVoice: Voice? = nil {
         didSet {
             if let id = attendVoice?.AVvoice.identifier {
@@ -582,7 +582,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
 #if ATTEND
     @Published var useAttendVoce: Bool = false {
         didSet {
-            suspendAttendSample = Date()
+            suspendSamplePlayback = Date()
             voiceSetting = useAttendVoce ? .Attend : .User
         }
     }
@@ -619,7 +619,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.userVoice = getDefaultVoice()
         }
         #if ATTEND
-        self.suspendAttendSample = Date()
+        self.suspendSamplePlayback = Date()
         if let id = UserDefaults.standard.value(forKey: "\(selectedVoiceKey)_\(selectedLanguage)_attend") as? String {
             self.attendVoice = getVoice(by: id)
         } else {
@@ -1865,9 +1865,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             }
         }
         if userInfo.type == .ChangeUserVoiceType {
-            self.silentUpdate(voice: getVoice(by: userInfo.value))
-            if modeType == .Normal && userInfo.flag1 {
-                self.playSample(mode: .User)
+            let voice = getVoice(by: userInfo.value)
+            if voice != self.userVoice {
+                self.silentUpdate(voice: voice)
+                if modeType == .Normal && userInfo.flag1 {
+                    suspendSamplePlayback = Date()
+                    self.playSample(mode: .User)
+                }
             }
         }
         if userInfo.type == .ChangeHandleSide {
