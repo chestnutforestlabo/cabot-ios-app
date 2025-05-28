@@ -1488,12 +1488,13 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
 
         if self.suitcaseConnected != saveSuitcaseConnected {
+            #if USER
             let text = centralConnected ? CustomLocalizedString("Suitcase has been connected", lang: self.resourceLang) :
             CustomLocalizedString("Suitcase has been disconnected", lang: self.resourceLang)
-            #if USER
-//            self.tts.speak(text, force: true, priority:.Normal) { _, _ in }
             NSLog("<TTS> skip speak:\(text)")
             #else
+            let text = centralConnected ? CustomLocalizedString("Suitcase has been connected", lang: self.selectedLanguage) :
+            CustomLocalizedString("Suitcase has been disconnected", lang: self.selectedLanguage)
             self.tts.speakForAdvanced(text, force: true) { _, _ in }
             #endif
 
