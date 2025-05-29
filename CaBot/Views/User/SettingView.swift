@@ -66,9 +66,7 @@ struct SettingView: View {
                     }
                 }
                 .onChange(of: modelData.userVoice, perform: { value in
-                    if modelData.suspendSamplePlayback.timeIntervalSinceNow < -0.5 {
-                        modelData.playSample(mode: .User)
-                    }
+                    modelData.playSample(mode: .User)
                 })
                 .pickerStyle(DefaultPickerStyle())
 

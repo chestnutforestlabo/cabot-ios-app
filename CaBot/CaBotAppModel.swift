@@ -414,17 +414,16 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         }
     }
 
+    var lastSamplePlaybackTime = Date()
+
     @Published var isTTSEnabledForAdvanced: Bool = true {
         didSet {
             UserDefaults.standard.setValue(isTTSEnabledForAdvanced, forKey: isTTSEnabledKey)
             UserDefaults.standard.synchronize()
-            if isTTSEnabledForAdvanced, suspendSamplePlayback.timeIntervalSinceNow < -0.5 {
-               playSample(mode: voiceSetting)
-            }
+            playSample(mode: voiceSetting)
         }
     }
 
-    var suspendSamplePlayback = Date()
     @Published var attendVoice: Voice? = nil {
         didSet {
             if let id = attendVoice?.AVvoice.identifier {
@@ -580,10 +579,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
 #if ATTEND
-    @Published var useAttendVoce: Bool = false {
+    @Published var useAttendVoice: Bool = false {
         didSet {
-            suspendSamplePlayback = Date()
-            voiceSetting = useAttendVoce ? .Attend : .User
+            voiceSetting = useAttendVoice ? .Attend : .User
         }
     }
     @Published var voiceSetting: VoiceMode = .User {
@@ -619,7 +617,7 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.userVoice = getDefaultVoice()
         }
         #if ATTEND
-        self.suspendSamplePlayback = Date()
+        self.lastSamplePlaybackTime = Date()
         if let id = UserDefaults.standard.value(forKey: "\(selectedVoiceKey)_\(selectedLanguage)_attend") as? String {
             self.attendVoice = getVoice(by: id)
         } else {
@@ -865,9 +863,11 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
         if let isTTSEnabled = UserDefaults.standard.value(forKey: isTTSEnabledKey) as? Bool {
             self.isTTSEnabledForAdvanced = isTTSEnabled
         }
+        #if ATTEND
         if let voiceSetting = UserDefaults.standard.value(forKey: voiceSettingKey) as? String {
-//            self.voiceSetting = VoiceMode(rawValue: voiceSetting)!
+            self.useAttendVoice = VoiceMode(rawValue: voiceSetting) == .Attend
         }
+        #endif
 
         // services
         self.locationManager.delegate = self
@@ -1266,15 +1266,20 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
     }
 
     func playSample(mode: VoiceMode, priority: CaBotTTS.SpeechPriority? = nil, timeout sec : TimeInterval? = nil ){
+        NSLog("<TTS> Play Sample after \(-self.lastSamplePlaybackTime.timeIntervalSinceNow) second")
+        if self.lastSamplePlaybackTime.timeIntervalSinceNow > -0.5 {
+            return
+        }
         if(self.modeType == .Normal){
             self.tts.speak(CustomLocalizedString("Hello Suitcase!", lang: self.resourceLang), force:false, priority:priority ?? .Required, timeout:sec, tag: .Sample(erase:true)) {code, _ in
             }
-        } else {
+            lastSamplePlaybackTime = Date()
+        } else if self.isTTSEnabledForAdvanced {
             updateTTS()
             self.tts.speakForAdvanced(CustomLocalizedString("Hello Suitcase!", lang: self.selectedLanguage), force:false, tag: .Sample(erase:true)) {code, _ in
             }
+            lastSamplePlaybackTime = Date()
         }
-
     }
 
     func playAudio(file: String) {
@@ -1865,13 +1870,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             }
         }
         if userInfo.type == .ChangeUserVoiceType {
-            let voice = getVoice(by: userInfo.value)
-            if voice != self.userVoice {
-                self.silentUpdate(voice: voice)
-                if modeType == .Normal && userInfo.flag1 {
-                    suspendSamplePlayback = Date()
-                    self.playSample(mode: .User)
-                }
+            self.silentUpdate(voice: getVoice(by: userInfo.value))
+            if modeType == .Normal && userInfo.flag1 {
+                self.playSample(mode: .User)
             }
         }
         if userInfo.type == .ChangeHandleSide {

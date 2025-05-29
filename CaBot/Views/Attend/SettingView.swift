@@ -99,7 +99,7 @@ struct SettingView: View {
                     Text("TTS Enabled (Advanced only)")
                 }
                 if modelData.isTTSEnabledForAdvanced {
-                    Toggle(isOn: $modelData.useAttendVoce) {
+                    Toggle(isOn: $modelData.useAttendVoice) {
                         Text("Speak in a different voice")
                     }
                     if(modelData.voiceSetting == .Attend){
@@ -108,7 +108,7 @@ struct SettingView: View {
                                 Text(voice.AVvoice.name).tag(voice as Voice?)
                             }
                         }.onChange(of: modelData.attendVoice, perform: { value in
-                            if let _ = modelData.attendVoice, modelData.suspendSamplePlayback.timeIntervalSinceNow < -0.5 {
+                            if let _ = modelData.attendVoice {
                                 modelData.playSample(mode: VoiceMode.Attend)
                             }
                         })
