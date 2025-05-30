@@ -36,10 +36,12 @@ public struct ContentView: View {
                 model.toggleChat()
             }, state: $model.chatState)
             .frame(width: 150)
+            .disabled(appModel.sendingChatData)
             Spacer()
         }
         .frame(height: 200)
         .onAppear() {
+            appModel.sendingChatData = false
             startChat(true)
         }
         .onDisappear() {

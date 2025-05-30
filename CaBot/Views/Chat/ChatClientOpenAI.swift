@@ -118,6 +118,7 @@ class ChatClientOpenAI: ChatClient {
         self.prepareSinkForHistory()
         var error_count = 0, success_count = 0
         var camera_message: String?
+        appModel.sendingChatData = true
         client?.chatsStream(query: query) { partialResult in
             print("chat stream partialResult \(partialResult)")
             guard let pub = self.pub, appModel.showingChatView else { return }
@@ -202,6 +203,7 @@ class ChatClientOpenAI: ChatClient {
                     }
                 }
             }
+            appModel.sendingChatData = false
         }
     }
     
