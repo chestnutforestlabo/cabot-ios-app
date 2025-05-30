@@ -203,7 +203,9 @@ class ChatClientOpenAI: ChatClient {
                     }
                 }
             }
-            appModel.sendingChatData = false
+            DispatchQueue.main.async {
+                appModel.sendingChatData = false
+            }
         }
     }
     
