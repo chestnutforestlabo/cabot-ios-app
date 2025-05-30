@@ -1896,8 +1896,12 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             self.silentForSpeakerSettingUpdate = true
             self.speakerVolume = Float(userInfo.value) ?? 0.0
         case .UpdateSpeakerSettings:
-            self.silentForSpeakerSettingUpdate = Bool(userInfo.value) ?? true
-            self.updateSpeakerSettings()
+            if self.modeType == .Normal {
+                self.silentForSpeakerSettingUpdate = Bool(userInfo.value) ?? true
+                self.updateSpeakerSettings()
+            } else {
+                NSLog("Unexpected UpdateSpeakerSettings silent=\(userInfo.value)")
+            }
         default:
             break
         }
