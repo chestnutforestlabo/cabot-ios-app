@@ -105,7 +105,7 @@ class ChatClientOpenAI: ChatClient {
             self.metadata["destinations"] = tourManager.destinations.map{$0._id}
         }
         // query
-        let query = ChatQuery(messages: messages, model: "dummy", metadata: AnyCodable(self.metadata))
+        let query = ChatQuery(messages: messages, model: "dummy", metadata: AnyCodable(self.metadata), stream: true)
 
         if let data = try? JSONEncoder().encode(query) {
             if let str = String(data: data, encoding: .utf8) {
@@ -124,12 +124,12 @@ class ChatClientOpenAI: ChatClient {
             guard let pub = self.pub, appModel.showingChatView else { return }
             switch partialResult {
             case .success(let result):
-                success_count += 1
                 if camera_message == nil && !self.callback_called.contains(result.id) && result.choices[0].delta.toolCalls == nil {
                     self.callback?(result.id, pub)
                     self.callback_called.insert(result.id)
                 }
                 if camera_message == nil, let content = result.choices[0].delta.content {
+                    success_count += min(content.count, 1)
                     pub.send(content)
                     NSLog("chat stream content \(content)")
                 }
@@ -141,6 +141,7 @@ class ChatClientOpenAI: ChatClient {
                                 if let params = try? JSONDecoder().decode(AroundDescription.self, from: arguments) {
                                     NSLog("chat function \(name): \(params)")
                                     if params.is_image_required {
+                                        success_count += 1
                                         if let imageUrl = ChatData.shared.lastCameraImage {
                                             camera_message = imageUrl
                                             if let orientation = ChatData.shared.lastCameraOrientation, orientation.camera_rotate {
@@ -154,6 +155,7 @@ class ChatClientOpenAI: ChatClient {
                                 break
                             case "destination_setting":
                                 if let params = try? JSONDecoder().decode(DestinationSetting.self, from: arguments) {
+                                    success_count += 1
                                     NSLog("chat function \(name): \(params)")
                                     self.checkDestination(params)
                                     DispatchQueue.main.async {
@@ -163,6 +165,7 @@ class ChatClientOpenAI: ChatClient {
                                 break
                             case "tour_setting":
                                 if let params = try? JSONDecoder().decode(TourSetting.self, from: arguments) {
+                                    success_count += 1
                                     NSLog("chat function \(name): \(params)")
                                     self.checkTour(params)
                                     DispatchQueue.main.async {
