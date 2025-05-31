@@ -112,10 +112,11 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
             cameraPose : {x: 0, y: 1, z: 50}
         })
 
+        let gridClient;
         // setTimeout decrease issue other elements are not shown
         setTimeout(function() {
             // Setup the marker client.
-            const gridClient = new ROS3D.OccupancyGridClient({
+            gridClient = new ROS3D.OccupancyGridClient({
                 ros : ros,
                 tfClient : tfClient,
                 rootObject : viewer.scene,
@@ -153,6 +154,10 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
             checkLoopCount++;
             window.webkit?.messageHandlers?.callbackHandler?.postMessage(`processed_frames=[${Array.from(processed_frames)}] checkLoopCount=${checkLoopCount}`);
             window.webkit?.messageHandlers?.StartIdleTimer?.postMessage('');
+            if (processed_frames.size >= 3 || checkLoopCount % 10 == 0) {
+                window.webkit?.messageHandlers?.callbackHandler?.postMessage(`frameInfos=${JSON.stringify(tfClient.frameInfos)}`);
+                window.webkit?.messageHandlers?.callbackHandler?.postMessage(`currentGrid=${JSON.stringify(gridClient?.currentGrid?.message?.info)}`);
+            }
             if (processed_frames.size >= 3) {
                 clearInterval(checkLoopID);
                 document.getElementById('loading').style.display = 'none';
