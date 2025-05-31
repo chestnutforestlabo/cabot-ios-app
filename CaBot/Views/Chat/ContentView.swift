@@ -33,6 +33,7 @@ public struct ContentView: View {
         HStack {
             Spacer()
             ChatStateButton(action: {
+                NSLog("Tapped ChatStateButton while \(model.chatState.chatState.rawValue)")
                 model.toggleChat()
             }, state: $model.chatState)
             .frame(width: 150)
