@@ -1853,7 +1853,9 @@ final class CaBotAppModel: NSObject, ObservableObject, CaBotServiceDelegateBLE, 
             
             let appLogURLs = appLogs.map { documentsURL.appendingPathComponent($0) }
 
-            self.submitAppLog(app_log: appLogs, urls: appLogURLs, log_name: logName)
+            DispatchQueue.global(qos: .background).async {
+                self.submitAppLog(app_log: appLogs, urls: appLogURLs, log_name: logName)
+            }
         } catch {
             print("error: \(error)")
         }
