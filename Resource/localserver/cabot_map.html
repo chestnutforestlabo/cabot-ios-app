@@ -154,11 +154,17 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
             checkLoopCount++;
             window.webkit?.messageHandlers?.callbackHandler?.postMessage(`processed_frames=[${Array.from(processed_frames)}] checkLoopCount=${checkLoopCount}`);
             window.webkit?.messageHandlers?.StartIdleTimer?.postMessage('');
-            if (processed_frames.size >= 3 || checkLoopCount % 10 == 0) {
+            const currentGrid = gridClient?.currentGrid;
+            const done = processed_frames.size >= 3 && currentGrid;
+            if (done || checkLoopCount % 10 == 0) {
                 window.webkit?.messageHandlers?.callbackHandler?.postMessage(`frameInfos=${JSON.stringify(tfClient.frameInfos)}`);
-                window.webkit?.messageHandlers?.callbackHandler?.postMessage(`currentGrid=${JSON.stringify(gridClient?.currentGrid?.message?.info)}`);
+                if (currentGrid) {
+                    window.webkit?.messageHandlers?.callbackHandler?.postMessage(`currentGrid message.info=${JSON.stringify(currentGrid.message?.info)}, message.data.length=${currentGrid.message?.data?.length}`);
+                } else {
+                    window.webkit?.messageHandlers?.callbackHandler?.postMessage('currentGrid is not set');
+                }
             }
-            if (processed_frames.size >= 3) {
+            if (done) {
                 clearInterval(checkLoopID);
                 document.getElementById('loading').style.display = 'none';
             } else if (tfClient.frameInfos.map) {
