@@ -120,7 +120,7 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
                 ros : ros,
                 tfClient : tfClient,
                 rootObject : viewer.scene,
-                continuous: false,
+                continuous: true,
                 compression : map_compression
             });
         }, 0);
@@ -146,15 +146,20 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
             }
             originalTFProcessFunc.call(tfClient, tfs);
         };
+        const originalGridProcessFunc = ROS3D.OccupancyGridClient.prototype.processMessage;
+        ROS3D.OccupancyGridClient.prototype.processMessage = (message) => {
+            window.webkit?.messageHandlers?.callbackHandler?.postMessage(`processMessage message.info=${JSON.stringify(message.info)}, message.data.length=${message.data?.length}`);
+            originalGridProcessFunc.call(gridClient, message);
+        };
 
         let checkLoopCount = 0;
         let mapRefreshCount = 0;
         document.getElementById('loading').style.display = 'unset';
         const checkLoopID = setInterval(function() {
             checkLoopCount++;
-            window.webkit?.messageHandlers?.callbackHandler?.postMessage(`processed_frames=[${Array.from(processed_frames)}] checkLoopCount=${checkLoopCount}`);
-            window.webkit?.messageHandlers?.StartIdleTimer?.postMessage('');
             const currentGrid = gridClient?.currentGrid;
+            window.webkit?.messageHandlers?.callbackHandler?.postMessage(`processed_frames=[${Array.from(processed_frames)}] currentGrid=${!!currentGrid} checkLoopCount=${checkLoopCount}`);
+            window.webkit?.messageHandlers?.StartIdleTimer?.postMessage('');
             const done = processed_frames.size >= 3 && currentGrid;
             if (done || checkLoopCount % 10 == 0) {
                 window.webkit?.messageHandlers?.callbackHandler?.postMessage(`frameInfos=${JSON.stringify(tfClient.frameInfos)}`);
@@ -167,6 +172,9 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
             if (done) {
                 clearInterval(checkLoopID);
                 document.getElementById('loading').style.display = 'none';
+                if (!(currentGrid.message?.data?.length > 0)) {
+                    gridClient.subscribe();
+                }
             } else if (tfClient.frameInfos.map) {
                 mapRefreshCount++;
                 if (mapRefreshCount % 10 == 5) {
