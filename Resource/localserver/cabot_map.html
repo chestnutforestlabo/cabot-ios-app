@@ -164,7 +164,7 @@ THE SOFTWARE.Copyright (c) 2023  Carnegie Mellon University and Miraikan
             if (done || checkLoopCount % 10 == 0) {
                 window.webkit?.messageHandlers?.callbackHandler?.postMessage(`frameInfos=${JSON.stringify(tfClient.frameInfos)}`);
                 if (currentGrid) {
-                    window.webkit?.messageHandlers?.callbackHandler?.postMessage(`currentGrid message.info=${JSON.stringify(currentGrid.message?.info)}, message.data.length=${currentGrid.message?.data?.length}`);
+                    window.webkit?.messageHandlers?.callbackHandler?.postMessage(`currentGrid message.info=${JSON.stringify(currentGrid.message?.info)}, message.data.length=${currentGrid.message?.data?.length}, texture.image.data.length=${currentGrid.texture?.image?.data?.length}`);
                 } else {
                     window.webkit?.messageHandlers?.callbackHandler?.postMessage('currentGrid is not set');
                 }
